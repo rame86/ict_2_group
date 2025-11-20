@@ -29,7 +29,7 @@
 </head>
 
 <body>
-    <a href="/rame/test" class="button-style"> 테스트 </a>
+    <a href="/rame/test" class="button-style"> 너니???테스트 </a>
 
 </body>
 
