@@ -2,10 +2,6 @@
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<%
-    request.setAttribute("menu", "status");
-%>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,7 +10,6 @@
 <link href="/css/approve-main.css" rel="stylesheet"></link>
 </head>
 <body class="sb-nav-fixed">
-
 	<!-- 헤더 -->
 	<jsp:include page="../common/header.jsp" flush="true"/>
 	

@@ -6,5 +6,4 @@ import lombok.Data;
 public class MemberVO {
 	private String id;
 	private String pass;
-		
 }
