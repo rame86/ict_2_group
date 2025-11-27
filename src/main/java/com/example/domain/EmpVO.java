@@ -19,4 +19,6 @@ public class EmpVO {
 	private String deptName;
 	private String statusName;
 
+
+
 }

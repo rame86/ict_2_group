@@ -8,27 +8,39 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.domain.EmpVO;
 import com.example.domain.SalVO;
+import com.example.service.EmpService;
 import com.example.service.SalService;
 
 @Controller
 public class SalController {
 
     @Autowired
+    private EmpService empService;
+
+    @Autowired
     private SalService salService;
 
     @GetMapping("/sal/list")
-    public String salList(@RequestParam(required = false) Integer empNo, Model model) {
+    public String salList(@RequestParam(required = false) Integer empNo,
+                          Model model) {
 
-        // empNo가 없으면(=null이면) 사원목록으로 돌려보내기 등 처리
+        // empNo 없이 직접 URL로 들어온 경우 → 사원 목록으로 보냄
         if (empNo == null) {
             return "redirect:/emp/list";
         }
 
-        // TODO: 급여 서비스 호출
-        // List<SalVO> list = salService.getSalList(empNo);
-        // model.addAttribute("salList", list);
+        // 1. 사원 정보 1건
+        EmpVO emp = empService.getEmp(empNo);   // ← 이 메서드는 EmpService에 새로 추가해야 함
 
+        // 2. 해당 사원의 급여 리스트
+        List<SalVO> salList = salService.getSalList(empNo);
+
+        model.addAttribute("emp", emp);
+        model.addAttribute("salList", salList);
+
+        // /WEB-INF/views/sal/salList.jsp
         return "sal/salList";
     }
 }
