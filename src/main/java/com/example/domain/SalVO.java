@@ -14,5 +14,6 @@ public class SalVO {
 	private Integer salPlus;
 	private Integer insurance;
 	private Integer tax;
+	private Integer realpay;
 
 }

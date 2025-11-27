@@ -62,7 +62,7 @@
                                 </nav>
                             </div>
                             
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseLayouts">
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseLayouts" <%= menu.equals("salemp") ? "active" : "" %>>
                                 <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                                 급여관리
                                 <div class="sb-sidenav-collapse-arrow"></div>
