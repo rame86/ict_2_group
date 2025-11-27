@@ -1,9 +1,9 @@
 package com.example.repository;
 
-import com.example.domain.EmpVO;
+import com.example.domain.LoginVO;
 import com.example.domain.MemberVO;
 
 public interface MemberDAO {
-	public EmpVO loginCheck(MemberVO vo);
+	public LoginVO loginCheck(MemberVO vo);
 
 }

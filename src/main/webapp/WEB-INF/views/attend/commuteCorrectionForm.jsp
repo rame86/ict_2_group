@@ -105,16 +105,24 @@
         
         <form id="correctionForm" class="space-y-6">
             
-            <fieldset class="p-4 border border-gray-200 rounded-lg">
+           <fieldset class="p-4 border border-gray-200 rounded-lg">
                 <legend class="text-sm font-bold text-blue-600 px-2">신청자 정보 (자동 입력)</legend>
-                <div class="flex items-center mb-3">
-                    <label class="w-24 text-sm font-medium text-gray-600">이름:</label> 
-                    <input type="text" value="김민수" readonly class="flex-1 p-2 border rounded-md bg-gray-50 text-gray-600">
+                
+                <div class="form-group-flex">
+                    <label for="employeeName" class="form-label text-sm font-medium text-gray-600">이름:</label> 
+                    <input type="text" id="employeeName" name="empName" value="${sessionScope.login.empName}" readonly class="form-input auto-filled-input">
                 </div>
-                <div class="flex items-center">
-                    <label class="w-24 text-sm font-medium text-gray-600">사번:</label> 
-                    <input type="text" value="E20251124" readonly class="flex-1 p-2 border rounded-md bg-gray-50 text-gray-600">
+                
+                <div class="form-group-flex">
+                    <label for="employeeId" class="form-label text-sm font-medium text-gray-600">사번:</label> 
+                    <input type="text" id="employeeId" name="empNo" value="${sessionScope.login.empNo}" readonly class="form-input auto-filled-input">
                 </div>
+                
+                <div class="form-group-flex">
+                    <label for="department" class="form-label text-sm font-medium text-gray-600">부서:</label> 
+                    <input type="text" id="department" name="deptName" value="${sessionScope.login.deptName}" readonly class="form-input auto-filled-input">
+                </div>
+                
             </fieldset>
 
             <fieldset class="p-4 border border-gray-200 rounded-lg">

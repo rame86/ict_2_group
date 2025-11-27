@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.domain.EmpVO;
+import com.example.domain.LoginVO;
 import com.example.domain.MemberVO;
 import com.example.service.MemberService;
 
@@ -21,7 +22,7 @@ public class MemberController {
 	@PostMapping("loginCheck")
 	public String loginCheck(MemberVO vo, HttpSession session) {
 		log.info("[MemberController - member/loginCheck] 요청받음 :" + vo.toString());
-		EmpVO check = memberService.loginCheck(vo);
+		LoginVO check = memberService.loginCheck(vo);
 		if (check != null) {
 			session.setAttribute("login", check);
 			log.info("로그인 성공" + check.toString());
