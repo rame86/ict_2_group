@@ -268,17 +268,17 @@
                 
                 <div class="form-group-flex">
                     <label for="employeeName" class="form-label text-sm font-medium text-gray-600">이름:</label> 
-                    <input type="text" id="employeeName" name="employeeName" value="${sessionScope.login.empName}" readonly class="form-input auto-filled-input">
+                    <input type="text" id="employeeName" name="empName" value="${sessionScope.login.empName}" readonly class="form-input auto-filled-input">
                 </div>
                 
                 <div class="form-group-flex">
                     <label for="employeeId" class="form-label text-sm font-medium text-gray-600">사번:</label> 
-                    <input type="text" id="employeeId" name="employeeId" value="${sessionScope.login.empNo}" readonly class="form-input auto-filled-input">
+                    <input type="text" id="employeeId" name="empNo" value="${sessionScope.login.empNo}" readonly class="form-input auto-filled-input">
                 </div>
                 
                 <div class="form-group-flex">
                     <label for="department" class="form-label text-sm font-medium text-gray-600">부서:</label> 
-                    <input type="text" id="department" name="department" value="개발팀" readonly class="form-input auto-filled-input">
+                    <input type="text" id="department" name="deptName" value="${sessionScope.login.deptName}" readonly class="form-input auto-filled-input">
                 </div>
                 
             </fieldset>
