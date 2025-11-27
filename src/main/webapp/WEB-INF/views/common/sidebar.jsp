@@ -49,12 +49,17 @@
                                 전자결재
                                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                             </a>
-                            <div class="collapse" id="collapseApproval" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                            <div class="collapse <%= 
+												    menu.equals("status") || 
+												    menu.equals("receive") ||
+												    menu.equals("send") ||
+												    menu.equals("create") ? "show" : ""
+												%>" id="collapseApproval" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                	<a class="nav-link" href="/approve/statusList">결재 현황</a>
-                                    <a class="nav-link" href="/approve/receiveList">결재 받을 문서</a>
-                                    <a class="nav-link" href="/approve/sendList">결재 할 문서</a>
-                                    <a class="nav-link" href="/approve/createForm">문서 작성 하기</a>
+                                	<a class="nav-link  <%= menu.equals("status") ? "active" : "" %>" href="/approve/statusList">결재 현황</a>
+                                    <a class="nav-link <%= menu.equals("receive") ? "active" : "" %>" href="/approve/receiveList">결재 받을 문서</a>
+                                    <a class="nav-link <%= menu.equals("send") ? "active" : "" %>" href="/approve/sendList">결재 할 문서</a>
+                                    <a class="nav-link <%= menu.equals("create") ? "active" : "" %>" href="/approve/createForm">문서 작성 하기</a>
                                 </nav>
                             </div>
                             
