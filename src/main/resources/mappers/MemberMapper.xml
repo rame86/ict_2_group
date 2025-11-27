@@ -4,9 +4,8 @@
 <mapper namespace="com.example.repository.MemberDAO">
 	<select id="loginCheck" parameterType="MemberVO" resultType="EmpVO">
 		SELECT E.*, M.MEMBER_NO, M.EMP_PASS
-		FROM MEMBER M
-    	INNER JOIN EMP E ON M.EMP_NO = E.EMP_NO
-    	WHERE M.EMP_NO = #{empNo}
-    	AND M.EMP_PASS = #{empPass}	
+		FROM MEMBER M INNER JOIN EMP E 
+    	ON M.EMP_NO = E.EMP_NO
+    	WHERE M.EMP_NO = #{empNo} AND M.EMP_PASS = #{empPass}	
 	</select>
 </mapper>
