@@ -25,11 +25,10 @@
                                 마이페이지
                             </a>
                             <div class="sb-sidenav-menu-heading">메인 메뉴</div>
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                근태관리
-                                <div class="sb-sidenav-collapse-arrow"></div>
-                            </a>
+                            <a class="nav-link" href="/attend/attend">
+    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+    근태관리
+</a>
                             
                             
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
