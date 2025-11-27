@@ -5,6 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import com.example.domain.EmpVO;
 import com.example.domain.MemberVO;
 import com.example.service.MemberService;
 
@@ -30,7 +31,7 @@ public class TestController {
 	@PostMapping("loginCheck")
 	public String loginCheck(MemberVO vo, HttpSession session) {
 		log.info("[MemberController - member/loginCheck] 요청받음 :" + vo.toString());
-		MemberVO check = memberService.loginCheck(vo);
+		EmpVO check = memberService.loginCheck(vo);
 		if (check != null) {
 			session.setAttribute("login", check);
 			log.info("로그인 성공" + check.toString());
@@ -46,6 +47,11 @@ public class TestController {
 		
 	}
 	
+	@PostMapping("approve/approve-form")
+	public String approveForm(){
+		return "approve/statusList";
+	}
+	
 	@GetMapping("approve/receiveList")
 	public void receiveList() {
 		
@@ -56,7 +62,7 @@ public class TestController {
 		
 	}
 	
-	@GetMapping("aapprove/createForm")
+	@GetMapping("approve/createForm")
 	public void createForm() {
 		
 	}

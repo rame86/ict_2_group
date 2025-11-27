@@ -4,17 +4,18 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.example.domain.EmpVO;
 import com.example.domain.MemberVO;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO{
 	
 	@Autowired
-	SqlSessionTemplate sess;
+	private SqlSessionTemplate sess;
 
 	@Override
-	public MemberVO loginCheck(MemberVO vo) {
-		return sess.selectOne("com.example.domain.MemberVO.loginCheck", vo);
+	public EmpVO loginCheck(MemberVO vo) {
+		return sess.selectOne("com.example.repository.MemberDAO.loginCheck", vo);
 	}
 
 }
