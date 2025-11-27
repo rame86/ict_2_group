@@ -26,11 +26,11 @@
                                     <div class="card-body">
                                         <form action="loginCheck" method="post">
                                             <div class="form-floating mb-3">
-                                                <input class="form-control" id="inputEmpno" type="text" placeholder="name@example.com" name="id"/>
+                                                <input class="form-control" id="inputEmpno" type="text" placeholder="name@example.com" name="empNo"/>
                                                 <label for="inputEmpno">사원번호</label>
                                             </div>
                                             <div class="form-floating mb-3">
-                                                <input class="form-control" id="inputPassword" type="password" placeholder="Password" name="pass"/>
+                                                <input class="form-control" id="inputPassword" type="password" placeholder="Password" name="empPass"/>
                                                 <label for="inputPassword">비밀번호</label>
                                             </div>
                                             <div class="form-check mb-3">

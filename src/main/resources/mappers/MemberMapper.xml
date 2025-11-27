@@ -5,6 +5,6 @@
 	<select id="loginCheck" parameterType="MemberVO" resultType="MemberVO">
 		SELECT *
 		FROM  member
-		where id=#{id} and pass=#{pass}		
+		where EMP_NO=#{empNo} and EMP_PASS=#{empPass}		
 	</select>
 </mapper>
