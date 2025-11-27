@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주간 근무 시간 그래프</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* 그래프 컨테이너의 크기를 지정하여 캔버스가 적절하게 표시되도록 합니다. */
+        .chart-container {
+            width: 300px;
+            margin: 50px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chart-container">
+        <canvas id="workHoursChart"></canvas>
+    </div>
+
+    <script>
+      // 근무 시간 데이터 설정
+const totalHours = 40; // 주간 총 근무 기준 시간 (100%)
+const workedHours = 37; // 현재 일한 시간 (예시)
+const remainingHours = totalHours - workedHours; // 남은 시간
+
+// 비율 계산
+const workedPercentage = ((workedHours / totalHours) * 100).toFixed(1);
+
+// 데이터 레이블 설정
+const dataLabels = [
+    `근무 시간 (${workedHours}시간)`, // 일한 시간
+    `남은 시간 (${remainingHours}시간)` // 남은 시간
+];
+
+// 차트에 사용될 데이터셋
+const data = {
+    labels: dataLabels, // 도넛 차트의 각 조각에 대한 레이블
+    datasets: [{
+        label: '주간 근무 시간',
+        data: [workedHours, remainingHours], // 일한 시간, 남은 시간
+        backgroundColor: [
+            'rgb(54, 162, 235)', // 근무 시간 (파란색 계열)
+            'rgb(201, 203, 207)'  // 남은 시간 (회색 계열)
+        ],
+        hoverOffset: 4,
+        borderWidth: 0 // 경계선 제거
+    }]
+};
+
+// 차트 구성 옵션
+const config = {
+    type: 'doughnut', // 도넛 차트 유형
+    data: data,
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom', // 범례 위치
+            },
+            title: {
+                display: true,
+                text: `주간 근무 현황: ${workedHours} / ${totalHours} 시간 (${workedPercentage}%)`, // 차트 제목
+                font: {
+                    size: 16
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        // 툴팁에 표시될 텍스트 커스터마이징
+                        let label = context.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        // 시간과 백분율 표시
+                        const value = context.parsed;
+                        const percentage = ((value / totalHours) * 100).toFixed(1);
+                        return `${label} ${value}시간 (${percentage}%)`;
+                    }
+                }
+            }
+        },
+        cutout: '70%', // 도넛 차트의 내부 구멍 크기 (크기가 클수록 도넛처럼 보임)
+    },
+};
+
+// 캔버스 요소를 가져와 차트 생성
+const workHoursChart = new Chart(
+    document.getElementById('workHoursChart'),
+    config
+);
+    </script>
+</body>
+</html>
