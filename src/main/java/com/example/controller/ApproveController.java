@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-public class TestController {
+public class ApproveController {
 	
 	@Autowired
 	private MemberService memberService;
@@ -28,19 +28,7 @@ public class TestController {
 		return "index";
 	}
 	
-	@PostMapping("loginCheck")
-	public String loginCheck(MemberVO vo, HttpSession session) {
-		log.info("[MemberController - member/loginCheck] 요청받음 :" + vo.toString());
-		EmpVO check = memberService.loginCheck(vo);
-		if (check != null) {
-			session.setAttribute("login", check);
-			log.info("로그인 성공" + check.toString());
-			return "index";
-		} else {
-			log.info("로그인 실패");
-			return "/member/login";
-		}
-	}
+	
 	
 	@GetMapping("approve/statusList")
 	public void statusList() {
