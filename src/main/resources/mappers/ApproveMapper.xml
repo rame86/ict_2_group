@@ -1,0 +1,34 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.repository.ApproveDAO">
+
+	<insert id="insertDoc" parameterType="DocVO">
+		insert into DOC(DOC_NO, DOC_TYPE, DOC_TITLE, DOC_CONTENT, DOC_DATE) 
+		values(doc_no_seq.NEXTVAL, #{DOC_TYPE}, #{DOC_TITLE}, #{DOC_CONTENT}, SYSDATE)
+	</insert>
+	
+	<insert id="insertApprove" parameterType="ApproveVO">
+		INSERT INTO approve(
+			approve_no, 
+			emp_no, 
+			doc_no, 
+			approve_date, 
+			step1_status, 
+			step1_manager_no, 
+			step2_status, 
+			step2_manager_no 
+			)
+		VALUES (
+	    	approve_no_seq.NEXTVAL,
+	    	#{emp_no},
+	    	#{doc_no},
+	    	SYSDATE,
+	    	#{step1_status},
+	    	#{step1_manager_no},
+	    	#{step2_status},
+	    	#{step2_manager_no}
+		)
+	</insert>
+	
+</mapper>
