@@ -16,5 +16,8 @@ public class EmpVO {
 	private String empImage;
 	private String empRegNo;
 	private String empRegdate;
+	
+	private String deptName;
+	private String statusName;
 
 }

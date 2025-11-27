@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.repository.SalMapper">
+
+    <select id="selectSalList" parameterType="int" resultType="com.example.domain.SalVO">
+
+        SELECT
+            s.SAL_NUM         										AS salNum,
+            s.EMP_NO          										AS empNo,
+            s.MONTH_ATTNO     									AS monthAttno,
+            TO_CHAR(s.SAL_DATE,'YYYY-MM-DD') 	AS salDate,
+            s.SAL_BASE        										AS salBase,
+            NVL(s.SAL_BONUS,0) 								AS salBonus,
+            NVL(s.SAL_PLUS,0)  									AS salPlus,
+            s.INSURANCE       										AS insurance,
+            s.TAX             												AS tax,
+            (s.SAL_BASE + NVL(s.SAL_BONUS,0) + NVL(s.SAL_PLUS,0) 
+             - s.INSURANCE - s.TAX) 							
+             																	AS realPay
+        FROM SAL s
+        WHERE s.EMP_NO = #{empNo}
+        ORDER BY s.SAL_DATE DESC
+
+    </select>
+
+</mapper>
