@@ -268,12 +268,12 @@
                 
                 <div class="form-group-flex">
                     <label for="employeeName" class="form-label text-sm font-medium text-gray-600">이름:</label> 
-                    <input type="text" id="employeeName" name="employeeName" value="김민수" readonly class="form-input auto-filled-input">
+                    <input type="text" id="employeeName" name="employeeName" value="${sessionScope.login.empName}" readonly class="form-input auto-filled-input">
                 </div>
                 
                 <div class="form-group-flex">
                     <label for="employeeId" class="form-label text-sm font-medium text-gray-600">사번:</label> 
-                    <input type="text" id="employeeId" name="employeeId" value="E20251124" readonly class="form-input auto-filled-input">
+                    <input type="text" id="employeeId" name="employeeId" value="${sessionScope.login.empNo}" readonly class="form-input auto-filled-input">
                 </div>
                 
                 <div class="form-group-flex">

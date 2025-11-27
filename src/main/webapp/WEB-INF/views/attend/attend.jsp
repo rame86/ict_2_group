@@ -22,13 +22,15 @@
 </head>
 
 <body class="sb-nav-fixed">
-
+	
+	<!-- 헤더(헤더에 로그인정보 히든속성으로 저장) -->
 	<jsp:include page="../common/header.jsp" flush="true" />
 
 	<div id="layoutSidenav">
-
+		<!-- 사이드 바 -->
 		<jsp:include page="../common/sidebar.jsp" flush="true" />
 
+		<!-- 메인 바 -->
 		<div id="layoutSidenav_content">
 			<main id="content-area">
 				<div class="main-layout-container">
@@ -72,22 +74,22 @@
 	</div>
 
 	<div id="vacationModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>         
-            <div id="vacationFormContent">
-                <jsp:include page="vacationForm.jsp" flush="true" />
-            </div>
-            </div>
-    </div>
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<div id="vacationFormContent">
+				<jsp:include page="vacationForm.jsp" flush="true" />
+			</div>
+		</div>
+	</div>
 
-    <div id="commuteCorrectionModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>            
-            <div id="commuteCorrectionFormContent">
-                <jsp:include page="commuteCorrectionForm.jsp" flush="true" />
-            </div>
-            </div>
-    </div>
+	<div id="commuteCorrectionModal" class="modal">
+		<div class="modal-content">
+			<span class="close">&times;</span>
+			<div id="commuteCorrectionFormContent">
+				<jsp:include page="commuteCorrectionForm.jsp" flush="true" />
+			</div>
+		</div>
+	</div>
 
 </body>
 </html>

@@ -1,0 +1,10 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.repository.DayAttendDAO">
+	<select id="dayAttend" parameterType="EmpVO" resultType="DayAttendVO">
+		SELECT 	*
+		FROM DAY_ATTEND
+		WHERE emp_no = #{empNO}
+	</select>
+</mapper>
