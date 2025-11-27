@@ -7,8 +7,6 @@
 <head>
 <meta charset="UTF-8">
 <title>approve - sendList</title>
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<link rel="stylesheet" href="https://cdn.datatables.net/2.3.5/css/dataTables.dataTables.css"/>
 </head>
 <body class="sb-nav-fixed">
 
@@ -31,7 +29,7 @@
                                 결재 할 문서
                             </div>
                             <div class="card-body">
-                                <table id="myDataTable" class="display">
+                                <table id="datatablesSimple" class="display">
                                     <thead>
                                         <tr>
                                             <th>문서번호</th>
@@ -518,8 +516,6 @@
 				</main>
 				<!-- 푸터 -->
 				<jsp:include page="../common/footer.jsp" flush="true"/>
-				<script src="https://cdn.datatables.net/2.3.5/js/dataTables.js"></script>
-				<script src="/js/dataTable.js"></script>
 			</div>
 		</div>
 </body>
