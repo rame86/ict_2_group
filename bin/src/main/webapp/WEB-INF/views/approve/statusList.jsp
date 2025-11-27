@@ -10,7 +10,6 @@
 <link href="/css/approve-main.css" rel="stylesheet"></link>
 </head>
 <body class="sb-nav-fixed">
-
 	<!-- 헤더 -->
 	<jsp:include page="../common/header.jsp" flush="true"/>
 	

@@ -19,28 +19,33 @@ public class TestController {
 	private MemberService memberService;
 	
 	@GetMapping("/")
-	public String index(HttpSession session) {
-		Object login = session.getAttribute("login");
-		if (login == null) {
-			return "/member/login";
-		}		
+	public String test() {
 		return "index";
 	}
 	
-	@PostMapping("loginCheck")
-	public String loginCheck(MemberVO vo, HttpSession session) {
-		log.info("[MemberController - member/loginCheck] 요청받음 :" + vo.toString());
-		MemberVO check = memberService.loginCheck(vo);
-		if (check != null) {
-			session.setAttribute("login", check);
-			log.info("로그인 성공" + check.toString());
-			return "index";
-		} else {
-			log.info("로그인 실패");
-			return "/member/login";
-		}
-	}
-	
+//	@GetMapping("/")
+//	public String index(HttpSession session) {
+//		Object login = session.getAttribute("login");
+//		if (login == null) {
+//			return "/member/login";
+//		}		
+//		return "index";
+//	}
+//	
+//	@PostMapping("loginCheck")
+//	public String loginCheck(MemberVO vo, HttpSession session) {
+//		log.info("[MemberController - member/loginCheck] 요청받음 :" + vo.toString());
+//		MemberVO check = memberService.loginCheck(vo);
+//		if (check != null) {
+//			session.setAttribute("login", check);
+//			log.info("로그인 성공" + check.toString());
+//			return "index";
+//		} else {
+//			log.info("로그인 실패");
+//			return "/member/login";
+//		}
+//	}
+//	
 	@GetMapping("approve/statusList")
 	public void statusList() {
 		
