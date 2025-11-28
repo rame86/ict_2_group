@@ -61,15 +61,16 @@
                                     <a class="nav-link <%= menu.equals("create") ? "active" : "" %>" href="/approve/createForm">문서 작성 하기</a>
                                 </nav>
                             </div>
-                            
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseLayouts" <%= menu.equals("salemp") ? "active" : "" %>>
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                급여관리
-                                <div class="sb-sidenav-collapse-arrow"></div>
-                            </a>
 
-                            
-                            <div class="sb-sidenav-menu-heading">Addons</div>
+					<a class="nav-link <%=menu.equals("salemp") ? "active" : ""%>"
+						href="<c:url value='/emp/list' />">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-columns"></i>
+						</div> 급여관리
+					</a>
+
+
+					<div class="sb-sidenav-menu-heading">Addons</div>
                             <a class="nav-link" href="charts.html">
                                 <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
                                 Charts

@@ -60,7 +60,7 @@
 	                                            <td>${ vo.docTitle }</td>
 	                                            <td>
 	                                            	${ vo.step1ManagerName }
-	                                            	<c:if test="${not empty vo.step2ManagerName}">
+	                                            	<c:if test="${ not empty vo.step2ManagerName and vo.step1ManagerName != vo.step2ManagerName }">
 	                                            		, ${vo.step2ManagerName}
 	                                            	</c:if>
 	                                            </td>

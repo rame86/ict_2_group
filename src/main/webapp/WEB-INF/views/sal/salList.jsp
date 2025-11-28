@@ -1,128 +1,147 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<%
+    request.setAttribute("menu", "salemp"); // 사이드바 메뉴 활성화용
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>사원목록</title>
-
-    <!-- DataTables + jQuery (CDN 예시) -->
-    <link rel="stylesheet"
-          href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <title>급여 대장</title>
 
     <style>
-        /* 가운데 콘텐츠 영역만 대략 스타일 */
         .content-wrapper {
             padding: 20px 30px;
         }
+
         .page-title {
             font-size: 20px;
             font-weight: 600;
-            margin-bottom: 15px;
-        }
-        .search-bar {
             margin-bottom: 10px;
         }
-        .search-bar input,
-        .search-bar select {
-            padding: 4px 6px;
-            margin-right: 5px;
+
+        .emp-info {
+            font-size: 14px;
+            margin-bottom: 15px;
         }
-        table.dataTable tbody tr {
+
+        .emp-info span {
+            margin-right: 12px;
+        }
+
+        table.salary-list {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+        }
+
+        table.salary-list th,
+        table.salary-list td {
+            border: 1px solid #ddd;
+            padding: 8px 10px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        table.salary-list th {
+            background-color: #fafafa;
+            font-weight: 600;
+        }
+
+        table.salary-list tbody tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        a.month-link {
+            color: #007bff;
+            text-decoration: underline;
             cursor: pointer;
         }
+
+        a.month-link:hover {
+            text-decoration: none;
+        }
     </style>
-
-    <script>
-        $(function () {
-
-            // DataTable 초기화
-            const table = $('#empTable').DataTable({
-                language: {
-                    "emptyTable":     "조회된 사원 정보가 없습니다.",
-                    "info":           "_TOTAL_명 중 _START_ ~ _END_명 표시",
-                    "infoEmpty":      "0명",
-                    "infoFiltered":   "(_MAX_명에서 필터링됨)",
-                    "lengthMenu":     "페이지당 _MENU_명 보기",
-                    "loadingRecords": "로딩 중...",
-                    "processing":     "처리 중...",
-                    "search":         "검색:",
-                    "zeroRecords":    "일치하는 사원이 없습니다.",
-                    "paginate": {
-                        "first":      "처음",
-                        "last":       "마지막",
-                        "next":       "다음",
-                        "previous":   "이전"
-                    }
-                },
-                order: [[0, 'asc']] // 기본 정렬: 사번 오름차순
-            });
-
-            // (선택) 위에 있는 검색창으로 DataTables 검색 연동
-            $('#keyword').on('keyup', function () {
-                table.search(this.value).draw();
-            });
-
-            // 행 클릭 시 급여 페이지로 이동 (원하면 사용)
-            $('#empTable tbody').on('click', 'tr', function () {
-                const empNo = $(this).data('empno');
-                if (!empNo) return;
-                // TODO: 나중에 급여내역 페이지 URL로 바꾸기
-                // 예: location.href = '/salary/list?empNo=' + empNo;
-                console.log('clicked empNo = ' + empNo);
-            });
-        });
-    </script>
 </head>
 
 <body>
-<!-- 여기 위/왼쪽은 공통 include 라고 가정(header, left menu 등) -->
 
-<div class="content-wrapper">
-    <!-- 상단 제목 -->
-    <div class="page-title">사원 목록</div>
+<!-- 공통 헤더 -->
+<jsp:include page="../common/header.jsp" flush="true" />
 
-    <!-- 상단 검색 영역 (와이어프레임의 SEARCH 박스 역할) -->
-    <div class="search-bar">
-        이름/부서/상태 검색:
-        <input type="text" id="keyword" placeholder="검색어를 입력하세요.">
-        <!-- 필요하면 부서, 재직상태 select 도 추가 가능 -->
-        <%-- 
-        <select id="deptFilter">
-            <option value="">전체 부서</option>
-            ...
-        </select>
-        --%>
+<div id="layoutSidenav">
+
+    <!-- 사이드바 -->
+    <jsp:include page="../common/sidebar.jsp" flush="true" />
+
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4 content-wrapper">
+
+                <h3 class="mt-4">급여관리</h3>
+                <div class="page-title">급여 대장</div>
+
+                <!-- 선택된 사원 정보 -->
+                <div class="emp-info">
+                    <span>사원명 : <strong>${emp.empName}</strong></span>
+                    <span>사번 : <strong>${emp.empNo}</strong></span>
+                    <c:if test="${not empty emp.deptName}">
+                        <span>부서 : <strong>${emp.deptName}</strong></span>
+                    </c:if>
+                </div>
+
+                <!-- 급여 요약 리스트 -->
+                <table class="salary-list" id="salListTable">
+                    <thead>
+                        <tr>
+                            <th>지급월</th>
+                            <th>총지급액</th>
+                            <th>공제총액</th>
+                            <th>차인지급액</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="s" items="${summaryList}">
+                            <tr data-monthattno="${s.monthAttno}">
+                                <td>
+                                    <a href="javascript:void(0);" class="month-link">
+                                        ${s.yearMonthLabel}
+                                    </a>
+                                </td>
+                                <td>${s.totalPay}</td>
+                                <td>${s.deduction}</td>
+                                <td>${s.realPay}</td>
+                            </tr>
+                        </c:forEach>
+                    </tbody>
+                </table>
+
+            </div>
+        </main>
+
+        <!-- 푸터 -->
+        <jsp:include page="../common/footer.jsp" flush="true" />
     </div>
-
-    <!-- 사원 목록 테이블 -->
-    <table id="empTable" class="display" style="width:100%">
-        <thead>
-        <tr>
-            <th>사번</th>
-            <th>이름</th>
-            <th>부서</th>
-            <th>재직상태</th>
-            <th>입사일</th>
-            <th>연락처</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:forEach var="emp" items="${empList}">
-            <tr data-empno="${emp.empNo}">
-                <td>${emp.empNo}</td>
-                <td>${emp.empName}</td>
-                <td>${emp.deptName}</td>
-                <td>${emp.statusName}</td>
-                <td>${emp.empRegdate}</td>
-                <td>${emp.empPhone}</td>
-            </tr>
-        </c:forEach>
-        </tbody>
-    </table>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+$(function () {
+    // 지급월(링크) 클릭 시 → 급여명세서로 이동
+    $('#salListTable').on('click', 'a.month-link', function () {
+        const tr = $(this).closest('tr');
+        const monthAttno = tr.data('monthattno');
+        const empNo = "${emp.empNo}";
+
+        if (!monthAttno || !empNo) return;
+
+        location.href = '/sal/detail?empNo=' + encodeURIComponent(empNo)
+                      + '&monthAttno=' + monthAttno;
+    });
+});
+</script>
 
 </body>
 </html>

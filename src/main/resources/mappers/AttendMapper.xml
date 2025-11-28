@@ -5,6 +5,6 @@
 	<select id="dayAttend" parameterType="EmpVO" resultType="DayAttendVO">
 		SELECT 	*
 		FROM DAY_ATTEND
-		WHERE emp_no = #{empNO}
+		WHERE emp_no = #{empNo}
 	</select>
 </mapper>

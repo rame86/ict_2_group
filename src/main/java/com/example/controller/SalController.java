@@ -6,29 +6,51 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.domain.EmpVO;
+import com.example.domain.SalSummaryVO;
 import com.example.domain.SalVO;
+import com.example.service.EmpService;
 import com.example.service.SalService;
 
 @Controller
+@RequestMapping("/sal")
 public class SalController {
+
+    @Autowired
+    private EmpService empService;
 
     @Autowired
     private SalService salService;
 
-    @GetMapping("/sal/list")
-    public String salList(@RequestParam(required = false) Integer empNo, Model model) {
+    // 급여대장 리스트
+    @GetMapping("/list")
+    public String salList(@RequestParam String empNo, Model model) {
 
-        // empNo가 없으면(=null이면) 사원목록으로 돌려보내기 등 처리
-        if (empNo == null) {
-            return "redirect:/emp/list";
-        }
+        EmpVO emp = empService.getEmp(empNo);
+        List<SalSummaryVO> summaryList = salService.getSalarySummaryList(empNo);
 
-        // TODO: 급여 서비스 호출
-        // List<SalVO> list = salService.getSalList(empNo);
-        // model.addAttribute("salList", list);
+        model.addAttribute("emp", emp);
+        model.addAttribute("summaryList", summaryList);
 
-        return "sal/salList";
+        return "sal/salList";   // 아래 JSP
+    }
+
+    // 월 클릭 → 급여 명세서
+    @GetMapping("/detail")
+    public String salDetail(@RequestParam String empNo,
+                            @RequestParam Integer monthAttno,
+                            Model model) {
+
+        EmpVO emp = empService.getEmp(empNo);
+        SalVO sal = salService.getSalaryDetail(empNo, monthAttno);
+
+        model.addAttribute("emp", emp);
+        model.addAttribute("sal", sal);
+
+        return "sal/salDetail"; // 명세서 JSP
     }
 }

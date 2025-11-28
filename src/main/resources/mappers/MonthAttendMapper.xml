@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.repository.MonthAttendMapper">
+
+    <select id="getMonthAttendList" parameterType="string"
+        resultType="com.example.domain.MonthAttendVO">
+    SELECT
+        MONTH_ATTNO   AS monthAttno,
+        EMP_NO        AS empNo,
+        WORK_DAY      AS workDay,
+        WORK_HOUR     AS workHour,
+        OVERTIME      AS overtime,
+        LATE_CNT      AS lateCnt,
+        ABCENT_CNT    AS abcentCnt
+    FROM MONTH_ATTEND
+    WHERE EMP_NO = #{empNo}
+    ORDER BY MONTH_ATTNO DESC
+</select>
+
+<select id="getMonthAttend" resultType="com.example.domain.MonthAttendVO">
+    SELECT
+        MONTH_ATTNO   AS monthAttno,
+        EMP_NO        AS empNo,
+        WORK_DAY      AS workDay,
+        WORK_HOUR     AS workHour,
+        OVERTIME      AS overtime,
+        LATE_CNT      AS lateCnt,
+        ABCENT_CNT    AS abcentCnt
+    FROM MONTH_ATTEND
+    WHERE EMP_NO = #{empNo}
+      AND MONTH_ATTNO = #{monthAttno}
+</select>
+
+</mapper>

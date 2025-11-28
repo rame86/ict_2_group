@@ -19,4 +19,16 @@ public class EmpServiceImpl implements EmpService {
     public List<EmpVO> getEmpList(EmpSearchVO search) {
         return empMapper.selectEmpList(search);
     }
+
+	@Override
+	public EmpVO getEmp(String empNo) {
+		return empMapper.getEmp(empNo);
+	}
+
+
+
+
+
+
+	
 }

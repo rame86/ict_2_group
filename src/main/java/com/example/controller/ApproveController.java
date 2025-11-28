@@ -25,23 +25,13 @@ public class ApproveController {
 	
 	@Autowired
 	private ApproveService approveService;
-	
-	@GetMapping("/")
-	public String index(HttpSession session) {
-		Object login = session.getAttribute("login");
-		if (login == null) {
-			return "/member/login";
-		}		
-		return "index";
-	}
-	
+
 	// 로그인 세션 받아오기
 	@ModelAttribute("login")
 	public LoginVO getLogin(HttpSession session) {
 		return (LoginVO)session.getAttribute("login");
 	}
 	
-	// 결재 현황
 	@GetMapping("approve/statusList")
 	public void statusList(@ModelAttribute("login") LoginVO login, Model m) {
 		Map<String, List<ApproveListVO>> list = approveService.approveStatusList(login.getEmpNo(), 5);

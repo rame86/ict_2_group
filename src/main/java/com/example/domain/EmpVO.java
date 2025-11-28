@@ -6,9 +6,9 @@ import lombok.Data;
 public class EmpVO {
 
 	private String empNo;
-	private String statusNo;
-	private String deptNo;
-	private String gradeNo;
+	private Integer statusNo;
+	private Integer deptNo;
+	private Integer gradeNo;
 	private String empName;
 	private String empPhone;
 	private String empAddr;
@@ -18,5 +18,8 @@ public class EmpVO {
 	private String empRegdate;	
 	private String deptName;
 	private String statusName;
+	private Integer baseSal;
+
+
 
 }

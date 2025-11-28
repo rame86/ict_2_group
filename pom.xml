@@ -41,7 +41,10 @@
 			<artifactId>mybatis-spring-boot-starter</artifactId>
 			<version>3.0.5</version>
 		</dependency>
-
+		<dependency>
+     	  	 <groupId>org.springframework.boot</groupId>
+      	 	 <artifactId>spring-boot-starter-webflux</artifactId>
+    	</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -74,7 +77,11 @@
 			<scope>test</scope>
 		</dependency>
 		
-		
+		<dependency>
+  		  <groupId>com.fasterxml.jackson.core</groupId>
+  		  <artifactId>jackson-databind</artifactId>
+		</dependency>
+
 
 		<!-- JSTL 라이브러리 -->
 		<!-- 아래처럼 추가 -->

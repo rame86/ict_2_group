@@ -24,5 +24,77 @@
         ORDER BY s.SAL_DATE DESC
 
     </select>
+    
+    <!-- 급여 존재 여부 확인 -->
+    <select id="existsSal" resultType="int">
+    SELECT COUNT(*) 
+    FROM SAL
+    WHERE MONTH_ATTNO = #{monthAttno}
+</select>
 
+	<!-- 급여 입력 -->
+	<insert id="insertSal" parameterType="com.example.domain.SalVO">
+    INSERT INTO SAL (
+        SAL_NUM,
+        MONTH_ATTNO,
+        EMP_NO,
+        SAL_DATE,
+        SAL_BASE,
+        SAL_BONUS,
+        SAL_PLUS,
+        INSURANCE,
+        TAX
+    )
+    VALUES (
+        SAL_SEQ.NEXTVAL,
+        #{monthAttno},
+        #{empNo},
+        SYSDATE,
+        #{salBase},
+        #{salBonus},
+        #{salPlus},
+        #{insurance},
+        #{tax}
+    )
+</insert>
+
+<select id="getSalList" parameterType="int"
+        resultType="com.example.domain.SalVO">
+    SELECT
+        SAL_NUM     AS salNum,
+        MONTH_ATTNO AS monthAttno,
+        EMP_NO      AS empNo,
+        SAL_DATE    AS salDate,
+        SAL_BASE    AS salBase,
+        SAL_BONUS   AS salBonus,
+        SAL_PLUS    AS salPlus,
+        INSURANCE   AS insurance,
+        TAX         AS tax
+    FROM SAL
+    WHERE EMP_NO = #{empNo}
+    ORDER BY SAL_DATE DESC
+</select>
+
+<select id="getSalDetail" parameterType="int"
+        resultType="com.example.domain.SalVO">
+    SELECT
+        SAL_NUM     AS salNum,
+        MONTH_ATTNO AS monthAttno,
+        EMP_NO      AS empNo,
+        SAL_DATE    AS salDate,
+        SAL_BASE    AS salBase,
+        SAL_BONUS   AS salBonus,
+        SAL_PLUS    AS salPlus,
+        INSURANCE   AS insurance,
+        TAX         AS tax
+    FROM SAL
+    WHERE SAL_NUM = #{salNum}
+</select>
+
+<select id="existsMonthlySalary" resultType="int">
+    SELECT COUNT(*)
+    FROM SAL
+    WHERE EMP_NO = #{empNo}
+      AND MONTH_ATTNO = #{monthAttno}
+</select>
 </mapper>

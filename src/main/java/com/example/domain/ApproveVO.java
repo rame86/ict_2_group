@@ -11,5 +11,5 @@ public class ApproveVO {
 	private String step1Status;
 	private String step1ManagerNo;
 	private String step2Status;
-	private String step2ManagerNo;
+	private Integer step2ManagerNo;
 }

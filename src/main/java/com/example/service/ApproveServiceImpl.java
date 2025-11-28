@@ -40,15 +40,17 @@ public class ApproveServiceImpl implements ApproveService {
 		if(avo.getStep1Status() == null) avo.setStep1Status("W");
 		
 		int deptNo = Integer.parseInt(manager.getDeptNo());
-		System.out.println(deptNo);
+		System.out.println("내 부서번호 : " + deptNo);
 		
 		DeptVO parent = approveDao.selectParentDept(deptNo);
+		System.out.println("내 상위 부서번호 : " + parent.getParentDeptNo());
+		
 		if(manager.getDeptNo() == (parent.getParentDeptNo())) {
-			avo.setStep2ManagerNo("X");
+			avo.setStep2ManagerNo(null);
 			avo.setStep2Status("X");
 		}else {
 			System.out.println(parent.getParentDeptNo());
-			avo.setStep2ManagerNo(parent.getParentManagerEmpNo());
+			avo.setStep2ManagerNo(Integer.parseInt(parent.getParentManagerEmpNo()));
 			avo.setStep2Status("W");
 		}
 		
