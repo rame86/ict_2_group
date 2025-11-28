@@ -10,7 +10,9 @@ request.setAttribute("menu", "salemp");
 <head>
 <meta charset="UTF-8">
 
-<title>사원 목록</title>
+<title>급여관리</title>
+
+
 
 <!-- 공통 헤더 -->
 <jsp:include page="../common/header.jsp" />
@@ -102,8 +104,9 @@ $(document).ready(function() {
         <main>
             <div class="container-fluid px-4">
 
-                <h3 class="mt-4">사원 목록</h3>
+                <h3 class="mt-4">급여 관리</h3>
                 <br>
+                <h4> 사원목록 </h4>
 
                 <div class="content-wrapper">
 

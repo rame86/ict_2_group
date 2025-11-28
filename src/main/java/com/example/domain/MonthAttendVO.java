@@ -7,9 +7,10 @@ public class MonthAttendVO {
 
 	private Integer monthAttno;
     private String empNo;
+    
     private Double workHour;
-    private Double overtime;
     private Integer workDay;
+    private Double overtime;
     private Integer lateCnt;
     private Integer abcentCnt;
 }
