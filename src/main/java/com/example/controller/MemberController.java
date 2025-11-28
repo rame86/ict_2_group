@@ -2,9 +2,10 @@ package com.example.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.domain.MemberVO;
 import com.example.service.MemberService;
@@ -15,10 +16,37 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Controller
 public class MemberController {
-	
+
 	@Autowired
 	private MemberService memberService;
 
+	// step 변수에 자동으로 요청값이 들어가고 추적하여 열어줌
+	// @PathVariable
+	@GetMapping("{step}")
+	public void asdf(@PathVariable String step) {
+		log.info("요청받은 step : " + step);
+	}
+
+//	@GetMapping("/")
+//	public String index(HttpSession session) {
+//		Object login = session.getAttribute("login");
+//		if (login == null) {
+//			return "/member/login";
+//		}		
+//		return "index";
+//	}
+
+	@GetMapping("/login")
+	public String loginPage() {
+		return "redirect:/member/login.jsp";
+	}
+
+	@GetMapping("/member/register")
+	public String register() {
+		return "redirect:/member/register.jsp";
+	}
+	
+	
 	@PostMapping("loginCheck")
 	public String loginCheck(MemberVO vo, HttpSession session) {
 		log.info("[MemberController - member/loginCheck] 요청받음 :" + vo.toString());

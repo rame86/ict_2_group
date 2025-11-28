@@ -14,9 +14,15 @@ public class MemberDAOImpl implements MemberDAO{
 	@Autowired
 	private SqlSessionTemplate sess;
 
-	@Override
+	// 로그인 아이디 비번 체크
 	public LoginVO loginCheck(MemberVO vo) {
 		return sess.selectOne("com.example.repository.MemberDAO.loginCheck", vo);
+	}
+	
+	// 회원가입 상태 확인
+	@Override
+	public Integer memberCheck(Long kakaoId) {
+		return sess.selectOne("com.example.repository.MemberDAO.memberCheck", kakaoId);
 	}
 
 }

@@ -8,14 +8,17 @@ import com.example.domain.MemberVO;
 import com.example.repository.MemberDAO;
 
 @Service
-public class MemberServiceImpl implements MemberService{
-	
+public class MemberServiceImpl implements MemberService {
+
 	@Autowired
 	MemberDAO memberDao;
 
-	@Override
 	public LoginVO loginCheck(MemberVO vo) {
 		return memberDao.loginCheck(vo);
 	}
 
+public Integer memberCheck(Long kakaoId) {
+	
+	return memberDao.memberCheck(kakaoId);
+}
 }

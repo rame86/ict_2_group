@@ -32,6 +32,6 @@ body {
 	<a href="/kakao/logout" style="color: red; font-weight: bold;">[카카오
 		로그아웃 및 로컬 세션 삭제]</a>
 	<br>
-	<a href="/kakao/page">다시 로그인 화면으로</a>
+	<a href="/kakao/login">다시 로그인 화면으로</a>
 </body>
 </html>

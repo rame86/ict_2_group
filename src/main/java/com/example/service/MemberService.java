@@ -7,4 +7,5 @@ import com.example.domain.MemberVO;
 public interface MemberService {
 	public LoginVO loginCheck(MemberVO vo);
 
+	public Integer memberCheck(Long kakaoId);
 }

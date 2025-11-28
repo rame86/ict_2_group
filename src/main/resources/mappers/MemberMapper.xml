@@ -7,10 +7,18 @@
 		resultType="loginVO">
 		SELECT *
 		FROM MEMBER M
-		INNER JOIN EMP E ON M.EMP_NO = E.EMP_NO
+		INNER JOIN EMP E ON M.EMP_NO =
+		E.EMP_NO
 		INNER JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
-		WHERE M.EMP_NO = #{empNo}
+		WHERE M.EMP_NO =
+		#{empNo}
 		AND M.EMP_PASS = #{empPass}
 	</select>
 
+	<select id="memberCheck" parameterType="Long" resultType="int">
+		SELECT
+		*
+		FROM KAKAO_API_LINK
+		WHERE KAKAO_ID = #{kakaoId}
+	</select>
 </mapper>
