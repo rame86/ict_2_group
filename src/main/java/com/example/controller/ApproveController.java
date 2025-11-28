@@ -17,18 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ApproveController {
 	
 	@Autowired
-	private MemberService memberService;
-	
-	@GetMapping("/")
-	public String index(HttpSession session) {
-		Object login = session.getAttribute("login");
-		if (login == null) {
-			return "/member/login";
-		}		
-		return "index";
-	}
-	
-	
+	private MemberService memberService;	
 	
 	@GetMapping("approve/statusList")
 	public void statusList() {

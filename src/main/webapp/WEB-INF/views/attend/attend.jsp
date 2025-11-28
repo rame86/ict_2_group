@@ -2,6 +2,8 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
+<c:set var="menu" value="status" scope="request" />
+
 
 <!DOCTYPE html>
 <html>
@@ -18,11 +20,10 @@
 	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales-all.min.js'></script>
 
 <script src="/js/attend.js"></script>
-
 </head>
 
 <body class="sb-nav-fixed">
-	
+
 	<!-- 헤더(헤더에 로그인정보 히든속성으로 저장) -->
 	<jsp:include page="../common/header.jsp" flush="true" />
 
@@ -32,8 +33,10 @@
 
 		<!-- 메인 바 -->
 		<div id="layoutSidenav_content">
+		
 			<main id="content-area">
-				<div class="main-layout-container">
+			
+				<div class="main-layout-container">				
 					<div class="report-section">
 						<jsp:include page="../attend/donutChart.jsp" flush="true" />
 					</div>
@@ -67,6 +70,7 @@
 				</div>
 			</main>
 
+			<!-- 푸터 -->
 			<jsp:include page="../common/footer.jsp" flush="true" />
 
 		</div>

@@ -33,26 +33,29 @@
 										<div class="row mb-3">
 											<div class="col-md-6">
 												<div class="form-floating mb-3 mb-md-0">
-													<input class="form-control" id="empNo" type="number"
-														placeholder="사원번호를 입력하세요" /> <label for="inputFirstName">사원번호</label>
+													<input class="form-control" id="empNo" name="empNo"
+														type="number" placeholder="사원번호를 입력하세요" /> <label
+														for="inputFirstName">사원번호</label>
 												</div>
 											</div>
 											<div class="col-md-6">
 												<div class="form-floating">
-													<input class="form-control" id="empName" type="text"
-														placeholder="이름을 입력하세요" /> <label for="inputLastName">이름</label>
+													<input class="form-control" id="empName" name="empName"
+														type="text" placeholder="이름을 입력하세요" /> <label
+														for="inputLastName">이름</label>
 												</div>
 											</div>
 										</div>
 										<div class="form-floating mb-3">
-											<input class="form-control" id="empEmail" type="email"
-												placeholder="name@example.com" /> <label for="inputEmail">이메일주소</label>
+											<input class="form-control" id="empEmail" name="empEmail"
+												type="email" placeholder="name@example.com" /> <label
+												for="inputEmail">이메일주소</label>
 										</div>
 										<div class="row mb-3">
 											<div class="col-md-6">
 												<div class="form-floating mb-3 mb-md-0">
-													<input class="form-control" id="empPass" type="password"
-														placeholder="Create a password" /> <label
+													<input class="form-control" id="empPass" name="empPass"
+														type="password" placeholder="Create a password" /> <label
 														for="inputPassword">비밀번호</label>
 												</div>
 											</div>
@@ -73,7 +76,7 @@
 								</div>
 								<div class="card-footer text-center py-3">
 									<div class="small">
-										<a href="login.html">아이디가 있나요? 회원가입 고고</a> <br> <a
+										<a href="login.html">아이디가 있나요? 로그인하러 가기</a> <br> <a
 											href="/kakao/logout" style="color: red; font-weight: bold;">[카카오
 											로그아웃 및 로컬 세션 삭제]</a>
 									</div>

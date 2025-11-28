@@ -3,6 +3,18 @@
 
 <mapper namespace="com.example.repository.MemberDAO">
 
+	<select id="kakaoLoginInfo" parameterType="String"
+		resultType="loginVO">
+		SELECT * 
+		FROM emp e 
+		JOIN member m ON e.emp_NO = m.emp_no 
+		JOIN 
+		kakao_api_link k ON m.member_no = k.member_NO 
+		WHERE 
+		k.kakao_id =
+		#{kakaoId}
+	</select>
+
 	<select id="loginCheck" parameterType="MemberVO"
 		resultType="loginVO">
 		SELECT *
@@ -15,11 +27,12 @@
 		AND M.EMP_PASS = #{empPass}
 	</select>
 
-	<select id="memberCheck" parameterType="Long" resultType="int">
-		SELECT
-		*
+	<select id="memberCheck" parameterType="String"
+		resultType="String">
+		SELECT KAKAO_ID
 		FROM KAKAO_API_LINK
-		WHERE KAKAO_ID = #{kakaoId}
+		WHERE KAKAO_ID =
+		#{kakaoId}
 	</select>
 
 	<select id="getNextMemberNo" resultType="java.lang.Long">
@@ -29,24 +42,25 @@
 
 
 	<insert id="insertMember" parameterType="MemberSaveVO">
-		INSERT INTO MEMBER (MEMBER_NO, EMP_NO, EMP_PASS)
-        SELECT 
-            #{memberNo}, 
-            #{empNo}, 
-            #{empPass}
-        FROM DUAL
-        WHERE EXISTS (
-            SELECT 1 
-            FROM EMP 
-            WHERE EMP_NO = #{empNo}
-        )
+		INSERT INTO MEMBER
+		(MEMBER_NO, EMP_NO, EMP_PASS)
+		SELECT
+		#{memberNo},
+		#{empNo},
+		#{empPass}
+		FROM DUAL
+		WHERE EXISTS (
+		SELECT 1
+		FROM EMP
+		WHERE EMP_NO = #{empNo}
+		)
 	</insert>
 
 	<insert id="insertKakaoApiLink">
 		INSERT INTO KAKAO_API_LINK (KAKAO_ID, MEMBER_NO)
-        VALUES (
-            #{kakaoId}, 
-            #{memberNo}
-        )
+		VALUES (
+		#{kakaoId},
+		#{memberNo}
+		)
 	</insert>
 </mapper>

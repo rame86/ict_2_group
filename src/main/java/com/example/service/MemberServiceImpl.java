@@ -18,19 +18,22 @@ public class MemberServiceImpl implements MemberService {
 		return memberDao.loginCheck(vo);
 	}
 
-	public Integer memberCheck(Long kakaoId) {
+	public String memberCheck(String kakaoId) {
 		return memberDao.memberCheck(kakaoId);
 	}
-	
+
 	@Override
 	public Long getNextMemberNo() {
-	
+
 		return memberDao.getNextMemberNo();
 	}
-	
+
 	public Integer memberSave(MemberSaveVO vo) {
 		return memberDao.memberSave(vo);
-				
-		
+	}
+
+	public LoginVO kakaoLoginInfo(String kakaId) {
+		return memberDao.kakaoLoginInfo(kakaId);
+
 	}
 }

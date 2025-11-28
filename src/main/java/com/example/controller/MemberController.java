@@ -29,29 +29,22 @@ public class MemberController {
 		log.info("요청받은 step : " + step);
 	}
 
-//	@GetMapping("/")
-//	public String index(HttpSession session) {
-//		Object login = session.getAttribute("login");
-//		if (login == null) {
-//			return "/member/login";
-//		}		
-//		return "index";
-//	}
-
-	@GetMapping("/login")
-	public String loginPage() {
-		return "redirect:/member/login.jsp";
-	}
-
-	@GetMapping("/member/register")
-	public String register() {
-		return "redirect:/member/register.jsp";
+	@GetMapping("/")
+	public String index(HttpSession session) {
+		Object login = session.getAttribute("login");
+		if (login == null) {
+			return "/member/login";
+		}
+		return "index";
 	}
 
 	@PostMapping("loginCheck")
 	public String loginCheck(MemberVO vo, HttpSession session) {
+		
 		log.info("[MemberController - member/loginCheck] 요청받음 :" + vo.toString());
+		
 		LoginVO check = memberService.loginCheck(vo);
+		
 		if (check != null) {
 			session.setAttribute("login", check);
 			log.info("로그인 성공" + check.toString());
@@ -61,6 +54,18 @@ public class MemberController {
 			return "/member/login";
 		}
 	}
+	
+	@GetMapping("/login")
+	public String loginPage() {
+		return "redirect:/member/login";
+	}
+
+	@GetMapping("/member/register")
+	public String register() {
+		return "redirect:/member/register";
+	}
+
+	
 
 	@Transactional
 	@PostMapping("member/memberSave")
@@ -69,11 +74,11 @@ public class MemberController {
 		vo.setKakaoId(kakaoId);
 		Long memberNo = memberService.getNextMemberNo();
 		vo.setMemberNo(memberNo);
-		
+
 		log.info(vo.toString());
-		
+
 		Integer result = memberService.memberSave(vo);
-		
+
 		if (result != null) {
 			return "/member/login";
 

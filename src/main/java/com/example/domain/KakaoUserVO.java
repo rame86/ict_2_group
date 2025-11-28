@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 public class KakaoUserVO {
     // 최상위 필드
-    private Long id; // 카카오 회원번호
+    private String id; // 카카오 회원번호
 
     @JsonProperty("connected_at")
     private String connectedAt;

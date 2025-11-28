@@ -1,6 +1,8 @@
 package com.example.controller;
 
 import com.example.domain.KakaoUserVO;
+import com.example.domain.LoginVO;
+import com.example.domain.MemberVO;
 import com.example.service.KakaoService;
 import com.example.service.MemberService;
 
@@ -10,7 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
 public class KakaoController {
 
@@ -42,7 +46,8 @@ public class KakaoController {
     // 카카오 로그인 요청 (인가 코드 발급을 위한 URL로 리다이렉트)
     @GetMapping("/kakao/login")
     public String kakaoLogin() {
-        // 카카오 인증 URL 생성
+        log.info("[KakaoController - /kakao/login] 요청");
+    	// 카카오 인증 URL 생성
         String authUrl = "https://kauth.kakao.com/oauth/authorize" 
                 + "?client_id=" + kakaoRestApiKey 
                 + "&redirect_uri=" + kakaoRedirectUri 
@@ -54,23 +59,32 @@ public class KakaoController {
 
     // 카카오 로그인 콜백 처리 (인가 코드 수신)
     @GetMapping("/kakao/callback")
-    public String kakaoCallback(@RequestParam String code, HttpSession session) {
-        try {
+    public String kakaoCallback(@RequestParam String code, HttpSession session, MemberVO vo) {
+    	log.info("[KakaoController - /kakao/callback] 요청");
+    	
+    	try {
             // 1. 인가 코드로 KakaoUserVO 객체 전체를 조회
             KakaoUserVO kakaoUserVO = kakaoService.getUserInfo(code);
             
             // 2. VO 객체에서 고유 식별자(id) 값만 추출
-            Long kakaoId = kakaoUserVO.getId();
+            String kakaoId = kakaoUserVO.getId();
             
             // 3. 추출한 ID 값을 세션에 저장
             // DAO에 전달할 인자(Long)이 아닌 세션 저장용 String으로 변환하여 저장
             session.setAttribute("kakaoId", String.valueOf(kakaoId));
             
+            log.info("로그인 한 사람의 kakaoId 값 : "+kakaoId.toString());
             
             // (DAO 저장이 필요하다면, 여기서 DAO를 호출하는 Service 메서드를 추가 호출)
-            Integer memberCheckResult = memberService.memberCheck(kakaoId);
-            if(memberCheckResult != null && memberCheckResult == 1) {
-            	 return "/member/login";
+            String memberCheckResult = memberService.memberCheck(kakaoId);
+            
+            log.info("해당 kakaoId로 검색결과 : "+memberCheckResult.toString());
+            
+            if(memberCheckResult != null && memberCheckResult.equals(kakaoId)) {
+            	LoginVO loginInfo = memberService.kakaoLoginInfo(kakaoId);
+            	session.setAttribute("login", loginInfo);
+    			log.info("로그인 성공" + loginInfo.toString());
+    			return "index";
             }
             else {
             	 return "/member/register";
