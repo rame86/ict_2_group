@@ -5,27 +5,22 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.example.domain.EmpVO;
 import com.example.domain.SalVO;
 
 @Mapper
 public interface SalMapper {
 
-    // 사원 정보 가져오기
-    EmpVO getEmp(int empNo);
+    /** 급여 대장: 사원 한 명의 월별 급여 목록 */
+    List<SalVO> selectSalList(@Param("empNo") Integer empNo);
 
-    // 해당 사원의 급여 리스트 조회
-    List<SalVO> selectSalList(int empNo);
+    /** 급여 명세서: 사원 한 명 + 특정 월 급여 상세 */
+    SalVO selectSalDetail(@Param("empNo") Integer empNo,
+                          @Param("monthAttno") Integer monthAttno);
 
-    // 특정 월 급여가 이미 생성됐는지 확인
-    Integer existsSal(@Param("monthAttno") int monthAttno);
+    int existsSal(@Param("monthAttno") Integer monthAttno);
 
-    // 새로운 급여 등록
-    int insertSal(SalVO vo);
+    int existsMonthlySalary(@Param("empNo") Integer empNo,
+                            @Param("monthAttno") Integer monthAttno);
 
-	SalVO getSalDetail(int salNum);
-
-	int existsMonthlySalary(int empNo, int monthAttno);
-
-
+    void insertSal(SalVO vo);
 }
