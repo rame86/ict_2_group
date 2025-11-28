@@ -6,14 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.domain.EmpVO;
+import com.example.domain.SalSummaryVO;
 import com.example.domain.SalVO;
 import com.example.service.EmpService;
 import com.example.service.SalService;
 
 @Controller
+@RequestMapping("/sal")
 public class SalController {
 
     @Autowired
@@ -22,25 +26,31 @@ public class SalController {
     @Autowired
     private SalService salService;
 
-    @GetMapping("/sal/list")
-    public String salList(@RequestParam(required = false) Integer empNo,
-                          Model model) {
+    // 급여대장 리스트
+    @GetMapping("/list")
+    public String salList(@RequestParam String empNo, Model model) {
 
-        // empNo 없이 직접 URL로 들어온 경우 → 사원 목록으로 보냄
-        if (empNo == null) {
-            return "redirect:/emp/list";
-        }
-
-        // 1. 사원 정보 1건
-        EmpVO emp = empService.getEmp(empNo);   // ← 이 메서드는 EmpService에 새로 추가해야 함
-
-        // 2. 해당 사원의 급여 리스트
-        List<SalVO> salList = salService.getSalList(empNo);
+        EmpVO emp = empService.getEmp(empNo);
+        List<SalSummaryVO> summaryList = salService.getSalarySummaryList(empNo);
 
         model.addAttribute("emp", emp);
-        model.addAttribute("salList", salList);
+        model.addAttribute("summaryList", summaryList);
 
-        // /WEB-INF/views/sal/salList.jsp
-        return "sal/salList";
+        return "sal/salList";   // 아래 JSP
+    }
+
+    // 월 클릭 → 급여 명세서
+    @GetMapping("/detail")
+    public String salDetail(@RequestParam String empNo,
+                            @RequestParam Integer monthAttno,
+                            Model model) {
+
+        EmpVO emp = empService.getEmp(empNo);
+        SalVO sal = salService.getSalaryDetail(empNo, monthAttno);
+
+        model.addAttribute("emp", emp);
+        model.addAttribute("sal", sal);
+
+        return "sal/salDetail"; // 명세서 JSP
     }
 }

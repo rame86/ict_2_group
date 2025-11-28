@@ -21,7 +21,14 @@ public class EmpServiceImpl implements EmpService {
     }
 
 	@Override
-	public EmpVO getEmp(int empNo) {
+	public EmpVO getEmp(String empNo) {
 		return empMapper.getEmp(empNo);
 	}
+
+
+
+
+
+
+	
 }

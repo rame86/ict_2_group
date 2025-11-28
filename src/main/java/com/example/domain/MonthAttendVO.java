@@ -5,12 +5,11 @@ import lombok.Data;
 @Data
 public class MonthAttendVO {
 
-	private String monthAttvo;
-	private String empNo;
-	private String workDay;
-	private String workHour;
-	private String overtime;
-	private String lateCnt;
-	private String abcentCnt;
-
+	private Integer monthAttno;
+    private String empNo;
+    private Double workHour;
+    private Double overtime;
+    private Integer workDay;
+    private Integer lateCnt;
+    private Integer abcentCnt;
 }

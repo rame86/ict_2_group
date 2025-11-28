@@ -36,28 +36,21 @@
 		ORDER BY e.EMP_NO ASC
 	</select>
 
-	<select id="getEmp" parameterType="int"
+	<!-- EmpMapper.xml -->
+	<select id="getEmp" parameterType="String"
 		resultType="com.example.domain.EmpVO">
-
 		SELECT
-		e.emp_no 									AS empNo,
-		e.emp_name 								AS empName,
-		e.dept_no 									AS deptNo,
-		d.dept_name								AS deptName,
-		e.status_no 								AS statusNo,
-		s.status 										AS statusName,
-		e.emp_phone 							AS empPhone,
-		e.emp_email 								AS empEmail,
-		e.emp_regdate 							AS empRegdate
-		
-		FROM emp e
-					LEFT JOIN dept d
-			ON e.dept_no = d.dept_no
-					LEFT JOIN emp_status s
-			ON e.status_no = s.status_no
-			
+		e.emp_no AS empNo,
+		e.emp_name AS empName,
+		e.emp_phone AS empPhone,
+		e.emp_regdate AS empRegdate,
+		e.base_sal AS baseSal, -- ★ 새로 추가한 기본급
+		d.dept_name AS deptName,
+		s.status AS statusName
+		FROM EMP e
+		LEFT JOIN DEPT d ON e.dept_no = d.dept_no
+		LEFT JOIN EMP_STATUS s ON e.status_no = s.status_no
 		WHERE e.emp_no = #{empNo}
-
 	</select>
 
 </mapper>
