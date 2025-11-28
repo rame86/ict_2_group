@@ -75,12 +75,13 @@
                         <div class="card mb-4 approve-main">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
-                                <a href="receiveList">결재 받을 문서</a>
+                                <a href="receiveList">결재 할 문서</a>
                             </div>
                             <div class="card-body">
                                 <table id="tableSimple1">
                                     <thead>
                                         <tr>
+                                        	<th>번호</th>
                                             <th>작성날짜</th>
                                             <th>제목</th>
                                             <th>작성자</th>
@@ -89,41 +90,21 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Tiger Nixon</td>
-                                            <td>System Architect</td>
-                                            <td>Edinburgh</td>
-                                            <td>61</td>
-                                            <td>2011/04/25</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Garrett Winters</td>
-                                            <td>Accountant</td>
-                                            <td>Tokyo</td>
-                                            <td>63</td>
-                                            <td>2011/07/25</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Ashton Cox</td>
-                                            <td>Junior Technical Author</td>
-                                            <td>San Francisco</td>
-                                            <td>66</td>
-                                            <td>2009/01/12</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Cedric Kelly</td>
-                                            <td>Senior Javascript Developer</td>
-                                            <td>Edinburgh</td>
-                                            <td>22</td>
-                                            <td>2012/03/29</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Airi Satou</td>
-                                            <td>Accountant</td>
-                                            <td>Tokyo</td>
-                                            <td>33</td>
-                                            <td>2008/11/28</td>
-                                        </tr>
+                                    	<c:forEach var="vo" items="${receive}">
+	                                        <tr>
+	                                            <td>${ vo.docNo }</td>
+	                                            <td>${ vo.docDate }</td>
+	                                            <td>${ vo.docTitle }</td>
+	                                            <td>${ vo.writerName }</td>
+												<td>
+	                                            	${ vo.step1ManagerName }
+	                                            	<c:if test="${not empty vo.step2ManagerName}">
+	                                            		, ${vo.step2ManagerName}
+	                                            	</c:if>
+	                                            </td>
+	                                            <td>${ vo.progressStatus }</td>
+	                                        </tr>
+                                        </c:forEach>
                                     </tbody>
                                 </table>
                             </div>
@@ -132,55 +113,34 @@
                         <div class="card mb-4 approve-main">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
-                                <a href="sendList">결재 할 문서</a>
+                                <a href="sendList">결재 받을 문서</a>
                             </div>
                             <div class="card-body">
                                 <table id="tableSimple2">
                                     <thead>
                                         <tr>
+                                        	<th>번호</th>
                                             <th>작성날짜</th>
                                             <th>제목</th>
-                                            <th>작성자</th>
                                             <th>결재자</th>
                                             <th>진행상태</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Tiger Nixon</td>
-                                            <td>System Architect</td>
-                                            <td>Edinburgh</td>
-                                            <td>61</td>
-                                            <td>2011/04/25</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Garrett Winters</td>
-                                            <td>Accountant</td>
-                                            <td>Tokyo</td>
-                                            <td>63</td>
-                                            <td>2011/04/25</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Ashton Cox</td>
-                                            <td>Junior Technical Author</td>
-                                            <td>San Francisco</td>
-                                            <td>66</td>
-                                            <td>2009/01/12</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Cedric Kelly</td>
-                                            <td>Senior Javascript Developer</td>
-                                            <td>Edinburgh</td>
-                                            <td>22</td>
-                                            <td>2012/03/29</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Airi Satou</td>
-                                            <td>Accountant</td>
-                                            <td>Tokyo</td>
-                                            <td>33</td>
-                                            <td>2008/11/28</td>
-                                        </tr>
+                                        <c:forEach var="vo" items="${ send }">
+	                                        <tr>
+	                                            <td>${ vo.docNo }</td>
+	                                            <td>${ vo.docDate }</td>
+	                                            <td>${ vo.docTitle }</td>
+												<td>
+	                                            	${ vo.step1ManagerName }
+	                                            	<c:if test="${not empty vo.step2ManagerName}">
+	                                            		, ${vo.step2ManagerName}
+	                                            	</c:if>
+	                                            </td>
+	                                            <td>${ vo.progressStatus }</td>
+	                                        </tr>
+                                        </c:forEach>
                                     </tbody>
                                 </table>
                             </div>

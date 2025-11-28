@@ -3,9 +3,13 @@
 
 <mapper namespace="com.example.repository.ApproveDAO">
 
+	<select id="selectDocSeqNextVal" resultType="int">
+	    SELECT doc_no_seq.NEXTVAL FROM DUAL
+	</select>
+
 	<insert id="insertDoc" parameterType="DocVO">
 		insert into DOC(DOC_NO, DOC_TYPE, DOC_TITLE, DOC_CONTENT, DOC_DATE) 
-		values(doc_no_seq.NEXTVAL, #{DOC_TYPE}, #{DOC_TITLE}, #{DOC_CONTENT}, SYSDATE)
+		values(#{docNo}, #{docType}, #{docTitle}, #{docContent}, SYSDATE)
 	</insert>
 	
 	<insert id="insertApprove" parameterType="ApproveVO">
@@ -21,14 +25,108 @@
 			)
 		VALUES (
 	    	approve_no_seq.NEXTVAL,
-	    	#{emp_no},
-	    	#{doc_no},
+	    	#{empNo},
+	    	#{docNo},
 	    	SYSDATE,
-	    	#{step1_status},
-	    	#{step1_manager_no},
-	    	#{step2_status},
-	    	#{step2_manager_no}
+	    	#{step1Status},
+	    	#{step1ManagerNo},
+	    	#{step2Status},
+	    	#{step2ManagerNo}
 		)
 	</insert>
+
+	<select id="selectManager" resultType="DeptVO">
+	    SELECT
+	    D.DEPT_NO AS DEPT_NO, 
+		M.EMP_NO AS MANAGER_EMP_NO, 
+   		M.EMP_NAME AS MANAGER_EMP_NAME 
+		FROM
+   	 	EMP U 
+		INNER JOIN
+    	DEPT D ON U.DEPT_NO = D.DEPT_NO 
+		INNER JOIN
+    	EMP M ON D.MANAGER_EMP_NO = M.EMP_NO 
+		WHERE
+    	U.EMP_NO = #{empNo}
+	</select>
+
+	<select id="selectParentDept" resultType="DeptVO" parameterType="int">
+    	SELECT 
+        D.DEPT_NO, 
+        D.DEPT_NAME, 
+        D.PARENT_DEPT_NO AS MY_PARENT_DEPT_NO,
+
+        PD.DEPT_NO AS PARENT_DEPT_NO,
+        PD.MANAGER_EMP_NO AS PARENT_MANAGER_EMP_NO, 
+
+        M.EMP_NAME AS PARENT_MANAGER_NAME, 
+        M.EMP_PHONE AS PARENT_MANAGER_PHONE, 
+        M.EMP_EMAIL AS PARENT_MANAGER_EMAIL 
+
+    	FROM 
+        DEPT D 
+        LEFT JOIN DEPT PD ON D.PARENT_DEPT_NO = PD.DEPT_NO 
+        LEFT JOIN EMP M ON PD.MANAGER_EMP_NO = M.EMP_NO 
+
+    	WHERE
+        D.DEPT_NO = #{deptNo}
+	</select>
+	
+	<select id="selectSendApproveList" resultType="ApproveListVO" parameterType="map">
+	    SELECT * FROM (
+	        SELECT 
+	            D.DOC_NO AS docNo,
+	            D.DOC_TITLE AS docTitle,
+	            D.DOC_DATE AS docDate,
+	            M1.EMP_NAME AS step1ManagerName,
+	            M2.EMP_NAME AS step2ManagerName,
+	            CASE 
+	                WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN '반려'
+	                WHEN A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'X' THEN '최종 승인'
+	                WHEN A.STEP1_STATUS = 'W' THEN '1차 대기'
+	                WHEN A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'W' THEN '2차 대기'
+	                WHEN A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'A' THEN '최종 승인'
+	                ELSE '대기'
+	            END AS progressStatus
+	        FROM APPROVE A
+	        JOIN DOC D ON A.DOC_NO = D.DOC_NO
+	        LEFT JOIN EMP M1 ON A.STEP1_MANAGER_NO = M1.EMP_NO
+	        LEFT JOIN EMP M2 ON A.STEP2_MANAGER_NO = M2.EMP_NO
+	        WHERE A.EMP_NO = #{empNo}
+	        ORDER BY D.DOC_NO DESC
+	    )
+	    <if test="limit != null">
+	        WHERE ROWNUM &lt;= #{limit}
+	    </if>
+	</select>
+	
+	<select id="selectReceiveApproveList" resultType="ApproveListVO" parameterType="map">
+	    SELECT * FROM (
+	        SELECT 
+	            D.DOC_NO,
+	            D.DOC_TITLE,
+	            D.DOC_DATE,
+	            U.EMP_NAME AS writerName,
+	            M1.EMP_NAME AS step1ManagerName,
+	            M2.EMP_NAME AS step2ManagerName,
+	            CASE 
+	                WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN '반려'
+	                WHEN A.STEP1_STATUS = 'W' THEN '1차 대기'
+	                WHEN A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'W' THEN '2차 대기'
+	                WHEN A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'A' THEN '최종 승인'
+	                ELSE '대기'
+	            END AS progressStatus
+	        FROM APPROVE A
+	        JOIN DOC D ON A.DOC_NO = D.DOC_NO
+	        JOIN EMP U ON A.EMP_NO = U.EMP_NO
+	        LEFT JOIN EMP M1 ON A.STEP1_MANAGER_NO = M1.EMP_NO
+	        LEFT JOIN EMP M2 ON A.STEP2_MANAGER_NO = M2.EMP_NO
+	        WHERE A.STEP1_MANAGER_NO = #{empNo} OR A.STEP2_MANAGER_NO = #{empNo}
+	        ORDER BY D.DOC_DATE DESC
+	    )
+	    <if test="limit != null">
+	        WHERE ROWNUM &lt;= #{limit}
+	    </if>
+	</select>
 	
 </mapper>
