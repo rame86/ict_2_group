@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.domain.LoginVO;
+import com.example.domain.MemberSaveVO;
 import com.example.domain.MemberVO;
 import com.example.repository.MemberDAO;
 
@@ -17,8 +18,19 @@ public class MemberServiceImpl implements MemberService {
 		return memberDao.loginCheck(vo);
 	}
 
-public Integer memberCheck(Long kakaoId) {
+	public Integer memberCheck(Long kakaoId) {
+		return memberDao.memberCheck(kakaoId);
+	}
 	
-	return memberDao.memberCheck(kakaoId);
-}
+	@Override
+	public Long getNextMemberNo() {
+	
+		return memberDao.getNextMemberNo();
+	}
+	
+	public Integer memberSave(MemberSaveVO vo) {
+		return memberDao.memberSave(vo);
+				
+		
+	}
 }

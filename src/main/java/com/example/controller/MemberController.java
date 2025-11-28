@@ -2,11 +2,13 @@ package com.example.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.example.domain.LoginVO;
+import com.example.domain.MemberSaveVO;
 import com.example.domain.MemberVO;
 import com.example.service.MemberService;
 
@@ -45,8 +47,7 @@ public class MemberController {
 	public String register() {
 		return "redirect:/member/register.jsp";
 	}
-	
-	
+
 	@PostMapping("loginCheck")
 	public String loginCheck(MemberVO vo, HttpSession session) {
 		log.info("[MemberController - member/loginCheck] 요청받음 :" + vo.toString());
@@ -60,4 +61,26 @@ public class MemberController {
 			return "/member/login";
 		}
 	}
+
+	@Transactional
+	@PostMapping("member/memberSave")
+	public String memberSave(MemberSaveVO vo, HttpSession session) {
+		String kakaoId = (String) session.getAttribute("kakaoId");
+		vo.setKakaoId(kakaoId);
+		Long memberNo = memberService.getNextMemberNo();
+		vo.setMemberNo(memberNo);
+		
+		log.info(vo.toString());
+		
+		Integer result = memberService.memberSave(vo);
+		
+		if (result != null) {
+			return "/member/login";
+
+		} else {
+			log.info("회원가입 실패");
+			return "redirect:/member/register.jsp";
+		}
+	}
+
 }

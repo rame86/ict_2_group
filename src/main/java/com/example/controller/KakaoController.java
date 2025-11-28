@@ -68,8 +68,8 @@ public class KakaoController {
             
             
             // (DAO 저장이 필요하다면, 여기서 DAO를 호출하는 Service 메서드를 추가 호출)
-            int memberCheck = memberService.memberCheck(kakaoId);
-            if(memberCheck == 1) {
+            Integer memberCheckResult = memberService.memberCheck(kakaoId);
+            if(memberCheckResult != null && memberCheckResult == 1) {
             	 return "/member/login";
             }
             else {
