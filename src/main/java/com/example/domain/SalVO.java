@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class SalVO {
 
-	private String salNum;
-	private String monthAttno;
+	private Integer salNum;
+	private Integer monthAttno;
 	private String empNo;
 	private String salDate;
 	private Integer salBase;
@@ -15,5 +15,9 @@ public class SalVO {
 	private Integer insurance;
 	private Integer tax;
 	private Integer realpay;
+	private String yearMonth;
+	
+		
+	
 
 }

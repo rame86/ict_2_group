@@ -12,5 +12,5 @@ import com.example.domain.EmpSearchVO;
 public interface EmpMapper {
     List<EmpVO> selectEmpList(EmpSearchVO search);
 
-	EmpVO getEmp(int empNo);
+    EmpVO getEmp(String empNo);
 }
