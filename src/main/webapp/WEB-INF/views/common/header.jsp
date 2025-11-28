@@ -21,8 +21,8 @@
 	<script src="/js/datatables-simple-demo.js"></script>
 </head>
 <c:if test="${not empty sessionScope.login}">
-		<input type="hidden" id="sessionEmpNo"
-			value="${sessionScope.login.empNo}">
+		<input type="hidden" id="sessionEmp"
+			value="${sessionScope.login}">
 	</c:if>
 	<body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">

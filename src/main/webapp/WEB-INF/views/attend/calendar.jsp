@@ -39,30 +39,35 @@
 
     <script>
       
-        const mockEvents = [
-            { title: "근무", start: "2025-11-03", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-04", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-05", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-06", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-07", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-10", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-11", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-12", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-13", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-14", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-17", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-18", allDay: true, color: "#4CAF50" },
-            { title: "근무", start: "2025-11-19", allDay: true, color: "#4CAF50" }
-        ];
+ // 🚨 주의: 이 데이터는 실제 API 응답 대신 동작 테스트를 위해 하드 코딩한 Mock 데이터입니다.
+    // 실제 프로젝트에서는 서버 API 호출로 대체해야 합니다.
 
-        // 2. 특정 날짜 근무 상세 정보 (API 2의 응답 역할)
-        const mockWorkDetails = {
-            status: "정상 근무",
-            checkIn: "09:00:00",
-            checkOut: "17:00:00",
-            breakTime: "01:00:00",
-            totalWorkHours: "07:00:00"
-        };
+    // 1. 달력에 표시할 근무일 목록 데이터 (API 1의 응답 역할)
+    const mockEvents = [
+        { title: "근무", start: "2025-11-03", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-04", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-05", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-06", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-07", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-10", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-11", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-12", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-13", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-14", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-17", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-18", allDay: true, color: "#4CAF50" },
+        { title: "근무", start: "2025-11-19", allDay: true, color: "#4CAF50" }
+    ];
+
+    // 2. 특정 날짜 근무 상세 정보 (API 2의 응답 역할)
+    const mockWorkDetails = {
+        status: "정상 근무",
+        checkIn: "09:00:00",
+        checkOut: "17:00:00",
+        breakTime: "01:00:00",
+        totalWorkHours: "07:00:00"
+    };
+
 
 
         document.addEventListener('DOMContentLoaded', function() {
