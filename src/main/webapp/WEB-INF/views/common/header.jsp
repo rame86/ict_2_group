@@ -20,9 +20,9 @@
 	<script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
 	<script src="/js/datatables-simple-demo.js"></script>
 </head>
-<c:if test="${not empty sessionScope.login}">
-		<input type="hidden" id="sessionEmp"
-			value="${sessionScope.login}">
+
+	<c:if test="${not empty sessionScope.login}">
+		<input type="hidden" id="sessionEmp" value="${sessionScope.login}">
 	</c:if>
 	<body class="sb-nav-fixed">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">

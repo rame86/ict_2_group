@@ -37,25 +37,27 @@
 			        	<input type="hidden" name="DocType" id="documentTypeInput" value="1">
 						<input type="hidden" name="empNo" value="${ sessionScope.login.empNo }">
 						<input type="hidden" name="empNo" value="${ sessionScope.login.gradeNo }">
+						<input type="hidden" name="step1ManagerNo" value="${ loginVO.managerEmpNo }">
+						<input type="hidden" name="step2ManagerNo" value="${ loginVO.parentDeptNo }">
 						
 					    <div class="mb-3">
 					        <label for="documentTitle" class="form-label fw-bold">문서제목</label>
-					        <input type="text" class="form-control" id="documentTitle" name="DocTitle" placeholder="제목을 입력하세요" required>
+					        <input type="text" class="form-control" id="documentTitle" name="docTitle" placeholder="제목을 입력하세요" required>
 					    </div>
 					
 					    <div class="mb-3">
 					        <label for="draftDate" class="form-label fw-bold">기안일</label>
-					        <input type="date" class="form-control" id="draftDate" name="DocDate" value="2025-11-27" required>
+					        <input type="date" class="form-control" id="draftDate" name="docDate" value="2025-11-27" required>
 					    </div>
 					    
 					    <div class="mb-3">
 					        <label for="documentTitle" class="form-label fw-bold">기안자</label>
-					        <input type="text" class="form-control" id="documentTitle" name="" value="${ sessionScope.login.empName }" readonly>
+					        <input type="text" class="form-control" id="documentTitle" name="empName" value="${ sessionScope.login.empName }" readonly>
 					    </div>
 					
 					    <div class="mb-3">
 					        <label for="documentContent" class="form-label fw-bold">내용</label>
-					        <textarea class="form-control" id="documentContent" name="DocContent" rows="8" placeholder="문서의 상세 내용을 입력하세요." required></textarea>
+					        <textarea class="form-control" id="documentContent" name="docContent" rows="8" placeholder="문서의 상세 내용을 입력하세요." required></textarea>
 					    </div>
 					
 					    <div class="mt-4">
@@ -63,6 +65,8 @@
 					        <button type="reset" class="btn btn-secondary">초기화</button>
 					    </div>
 			        </form>
+			        
+			        <div class="frame">
 			        
 				</div>
 			</main>
