@@ -24,15 +24,10 @@ public class MemberDAOImpl implements MemberDAO {
 		return sess.selectOne("com.example.repository.MemberDAO.memberCheck", kakaoId);
 	}
 
-	
-	public Long getNextMemberNo() {
-		return sess.selectOne("com.example.repository.MemberDAO.getNextMemberNo");
 
-	}
 
-	public Integer memberSave(MemberSaveVO vo) {
-		sess.insert("com.example.repository.MemberDAO.insertMember", vo);
-		return sess.insert("com.example.repository.MemberDAO.insertKakaoApiLink", vo);
+	public Integer memberSave(MemberSaveVO vo) {		
+		return sess.insert("com.example.repository.MemberDAO.insertMember", vo);
 		
 	}
 

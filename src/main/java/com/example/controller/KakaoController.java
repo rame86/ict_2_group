@@ -78,9 +78,10 @@ public class KakaoController {
             // (DAO 저장이 필요하다면, 여기서 DAO를 호출하는 Service 메서드를 추가 호출)
             String memberCheckResult = memberService.memberCheck(kakaoId);
             
-            log.info("해당 kakaoId로 검색결과 : "+memberCheckResult.toString());
+            
             
             if(memberCheckResult != null && memberCheckResult.equals(kakaoId)) {
+            	log.info("해당 kakaoId로 검색결과 : "+memberCheckResult.toString());
             	LoginVO loginInfo = memberService.kakaoLoginInfo(kakaoId);
             	session.setAttribute("login", loginInfo);
     			log.info("로그인 성공" + loginInfo.toString());

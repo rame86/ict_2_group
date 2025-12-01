@@ -72,9 +72,7 @@ public class MemberController {
 	public String memberSave(MemberSaveVO vo, HttpSession session) {
 		String kakaoId = (String) session.getAttribute("kakaoId");
 		vo.setKakaoId(kakaoId);
-		Long memberNo = memberService.getNextMemberNo();
-		vo.setMemberNo(memberNo);
-
+		
 		log.info(vo.toString());
 
 		Integer result = memberService.memberSave(vo);

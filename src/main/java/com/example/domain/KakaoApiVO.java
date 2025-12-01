@@ -3,7 +3,7 @@ package com.example.domain;
 import lombok.Data;
 
 @Data
-public class KakaoApiLinkVO {
+public class KakaoApiVO {
 
 	private String kakaoId;
 	private String memberNo;
