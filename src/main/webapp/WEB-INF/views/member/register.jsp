@@ -14,8 +14,13 @@
 <meta name="author" content="" />
 <title>사원 계정 등록</title>
 <link href="/css/styles.css" rel="stylesheet" />
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
 	crossorigin="anonymous"></script>
+<script src="/js/member.js"></script>
+
+
 </head>
 <body class="bg-primary">
 	<div id="layoutAuthentication">
@@ -35,7 +40,9 @@
 												<div class="form-floating mb-3 mb-md-0">
 													<input class="form-control" id="empNo" name="empNo"
 														type="number" placeholder="사원번호를 입력하세요" /> <label
-														for="inputFirstName">사원번호</label>
+														for="inputFirstName">사원번호</label> <br>
+													<button id='empNoCheck' type="button">사번확인</button>
+													<br> <span id="empNoCheckResult" style="width: 150px;"></span>
 												</div>
 											</div>
 											<div class="col-md-6">
@@ -61,10 +68,12 @@
 											</div>
 											<div class="col-md-6">
 												<div class="form-floating mb-3 mb-md-0">
-													<input class="form-control" id="inputPasswordConfirm"
+													<input class="form-control" id="empPassConfirm"
 														type="password" placeholder="Confirm password" /> <label
-														for="inputPasswordConfirm">비밀번호 확인</label>
+														for="inputPasswordConfirm">비밀번호 확인</label> <br> <span
+														id="passCheck" style="width: 150px;"></span>
 												</div>
+
 											</div>
 										</div>
 										<div class="mt-4 mb-0">
@@ -105,6 +114,6 @@
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
 		crossorigin="anonymous"></script>
-	<script src="js/scripts.js"></script>
+	<script src="/js/scripts.js"></script>
 </body>
 </html>

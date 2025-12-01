@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.domain.LoginVO;
 import com.example.domain.MemberSaveVO;
@@ -38,13 +39,25 @@ public class MemberController {
 		return "index";
 	}
 
+	@GetMapping("/member/empNoCheck")
+	@ResponseBody
+	public String empNoCheck(String empNo) {
+		log.info("MemberControll empNoCheck 요청받음. empNo :" + empNo);
+		String empCheckResult = memberService.empNoCheck(empNo);
+		if (empCheckResult != null) {
+			log.info("MemberControll empNoCheck 결과값 :" + empCheckResult.toString());
+		}
+		return empCheckResult;
+
+	}
+
 	@PostMapping("loginCheck")
 	public String loginCheck(MemberVO vo, HttpSession session) {
-		
+
 		log.info("[MemberController - member/loginCheck] 요청받음 :" + vo.toString());
-		
+
 		LoginVO check = memberService.loginCheck(vo);
-		
+
 		if (check != null) {
 			session.setAttribute("login", check);
 			log.info("로그인 성공" + check.toString());
@@ -54,7 +67,7 @@ public class MemberController {
 			return "/member/login";
 		}
 	}
-	
+
 	@GetMapping("/login")
 	public String loginPage() {
 		return "redirect:/member/login";
@@ -62,17 +75,15 @@ public class MemberController {
 
 	@GetMapping("/member/register")
 	public String register() {
-		return "redirect:/member/register";
+		return "/member/register";
 	}
-
-	
 
 	@Transactional
 	@PostMapping("member/memberSave")
 	public String memberSave(MemberSaveVO vo, HttpSession session) {
 		String kakaoId = (String) session.getAttribute("kakaoId");
 		vo.setKakaoId(kakaoId);
-		
+
 		log.info(vo.toString());
 
 		Integer result = memberService.memberSave(vo);

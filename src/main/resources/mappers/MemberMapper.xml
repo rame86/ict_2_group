@@ -19,6 +19,13 @@
 		WHERE EMP_NO = #{empNo} and EMP_PASS =
 		#{empPass}
 	</select>
+	
+	<select id="empNoCheck" parameterType="String"
+		resultType="String">
+		SELECT *
+		FROM EMP
+		WHERE EMP_NO = #{empNo}
+	</select>
 
 	<select id="memberCheck" parameterType="String"
 		resultType="String">

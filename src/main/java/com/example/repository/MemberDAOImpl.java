@@ -24,7 +24,11 @@ public class MemberDAOImpl implements MemberDAO {
 		return sess.selectOne("com.example.repository.MemberDAO.memberCheck", kakaoId);
 	}
 
-
+	
+	// emp넘버 조회
+	public String empNoCheck(String empNo) {
+		return sess.selectOne("com.example.repository.MemberDAO.empNoCheck", empNo);
+	}
 
 	public Integer memberSave(MemberSaveVO vo) {		
 		return sess.insert("com.example.repository.MemberDAO.insertMember", vo);

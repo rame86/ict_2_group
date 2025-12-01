@@ -62,7 +62,7 @@
 								</div>
 								<div class="card-footer text-center py-3">
 									<div class="small">
-										<a href="register.html">회원가입은 이곳으로 오세요!</a>
+										<a href="/member/register">회원가입은 이곳으로 오세요!</a>
 									</div>
 								</div>
 							</div>
