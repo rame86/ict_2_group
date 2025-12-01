@@ -4,26 +4,24 @@
 
 <mapper namespace="com.example.repository.SalMapper">
 
-    <!-- 1. 급여 대장: 사원 한 명의 월별 목록 -->
-    <select id="selectSalList"
-        parameterType="int"
-        resultType="com.example.domain.SalVO">
-
-    SELECT
-        s.SAL_NUM      AS salNum,
-        s.EMP_NO       AS empNo,
-        s.MONTH_ATTNO  AS monthAttno,
-        TO_CHAR(s.SAL_DATE,'YYYY-MM-DD') AS salDate,
-        s.SAL_BASE     AS salBase,
-        NVL(s.SAL_BONUS,0) AS salBonus,
-        NVL(s.SAL_PLUS,0)  AS salPlus,
-        s.INSURANCE    AS insurance,
-        s.TAX          AS tax,
-        s.REALPAY      AS realPay
-    FROM SAL s
-    WHERE s.EMP_NO = #{empNo}
-    ORDER BY s.SAL_DATE DESC
-</select>
+     <!-- 사번(empNo)으로 급여 내역 리스트 조회 -->
+    <select id="selectSalList" parameterType="string"
+            resultType="com.example.domain.SalVO">
+        SELECT
+            s.SAL_NUM      AS salNum,
+            s.MONTH_ATTNO  AS monthAttno,
+            s.EMP_NO       AS empNo,
+            TO_CHAR(s.SAL_DATE, 'YYYY-MM-DD') AS salDate,
+            s.SAL_BASE     AS salBase,
+            NVL(s.SAL_BONUS, 0) AS salBonus,
+            NVL(s.SAL_PLUS, 0)  AS salPlus,
+            s.INSURANCE    AS insurance,
+            s.TAX          AS tax,
+            s.REALPAY      AS realPay
+        FROM SAL s
+        WHERE s.EMP_NO = #{empNo}
+        ORDER BY s.SAL_DATE DESC
+    </select>
 
     <!-- 2. 급여 명세서: 사원 + 월별 상세 -->
     <select id="selectSalDetail"
@@ -61,7 +59,7 @@
       AND MONTH_ATTNO = #{monthAttno}
 </select>
 
-    <!-- 5. 급여 INSERT (REALPAY까지 같이) -->
+   <!-- 급여 명세서 등록 -->
     <insert id="insertSal" parameterType="com.example.domain.SalVO">
         INSERT INTO SAL (
             SAL_NUM,
@@ -75,21 +73,19 @@
             TAX,
             REALPAY
         ) VALUES (
-            SAL_SEQ.NEXTVAL,
+            SEQ_SAL.NEXTVAL,
             #{monthAttno},
             #{empNo},
-            SYSDATE,
+            TO_DATE(#{salDate}, 'YYYY-MM-DD'),
             #{salBase},
             #{salBonus},
             #{salPlus},
             #{insurance},
             #{tax},
-            (#{salBase}
-             + NVL(#{salBonus},0)
-             + NVL(#{salPlus},0)
-             - #{insurance}
-             - #{tax})
+            #{realPay}
         )
     </insert>
+
+
 
 </mapper>
