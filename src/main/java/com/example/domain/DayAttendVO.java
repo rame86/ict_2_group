@@ -7,7 +7,7 @@ public class DayAttendVO {
 
 	private String dayAttno;
 	private String empNo;
-	private String att_Status;
+	private String attStatus;
 	private String inTime;
 	private String outTime;
 	private String dayFulltime;
