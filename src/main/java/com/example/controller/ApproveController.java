@@ -63,7 +63,7 @@ public class ApproveController {
 	@PostMapping("approve/approve-form")
 	public String approveForm(DocVO dvo, ApproveVO avo){
 		approveService.ApprovalApplication(dvo, avo);
-		return "approve/statusList";
+		return "redirect:statusList";
 	}
 	
 }
