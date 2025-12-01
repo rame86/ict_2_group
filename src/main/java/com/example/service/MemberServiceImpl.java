@@ -22,9 +22,11 @@ public class MemberServiceImpl implements MemberService {
 		return memberDao.memberCheck(kakaoId);
 	}
 
+
 	public String empNoCheck(String empNo) {
 		return memberDao.empNoCheck(empNo);
 	}
+
 
 
 	public Integer memberSave(MemberSaveVO vo) {
