@@ -9,5 +9,5 @@ public class MemberSaveVO {
 	private String empPass;
 	private String kakaoId;	
 	private String empEmail;
-	private Long memberNo;
+	
 }

@@ -9,8 +9,6 @@ public interface MemberDAO {
 
 	public String memberCheck(String kakaoId);
 
-	public Long getNextMemberNo();
-	
 	public Integer memberSave(MemberSaveVO vo);
 	
 	public LoginVO kakaoLoginInfo(String kakaId);
