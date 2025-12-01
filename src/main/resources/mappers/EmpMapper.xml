@@ -4,53 +4,41 @@
 
 <mapper namespace="com.example.repository.EmpMapper">
 
-	<select id="selectEmpList"
-		parameterType="com.example.domain.EmpSearchVO"
-		resultType="com.example.domain.EmpVO">
-
-		SELECT
-		e.EMP_NO 												AS empNo,
-		e.EMP_NAME 										AS empName,
-		e.EMP_PHONE 										AS empPhone,
-		e.EMP_REGDATE 									AS empRegdate,
-
-		d.DEPT_NAME AS deptName, -- DEPT 테이블 컬럼
-		s.STATUS AS statusName -- EMP_STATUS.STATUS 컬럼
-
-		FROM EMP e
-					LEFT JOIN DEPT d 
-			ON e.DEPT_NO = d.DEPT_NO
-					LEFT JOIN EMP_STATUS s 
-			ON e.STATUS_NO = s.STATUS_NO
-
-		<where>
-			<if test="keyword != null and keyword != ''">
-				( e.EMP_NAME LIKE '%' || #{keyword} || '%'
-				OR d.DEPT_NAME
-				LIKE '%' || #{keyword} || '%'
-				OR s.STATUS LIKE '%' || #{keyword} ||
-				'%' )
-			</if>
-		</where>
-
-		ORDER BY e.EMP_NO ASC
-	</select>
+	<select id="selectEmpList" resultType="com.example.domain.EmpVO">
+    SELECT  e.EMP_NO      AS empNo,
+            e.STATUS_NO   AS statusNo,      -- ✅ 숫자 코드
+            e.EMP_NAME    AS empName,
+            e.EMP_PHONE   AS empPhone,
+            e.EMP_REGDATE AS empRegdate,
+            e.BASE_SAL    AS baseSal,
+            d.DEPT_NAME   AS deptName
+    FROM EMP e
+        LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+    ORDER BY e.EMP_NO ASC
+</select>
 
 	<!-- EmpMapper.xml -->
 	<select id="getEmp" parameterType="String"
-		resultType="com.example.domain.EmpVO">
-		SELECT
-		e.emp_no AS empNo,
-		e.emp_name AS empName,
-		e.emp_phone AS empPhone,
-		e.emp_regdate AS empRegdate,
-		e.base_sal AS baseSal, -- ★ 새로 추가한 기본급
-		d.dept_name AS deptName,
-		s.status AS statusName
-		FROM EMP e
-		LEFT JOIN DEPT d ON e.dept_no = d.dept_no
-		LEFT JOIN EMP_STATUS s ON e.status_no = s.status_no
-		WHERE e.emp_no = #{empNo}
-	</select>
+        resultType="com.example.domain.EmpVO">
+    SELECT
+        e.EMP_NO      AS empNo,
+        e.STATUS_NO   AS statusNo,
+        e.DEPT_NO     AS deptNo,
+        e.GRADE_NO    AS gradeNo,
+        e.EMP_PASS    AS empPass,
+        e.KAKAO_ID    AS kakaoId,
+        e.EMP_NAME    AS empName,
+        e.EMP_PHONE   AS empPhone,
+        e.EMP_ADDR    AS empAddr,
+        e.EMP_EMAIL   AS empEmail,
+        e.EMP_IMAGE   AS empImage,
+        e.EMP_REG_NO  AS empRegNo,
+        e.EMP_REGDATE AS empRegdate,
+        e.BASE_SAL    AS baseSal,
+        d.DEPT_NAME   AS deptName
+    FROM EMP e
+        LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+    WHERE e.EMP_NO = #{empNo}
+</select>
 
 </mapper>

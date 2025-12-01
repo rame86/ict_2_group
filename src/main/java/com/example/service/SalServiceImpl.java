@@ -17,16 +17,8 @@ public class SalServiceImpl implements SalService {
     @Override
     public List<SalVO> getSalList(String empNo) {
 
-        // "1001" → 1001
-        Integer empNoInt = null;
-        try {
-            empNoInt = Integer.parseInt(empNo);
-        } catch (NumberFormatException e) {
-            System.out.println("[SalServiceImpl] empNo 파싱 실패: " + empNo);
-            return List.of(); // 혹은 Collections.emptyList();
-        }
-
-        List<SalVO> list = salMapper.selectSalList(empNoInt);
+        // 이제 굳이 숫자로 바꾸지 않고, 그대로 String으로 넘겨요
+        List<SalVO> list = salMapper.selectSalList(empNo);
 
         for (SalVO vo : list) {
             fillCalculatedFields(vo);
@@ -37,15 +29,9 @@ public class SalServiceImpl implements SalService {
     @Override
     public SalVO getSalaryDetail(String empNo, Integer monthAttno) {
 
-        Integer empNoInt = null;
-        try {
-            empNoInt = Integer.parseInt(empNo);
-        } catch (NumberFormatException e) {
-            System.out.println("[SalServiceImpl] empNo 파싱 실패(Detail): " + empNo);
-            return null;
-        }
+        // 마찬가지로 empNo를 그대로 String으로 전달
+        SalVO vo = salMapper.selectSalDetail(empNo, monthAttno);
 
-        SalVO vo = salMapper.selectSalDetail(empNoInt, monthAttno);
         if (vo != null) {
             fillCalculatedFields(vo);
         }
