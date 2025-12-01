@@ -8,7 +8,9 @@ public interface MemberDAO {
 	public LoginVO loginCheck(MemberVO vo);
 
 	public String memberCheck(String kakaoId);
-
+	
+	public String empNoCheck(String empNo);
+	
 	public Integer memberSave(MemberSaveVO vo);
 	
 	public LoginVO kakaoLoginInfo(String kakaId);
