@@ -62,8 +62,7 @@
                                 </nav>
                             </div>
 
-					<a class="nav-link <%=menu.equals("salemp") ? "active" : ""%>"
-						href="<c:url value='/emp/list' />">
+					<a class="nav-link <%=menu.equals("salemp") ? "active" : ""%>" href="<c:url value='/emp/list' />">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-columns"></i>
 						</div> 급여관리
