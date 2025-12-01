@@ -8,7 +8,9 @@ public class EmpVO {
 	private String empNo;
 	private Integer statusNo;
 	private Integer deptNo;
-	private Integer gradeNo;
+	private Integer grade_No;
+	private String emp_Pass;
+	private String kakao_Id;
 	
 	private String empName;
 	private String empPhone;

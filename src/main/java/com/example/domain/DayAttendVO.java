@@ -6,8 +6,8 @@ import lombok.Data;
 public class DayAttendVO {
 
 	private String dayAttno;
-	private String attNo;
 	private String empNo;
+	private String att_Status;
 	private String inTime;
 	private String outTime;
 	private String dayFulltime;
