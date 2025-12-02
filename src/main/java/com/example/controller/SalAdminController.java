@@ -16,6 +16,9 @@ import com.example.service.EmpService;
 import com.example.service.SalService;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/sal/admin")
@@ -47,7 +50,11 @@ public class SalAdminController {
      *  - 일단은 화면 접근 권한만 체크하고, 리스트는 나중에 붙여도 됨
      */
     @GetMapping("/list")
-    public String adminSalList(HttpSession session, Model model) {
+    public String adminSalList(
+    		@RequestParam(name = "sort", defaultValue = "month") String sort,
+            @RequestParam(name = "dir",  defaultValue = "asc")   String dir,
+            HttpSession session,
+            Model model) {
 
     	// 1) 관리자 권한 체크
         if (!isAdmin(session)) {
@@ -56,9 +63,17 @@ public class SalAdminController {
 
         // 2) 관리자용 급여 대장 데이터 조회
         //    (조건 검색은 나중에 추가해도 되고 지금은 전체 조회)
-        List<SalVO> salList = salService.getAdminSalList();
+        Map<String, String> param = new HashMap<>();
+        param.put("sort", sort);   // month, empNo, name, dept
+        param.put("dir", dir);     // asc, desc
+        
+     // 3) 서비스 호출 (정렬 반영된 관리자 급여 목록)
+        List<SalVO> salList = salService.getAdminSalList(param);
 
+        // 4) 화면으로 전달
         model.addAttribute("salList", salList);
+        model.addAttribute("sort", sort);
+        model.addAttribute("dir", dir);
         model.addAttribute("menu", "saladmin");
 
         return "sal/adminList";   // /WEB-INF/views/sal/adminList.jsp
@@ -70,17 +85,23 @@ public class SalAdminController {
      *    관리자 권한을 한 번 더 체크하는 버전
      */
     @GetMapping("/detail")
-    public String adminSalDetail(@RequestParam String empNo,
-                                 @RequestParam Integer monthAttno,
-                                 HttpSession session,
-                                 Model model) {
+    public String SalDetail(@RequestParam String empNo,
+                            @RequestParam Integer monthAttno,
+                            HttpSession session,
+                            Model model) {
 
-        // 1) 관리자 권한 체크
+        LoginVO login = (LoginVO) session.getAttribute("login");
+        if (login == null) {
+            return "redirect:/member/login";
+        }
+
+        boolean isAdmin = "1".equals(login.getGradeNo());
+
+        // 🔒 관리자 아니면 무조건 차단
         if (!isAdmin(session)) {
             return "error/NoAuthPage";
         }
 
-        // 2) 급여 상세 + 사원 정보 조회 (기존 서비스 재사용)
         SalVO sal = salService.getSalaryDetail(empNo, monthAttno);
         EmpVO emp = empService.getEmp(empNo);
 
@@ -88,6 +109,6 @@ public class SalAdminController {
         model.addAttribute("sal", sal);
         model.addAttribute("menu", "saladmin");
 
-        return "sal/adminDetail";   // /WEB-INF/views/sal/adminDetail.jsp
+        return "sal/salDetail";    // 또는 "sal/adminDetail" (관리자 전용 화면 쓰고 싶으면)
     }
 }
