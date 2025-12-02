@@ -1,5 +1,7 @@
 package com.example.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,40 +25,41 @@ public class AttendController {
 	private AttendService attendService;
 
 	@GetMapping("/attend/attend")
-	public String attend(EmpVO vo, Model m, HttpSession session) {
+	public String attend(LoginVO vo, Model m, HttpSession session) {
 		log.info("[AttendController-attend 요청 받음]");
 
-		// 1. 세션에서 "login" 객체를 가져오기
-		Object loginObject = session.getAttribute("login");
-
-		if (loginObject != null) {
-
+		
+	    Object loginInfoObj = session.getAttribute("login");
+	    
+		if (loginInfoObj != null) {			
 			try {
 				// LoginVO 타입으로 캐스팅
-				LoginVO loginVo = (LoginVO) loginObject;
-				String empNoFromSession = loginVo.getEmpNo();
+				vo = (LoginVO)loginInfoObj;				
 
-				if (empNoFromSession != null) {
-					// 쿼리에 사용할 vo 객체에 empNo를 설정
-					vo.setEmpNo(empNoFromSession);
-					log.info("세션(LoginVO)에서 가져온 empNo 설정 완료: {}", empNoFromSession);
-				} else {
-					log.warn("세션 login 객체(LoginVO) 내부에 empNo 필드 값이 null입니다.");
-				}
-
-			} catch (ClassCastException e) {
-				// 4. 세션 객체의 타입이 예상과 다를 때 발생하는 오류 처리
+			} catch (ClassCastException e) {				
 				log.error("세션 속성 'login'을 LoginVO로 캐스팅하는 데 실패했습니다. 타입이 다릅니다.", e);
 			}
 
 		} else {
 			// 로그인 되지 않은 상태
-			log.warn("세션에 'login' 객체가 존재하지 않습니다. 로그인 상태를 확인하세요.");
-			// return "redirect:/member/login"; // 로그인 필요 시 리다이렉트
+			log.warn("세션에 'login' 객체가 존재하지 않습니다. 로그인 상태를 확인하세요.");			
 		}
 
+		LocalDate todayDate = LocalDate.now();
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+				
+		String toDay = todayDate.format(formatter);
+		String empNo = vo.getEmpNo();
+		
+		
+		// ************** 테스트용 toDay************
+		toDay = "2025-11";
+		log.info("toDay : "+toDay);		
+		log.info("empNo : "+empNo);
+		
 		// vo.empNo에 유효한 값이 설정되었으므로 DB 쿼리 실행
-		List<DayAttendVO> result = attendService.selectDayAttend(vo);
+		List<DayAttendVO> result = attendService.selectDayAttend(empNo, toDay);
 
 		for (DayAttendVO day : result) {
 			log.info("데이터: {}", day.toString()); // VO 객체의 toString() 호출
