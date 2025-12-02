@@ -14,4 +14,8 @@ public interface MemberService {
 	public Integer memberSave(MemberSaveVO vo);
 
 	public LoginVO kakaoLoginInfo(String kakaId);
+
+	
+	
+
 }

@@ -61,6 +61,7 @@ public class MemberController {
 		if (check != null) {
 			session.setAttribute("login", check);
 			log.info("로그인 성공" + check.toString());
+			log.info("로그인 등급 gradeNo = " + check.getGradeNo());
 			return "index";
 		} else {
 			log.info("로그인 실패");

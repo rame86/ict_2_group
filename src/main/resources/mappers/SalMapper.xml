@@ -86,6 +86,30 @@
         )
     </insert>
 
+<!-- 관리자용 급여 대장: 모든 급여 + 사원명 + 부서명 -->
+<select id="selectAdminSalList"
+        resultType="com.example.domain.SalVO">
+
+    SELECT
+        s.SAL_NUM      AS salNum,
+        s.MONTH_ATTNO  AS monthAttno,
+        s.EMP_NO       AS empNo,
+        TO_CHAR(s.SAL_DATE, 'YYYY-MM-DD') AS salDate,
+        s.SAL_BASE     AS salBase,
+        NVL(s.SAL_BONUS, 0) AS salBonus,
+        NVL(s.SAL_PLUS, 0)  AS salPlus,
+        s.INSURANCE    AS insurance,
+        NVL(s.TAX, 0)  AS tax,
+        s.REALPAY      AS realPay,
+        e.EMP_NAME     AS empName,
+        d.DEPT_NAME    AS deptName
+    FROM SAL s
+        JOIN EMP e  ON s.EMP_NO = e.EMP_NO
+        LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+    ORDER BY
+        s.MONTH_ATTNO DESC,
+        s.EMP_NO ASC
+</select>
 
 
 </mapper>

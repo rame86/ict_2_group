@@ -70,4 +70,22 @@ public class SalServiceImpl implements SalService {
     private int n(Integer v) {
         return v == null ? 0 : v;
     }
+
+	@Override
+	public List<SalVO> getAdminSalList(Integer monthAttno, String deptNo, String keyword) {
+		
+		return null;
+	}
+	
+	@Override
+    public List<SalVO> getAdminSalList() {
+
+        List<SalVO> list = salMapper.selectAdminSalList();
+
+        // 기존과 동일하게 계산 필드 채워주기
+        for (SalVO vo : list) {
+            fillCalculatedFields(vo);
+        }
+        return list;
+    }
 }
