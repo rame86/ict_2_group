@@ -41,4 +41,19 @@
     WHERE e.EMP_NO = #{empNo}
 </select>
 
+<select id="loginCheck"
+        parameterType="com.example.domain.MemberVO"
+        resultType="com.example.domain.LoginVO">
+    SELECT
+        EMP_NO      AS empNo,
+        EMP_NAME    AS empName,
+        GRADE_NO    AS gradeNo,
+        DEPT_NO     AS deptNo,
+        EMP_EMAIL   AS empEmail,
+        EMP_PHONE   AS empPhone
+    FROM EMP
+    WHERE EMP_NO = #{empNo}
+      AND EMP_PASS = #{empPass}
+</select>
+
 </mapper>

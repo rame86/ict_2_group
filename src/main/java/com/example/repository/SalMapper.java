@@ -23,4 +23,7 @@ public interface SalMapper {
                             @Param("monthAttno") Integer monthAttno);
 
     void insertSal(SalVO vo);
+    
+    // 🔹 관리자용 급여 대장 조회
+    List<SalVO> selectAdminSalList();
 }
