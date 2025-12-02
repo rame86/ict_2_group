@@ -14,5 +14,6 @@ public class DayAttendVO {
 	private String firstDaytime;
 	private String updateTime;
 	private String memo;
+	private String dateAttend;
 
 }

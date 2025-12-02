@@ -19,16 +19,6 @@
 	gap: 40px; /* 왼쪽과 오른쪽 사이 간격 */
 }
 
-/* 3. [왼쪽] 그래프 영역 */
-/* .report-section {
-    width: 350px; 너비 고정
-    min-width: 350px; 줄어들지 않게 고정
-    border-right: 1px solid #ddd; 오른쪽 구분선 (선택사항)
-    padding-right: 30px;
-    jsp include된 그래프가 너무 크면 여기서 overflow 제어
-    overflow: hidden; 
-} */
-
 /* 4. [오른쪽] 달력 및 버튼 영역 전체 */
 .calendar-section {
 	flex-grow: 1; /* 남은 공간 다 차지 */
@@ -97,54 +87,112 @@
 	cursor: pointer;
 }
 
- .modal {
-        display: none; /* 초기에는 숨김 */
-        position: fixed; /* 화면에 고정 */
-        z-index: 1000; /* 다른 요소 위에 표시 */
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.4); /* 반투명 검은색 배경 */
-        opacity: 0; /* 부드러운 효과를 위한 초기 투명도 */
-        transition: opacity 0.3s ease-in-out; /* 부드러운 효과 */
-    }
+.modal {
+	display: none; /* 초기에는 숨김 */
+	position: fixed; /* 화면에 고정 */
+	z-index: 1000; /* 다른 요소 위에 표시 */
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4); /* 반투명 검은색 배경 */
+	opacity: 0; /* 부드러운 효과를 위한 초기 투명도 */
+	transition: opacity 0.3s ease-in-out; /* 부드러운 효과 */
+}
 
-    .modal.show {
-        display: block;
-        opacity: 1;
-    }
+.modal.show {
+	display: block;
+	opacity: 1;
+}
 
-    .modal-content {
-        background-color: #fefefe;
-        margin: 2% auto; /* 상단에서 5% 위치, 가운데 정렬 */
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%; /* 모달 너비 */
-        max-width: 600px; /* 최대 너비 설정 */
-        border-radius: 8px;
-        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
-        position: relative;
-        /* 모달이 아래에서 위로 부드럽게 나타나는 효과 */
-        transform: translateY(20px);
-        transition: transform 0.3s ease-in-out;
-    }
+.modal-content {
+	background-color: #fefefe;
+	margin: 2% auto; /* 상단에서 5% 위치, 가운데 정렬 */
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%; /* 모달 너비 */
+	max-width: 600px; /* 최대 너비 설정 */
+	border-radius: 8px;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0
+		rgba(0, 0, 0, 0.19);
+	position: relative;
+	/* 모달이 아래에서 위로 부드럽게 나타나는 효과 */
+	transform: translateY(20px);
+	transition: transform 0.3s ease-in-out;
+}
 
-    .modal.show .modal-content {
-        transform: translateY(0);
-    }
+.modal.show .modal-content {
+	transform: translateY(0);
+}
 
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
+.close {
+	color: #aaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
 
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
+.close:hover, .close:focus {
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+/***************** 달력 영역 **************/
+
+/* 토요일과 일요일의 날짜 텍스트를 빨간색으로 설정 */
+.fc-day-sat .fc-daygrid-day-number, .fc-day-sun .fc-daygrid-day-number {
+	color: #F44336; /* 빨간색 */
+}
+
+/* 요일 헤더(토/일)도 빨간색으로 설정 */
+.fc-day-sat.fc-col-header-cell .fc-col-header-cell-cushion, .fc-day-sun.fc-col-header-cell .fc-col-header-cell-cushion
+	{
+	color: #F44336;
+}
+
+/* FullCalendar의 날짜 셀과 이벤트에 마우스를 올렸을 때 손가락 모양 커서 표시 */
+.fc-daygrid-day-frame, 
+.fc-event {
+    cursor: pointer;
+}
+
+/******************* 도우넛 그래프 영역 ********************/
+
+
+.chart-container {
+	width: 350px;
+	height: 350px;
+	margin: 50px auto 10px;
+	position: relative;
+}
+
+#summaryBox {
+	width: 350px;
+	margin: 10px auto 50px;
+	padding: 15px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	text-align: center;
+	background-color: #f9f9f9;
+}
+
+#summaryBox h3 {
+	margin: 0 0 5px 0;
+	font-size: 1.2em;
+	color: #333;
+}
+
+#summaryBox p {
+	margin: 5px 0;
+	font-size: 0.95em;
+	color: #666;
+}
+
+.report-section {
+	/* 차트 컨테이너의 너비와 맞추거나, 약간 더 넓게 지정 */
+    /* 현재 차트 컨테이너 너비가 350px이므로 */
+	width: 400px; 
+    min-width: 350px;
+}

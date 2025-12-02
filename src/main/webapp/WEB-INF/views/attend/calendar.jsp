@@ -6,69 +6,66 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>사원 근무 기록 달력</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사원 근무 기록 달력</title>
 
-    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' rel='stylesheet' />
-    
-    <style>
-        /* 토요일과 일요일의 날짜 텍스트를 빨간색으로 설정 */
-        .fc-day-sat .fc-daygrid-day-number,
-        .fc-day-sun .fc-daygrid-day-number {
-            color: #F44336; /* 빨간색 */
-        }
-        
-        /* 요일 헤더(토/일)도 빨간색으로 설정 */
-        .fc-day-sat.fc-col-header-cell .fc-col-header-cell-cushion,
-        .fc-day-sun.fc-col-header-cell .fc-col-header-cell-cushion {
-            color: #F44336;
-        }
+<link
+	href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css'
+	rel='stylesheet' />
 
-        /* 참고: 금요일은 기본 색상(검정)을 유지합니다. */
-    </style>
-    </head>
+
+</head>
 <body>
 
-    <div id="calendar"></div>
+	<div id="calendar"></div>
 
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-    
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales-all.min.js'></script>
+	<script
+		src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+
+	<script
+		src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales-all.min.js'></script>
 
 
-    <script>
-      
- // 🚨 주의: 이 데이터는 실제 API 응답 대신 동작 테스트를 위해 하드 코딩한 Mock 데이터입니다.
-    // 실제 프로젝트에서는 서버 API 호출로 대체해야 합니다.
-
-    // 1. 달력에 표시할 근무일 목록 데이터 (API 1의 응답 역할)
-    const mockEvents = [
-        { title: "근무", start: "2025-11-03", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-04", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-05", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-06", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-07", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-10", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-11", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-12", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-13", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-14", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-17", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-18", allDay: true, color: "#4CAF50" },
-        { title: "근무", start: "2025-11-19", allDay: true, color: "#4CAF50" }
-    ];
-
-    // 2. 특정 날짜 근무 상세 정보 (API 2의 응답 역할)
-    const mockWorkDetails = {
-        status: "정상 근무",
-        checkIn: "09:00:00",
-        checkOut: "17:00:00",
-        breakTime: "01:00:00",
-        totalWorkHours: "07:00:00"
+	<script>
+	// 이벤트 색상 정의
+    const colorMap = {
+        // 출퇴근 정상 기록 (기본)        
+        '출근': '#4CAF50', // 초록색 (정상근무와 동일하게 가정)
+        // 휴가 상태
+        '연차': '#2196F3', // 파란색
+        '반차': '#00BCD4', // 하늘색
+        '휴가': '#2196F3', // 파란색
+        // 결근 상태
+        '결근': '#FF9800', // 주황색
+        '지각': '#FFEB3B', // 노란색
+        '조퇴': '#FFC107', // 호박색
+        // 기타
+        '출장': '#9E9E9E' // 회색
     };
 
 
+    const appendEvents = [       
+        <c:forEach var="dayAttend" items="${result}" varStatus="status">
+        { 
+            title: "${dayAttend.attStatus}", 
+            date: "${dayAttend.dateAttend}",
+            // **[제거] start와 end 속성 제거**
+            allDay: true,
+            color: colorMap["${dayAttend.attStatus}"],
+            
+            // **[이동] 상세 정보를 이벤트 객체 자체에 포함**
+            attStatus: "${dayAttend.attStatus}",
+            inTime: "${dayAttend.inTime}",
+            outTime: "${dayAttend.outTime}",
+            breakTime: "01:00:00", // 휴게 시간은 Mock 값 그대로 유지
+            dayFulltime: "${dayAttend.dayFulltime}"
+         } <c:if test="${!status.last}">,</c:if>
+        </c:forEach>
+    ];
+
+    console.log("FullCalendar Events Data:", appendEvents);    
+    // **[삭제] mockWorkDetails 변수 제거**
 
         document.addEventListener('DOMContentLoaded', function() {
             var calendarEl = document.getElementById('calendar');
@@ -84,8 +81,8 @@
                 },
                 locale: 'ko', // 한글 설정
                 
-                // 1. FullCalendar 이벤트 소스 설정 (Mock 데이터 직접 사용)
-                events: mockEvents, 
+                // 1. FullCalendar 이벤트 소스 설정
+                events: appendEvents, 
                 
                 // 2. 날짜 클릭 이벤트 처리
                 dateClick: function(info) {
@@ -93,24 +90,23 @@
                     // 0=일요일, 1=월요일, ..., 5=금요일, 6=토요일
                     const clickedDay = new Date(clickedDate).getDay(); 
                     
-                    // 해당 날짜에 근무 기록이 있는지 mockEvents 배열에서 확인
-                    const isWorkDay = mockEvents.some(event => event.start === clickedDate);
+                    // **[수정] 해당 날짜의 이벤트 객체를 찾습니다.**
+                    const workEvent = appendEvents.find(event => event.date === clickedDate);
                     
                     // 토요일(6) 또는 일요일(0)인지 확인
                     const isWeekend = (clickedDay === 0 || clickedDay === 6);
 
 
-                    if (isWorkDay) {
-                        // 근무 기록이 있는 경우
+                    if (workEvent) {
+                        // 근무 기록이 있는 경우 (찾은 workEvent 사용)
                         
-                        // Mock 데이터 사용: 모든 근무일은 동일한 상세 정보를 가집니다.
                         alert(
                             `[${clickedDate} 근무 상세]\n` +
-                            `상태: ${mockWorkDetails.status}\n` +
-                            `출근: ${mockWorkDetails.checkIn}\n` +
-                            `퇴근: ${mockWorkDetails.checkOut}\n` +
-                            `휴게시간: ${mockWorkDetails.breakTime}\n` +
-                            `총 근무 시간: ${mockWorkDetails.totalWorkHours}`
+                            `상태: ${workEvent.attStatus}\n` +
+                            `출근: ${workEvent.inTime}\n` +
+                            `퇴근: ${workEvent.outTime}\n` +
+                            `휴게시간: ${workEvent.breakTime}\n` +
+                            `총 근무 시간: ${workEvent.dayFulltime}`
                         );
                     } else if (isWeekend) {
                         // 근무 기록은 없지만 토/일인 경우 (휴무일로 표시)
