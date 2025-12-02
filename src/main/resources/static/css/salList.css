@@ -1,0 +1,141 @@
+/* ====== 전체 레이아웃 ====== */
+
+.content-wrapper {
+    padding: 20px 30px;
+}
+
+.emp-info-box {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    font-size: 14px;
+}
+
+.emp-info-box span {
+    margin-right: 12px;
+}
+
+/* ====== 급여 테이블 기본 스타일 ====== */
+
+table.salary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+table.salary-table thead th {
+    background-color: #f1f1f1;
+    border: 1px solid #dee2e6;
+    padding: 8px 10px;
+    text-align: center;
+    font-weight: 600;
+}
+
+table.salary-table tbody td {
+    border: 1px solid #dee2e6;
+    padding: 8px 10px;
+    text-align: center;
+}
+
+table.salary-table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+/* 지급월 링크 */
+.month-link {
+    text-decoration: underline;
+    color: #0d6efd;
+    cursor: pointer;
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+/* DataTables 기본 보더 제거 */
+table.dataTable.no-footer {
+    border-bottom: 1px solid #dee2e6;
+}
+
+table.dataTable tbody tr:nth-child(odd),
+table.dataTable tbody tr:nth-child(even) {
+    background-color: #fff;
+}
+
+/* ====== 검색창 스타일 ====== */
+
+.dataTables_filter {
+    text-align: right;
+    margin-bottom: 5px;
+}
+
+.dataTables_filter label {
+    font-size: 14px;
+    color: #333;
+}
+
+.dataTables_filter label > span {
+    display: none; /* Search: 제거 */
+}
+
+.dataTables_filter input {
+    border: 1px solid #ccc !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    width: 180px !important;
+    outline: none !important;
+    transition: 0.2s;
+}
+
+.dataTables_filter input:focus {
+    border-color: #888 !important;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+}
+
+/* ====== 페이징 버튼 스타일 ====== */
+
+div.dataTables_wrapper div.dataTables_paginate {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.dataTables_paginate .paginate_button {
+    padding: 0px 6px !important;
+    margin-left: 2px;
+    font-size: 12px !important;
+    height: 26px !important;
+    line-height: 26px !important;
+}
+
+/* ====== 데이터 정렬 화살표 ====== */
+
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc {
+    background-image: none;
+    position: relative;
+}
+
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_desc:after {
+    content: "▲▼";
+    font-size: 10px;
+    color: #999;
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+table.dataTable thead .sorting_asc:after {
+    content: "▲";
+    color: #666;
+}
+
+table.dataTable thead .sorting_desc:after {
+    content: "▼";
+    color: #666;
+}

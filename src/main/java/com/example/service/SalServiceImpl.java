@@ -1,6 +1,7 @@
 package com.example.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ public class SalServiceImpl implements SalService {
     @Autowired
     private SalMapper salMapper;
 
+    /** 사원 개인 급여 목록 */
     @Override
     public List<SalVO> getSalList(String empNo) {
 
@@ -26,6 +28,7 @@ public class SalServiceImpl implements SalService {
         return list;
     }
 
+    /** 급여 상세 */
     @Override
     public SalVO getSalaryDetail(String empNo, Integer monthAttno) {
 
@@ -36,6 +39,18 @@ public class SalServiceImpl implements SalService {
             fillCalculatedFields(vo);
         }
         return vo;
+    }
+    
+     /** ✅ 관리자 전체 급여 목록 (정렬/검색용) */
+    @Override
+    public List<SalVO> getAdminSalList(Map<String, String> param) {
+
+        List<SalVO> list = salMapper.selectAdminSalList(param);
+
+        for (SalVO vo : list) {
+            fillCalculatedFields(vo);
+        }
+        return list;
     }
 
     /** 급여 계산 + yearMonthLabel 세팅 */
@@ -71,21 +86,7 @@ public class SalServiceImpl implements SalService {
         return v == null ? 0 : v;
     }
 
-	@Override
-	public List<SalVO> getAdminSalList(Integer monthAttno, String deptNo, String keyword) {
-		
-		return null;
-	}
 	
-	@Override
-    public List<SalVO> getAdminSalList() {
 
-        List<SalVO> list = salMapper.selectAdminSalList();
 
-        // 기존과 동일하게 계산 필드 채워주기
-        for (SalVO vo : list) {
-            fillCalculatedFields(vo);
-        }
-        return list;
-    }
 }
