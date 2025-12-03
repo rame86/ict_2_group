@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%
-    request.setAttribute("menu", "send");
+    request.setAttribute("menu", "finish");
 %>
 
 <!DOCTYPE html>
@@ -25,12 +25,12 @@
 		<div id="layoutSidenav_content">
 			<main>
 				<div class="container-fluid px-4">
-                        <h3 class="mt-4">결재 받을 문서</h3><br>
+                        <h3 class="mt-4">결재 완료 문서</h3><br>
                         
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
-                                결재 대기 문서
+                                결재 한 문서
                             </div>
                             <div class="card-body">
                                 <table id="datatablesSimple" class="display">
@@ -53,7 +53,7 @@
 								        </tr>
 								    </tfoot>
                                     <tbody>
-                                    	<c:forEach var="vo" items="${ waitList }">
+                                    	<c:forEach var="vo" items="${ receiveList }">
 	                                        <tr>
 	                                            <td>${ vo.docNo }</td>
 	                                            <td>${ vo.docDate }</td>
@@ -79,7 +79,7 @@
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
-                                결재 반려 문서
+                                결재 받은 문서
                             </div>
                             <div class="card-body">
                                 <table id="datatablesSimpleR" class="display">
@@ -102,7 +102,7 @@
 								        </tr>
 								    </tfoot>
                                     <tbody>
-                                    	<c:forEach var="vo" items="${ rejectList }">
+                                    	<c:forEach var="vo" items="${ sendList }">
 	                                        <tr>
 	                                            <td>${ vo.docNo }</td>
 	                                            <td>${ vo.docDate }</td>

@@ -29,47 +29,71 @@
 						<h3 class="mt-4">결재 현황</h3><br>
 						
 						<div class="row">
-							<div class="col-xl-3 col-md-6">
+							<div class="col-xl-2 col-md-4">
                                 <div class="card bg-primary text-white mb-4">
-                                    <div class="card-body">결재 완료</div>
-                                    <div class="card-body"><h3>4건</h3></div><br>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">자세히 보기</a>
+                                	<div class="card-header d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">결재 완료 문서</a>
                                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                                     </div>
+                                    <div class="card-body">승인 완료</div>
+                                    <div class="card-body"><h3>${ sendFinishCount }건</h3></div><br>
+                                    
                                 </div>
                             </div>
-                            <div class="col-xl-3 col-md-6">
+                            <div class="col-xl-2 col-md-4">
                                 <div class="card bg-warning text-white mb-4">
+                                	<div class="card-header d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">결재 받을 문서</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
                                     <div class="card-body">결재 진행중</div>
-                                    <div class="card-body"><h3>4건</h3></div><br>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">자세히 보기</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
+                                    <div class="card-body"><h3>${ sendWaitCount }건</h3></div><br>
+                                    
                                 </div>
                             </div>
-                            <div class="col-xl-3 col-md-6">
+                            <div class="col-xl-2 col-md-4">
                                 <div class="card bg-danger text-white mb-4">
+                                	<div class="card-header d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">결재 받을 문서</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
                                     <div class="card-body">결재 반려</div>
-                                    <div class="card-body"><h3>4건</h3></div><br>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">자세히 보기</a>
-                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-                                    </div>
+                                    <div class="card-body"><h3>${ sendrejectCount }건</h3></div><br>
                                 </div>
                             </div>
-                            <div class="col-xl-3 col-md-6">
+                            <div class="col-xl-2 col-md-4">
+                                <div class="card bg-primary text-white mb-4">
+                                	<div class="card-header d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">결재 완료 문서</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
+                                    <div class="card-body">결재 완료</div>
+                                    <div class="card-body"><h3>${ receiveFinishCount }건</h3></div><br>
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-md-4">
+                                <div class="card bg-warning text-white mb-4">
+                                	<div class="card-header d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">결재 할 문서</a>
+                                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                    </div>
+                                    <div class="card-body">결재 대기</div>
+                                    <div class="card-body"><h3>${ receiveWaitCount }건</h3></div><br>
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-md-4">
                                 <div class="card bg-success text-white mb-4">
-                                    <div class="card-body">승인할 문서</div>
-                                    <div class="card-body"><h3>4건</h3></div><br>
-                                    <div class="card-footer d-flex align-items-center justify-content-between">
-                                        <a class="small text-white stretched-link" href="#">자세히 보기</a>
+                                	<div class="card-header d-flex align-items-center justify-content-between">
+                                        <a class="small text-white stretched-link" href="#">모든 결재 문서</a>
                                         <div class="small text-white"><i class="fas fa-angle-right"></i></div>
                                     </div>
+                                    <div class="card-body">전체 합계</div>
+                                    <div class="card-body"><h3>${ totalCount }건</h3></div><br>
                                 </div>
                             </div>
-                        </div><br>
+                        </div>
+                        
+                        <br>
                         
                         <!-- 테이블 -->
                         <div class="card mb-4 approve-main">
@@ -94,13 +118,17 @@
 	                                        <tr>
 	                                            <td>${ vo.docNo }</td>
 	                                            <td>${ vo.docDate }</td>
-	                                            <td>${ vo.docTitle }</td>
+	                                            <td><a href="">${ vo.docTitle }</a></td>
 	                                            <td>${ vo.writerName }</td>
 												<td>
-	                                            	${ vo.step1ManagerName }
-	                                            	<c:if test="${ not empty vo.step2ManagerName and vo.step1ManagerName != vo.step2ManagerName }">
-	                                            		, ${vo.step2ManagerName}
-	                                            	</c:if>
+	                                            	<c:choose>
+												        <c:when test="${ not empty vo.step1ManagerName }">
+												            ${ vo.step1ManagerName }, ${ vo.step2ManagerName }
+												        </c:when>
+												        <c:otherwise>
+												            ${ vo.step2ManagerName }
+												        </c:otherwise>
+												    </c:choose>
 	                                            </td>
 	                                            <td>${ vo.progressStatus }</td>
 	                                        </tr>
@@ -131,12 +159,16 @@
 	                                        <tr>
 	                                            <td>${ vo.docNo }</td>
 	                                            <td>${ vo.docDate }</td>
-	                                            <td>${ vo.docTitle }</td>
+	                                            <td><a href="">${ vo.docTitle }</a></td>
 												<td>
-	                                            	${ vo.step1ManagerName }
-	                                            	<c:if test="${ not empty vo.step2ManagerName and vo.step1ManagerName != vo.step2ManagerName }">
-	                                            		, ${vo.step2ManagerName}
-	                                            	</c:if>
+	                                            	<c:choose>
+												        <c:when test="${ not empty vo.step1ManagerName }">
+												            ${ vo.step1ManagerName }, ${ vo.step2ManagerName }
+												        </c:when>
+												        <c:otherwise>
+												            ${ vo.step2ManagerName }
+												        </c:otherwise>
+												    </c:choose>
 	                                            </td>
 	                                            <td>${ vo.progressStatus }</td>
 	                                        </tr>

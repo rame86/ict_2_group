@@ -13,6 +13,9 @@ import com.example.domain.ApproveVO;
 import com.example.domain.DeptVO;
 import com.example.domain.DocVO;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Repository
 public class ApproveDAOImpl implements ApproveDAO {
 
@@ -43,7 +46,19 @@ public class ApproveDAOImpl implements ApproveDAO {
 	public DeptVO selectParentDept(int deptNo) {
 		return sess.selectOne("com.example.repository.ApproveDAO.selectParentDept", deptNo);
 	}
-
+	
+	// TEST
+	@Override
+	public List<ApproveListVO> selectSendApproveList(Map<String, Object> param) {
+		return sess.selectList("com.example.repository.ApproveDAO.selectSendApproveList", param);
+	}
+	
+	// 결재 받을 문서 TEST
+	@Override
+	public List<ApproveListVO> selectReceiveApproveList(Map<String, Object> param) {
+		return sess.selectList("com.example.repository.ApproveDAO.selectReceiveApproveList", param);
+	}
+	
 	@Override
 	public List<ApproveListVO> selectSendApproveList(String empNo, Integer limit) {
 		Map<String, Object> param = new HashMap<>();
@@ -53,7 +68,7 @@ public class ApproveDAOImpl implements ApproveDAO {
 		
 		return sess.selectList("com.example.repository.ApproveDAO.selectSendApproveList", param);
 	}
-	
+		
 	// 편의용
 	@Override
 	public List<ApproveListVO> selectSendApproveList(String empNo) {
@@ -61,19 +76,28 @@ public class ApproveDAOImpl implements ApproveDAO {
 	}
 
 	@Override
-	public List<ApproveListVO> selectReceiveApproveList(String empNo, Integer limit) {
-		Map<String, Object> param = new HashMap<>();
-		
-		param.put("empNo", empNo);
-		param.put("limit", limit);
-		
-		return sess.selectList("com.example.repository.ApproveDAO.selectReceiveApproveList", param);
+	public DocVO selectDocNo(int docNo) {
+		return sess.selectOne("com.example.repository.ApproveDAO.selectDocNo", docNo);
 	}
-	
-	// 편의용
+
 	@Override
-	public List<ApproveListVO> selectReceiveApproveList(String empNo) {
-		return selectReceiveApproveList(empNo, null);
+	public void updateApproveStatus(Map<String, Object> param) {
+		sess.update("com.example.repository.ApproveDAO.updateApproveStatus", param);
+	}
+
+	@Override
+	public void updateRejectStatus(Map<String, Object> param) {
+		sess.update("com.example.repository.ApproveDAO.updateRejectStatus", param);
+	}
+
+	@Override
+	public List<ApproveListVO> selectWaitingReceiveListLimit(Map<String, Object> param) {
+		return sess.selectList("com.example.repository.ApproveDAO.selectWaitingReceiveListLimit", param);
+	}
+
+	@Override
+	public List<Map<String, Object>> countSendApproveStatus(String empNo) {
+		return sess.selectList("com.example.repository.ApproveDAO.countSendApproveStatus", empNo);
 	}
 
 }

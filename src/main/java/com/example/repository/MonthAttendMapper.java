@@ -19,7 +19,6 @@ public interface MonthAttendMapper {
     List<MonthAttendVO> getMonthAttendList(String empNo);
 
     // (상세용) 월별 근무 1건 조회
-    MonthAttendVO getMonthAttend(@Param("empNo") String empNo,
-                                 								@Param("monthAttno") Integer monthAttno);
+    MonthAttendVO getMonthAttend(@Param("empNo") String empNo, @Param("monthAttno") Integer monthAttno);
     
 }

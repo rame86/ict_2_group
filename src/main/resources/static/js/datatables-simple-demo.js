@@ -9,6 +9,12 @@ window.addEventListener('DOMContentLoaded', event => {
         new simpleDatatables.DataTable(datatablesSimple);
     }
 	
+	const datatablesSimpleR = document.getElementById('datatablesSimpleR');
+	
+	if (datatablesSimpleR) {
+	    new simpleDatatables.DataTable(datatablesSimpleR);
+	}
+	
 	const tableSimpleElement1 = document.getElementById('tableSimple1'); 
 	
 	// 변형
