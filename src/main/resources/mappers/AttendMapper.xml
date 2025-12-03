@@ -7,7 +7,70 @@
 	<select id="dayAttend" parameterType="java.util.Map"
 		resultType="DayAttendVO">
 		SELECT * FROM DAY_ATTEND
-		WHERE EMP_NO = #{empNo} 
-		AND TO_CHAR(FIRST_DAYTIME, 'YYYY-MM') = #{today}
+		WHERE EMP_NO = #{empNo}
+		AND
+		TO_CHAR(FIRST_DAYTIME, 'YYYY-MM') = #{toDay}
 	</select>
+
+	<select id="dateCheck" parameterType="DayAttendVO"
+		resultType="DayAttendVO">
+		SELECT
+		TO_CHAR(IN_TIME, 'HH24:MI:SS') AS IN_TIME
+		,		TO_CHAR(OUT_TIME, 'HH24:MI:SS') AS OUT_TIME
+		, DAY_ATTNO
+		, EMP_NO
+		,		ATT_STATUS
+		, IN_TIME
+		FROM DAY_ATTEND
+		WHERE EMP_NO = #{empNo}
+		AND
+		TO_CHAR(DATE_ATTEND,
+		'YYYY-MM-DD') = #{dateAttend}
+	</select>
+
+	<insert id="insertCheckIn" parameterType="DayAttendVO">
+		INSERT INTO DAY_ATTEND
+		(
+		DAY_ATTNO,
+		EMP_NO,
+		IN_TIME,
+		FIRST_DAYTIME,
+		DATE_ATTEND,
+		ATT_STATUS
+
+		)
+		VALUES
+		(
+		day_attno_seq.NEXTVAL,
+		#{empNo},
+		SYSDATE,
+		SYSDATE,
+		SYSDATE,
+		#{attStatus}
+
+		)
+	</insert>
+
+	<update id="updateCheckIn" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND
+		SET
+		IN_TIME = SYSDATE,
+		ATT_STATUS = #{attStatus}
+		WHERE
+		DAY_ATTNO =
+		#{dayAttno}
+
+	</update>
+
+	<update id="updateCheckOut" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND
+		SET
+		OUT_TIME = SYSDATE,
+		ATT_STATUS = #{attStatus}
+		WHERE
+		DAY_ATTNO =
+		#{dayAttno}
+
+	</update>
+
 </mapper>
