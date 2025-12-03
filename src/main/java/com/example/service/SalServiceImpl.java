@@ -9,84 +9,40 @@ import org.springframework.stereotype.Service;
 import com.example.domain.SalVO;
 import com.example.repository.SalMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class SalServiceImpl implements SalService {
 
     @Autowired
     private SalMapper salMapper;
 
-    /** 사원 개인 급여 목록 */
     @Override
     public List<SalVO> getSalList(String empNo) {
-
-        // 이제 굳이 숫자로 바꾸지 않고, 그대로 String으로 넘겨요
-        List<SalVO> list = salMapper.selectSalList(empNo);
-
-        for (SalVO vo : list) {
-            fillCalculatedFields(vo);
-        }
-        return list;
+        return salMapper.selectSalList(empNo);
     }
 
-    /** 급여 상세 */
     @Override
     public SalVO getSalaryDetail(String empNo, Integer monthAttno) {
-
-        // 마찬가지로 empNo를 그대로 String으로 전달
-        SalVO vo = salMapper.selectSalDetail(empNo, monthAttno);
-
-        if (vo != null) {
-            fillCalculatedFields(vo);
-        }
-        return vo;
+        return salMapper.selectSalDetail(empNo, monthAttno);
     }
-    
-     /** ✅ 관리자 전체 급여 목록 (정렬/검색용) */
+
+    @Override
+    public int createSalaryByMonth(String month) {
+
+        log.info("============== SAL 생성 시작 ==============");
+        log.info("타겟 월(급여 기준월) : {}", month);
+
+        int inserted = salMapper.insertSalaryByMonth(month);
+
+        log.info("SAL INSERT 결과: {} 행 삽입됨", inserted);
+        log.info("============== SAL 생성 종료 ==============");
+		return inserted;
+    }
+
     @Override
     public List<SalVO> getAdminSalList(Map<String, String> param) {
-
-        List<SalVO> list = salMapper.selectAdminSalList(param);
-
-        for (SalVO vo : list) {
-            fillCalculatedFields(vo);
-        }
-        return list;
+        return salMapper.getAdminSalList(param);
     }
-
-    /** 급여 계산 + yearMonthLabel 세팅 */
-    private void fillCalculatedFields(SalVO vo) {
-        int base  = n(vo.getSalBase());
-        int bonus = n(vo.getSalBonus());
-        int plus  = n(vo.getSalPlus());
-        int ins   = n(vo.getInsurance());
-        int tax   = n(vo.getTax());
-
-        int payTotal    = base + bonus + plus;
-        int deductTotal = ins + tax;
-        int realPay     = payTotal - deductTotal;
-
-        vo.setPayTotal(payTotal);
-        vo.setDeductTotal(deductTotal);
-
-        // DB에서 realPay도 가져오지만, 여기서 다시 한 번 계산해서 맞춰줌
-        vo.setRealPay(realPay);
-
-        // monthAttno(202511) → "2025년 11월"
-        if (vo.getMonthAttno() != null) {
-            String m = vo.getMonthAttno().toString(); // 예: 202511
-            if (m.length() == 6) {
-                String year  = m.substring(0, 4);
-                String month = m.substring(4, 6);
-                vo.setYearMonthLabel(year + "년 " + month + "월");
-            }
-        }
-    }
-
-    private int n(Integer v) {
-        return v == null ? 0 : v;
-    }
-
-	
-
-
 }
