@@ -7,15 +7,15 @@ import com.example.domain.SalVO;
 
 public interface SalService {
 
-    // 사원 개인용 (기존 그대로 유지)
+    // 사원용 급여 목록
     List<SalVO> getSalList(String empNo);
 
+    // 급여 상세
     SalVO getSalaryDetail(String empNo, Integer monthAttno);
 
-    // ✅ 관리자용 : 정렬/검색용 전체 목록
-    List<SalVO> getAdminSalList(Map<String, String> param);
+    // 🔹 지정 월(YYYY-MM) 기준 급여 생성
+    int createSalaryByMonth(String month);
 
-	
-    
-	
+    // 관리자용 급여 목록 (월 필터 + 정렬)
+    List<SalVO> getAdminSalList(Map<String, String> param);
 }
