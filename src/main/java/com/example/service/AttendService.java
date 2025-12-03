@@ -8,5 +8,8 @@ public interface AttendService {
 	public List<DayAttendVO> selectDayAttend(String empNo, String toDay);
 
 	public String checkIn(DayAttendVO davo);
+
 	public String checkOut(DayAttendVO davo);
+
+	public String fieldwork(DayAttendVO davo);
 }

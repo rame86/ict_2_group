@@ -25,12 +25,14 @@ public class AttendServiceImpl implements AttendService {
 	}
 
 	public String checkIn(DayAttendVO davo) {
-
 		return attendDAO.checkIn(davo);
 	}
 
 	public String checkOut(DayAttendVO davo) {
-
 		return attendDAO.checkOut(davo);
+	}
+	
+	public String fieldwork(DayAttendVO davo) {
+		return attendDAO.fieldwork(davo);
 	}
 }

@@ -5,21 +5,40 @@
 
 	<select id="kakaoLoginInfo" parameterType="String"
 		resultType="loginVO">
-		SELECT *
-		FROM emp		
+		SELECT
+		E.*, 
+		D.MANAGER_EMP_NO,
+		D.DEPT_NAME,
+		D.PARENT_DEPT_NO,
+		D.DEPT_ADDR,
+		D.DEPT_PHONE
+		FROM
+		EMP E
+		JOIN
+		DEPT D ON E.DEPT_NO = D.DEPT_NO
 		WHERE
-		kakao_id =
+		E.kakao_id =
 		#{kakaoId}
 	</select>
 
 	<select id="loginCheck" parameterType="MemberVO"
 		resultType="loginVO">
-		SELECT *
-		FROM EMP
-		WHERE EMP_NO = #{empNo} and EMP_PASS =
-		#{empPass}
+		SELECT
+		E.*, 
+		D.MANAGER_EMP_NO,
+		D.DEPT_NAME,
+		D.PARENT_DEPT_NO,
+		D.DEPT_ADDR,
+		D.DEPT_PHONE
+		FROM
+		EMP E
+		JOIN
+		DEPT D ON E.DEPT_NO = D.DEPT_NO
+		WHERE
+		E.EMP_NO = #{empNo}
+		AND E.EMP_PASS = #{empPass}
 	</select>
-	
+
 	<select id="empNoCheck" parameterType="String"
 		resultType="String">
 		SELECT *

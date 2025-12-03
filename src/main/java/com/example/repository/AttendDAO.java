@@ -10,5 +10,7 @@ public interface AttendDAO {
 	public String checkIn(DayAttendVO davo);
 	
 	public String checkOut(DayAttendVO davo);
+	
+	public String fieldwork(DayAttendVO davo);
 
 }

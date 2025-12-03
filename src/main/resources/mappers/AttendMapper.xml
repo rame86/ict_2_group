@@ -16,10 +16,12 @@
 		resultType="DayAttendVO">
 		SELECT
 		TO_CHAR(IN_TIME, 'HH24:MI:SS') AS IN_TIME
-		,		TO_CHAR(OUT_TIME, 'HH24:MI:SS') AS OUT_TIME
+		,
+		TO_CHAR(OUT_TIME, 'HH24:MI:SS') AS OUT_TIME
 		, DAY_ATTNO
 		, EMP_NO
-		,		ATT_STATUS
+		,
+		ATT_STATUS
 		, IN_TIME
 		FROM DAY_ATTEND
 		WHERE EMP_NO = #{empNo}
@@ -54,7 +56,7 @@
 	<update id="updateCheckIn" parameterType="DayAttendVO">
 		UPDATE DAY_ATTEND
 		SET
-		IN_TIME = SYSDATE,
+		IN_TIME = #{inTime},
 		ATT_STATUS = #{attStatus}
 		WHERE
 		DAY_ATTNO =
@@ -65,12 +67,36 @@
 	<update id="updateCheckOut" parameterType="DayAttendVO">
 		UPDATE DAY_ATTEND
 		SET
-		OUT_TIME = SYSDATE,
+		OUT_TIME = #{outTime},
 		ATT_STATUS = #{attStatus}
 		WHERE
 		DAY_ATTNO =
 		#{dayAttno}
-
 	</update>
-
+	
+	<update id="updateDayFullTime" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND
+		SET
+		DAY_FULLTIME = NUMTODSINTERVAL(            
+            TO_NUMBER(SUBSTR(#{dayFulltime}, 1, 2)) * 3600 +      
+            TO_NUMBER(SUBSTR(#{dayFulltime}, 4, 2)) * 60 +      
+            TO_NUMBER(SUBSTR(#{dayFulltime}, 7, 2)),          
+            'SECOND'
+        ),
+		UPDATE_TIME = SYSDATE
+		WHERE
+		DAY_ATTNO =
+		#{dayAttno}
+	</update>
+	
+	<update id="updateFieldwork" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND
+		SET
+		MEMO = #{memo},
+		ATT_STATUS = #{attStatus}
+		WHERE
+		DAY_ATTNO =
+		#{dayAttno}
+	</update>
+	
 </mapper>

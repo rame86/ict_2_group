@@ -80,7 +80,8 @@ public class AttendController {
 		String empNo = login.getEmpNo();
 		davo.setEmpNo(empNo);
 		String nowTime = toDate.getCurrentTime();
-		davo.setInTime(nowTime);
+		String nowDateTime = toDate.getCurrentDateTime();
+		davo.setInTime(nowDateTime);
 
 		// 기준시간보다 늦으면 지각~
 		if (nowTime.compareTo(standardTime) < 0) {
@@ -114,7 +115,8 @@ public class AttendController {
 		String empNo = login.getEmpNo();
 		davo.setEmpNo(empNo);
 		String nowTime = toDate.getCurrentTime();
-		davo.setOutTime(nowTime);
+		String nowDateTime = toDate.getCurrentDateTime();		
+		davo.setOutTime(nowDateTime);
 
 		// 기준시간보다 먼저가면 조퇴~
 		if (nowTime.compareTo(standardTime) < 0) {
@@ -131,6 +133,32 @@ public class AttendController {
 	// end of checkOut()
 	// =======================================================================================
 
+	
+	//
+
+	// =======================================================================================
+	// fieldwork() 외근
+	@GetMapping("/attend/fieldwork")
+	@ResponseBody
+	public String fieldwork(@ModelAttribute("login") LoginVO login, Model m, DayAttendVO davo) {
+		log.info("[AttendController - fieldwork 요청 받음]");
+
+		String toDay = toDate.getToDay();
+		davo.setDateAttend(toDay);
+		String empNo = login.getEmpNo();
+		davo.setEmpNo(empNo);		
+		String nowDateTime = toDate.getCurrentDateTime();		
+		davo.setOutTime(nowDateTime);		
+
+		log.info(davo.toString());
+
+		String result = attendService.fieldwork(davo);
+
+		return result;
+	}
+	// end of checkOut()
+	// =======================================================================================
+	
 	//
 
 	// =======================================================================================
