@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import com.example.domain.ApproveListVO;
 import com.example.domain.ApproveVO;
@@ -13,8 +14,13 @@ public interface ApproveDAO {
 	public int selectDocSeqNextVal();
 	public DeptVO selectManager(int empNo);
 	public DeptVO selectParentDept(int deptNo);
+	public List<ApproveListVO> selectReceiveApproveList(Map<String, Object> pram);
+	public List<ApproveListVO> selectSendApproveList(Map<String, Object> param);
 	public List<ApproveListVO> selectSendApproveList(String empNo, Integer limit);
 	public List<ApproveListVO> selectSendApproveList(String empNo);
-	public List<ApproveListVO> selectReceiveApproveList(String empNo, Integer limit);
-	public List<ApproveListVO> selectReceiveApproveList(String empNo);
+	public List<ApproveListVO> selectWaitingReceiveListLimit(Map<String, Object> param);
+	public DocVO selectDocNo(int docNo);
+	public void updateApproveStatus(Map<String, Object> param);
+	public void updateRejectStatus(Map<String, Object> param);
+	public List<Map<String, Object>> countSendApproveStatus(String empNo);
 }

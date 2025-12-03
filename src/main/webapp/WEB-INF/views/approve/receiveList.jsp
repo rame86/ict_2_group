@@ -11,6 +11,7 @@
 <head>
 <meta charset="UTF-8">
 <title>approve - receiveList</title>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body class="sb-nav-fixed">
 
@@ -49,13 +50,17 @@
 	                                        <tr>
 	                                            <td>${ vo.docNo }</td>
 	                                            <td>${ vo.docDate }</td>
-	                                            <td>${ vo.docTitle }</td>
+	                                            <td><a href="#" class="documentDetail" data-docno="${ vo.docNo }">${ vo.docTitle }</a></td>
 	                                            <td>${ vo.writerName }</td>
 	                                            <td>
-	                                            	${ vo.step1ManagerName }
-	                                            	<c:if test="${ not empty vo.step2ManagerName and vo.step1ManagerName != vo.step2ManagerName }">
-	                                            		, ${vo.step2ManagerName}
-	                                            	</c:if>
+	                                            	<c:choose>
+												        <c:when test="${ not empty vo.step1ManagerName }">
+												            ${ vo.step1ManagerName }, ${ vo.step2ManagerName }
+												        </c:when>
+												        <c:otherwise>
+												            ${ vo.step2ManagerName }
+												        </c:otherwise>
+												    </c:choose>
 	                                            </td>
 	                                            <td>${ vo.progressStatus }</td>
 	                                        </tr>
@@ -74,6 +79,30 @@
 		</div>
 		
 	</div>
+	
+	<script>
+		$(function(){
+			$(".documentDetail").on("click", function(e){
+				e.preventDefault();
+				
+				let docNo = $(this).data("docno");
+				
+				$.ajax({
+					url : "documentDetail",
+					data : { docNo : docNo },
+					type : "get",
+					success : function(html){
+						$("#layoutSidenav_content").html(html);
+						window.scrollTo(0, 0)
+					},
+					error : function(){
+						alert("문서 상세 로딩 중 오류");
+					}
+				});
+				
+			});
+		});
+	</script>
 
 </body>
 </html>
