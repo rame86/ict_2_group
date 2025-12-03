@@ -123,6 +123,14 @@ public class AttendDAOImpl implements AttendDAO {
 				Duration restTime = Duration.ofHours(1); // 초단위로 변경(1시간이라 3600초 나옴)
 				// 총근무시간에 휴식시간 빼서 초기화~
 				Duration realWorkTime = workTime.minus(restTime);
+				
+				// 총 근무 시간이 1시간(restTime) 이상일 때만 휴식 시간을 뺌
+				if (workTime.compareTo(restTime) > 0) {
+				    realWorkTime = workTime.minus(restTime);
+				} else {
+				    // 1시간 미만 근무 시 휴식 시간 차감 없음 (총 근무 시간이 그대로 실 근무 시간)
+				    realWorkTime = workTime;
+				}
 
 				// 초단위를 다시 시간, 분 단위로 분리하기위해 long 타입으로 변환~
 				long totalSeconds = realWorkTime.getSeconds();
@@ -139,7 +147,7 @@ public class AttendDAOImpl implements AttendDAO {
 				currentData.setDayFulltime(dayFulltime);
 				log.info("[AttendDAO - checkOut - 총근무시간 계산 확인 :" + dayFulltime + "]");
 
-				log.info("[AttendDAO - checkOut -currentData :" + currentData + "]");
+				log.info("[AttendDAO - checkOut - currentData :" + currentData + "]");
 				sess.update("com.example.repository.DayAttendDAO.updateDayFullTime", currentData);
 
 				log.info("[AttendDAO - checkOut - 총근무시간 업데이트 완료 후 currentData :" + currentData + "]");
