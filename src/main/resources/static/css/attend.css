@@ -1,3 +1,5 @@
+/*attend.css*/
+
 /* 1. 배경 및 메인 영역 설정 */
 #content-area {
 	padding: 40px;
@@ -188,4 +190,8 @@
 	margin: 5px 0;
 	font-size: 0.95em;
 	color: #666;
+}
+
+.sb-sidenav-menu-nested.nav a {
+    visibility: visible !important; 
 }
