@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.example.domain.EmpVO;
+import com.example.domain.LoginVO;
+import com.example.domain.MemberVO;
 import com.example.domain.EmpSearchVO;
 
 
@@ -13,4 +15,8 @@ public interface EmpMapper {
     List<EmpVO> selectEmpList(EmpSearchVO search);
 
     EmpVO getEmp(String empNo);
+    LoginVO loginCheck(MemberVO vo);
+    
+    List<EmpVO> selectEmpList();
+
 }

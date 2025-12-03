@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%-- <%@ include file="/WEB-INF/views/include/header.jsp" %> --%>
 
 <%
     if (request.getAttribute("menu") == null) {
@@ -40,7 +41,7 @@
 
                         <div class="info-card-header">
                             <div>
-                                <span class="info-label">지급월</span> :
+                                <span class="info-label">지급월 :  
                                 <c:choose>
                                     <c:when test="${not empty sal.yearMonthLabel}">
                                         ${sal.yearMonthLabel}
@@ -48,7 +49,7 @@
                                     <c:otherwise>
                                         ${sal.monthAttno}
                                     </c:otherwise>
-                                </c:choose>
+                                </c:choose></span>
                             </div>
                             <button type="button" class="btn-print" onclick="window.print();">
                                 명세서 출력
@@ -57,7 +58,7 @@
 
                         <div class="info-row">
                             <span>
-                                <span class="info-label">지급일</span> :
+                                <span class="info-label">지급일 :
                                 <c:choose>
                                     <c:when test="${not empty sal.yearMonthLabel}">
                                         ${sal.yearMonthLabel} 15일
@@ -65,22 +66,23 @@
                                     <c:otherwise>
                                         15일
                                     </c:otherwise>
-                                </c:choose>
+                                </c:choose> </span> 
                             </span>
                         </div>
 
                         <div class="info-row">
                             <span>
-                                <span class="info-label">사번</span> : ${emp.empNo}
+                                <span class="info-label">사번 :  ${emp.empNo} </span>
                             </span>
                             <span>
-                                <span class="info-label">이름</span> : ${emp.empName}
+                                <span class="info-label">이름 : ${emp.empName} </span> 
+                            </span>
+                     	
+                            <span>
+                                <span class="info-label">부서 : ${emp.deptName} </span> 
                             </span>
                             <span>
-                                <span class="info-label">부서</span> : ${emp.deptName}
-                            </span>
-                            <span>
-                                <span class="info-label">재직상태</span> : ${emp.statusName}
+                                <span class="info-label">재직상태 : ${emp.statusName} </span> 
                             </span>
                         </div>
 

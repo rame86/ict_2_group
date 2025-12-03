@@ -1,10 +1,102 @@
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.repository.DayAttendDAO">
-	<select id="dayAttend" parameterType="EmpVO" resultType="DayAttendVO">
-		SELECT 	*
-		FROM DAY_ATTEND
-		WHERE emp_no = #{empNo}
+
+	<select id="dayAttend" parameterType="java.util.Map"
+		resultType="DayAttendVO">
+		SELECT * FROM DAY_ATTEND
+		WHERE EMP_NO = #{empNo}
+		AND
+		TO_CHAR(FIRST_DAYTIME, 'YYYY-MM') = #{toDay}
 	</select>
+
+	<select id="dateCheck" parameterType="DayAttendVO"
+		resultType="DayAttendVO">
+		SELECT
+		TO_CHAR(IN_TIME, 'HH24:MI:SS') AS IN_TIME
+		,
+		TO_CHAR(OUT_TIME, 'HH24:MI:SS') AS OUT_TIME
+		, DAY_ATTNO
+		, EMP_NO
+		,
+		ATT_STATUS
+		, IN_TIME
+		FROM DAY_ATTEND
+		WHERE EMP_NO = #{empNo}
+		AND
+		TO_CHAR(DATE_ATTEND,
+		'YYYY-MM-DD') = #{dateAttend}
+	</select>
+
+	<insert id="insertCheckIn" parameterType="DayAttendVO">
+		INSERT INTO DAY_ATTEND
+		(
+		DAY_ATTNO,
+		EMP_NO,
+		IN_TIME,
+		FIRST_DAYTIME,
+		DATE_ATTEND,
+		ATT_STATUS
+
+		)
+		VALUES
+		(
+		day_attno_seq.NEXTVAL,
+		#{empNo},
+		SYSDATE,
+		SYSDATE,
+		SYSDATE,
+		#{attStatus}
+
+		)
+	</insert>
+
+	<update id="updateCheckIn" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND
+		SET
+		IN_TIME = #{inTime},
+		ATT_STATUS = #{attStatus}
+		WHERE
+		DAY_ATTNO =
+		#{dayAttno}
+
+	</update>
+
+	<update id="updateCheckOut" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND
+		SET
+		OUT_TIME = #{outTime},
+		ATT_STATUS = #{attStatus}
+		WHERE
+		DAY_ATTNO =
+		#{dayAttno}
+	</update>
+	
+	<update id="updateDayFullTime" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND
+		SET
+		DAY_FULLTIME = NUMTODSINTERVAL(            
+            TO_NUMBER(SUBSTR(#{dayFulltime}, 1, 2)) * 3600 +      
+            TO_NUMBER(SUBSTR(#{dayFulltime}, 4, 2)) * 60 +      
+            TO_NUMBER(SUBSTR(#{dayFulltime}, 7, 2)),          
+            'SECOND'
+        ),
+		UPDATE_TIME = SYSDATE
+		WHERE
+		DAY_ATTNO =
+		#{dayAttno}
+	</update>
+	
+	<update id="updateFieldwork" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND
+		SET
+		MEMO = #{memo},
+		ATT_STATUS = #{attStatus}
+		WHERE
+		DAY_ATTNO =
+		#{dayAttno}
+	</update>
+	
 </mapper>

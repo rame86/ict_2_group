@@ -17,76 +17,15 @@
 <!-- 공통 헤더 -->
 <jsp:include page="../common/header.jsp" />
 
-<style>
-    .content-wrapper {
-        padding: 20px 30px;
-    }
+<!-- 외부 CSS로 분리 -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/salList.css">
 
-    .page-title {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 15px;
-    }
+<!-- DataTables CSS (정렬/검색/페이징용) -->
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
-    .emp-info-box {
-        margin-bottom: 15px;
-        padding: 10px 15px;
-        border-radius: 6px;
-        background-color: #f8f9fa;
-        font-size: 14px;
-    }
-
-    .emp-info-box span {
-        margin-right: 12px;
-    }
-
-    table.salary-table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    table.salary-table th,
-    table.salary-table td {
-        border: 1px solid #dee2e6;
-        padding: 8px 10px;
-        text-align: center;
-    }
-
-    table.salary-table thead {
-        background-color: #f1f1f1;
-    }
-
-    /* 지급월 링크 스타일 */
-    .month-link {
-        text-decoration: underline;
-        color: #0d6efd;
-        cursor: pointer;
-    }
-
-    .text-muted {
-        color: #6c757d;
-    }
-</style>
-
+<!-- jQuery (header.jsp에서 이미 포함돼있으면 이 줄은 빼도 됩니다) -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script>
-$(function() {
-
-    // 지급월(밑줄 링크) 클릭 시 → 급여 명세서 페이지로 이동
-    $("#salTable").on("click", "a.month-link", function(e) {
-        e.preventDefault();
-
-        const empNo      = $(this).data("empno");
-        const monthAttno = $(this).data("monthattno");
-
-        if (!empNo || !monthAttno) return;
-
-        location.href = "/sal/detail?empNo=" + encodeURIComponent(empNo)
-                      + "&monthAttno=" + encodeURIComponent(monthAttno);
-    });
-
-});
-</script>
 
 </head>
 <body>
@@ -115,7 +54,7 @@ $(function() {
                     </div>
 
                     <!-- 급여 리스트 테이블 -->
-                    <table id="salTable" class="salary-table">
+                    <table id="salTable" class="salary-table display">
                         <thead>
                             <tr>
                                 <th>지급월</th>
@@ -178,6 +117,50 @@ $(function() {
         </main>
     </div>
 </div>
+
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+<script>
+$(function() {
+
+    // 1) DataTables 초기화 (헤더 클릭 정렬 / 검색 / 페이징)
+    $('#salTable').DataTable({
+        ordering: true,              // 헤더 클릭 정렬
+        order: [[0, 'desc']],        // 기본: 지급월 내림차순
+        paging: true,
+        pageLength: 10,
+        lengthChange: false,
+        searching: false,             // 검색창 표시
+        info: false,
+        language: {
+            search: "",              // 'Search:' 텍스트 제거
+            emptyTable: "급여 정보가 없습니다.",
+            paginate: {
+                previous: "이전",
+                next: "다음"
+            }
+        }
+    });
+
+    // 검색창 placeholder 설정
+    $('.dataTables_filter input').attr('placeholder', 'Search...');
+
+    // 2) 지급월(밑줄 링크) 클릭 시 → 급여 명세서 페이지로 이동
+    $("#salTable").on("click", "a.month-link", function(e) {
+        e.preventDefault();
+
+        const empNo      = $(this).data("empno");
+        const monthAttno = $(this).data("monthattno");
+
+        if (!empNo || !monthAttno) return;
+
+        location.href = "/sal/detail?empNo=" + encodeURIComponent(empNo)
+                      + "&monthAttno=" + encodeURIComponent(monthAttno);
+    });
+
+});
+</script>
 
 </body>
 </html>

@@ -9,4 +9,5 @@ public interface EmpService {
 
     List<EmpVO> getEmpList(EmpSearchVO search);
 	EmpVO getEmp(String empNo);
+	List<EmpVO> selectEmpList();
 }

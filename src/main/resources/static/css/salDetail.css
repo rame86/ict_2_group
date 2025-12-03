@@ -151,3 +151,25 @@
     .btn-area button:hover {
         background-color: #5c636a;
     }
+
+    .sal-table {
+    width: 100%;
+    border-collapse: collapse;  /* 안쪽 선까지 하나로 붙이기 */
+    margin-top: 10px;
+}
+
+.sal-table th,
+.sal-table td {
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    text-align: center;
+}
+
+.sal-table th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+}
+
+.sal-table tr:hover {
+    background-color: #fafafa;
+}

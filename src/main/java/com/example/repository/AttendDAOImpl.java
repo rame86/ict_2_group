@@ -1,13 +1,17 @@
 package com.example.repository;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.example.controller.ToDate;
 import com.example.domain.DayAttendVO;
-import com.example.domain.EmpVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,14 +21,168 @@ public class AttendDAOImpl implements AttendDAO {
 
 	@Autowired
 	private SqlSessionTemplate sess;
-	
-	@Override
-	public List<DayAttendVO> selectDayAttend(EmpVO vo) {
-		log.info("[AttendDAO-selectDayAttend 요청 받음]");	 
-		 List<DayAttendVO> result = sess.selectList("com.example.repository.DayAttendDAO.dayAttend", vo);
-		 return result;
+	@Autowired
+	private ToDate toDate;
+
+	// =======================================================================================
+	// selectDayAttend()
+	public List<DayAttendVO> selectDayAttend(String empNo, String toDay) {
+		log.info("[AttendDAO - selectDayAttend 요청 받음]");
+		// Map 객체 생성
+		Map<String, Object> param = new HashMap<>();
+
+		// 인자들 Map에 담기
+		param.put("empNo", empNo);
+		param.put("toDay", toDay);
+		log.info("paramMap 내용: {}", param);
+
+		// 3. Map을 Mybatis에 전달
+		List<DayAttendVO> result = sess.selectList("com.example.repository.DayAttendDAO.dayAttend", param);
+
+		return result;
 	}
-	
+	// end of selectDayAttend()
+	// =======================================================================================
+
+	// =======================================================================================
+	// checkIn()
+	public String checkIn(DayAttendVO davo) {
+		log.info("[AttendDAO - checkIn 요청 받음]");
+
+		String checkInTime = "";
+		DayAttendVO currentData;
+		log.info("인자값 - davo 내용: " + davo.toString());
+		// 데이터가 있는지 먼저 확인~
+		DayAttendVO dateCheck = sess.selectOne("com.example.repository.DayAttendDAO.dateCheck", davo);
+		if (dateCheck == null) {
+			sess.insert("com.example.repository.DayAttendDAO.insertCheckIn", davo);
+			currentData = sess.selectOne("com.example.repository.DayAttendDAO.dateCheck", davo);
+			checkInTime = currentData.getInTime();
+		} else {
+			log.info("dateInTimeCheck 내용: " + dateCheck.toString());
+			checkInTime = dateCheck.getInTime();
+			davo.setDayAttno(dateCheck.getDayAttno());
+			if (checkInTime == null) {
+				sess.update("com.example.repository.DayAttendDAO.updateCheckIn", davo);
+				currentData = sess.selectOne("com.example.repository.DayAttendDAO.dateCheck", davo);
+				checkInTime = currentData.getInTime();
+			}
+		}
+		return checkInTime;
+	}
+	// end of checkIn()
+	// =======================================================================================
+
+	// =======================================================================================
+	// checkOut()
+	public String checkOut(DayAttendVO davo) {
+		log.info("[AttendDAO - checkOut 요청 받음]");
+
+		String checkOutTime = "";
+		String status = davo.getAttStatus();
+		DayAttendVO currentData;
+
+		log.info("[AttendDAO - checkOut - 인자값 davo 내용: " + davo.toString() + "]");
+
+		// 데이터가 있는지 먼저 확인~
+		DayAttendVO dateCheck = sess.selectOne("com.example.repository.DayAttendDAO.dateCheck", davo);
+		// 데이터가 없을 경우~
+		if (dateCheck == null) {
+			checkOutTime = "출근 데이터가 없습니다.";
+			return checkOutTime;
+		}
+
+		// 데이터가 있을경우~
+		else {
+			log.info("[AttendDAO - checkOut - dateCheck 내용: " + dateCheck.toString() + "]");
+
+			String checkStatus = dateCheck.getAttStatus();
+			davo.setDayAttno(dateCheck.getDayAttno());
+			// 정상 출근이고 입력값이 조퇴가 아닐 경우~
+			if (status.equals("null")) {
+				// 인자의 상태값에 데이터에 있는 출근 상태 값을 그대로 넣음~
+				davo.setAttStatus(checkStatus);
+				sess.update("com.example.repository.DayAttendDAO.updateCheckOut", davo);
+
+			}
+			// 조퇴일 경우~
+			else {
+				// controller 단에서 넣은 조퇴 상태값 그대로 ㄱㄱ
+				sess.update("com.example.repository.DayAttendDAO.updateCheckOut", davo);
+			}
+			currentData = sess.selectOne("com.example.repository.DayAttendDAO.dateCheck", davo);
+
+			// 퇴근시간 정상 입력되면 근무시간 계산하여 dayFulltime을 입력~
+			if (currentData.getInTime() != null && currentData.getOutTime() != null) {
+				// 열심히 만둘어둔 ToDate 클래스 dateTime 메소드 이용해서 파싱~
+				LocalDateTime inTime = toDate.dateTime(currentData.getInTime());
+				LocalDateTime outTime = toDate.dateTime(currentData.getOutTime());
+				// 총 근무 시간 계산
+				Duration workTime = Duration.between(inTime, outTime);
+				// 휴식시간 1시간 까기
+				Duration restTime = Duration.ofHours(1); // 초단위로 변경(1시간이라 3600초 나옴)
+				// 총근무시간에 휴식시간 빼서 초기화~
+				Duration realWorkTime = workTime.minus(restTime);
+
+				// 초단위를 다시 시간, 분 단위로 분리하기위해 long 타입으로 변환~
+				long totalSeconds = realWorkTime.getSeconds();
+
+				// 먼저 시간을 구함(1시간은 3600초니까 토탈 초를 3600으로 나눈값을 넣음)
+				long hours = totalSeconds / 3600;
+				// 분은 시간(3600)으로 나누고 남은 값을 60초로 또 나눠서 저장함
+				long minutes = (totalSeconds % 3600) / 60;
+				// 초는 모든 초를 분으로 나누고 남은값이니 토탈 초에 60을 나누고 남은값을 저장함
+				long seconds = totalSeconds % 60;
+
+				// String.format 사용해서 HH:mm:ss 형식으로 바꿔서 저장함
+				String dayFulltime = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+				currentData.setDayFulltime(dayFulltime);
+				log.info("[AttendDAO - checkOut - 총근무시간 계산 확인 :" + dayFulltime + "]");
+
+				log.info("[AttendDAO - checkOut -currentData :" + currentData + "]");
+				sess.update("com.example.repository.DayAttendDAO.updateDayFullTime", currentData);
+
+				log.info("[AttendDAO - checkOut - 총근무시간 업데이트 완료 후 currentData :" + currentData + "]");
+
+			}
+			checkOutTime = currentData.getOutTime();
+		}
+		return checkOutTime;
+	}
+	// end of checkOut()
+	// =======================================================================================
+
+	// =======================================================================================
+	// fieldwork()
+	public String fieldwork(DayAttendVO davo) {
+		log.info("[AttendDAO - fieldwork 요청 받음]");
+
+		String result = toDate.getFomatter(davo.getOutTime());
+		davo.setMemo("외근(" + result + ")");
+
+		// 데이터가 있는지 먼저 확인~
+		DayAttendVO dateCheck = sess.selectOne("com.example.repository.DayAttendDAO.dateCheck", davo);
+		// 데이터가 없을 경우~
+		if (dateCheck == null) {
+			result = "출근 데이터가 없습니다.";
+			return result;
+		} else {
+			log.info("[AttendDAO - fieldwork - dateCheck 내용: " + dateCheck.toString() + "]");
+
+			String checkStatus = dateCheck.getAttStatus();
+			davo.setDayAttno(dateCheck.getDayAttno());
+			// 정상출근일 경우에
+			if (checkStatus.equals("출근") || checkStatus.equals("퇴근")) {
+				davo.setAttStatus("외근");
+				sess.update("com.example.repository.DayAttendDAO.updateFieldwork", davo);
+			}
+			// 지각등의 사유가 있을 시
+			else {
+				davo.setAttStatus(checkStatus);
+				sess.update("com.example.repository.DayAttendDAO.updateFieldwork", davo);
+			}
+
+		}
+		return result;
+	}
 }
-
-

@@ -63,8 +63,8 @@ $(function() {
 		}
 	}
 
-	$('#pass').on('input', checkPassword);
-	$('#pass2').on('input', checkPassword);
+	$('#empPass').on('input', checkPassword); 
+	$('#empPassConfirm').on('input', checkPassword);
 
 	// end of checkPassword
 

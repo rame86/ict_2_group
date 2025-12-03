@@ -1,12 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <%
-    String menu = (String) request.getAttribute("menu");
-    if (menu == null) menu = "";
+String menu = (String) request.getAttribute("menu");
+if (menu == null)
+	menu = "";
 %>
-    
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -64,7 +65,8 @@
                                 </nav>
                             </div>
 
-					<a class="nav-link <%=menu.equals("salemp") ? "active" : ""%>" href="<c:url value='/emp/list' />">
+					<a class="nav-link <%=menu.equals("salemp") ? "active" : ""%>"
+						href="${pageContext.request.contextPath}/sal/list">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-columns"></i>
 						</div> 급여관리
@@ -72,22 +74,23 @@
 
 
 					<div class="sb-sidenav-menu-heading">Addons</div>
-                            <a class="nav-link" href="charts.html">
-                                <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                                Charts
-                            </a>
-                            <a class="nav-link" href="tables.html">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Tables
-                            </a>
-                        </div>
-                    </div>
-                    <div class="sb-sidenav-footer">
-                        <div class="small">Logged in as:</div>
-                        Start Bootstrap
-                    </div>
-                </nav>
-            </div>
+					<a class="nav-link" href="charts.html">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-chart-area"></i>
+						</div> Charts
+					</a> <a class="nav-link" href="tables.html">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-table"></i>
+						</div> Tables
+					</a>
+				</div>
+			</div>
+			<div class="sb-sidenav-footer">
+				<div class="small">Logged in as:</div>
+				Start Bootstrap
+			</div>
+		</nav>
+	</div>
 
 </body>
 </html>

@@ -1,16 +1,21 @@
 package com.example.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.example.domain.SalVO;
 
 public interface SalService {
 
-    // 급여 대장
+    // 사원 개인용 (기존 그대로 유지)
     List<SalVO> getSalList(String empNo);
 
-    // 급여 명세서 상세
     SalVO getSalaryDetail(String empNo, Integer monthAttno);
 
-    // (옵션) 급여 자동 계산 후 저장하는 메소드 앞으로 여기에 추가 가능
+    // ✅ 관리자용 : 정렬/검색용 전체 목록
+    List<SalVO> getAdminSalList(Map<String, String> param);
+
+	
+    
+	
 }
