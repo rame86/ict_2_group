@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.domain.LoginVO;
 import com.example.domain.DayAttendVO;
+import com.example.domain.DocVO;
+import com.example.service.ApproveService;
 import com.example.service.AttendService;
 
 import jakarta.servlet.http.HttpSession;
@@ -25,6 +27,8 @@ public class AttendController {
 	private AttendService attendService;
 	@Autowired
 	private ToDate toDate;
+	@Autowired
+	private ApproveService aproveService;
 
 	// =======================================================================================
 	// getLogin() 로그인 세션 받아오기
@@ -115,7 +119,7 @@ public class AttendController {
 		String empNo = login.getEmpNo();
 		davo.setEmpNo(empNo);
 		String nowTime = toDate.getCurrentTime();
-		String nowDateTime = toDate.getCurrentDateTime();		
+		String nowDateTime = toDate.getCurrentDateTime();
 		davo.setOutTime(nowDateTime);
 
 		// 기준시간보다 먼저가면 조퇴~
@@ -133,7 +137,6 @@ public class AttendController {
 	// end of checkOut()
 	// =======================================================================================
 
-	
 	//
 
 	// =======================================================================================
@@ -146,9 +149,9 @@ public class AttendController {
 		String toDay = toDate.getToDay();
 		davo.setDateAttend(toDay);
 		String empNo = login.getEmpNo();
-		davo.setEmpNo(empNo);		
-		String nowDateTime = toDate.getCurrentDateTime();		
-		davo.setOutTime(nowDateTime);		
+		davo.setEmpNo(empNo);
+		String nowDateTime = toDate.getCurrentDateTime();
+		davo.setOutTime(nowDateTime);
 
 		log.info(davo.toString());
 
@@ -158,7 +161,7 @@ public class AttendController {
 	}
 	// end of checkOut()
 	// =======================================================================================
-	
+
 	//
 
 	// =======================================================================================
@@ -184,4 +187,25 @@ public class AttendController {
 	}
 	// end of calendar()
 	// =======================================================================================
+
+	// =======================================================================================
+	// vacation() 외근
+	
+	@GetMapping("/attend/vacation")	
+	public String vacation(@ModelAttribute("login") Integer docNo) {
+		log.info("[AttendController - vacation 요청 받음]");
+
+		// **임시 docNo설정** //
+		docNo = 36;
+		// 문서번호로 내용 가져오기
+		DocVO docInfo = aproveService.selectDocNo(docNo);
+		log.info("[AttendController - vacation - docInfo 데이터 : " + docInfo.toString() + "]");
+
+		return "redirect:/approve/receiveList";
+	}
+	// end of checkOut()
+	// =======================================================================================
+
+	//
+
 }

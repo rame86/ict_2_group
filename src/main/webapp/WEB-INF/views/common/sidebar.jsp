@@ -11,58 +11,66 @@ if (menu == null) menu = "";
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>sidebar.jsp</title>
 </head>
 <body>
-
-<div id="layoutSidenav_nav">
-                <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
-                    <div class="sb-sidenav-menu">
-                        <div class="nav">
-                            <div class="sb-sidenav-menu-heading">관리자용</div>
-                            <a class="nav-link" href="index.html">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                                마이페이지
-                            </a>
-                            <div class="sb-sidenav-menu-heading">메인 메뉴</div>
-                            <a class="nav-link" href="/attend/attend">
-    							<div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-    							근태관리
-							</a>
-                            
-                            
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                                <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                                사원관리
-                                <div class="sb-sidenav-collapse-arrow"></div>
-                            </a>
-                            
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapsePages">
-                                <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                                부서관리
-                                <div class="sb-sidenav-collapse-arrow"></div>
-                            </a>
-                            
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseApproval" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                전자결재
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse <%= 
-												    menu.equals("status") || 
-												    menu.equals("receive") ||
-												    menu.equals("send") ||
-												    menu.equals("finish") ||
-												    menu.equals("create") ? "show" : ""
-												%>" id="collapseApproval" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                	<a class="nav-link  <%= menu.equals("status") ? "active" : "" %>" href="/approve/statusList">결재 현황</a>
-                                    <a class="nav-link <%= menu.equals("receive") ? "active" : "" %>" href="/approve/receiveList">결재 할 문서</a>
-                                    <a class="nav-link <%= menu.equals("send") ? "active" : "" %>" href="/approve/sendList">결재 받을 문서</a>
-                                    <a class="nav-link <%= menu.equals("finish") ? "active" : "" %>" href="/approve/finishList">결재 완료 문서</a>
-                                    <a class="nav-link <%= menu.equals("create") ? "active" : "" %>" href="/approve/createForm">문서 작성 하기</a>
-                                </nav>
-                            </div>
+	<div id="layoutSidenav_nav">
+		<nav class="sb-sidenav accordion sb-sidenav-light"
+			id="sidenavAccordion">
+			<div class="sb-sidenav-menu">
+				<div class="nav">
+					<div class="sb-sidenav-menu-heading">관리자용</div>
+					<a class="nav-link" href="index.html">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-tachometer-alt"></i>
+						</div> 마이페이지
+					</a>
+					<div class="sb-sidenav-menu-heading">메인 메뉴</div>
+					<a class="nav-link" href="/attend/attend">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-columns"></i>
+						</div> 근태관리
+					</a> <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+						data-bs-target="#collapsePages" aria-expanded="false"
+						aria-controls="collapsePages">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-book-open"></i>
+						</div> 사원관리
+						<div class="sb-sidenav-collapse-arrow"></div>
+					</a> <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+						aria-expanded="false" aria-controls="collapsePages">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-book-open"></i>
+						</div> 부서관리
+						<div class="sb-sidenav-collapse-arrow"></div>
+					</a> <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+						data-bs-target="#collapseApproval" aria-expanded="false"
+						aria-controls="collapseLayouts">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-columns"></i>
+						</div> 전자결재
+						<div class="sb-sidenav-collapse-arrow">
+							<i class="fas fa-angle-down"></i>
+						</div>
+					</a>
+					<div
+						class="collapse <%=menu.equals("status") || menu.equals("receive") || menu.equals("send") || menu.equals("finish")
+		|| menu.equals("create") ? "show" : ""%>"
+						id="collapseApproval" aria-labelledby="headingOne"
+						data-bs-parent="#sidenavAccordion">
+						<nav class="sb-sidenav-menu-nested nav">
+							<a class="nav-link  <%=menu.equals("status") ? "active" : ""%>"
+								href="/approve/statusList">결재 현황</a> <a
+								class="nav-link <%=menu.equals("receive") ? "active" : ""%>"
+								href="/approve/receiveList">결재 할 문서</a> <a
+								class="nav-link <%=menu.equals("send") ? "active" : ""%>"
+								href="/approve/sendList">결재 받을 문서</a> <a
+								class="nav-link <%=menu.equals("finish") ? "active" : ""%>"
+								href="/approve/finishList">결재 완료 문서</a> <a
+								class="nav-link <%=menu.equals("create") ? "active" : ""%>"
+								href="/approve/createForm">문서 작성 하기</a>
+						</nav>
+					</div>
 
 					<a class="nav-link <%=menu.equals("salemp") ? "active" : ""%>"
 						href="${pageContext.request.contextPath}/sal/list">

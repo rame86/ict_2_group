@@ -3,7 +3,6 @@ package com.example.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
 
 import com.example.domain.DayAttendVO;
@@ -15,24 +14,27 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class AttendServiceImpl implements AttendService {
 
-	@Autowired
-	private AttendDAO attendDAO;
+    @Autowired
+    private AttendDAO attendDAO;
 
-	public List<DayAttendVO> selectDayAttend(String empNo, String toDay) {
-		log.info("[AttendService - selectDayAttend 요청 받음]");
-		List<DayAttendVO> result = attendDAO.selectDayAttend(empNo, toDay);
-		return result;
-	}
+    @Override
+    public List<DayAttendVO> selectDayAttend(String empNo, String toDay) {
+        log.info("[AttendService - selectDayAttend 요청 받음]");
+        return attendDAO.selectDayAttend(empNo, toDay);
+    }
 
-	public String checkIn(DayAttendVO davo) {
-		return attendDAO.checkIn(davo);
-	}
+    @Override
+    public String checkIn(DayAttendVO davo) {
+        return attendDAO.checkIn(davo);
+    }
 
-	public String checkOut(DayAttendVO davo) {
-		return attendDAO.checkOut(davo);
-	}
-	
-	public String fieldwork(DayAttendVO davo) {
-		return attendDAO.fieldwork(davo);
-	}
+    @Override
+    public String checkOut(DayAttendVO davo) {
+        return attendDAO.checkOut(davo);
+    }
+
+    @Override
+    public String fieldwork(DayAttendVO davo) {
+        return attendDAO.fieldwork(davo);
+    }
 }

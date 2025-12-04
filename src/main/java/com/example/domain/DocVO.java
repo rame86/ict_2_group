@@ -20,4 +20,11 @@ public class DocVO {
     private String step2ManagerName;
     private String step2Status;
     private String rejectReason;
+    
+    // 휴가신청
+    private String startDate;
+    private String endDate;
+    private String totalDays;
+    private String emergencyContact;
+    private String empNo;
 }

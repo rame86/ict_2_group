@@ -4,67 +4,58 @@
 
 <mapper namespace="com.example.repository.SalMapper">
 
-    <!-- ================================================================== -->
-    <!-- 1. 사원 개인용: 사번(empNo)으로 급여 내역 리스트 조회              -->
-    <!--    - 본인 급여 목록 (/sal/list)                                    -->
-    <!--    - 정렬은 지급월(MONTH_ATTNO) 오름차순 하나만 사용               -->
-    <!-- ================================================================== -->
-    <select id="selectSalList"
-            parameterType="string"
-            resultType="com.example.domain.SalVO">
-        SELECT
-            s.SAL_NUM         										AS salNum,
-            s.MONTH_ATTNO     									AS monthAttno,
-            s.EMP_NO          										AS empNo,
-            TO_CHAR(s.SAL_DATE, 'YYYY-MM-DD') 	AS salDate,
-            s.SAL_BASE        										AS salBase,
-            NVL(s.SAL_BONUS, 0) 								AS salBonus,
-            NVL(s.SAL_PLUS,  0)									AS salPlus,
-            s.INSURANCE       										AS insurance,
-            s.TAX             												AS tax
-        FROM SAL s
-        WHERE s.EMP_NO = #{empNo}
-        ORDER BY s.MONTH_ATTNO ASC
-    </select>
+    <!-- 1. 사원 개인 급여 목록 -->
+    <select id="selectSalList" parameterType="string"
+        resultType="com.example.domain.SalVO">
+    SELECT
+        s.SAL_NUM      AS salNum,
+        s.MONTH_ATTNO  AS monthAttno,
+        s.EMP_NO       AS empNo,
 
-    <!-- ================================================================== -->
-    <!-- 2. 급여 명세서: 사원(empNo) + 월별(monthAttno) 상세                 -->
-    <!--    - /sal/detail, /sal/admin/detail 공통에서 사용                   -->
-    <!-- ================================================================== -->
-    <select id="selectSalDetail"
-            parameterType="map"
+       <!-- 🔹 지급월 라벨: 2025년 11월 이런 형태 -->
+        TO_CHAR(s.SAL_DATE, 'YYYY"년 "MM"월"') AS yearMonthLabel,
+
+
+        s.SAL_BASE     AS salBase,
+        NVL(s.SAL_BONUS, 0) AS salBonus,
+        NVL(s.SAL_PLUS,  0) AS salPlus,
+        s.INSURANCE    AS insurance,
+        s.TAX          AS tax
+    FROM SAL s
+    WHERE s.EMP_NO = #{empNo}
+    ORDER BY s.MONTH_ATTNO ASC
+</select>
+
+    <!-- 2. 급여 상세 -->
+    <select id="selectSalDetail" parameterType="map"
             resultType="com.example.domain.SalVO">
         SELECT
-            s.SAL_NUM         AS salNum,
-            s.EMP_NO          AS empNo,
-            s.MONTH_ATTNO     AS monthAttno,
+            s.SAL_NUM      AS salNum,
+            s.EMP_NO       AS empNo,
+            s.MONTH_ATTNO  AS monthAttno,
             TO_CHAR(s.SAL_DATE, 'YYYY-MM-DD') AS salDate,
-            s.SAL_BASE        AS salBase,
+            s.SAL_BASE     AS salBase,
             NVL(s.SAL_BONUS, 0) AS salBonus,
-            NVL(s.SAL_PLUS,  0) AS salPlus,
-            s.INSURANCE       AS insurance,
-            s.TAX             AS tax
+            NVL(s.SAL_PLUS, 0)  AS salPlus,
+            s.INSURANCE    AS insurance,
+            s.TAX          AS tax,
+            (s.SAL_BASE + NVL(s.SAL_BONUS,0) + NVL(s.SAL_PLUS,0)) AS payTotal,
+            (s.INSURANCE + s.TAX) AS deductTotal,
+            s.REALPAY      AS realPay
         FROM SAL s
         WHERE s.EMP_NO      = #{empNo}
           AND s.MONTH_ATTNO = #{monthAttno}
     </select>
 
-    <!-- ================================================================== -->
-    <!-- 3. 해당 월에 급여가 있는지 (옵션)                                   -->
-    <!-- ================================================================== -->
-    <select id="existsSal"
-            parameterType="int"
-            resultType="int">
+    <!-- 3. 해당 월 급여 존재 여부 -->
+    <select id="existsSal" parameterType="int" resultType="int">
         SELECT COUNT(*)
         FROM SAL
         WHERE MONTH_ATTNO = #{monthAttno}
     </select>
 
-    <!-- ================================================================== -->
-    <!-- 4. 사원 + 월 기준 급여 존재 여부 (옵션)                              -->
-    <!-- ================================================================== -->
-    <select id="existsMonthlySalary"
-            parameterType="map"
+    <!-- 4. 사번+월 급여 존재 여부 -->
+    <select id="existsMonthlySalary" parameterType="map"
             resultType="int">
         SELECT COUNT(*)
         FROM SAL
@@ -72,12 +63,8 @@
           AND MONTH_ATTNO = #{monthAttno}
     </select>
 
-    <!-- ================================================================== -->
-    <!-- 5. 급여 명세서 등록                                                 -->
-    <!--    - SalVO의 필드명: monthAttno, empNo, salDate, salBase, ...      -->
-    <!-- ================================================================== -->
-    <insert id="insertSal"
-            parameterType="com.example.domain.SalVO">
+    <!-- 5. 급여 1건 삽입 (수동 입력용) -->
+    <insert id="insertSal" parameterType="com.example.domain.SalVO">
         INSERT INTO SAL (
             SAL_NUM,
             MONTH_ATTNO,
@@ -101,71 +88,122 @@
         )
     </insert>
 
-    <!-- ================================================================== -->
-    <!-- 6. 관리자용: 정렬/검색 가능한 전체 급여 목록                        -->
-    <!--    - /sal/admin/list 에서 사용                                      -->
-    <!--    - 파라미터: sort, dir (Map 형태)                                 -->
-    <!--      sort: month, empNo, name, dept                                 -->
-    <!--      dir : asc, desc                                                -->
-    <!-- ================================================================== -->
-    <select id="selectAdminSalList"
-            parameterType="map"
+    <!-- 6. (구버전) 관리자 전체 급여 목록 정렬용 -->
+    <select id="selectAdminSalList" parameterType="map"
             resultType="com.example.domain.SalVO">
         SELECT
-            S.SAL_NUM          AS salNum,
-            S.MONTH_ATTNO       AS monthAttno,  -- 지급월(202511)
-            E.EMP_NO            AS empNo,
-            E.EMP_NAME          AS empName,
-            D.DEPT_NAME         AS deptName,
-            S.SAL_BASE          AS salBase,
-            S.SAL_BONUS         AS salBonus,
-            S.SAL_PLUS          AS salPlus,
-            S.INSURANCE         AS insurance,
-            S.TAX               AS tax
+            S.SAL_NUM     AS salNum,
+            S.MONTH_ATTNO AS monthAttno,
+            E.EMP_NO      AS empNo,
+            E.EMP_NAME    AS empName,
+            D.DEPT_NAME   AS deptName,
+            S.SAL_BASE    AS salBase,
+            S.SAL_BONUS   AS salBonus,
+            S.SAL_PLUS    AS salPlus,
+            S.INSURANCE   AS insurance,
+            S.TAX         AS tax
         FROM SAL S
-        JOIN EMP E
-          ON S.EMP_NO = E.EMP_NO
-        JOIN DEPT D
-          ON E.DEPT_NO = D.DEPT_NO
-
-        <choose>
-            <!-- 지급월 기준 정렬 -->
-            <when test="sort == 'month' and dir == 'asc'">
-                ORDER BY S.MONTH_ATTNO ASC
-            </when>
-            <when test="sort == 'month' and dir == 'desc'">
-                ORDER BY S.MONTH_ATTNO DESC
-            </when>
-
-            <!-- 사번 기준 정렬 -->
-            <when test="sort == 'empNo' and dir == 'asc'">
-                ORDER BY E.EMP_NO ASC
-            </when>
-            <when test="sort == 'empNo' and dir == 'desc'">
-                ORDER BY E.EMP_NO DESC
-            </when>
-
-            <!-- 이름 기준 정렬 -->
-            <when test="sort == 'name' and dir == 'asc'">
-                ORDER BY E.EMP_NAME ASC
-            </when>
-            <when test="sort == 'name' and dir == 'desc'">
-                ORDER BY E.EMP_NAME DESC
-            </when>
-
-            <!-- 부서명 기준 정렬 -->
-            <when test="sort == 'dept' and dir == 'asc'">
-                ORDER BY D.DEPT_NAME ASC
-            </when>
-            <when test="sort == 'dept' and dir == 'desc'">
-                ORDER BY D.DEPT_NAME DESC
-            </when>
-
-            <!-- 기본값: 지급월 오름차순 -->
-            <otherwise>
-                ORDER BY S.MONTH_ATTNO ASC
-            </otherwise>
-        </choose>
+        JOIN EMP E ON S.EMP_NO = E.EMP_NO
+        JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
+        <!-- 정렬 choose ... (생략 가능. 대신 아래 getAdminSalList 사용) -->
     </select>
+
+    <!-- 7. 🔹 MONTH_ATTEND 기준 급여 일괄 생성 -->
+    <insert id="insertSalaryByMonth" parameterType="string">
+        INSERT INTO SAL (
+            SAL_NUM,
+            MONTH_ATTNO,
+            EMP_NO,
+            SAL_DATE,
+            SAL_BASE,
+            SAL_BONUS,
+            SAL_PLUS,
+            INSURANCE,
+            TAX,
+            REALPAY
+        )
+        SELECT
+            SAL_SEQ.NEXTVAL,
+            T.MONTH_ATTNO,
+            T.EMP_NO,
+            TRUNC(T.MONTH_DATE_ATTEND, 'MM') + 14,
+            T.BASE_SAL,
+            0,
+            T.OVERTIME_PAY,
+            T.INSURANCE,
+            T.TAX,
+            T.REALPAY
+        FROM (
+            SELECT
+                M.MONTH_ATTNO,
+                M.EMP_NO,
+                M.MONTH_DATE_ATTEND,
+                E.BASE_SAL,
+                ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5) AS OVERTIME_PAY,
+                ROUND((E.BASE_SAL + ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5)) * 0.045) AS INSURANCE,
+                ROUND((E.BASE_SAL + ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5)) * 0.03)  AS TAX,
+                (
+                    E.BASE_SAL
+                  + ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5)
+                  - ROUND((E.BASE_SAL + ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5)) * 0.045)
+                  - ROUND((E.BASE_SAL + ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5)) * 0.03)
+                ) AS REALPAY
+            FROM MONTH_ATTEND M
+            JOIN EMP E ON M.EMP_NO = E.EMP_NO
+            WHERE TO_CHAR(M.MONTH_DATE_ATTEND, 'YYYY-MM') = #{targetMonth}
+        ) T
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM SAL S
+            WHERE S.MONTH_ATTNO = T.MONTH_ATTNO
+              AND S.EMP_NO     = T.EMP_NO
+        )
+    </insert>
+
+    <!-- 8. 🔹 관리자 화면용 (월 필터 + 정렬) -->
+   <select id="getAdminSalList" parameterType="map"
+        resultType="com.example.domain.SalVO">
+
+    SELECT
+        S.SAL_NUM      AS salNum,
+        S.MONTH_ATTNO  AS monthAttno,
+        S.EMP_NO       AS empNo,
+        E.EMP_NAME     AS empName,
+        D.DEPT_NAME    AS deptName,
+       <!-- 🔹 salDate는 문자열로 ('YYYY-MM-DD') -->
+        TO_CHAR(S.SAL_DATE, 'YYYY-MM-DD') AS salDate,
+       <!-- 🔹 yearMonthLabel: "2025년 10월" 같은 표시용 라벨 -->
+        TO_CHAR(S.SAL_DATE, 'YYYY"년 "MM"월"') AS yearMonthLabel,
+        S.SAL_BASE     AS salBase,
+        S.SAL_BONUS    AS salBonus,
+        S.SAL_PLUS     AS salPlus,
+        (S.INSURANCE + S.TAX) AS deductTotal,
+        S.REALPAY      AS realPay
+    FROM SAL S
+    JOIN EMP  E ON S.EMP_NO = E.EMP_NO
+    LEFT JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
+
+    <where>
+        <if test="month != null and month != ''">
+            AND TO_CHAR(S.SAL_DATE, 'YYYY-MM') = #{month}
+        </if>
+    </where>
+
+    <choose>
+        <when test="sort == 'empNo'">
+            ORDER BY S.EMP_NO ${dir}
+        </when>
+        <when test="sort == 'name'">
+            ORDER BY E.EMP_NAME ${dir}
+        </when>
+        <when test="sort == 'dept'">
+            ORDER BY D.DEPT_NAME ${dir}
+        </when>
+        <otherwise>
+            ORDER BY S.SAL_DATE ${dir}, S.EMP_NO ASC
+        </otherwise>
+    </choose>
+
+</select>
 
 </mapper>

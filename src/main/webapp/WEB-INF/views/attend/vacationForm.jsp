@@ -261,6 +261,10 @@
         <h2 class="text-2xl font-bold text-gray-800 text-center mb-8 pb-2">휴가 신청</h2>
         
         <form id="vacationForm" action="#" method="POST" class="space-y-6" enctype="multipart/form-data">
+        
+        	<input type="hidden" name="DocType" id="documentTypeInput" value="4">
+			<input type="hidden" name="step1ManagerNo" value="${ loginVO.managerEmpNo }">
+			<input type="hidden" name="step2ManagerNo" value="${ loginVO.parentDeptNo }">
             
             <!-- 1. 신청자 정보 (자동 입력) -->
             <fieldset class="p-4 border border-gray-200 rounded-lg">
@@ -329,7 +333,7 @@
 				<!-- 휴가 사유 -->
 				<div class="flex flex-col mb-4">
                     <label for="reason" class="text-sm font-semibold text-gray-700 mb-2">휴가 사유:</label>
-                    <textarea id="reason" name="reason" rows="6" placeholder="휴가 사유를 상세히 입력해 주세요." required class="w-full p-2 border border-gray-300 rounded-md resize-none focus:border-blue-500 focus:ring focus:ring-blue-200"></textarea>
+                    <textarea id="reason" name="docContent" rows="6" placeholder="휴가 사유를 상세히 입력해 주세요." required class="w-full p-2 border border-gray-300 rounded-md resize-none focus:border-blue-500 focus:ring focus:ring-blue-200"></textarea>
                 </div>
                 
                 <!-- 비상 연락처 -->
