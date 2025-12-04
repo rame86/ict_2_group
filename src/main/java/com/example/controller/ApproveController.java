@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import org.springframework.web.servlet.ModelAndView;
+
 
 import com.example.domain.ApproveListVO;
 import com.example.domain.ApproveVO;
@@ -100,6 +102,7 @@ public class ApproveController {
 	// 문서 작성
 	@PostMapping("approve/approve-form")
 	public String approveForm(DocVO dvo, ApproveVO avo){
+		System.out.println("approve-form 도착" + dvo.toString() + avo.toString());
 		approveService.ApprovalApplication(dvo, avo);
 		return "redirect:statusList";
 	}
@@ -118,14 +121,16 @@ public class ApproveController {
 			@RequestParam String status,
 			@RequestParam(required = false) String rejectReason,
 			@ModelAttribute("login") LoginVO login,
-			RedirectAttributes redirectAttributes){
+			ModelAndView mv){
 		Integer empNo = Integer.parseInt(login.getEmpNo());
 		approveService.approveDocument(docNo, status, empNo, rejectReason);
 		
 		DocVO vo = approveService.selectDocNo(docNo);
-		if(vo.getDocType().equals("4")) redirectAttributes.addFlashAttribute("docNo", vo.getDocNo());
-		else if(vo.getDocType().equals("5")) redirectAttributes.addFlashAttribute("docNo", vo.getDocNo());
+		mv.addObject("docNo", vo.getDocNo());
 		
+		if ("4".equals(vo.getDocType())) mv.setViewName("/attend/vacation");
+	    else if ("5".equals(vo.getDocType())) mv.setViewName("docType5Page");
+
 	}
 	
 	// 결재 완료된 문서들
