@@ -1,6 +1,8 @@
 package com.example.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -62,6 +64,8 @@ public class SalController {
                             HttpSession session,
                             Model model) {
 
+    	log.info("[SalController-salDetail] empNo = {}, monthAttno = {}", empNo, monthAttno);
+    	
         LoginVO login = (LoginVO) session.getAttribute("login");
         if (login == null) {
             return "redirect:/member/login";
@@ -94,4 +98,6 @@ public class SalController {
 
         return "redirect:/sal/admin/list?month=" + month;
     }
+    
+
 }

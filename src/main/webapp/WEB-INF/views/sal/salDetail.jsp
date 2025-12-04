@@ -1,7 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c"  uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%-- <%@ include file="/WEB-INF/views/include/header.jsp" %> --%>
 
 <%
     if (request.getAttribute("menu") == null) {
@@ -16,8 +15,7 @@
 <title>급여 명세서</title>
 
 <jsp:include page="../common/header.jsp" />
-<link rel="stylesheet" href="/css/salDetail.css">
-
+<link rel="stylesheet" href="${pageContext.request.contextPath}/css/salDetail.css">
 
 </head>
 <body>
@@ -39,50 +37,66 @@
                     <!-- 🔹 상단 정보 영역 : 지급월 / 지급일 / 사원 기본 정보 + 출력 버튼 -->
                     <div class="info-card">
 
+                        <!-- 상단 타이틀 줄 (지급월 + 출력 버튼) -->
                         <div class="info-card-header">
                             <div>
-                                <span class="info-label">지급월 :  
-                                <c:choose>
-                                    <c:when test="${not empty sal.yearMonthLabel}">
-                                        ${sal.yearMonthLabel}
-                                    </c:when>
-                                    <c:otherwise>
-                                        ${sal.monthAttno}
-                                    </c:otherwise>
-                                </c:choose></span>
+                                <span class="info-label">
+                                    지급월 :
+                                    <c:choose>
+                                        <c:when test="${not empty sal.yearMonthLabel}">
+                                            ${sal.yearMonthLabel}
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:choose>
+                                                <c:when test="${not empty sal.yearMonth}">
+                                                    ${sal.yearMonth}
+                                                </c:when>
+                                                <c:otherwise>
+                                                    ${sal.monthAttno}
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </span>
                             </div>
                             <button type="button" class="btn-print" onclick="window.print();">
                                 명세서 출력
                             </button>
                         </div>
 
+                        <!-- 지급일 표시 줄 -->
                         <div class="info-row">
                             <span>
-                                <span class="info-label">지급일 :
-                                <c:choose>
-                                    <c:when test="${not empty sal.yearMonthLabel}">
-                                        ${sal.yearMonthLabel} 15일
-                                    </c:when>
-                                    <c:otherwise>
-                                        15일
-                                    </c:otherwise>
-                                </c:choose> </span> 
+                                <span class="info-label">
+                                    지급일 :
+                                    <c:choose>
+                                        <c:when test="${not empty sal.salDate}">
+                                            ${sal.salDate}
+                                        </c:when>
+                                        <c:when test="${not empty sal.yearMonthLabel}">
+                                            ${sal.yearMonthLabel} 15일
+                                        </c:when>
+                                        <c:otherwise>
+                                            15일
+                                        </c:otherwise>
+                                    </c:choose>
+                                </span>
                             </span>
                         </div>
 
+                        <!-- 사원 기본 정보 -->
                         <div class="info-row">
                             <span>
-                                <span class="info-label">사번 :  ${emp.empNo} </span>
+                                <span class="info-label">사번 : ${emp.empNo}</span>
                             </span>
                             <span>
-                                <span class="info-label">이름 : ${emp.empName} </span> 
-                            </span>
-                     	
-                            <span>
-                                <span class="info-label">부서 : ${emp.deptName} </span> 
+                                <span class="info-label">이름 : ${emp.empName}</span>
                             </span>
                             <span>
-                                <span class="info-label">재직상태 : ${emp.statusName} </span> 
+                                <span class="info-label">부서 : ${emp.deptName}</span>
+                            </span>
+                            <span>
+                                <span class="info-label">재직상태 : ${emp.statusName}</span>
                             </span>
                         </div>
 
@@ -108,19 +122,17 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th>추가 수당</th>
+                                    <th>기타 수당</th>
                                     <td>
                                         <fmt:formatNumber value="${sal.salPlus}" type="number" pattern="#,##0" />원
                                     </td>
                                 </tr>
-                                <c:if test="${not empty sal.overtimePay}">
-                                    <tr>
-                                        <th>초과근무 수당</th>
-                                        <td>
-                                            <fmt:formatNumber value="${sal.overtimePay}" type="number" pattern="#,##0" />원
-                                        </td>
-                                    </tr>
-                                </c:if>
+                                <tr>
+                                    <th>초과근무 수당</th>
+                                    <td>
+                                        <fmt:formatNumber value="${sal.overtimePay}" type="number" pattern="#,##0" />원
+                                    </td>
+                                </tr>
                             </table>
                         </div>
 
@@ -145,7 +157,7 @@
 
                     </div>
 
-                    <!-- 🔹 하단 : 총 지급액 / 공제 합계 / 실지급액 한 박스 (공제 내역 밑) -->
+                    <!-- 🔹 하단 : 총 지급액 / 공제 합계 / 실지급액 -->
                     <div class="summary-box">
                         <div class="summary-row">
                             <span class="summary-label">총 지급액</span>
@@ -169,7 +181,9 @@
 
                     <!-- 🔹 버튼 영역 -->
                     <div class="btn-area">
-                        <button type="button" onclick="history.back();">급여 명세서 목록으로 돌아가기</button>
+                        <button type="button" onclick="history.back();">
+                            급여 명세서 목록으로 돌아가기
+                        </button>
                     </div>
 
                 </div>
