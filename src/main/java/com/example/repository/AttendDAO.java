@@ -14,6 +14,8 @@ public interface AttendDAO {
 	
 	public String fieldwork(DayAttendVO davo);
 	
-	public void insertVacation(DocVO vo, Integer totalDays);
+	public void insertVacation(DayAttendVO davo, Integer totalDays);
+	
+	public void commuteCorrection(DayAttendVO davo);
 
 }
