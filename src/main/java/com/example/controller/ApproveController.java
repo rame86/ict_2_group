@@ -126,5 +126,13 @@ public class ApproveController {
 		m.addAttribute("receiveList", receiveList);
 		m.addAttribute("sendList", sendList.get("sendList"));
 	}
+	
+	// 내가 보낸 문서 상세보기
+	@GetMapping("approve/documentDetailPopup")
+	public void documentDetailPopup(@RequestParam Integer docNo, Model m, @ModelAttribute("login") LoginVO login) {
+		DocVO vo = approveService.selectDocNo(docNo);
+		m.addAttribute("dept", login.getDeptName());
+		m.addAttribute("vo", vo);
+	}
 		
 }

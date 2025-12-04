@@ -4,8 +4,7 @@
 
 <%
 String menu = (String) request.getAttribute("menu");
-if (menu == null)
-	menu = "";
+if (menu == null) menu = "";
 %>
 
 <!DOCTYPE html>
@@ -27,9 +26,9 @@ if (menu == null)
                             </a>
                             <div class="sb-sidenav-menu-heading">메인 메뉴</div>
                             <a class="nav-link" href="/attend/attend">
-    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-    근태관리
-</a>
+    							<div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+    							근태관리
+							</a>
                             
                             
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">

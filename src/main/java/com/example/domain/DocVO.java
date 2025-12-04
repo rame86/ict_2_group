@@ -19,4 +19,5 @@ public class DocVO {
     private Integer step2ManagerNo;
     private String step2ManagerName;
     private String step2Status;
+    private String rejectReason;
 }
