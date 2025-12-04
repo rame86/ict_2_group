@@ -36,4 +36,6 @@ public interface SalMapper {
 
     // 🔹 관리자용 정렬/월필터 급여 목록
     List<SalVO> getAdminSalList(Map<String, String> param);
+
+	
 }

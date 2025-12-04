@@ -34,5 +34,4 @@ public class SalVO {
  // 🔹 관리자 급여대장 화면용 추가 필드
     private String empName;   // 사원 이름
     private String deptName;  // 부서 이름
-
 }

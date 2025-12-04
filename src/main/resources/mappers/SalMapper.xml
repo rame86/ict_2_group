@@ -6,42 +6,73 @@
 
     <!-- 1. 사원 개인 급여 목록 -->
     <select id="selectSalList" parameterType="string"
-        resultType="com.example.domain.SalVO">
-    SELECT
-        s.SAL_NUM      AS salNum,
-        s.MONTH_ATTNO  AS monthAttno,
-        s.EMP_NO       AS empNo,
+            resultType="com.example.domain.SalVO">
+        SELECT
+            s.SAL_NUM       AS salNum,
+            s.MONTH_ATTNO   AS monthAttno,
+            s.EMP_NO        AS empNo,
 
-       <!-- 🔹 지급월 라벨: 2025년 11월 이런 형태 -->
-        TO_CHAR(s.SAL_DATE, 'YYYY"년 "MM"월"') AS yearMonthLabel,
+            -- 지급월 라벨: 2025년 11월
+            TO_CHAR(s.SAL_DATE, 'YYYY"년 "MM"월"') AS yearMonthLabel,
 
+            s.SAL_BASE                AS salBase,
+            NVL(s.SAL_BONUS, 0)       AS salBonus,
 
-        s.SAL_BASE     AS salBase,
-        NVL(s.SAL_BONUS, 0) AS salBonus,
-        NVL(s.SAL_PLUS,  0) AS salPlus,
-        s.INSURANCE    AS insurance,
-        s.TAX          AS tax
-    FROM SAL s
-    WHERE s.EMP_NO = #{empNo}
-    ORDER BY s.MONTH_ATTNO ASC
-</select>
+            -- 기타 수당
+            NVL(s.SAL_PLUS, 0)        AS salPlus,
+            -- 초과근무 수당 (DB에 OVERTIME_PAY 칼럼이 있다고 가정)
+            NVL(s.OVERTIME_PAY, 0)    AS overtimePay,
+
+            s.INSURANCE               AS insurance,
+            s.TAX                     AS tax,
+
+            -- 총 지급액 / 공제 총액 / 실지급액
+            (
+                s.SAL_BASE
+              + NVL(s.SAL_BONUS, 0)
+              + NVL(s.SAL_PLUS, 0)
+              + NVL(s.OVERTIME_PAY, 0)
+            ) AS payTotal,
+
+            (s.INSURANCE + s.TAX)     AS deductTotal,
+            s.REALPAY                 AS realPay
+        FROM SAL s
+        WHERE s.EMP_NO = #{empNo}
+        ORDER BY s.MONTH_ATTNO ASC
+    </select>
 
     <!-- 2. 급여 상세 -->
     <select id="selectSalDetail" parameterType="map"
             resultType="com.example.domain.SalVO">
         SELECT
-            s.SAL_NUM      AS salNum,
-            s.EMP_NO       AS empNo,
-            s.MONTH_ATTNO  AS monthAttno,
+            s.SAL_NUM       AS salNum,
+            s.EMP_NO        AS empNo,
+            s.MONTH_ATTNO   AS monthAttno,
+
+            -- 'YYYY-MM-DD'
             TO_CHAR(s.SAL_DATE, 'YYYY-MM-DD') AS salDate,
-            s.SAL_BASE     AS salBase,
-            NVL(s.SAL_BONUS, 0) AS salBonus,
-            NVL(s.SAL_PLUS, 0)  AS salPlus,
-            s.INSURANCE    AS insurance,
-            s.TAX          AS tax,
-            (s.SAL_BASE + NVL(s.SAL_BONUS,0) + NVL(s.SAL_PLUS,0)) AS payTotal,
-            (s.INSURANCE + s.TAX) AS deductTotal,
-            s.REALPAY      AS realPay
+            -- "2025년 10월"
+            TO_CHAR(s.SAL_DATE, 'YYYY"년 "MM"월"') AS yearMonthLabel,
+
+            s.SAL_BASE                AS salBase,
+            NVL(s.SAL_BONUS, 0)       AS salBonus,
+
+            -- 기타 수당
+            NVL(s.SAL_PLUS, 0)        AS salPlus,
+            -- 초과근무 수당
+            NVL(s.OVERTIME_PAY, 0)    AS overtimePay,
+
+            s.INSURANCE               AS insurance,
+            s.TAX                     AS tax,
+
+            (
+                s.SAL_BASE
+              + NVL(s.SAL_BONUS, 0)
+              + NVL(s.SAL_PLUS, 0)
+              + NVL(s.OVERTIME_PAY, 0)
+            ) AS payTotal,
+            (s.INSURANCE + s.TAX)     AS deductTotal,
+            s.REALPAY                 AS realPay
         FROM SAL s
         WHERE s.EMP_NO      = #{empNo}
           AND s.MONTH_ATTNO = #{monthAttno}
@@ -73,42 +104,44 @@
             SAL_BASE,
             SAL_BONUS,
             SAL_PLUS,
+            OVERTIME_PAY,
             INSURANCE,
             TAX
         ) VALUES (
-            SEQ_SAL.NEXTVAL,
+            SEQ_SAL.NEXTVAL,                  -- 실제 시퀀스명 확인
             #{monthAttno},
             #{empNo},
             TO_DATE(#{salDate}, 'YYYY-MM-DD'),
             #{salBase},
             #{salBonus},
             #{salPlus},
+            #{overtimePay},
             #{insurance},
             #{tax}
         )
     </insert>
 
-    <!-- 6. (구버전) 관리자 전체 급여 목록 정렬용 -->
+    <!-- 6. (구버전) 관리자 전체 급여 목록 -->
     <select id="selectAdminSalList" parameterType="map"
             resultType="com.example.domain.SalVO">
         SELECT
-            S.SAL_NUM     AS salNum,
-            S.MONTH_ATTNO AS monthAttno,
-            E.EMP_NO      AS empNo,
-            E.EMP_NAME    AS empName,
-            D.DEPT_NAME   AS deptName,
-            S.SAL_BASE    AS salBase,
-            S.SAL_BONUS   AS salBonus,
-            S.SAL_PLUS    AS salPlus,
-            S.INSURANCE   AS insurance,
-            S.TAX         AS tax
+            S.SAL_NUM        AS salNum,
+            S.MONTH_ATTNO    AS monthAttno,
+            E.EMP_NO         AS empNo,
+            E.EMP_NAME       AS empName,
+            D.DEPT_NAME      AS deptName,
+            S.SAL_BASE       AS salBase,
+            S.SAL_BONUS      AS salBonus,
+            NVL(S.SAL_PLUS, 0)      AS salPlus,
+            NVL(S.OVERTIME_PAY, 0)  AS overtimePay,
+            S.INSURANCE      AS insurance,
+            S.TAX            AS tax
         FROM SAL S
-        JOIN EMP E ON S.EMP_NO = E.EMP_NO
+        JOIN EMP E  ON S.EMP_NO = E.EMP_NO
         JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
-        <!-- 정렬 choose ... (생략 가능. 대신 아래 getAdminSalList 사용) -->
     </select>
 
-    <!-- 7. 🔹 MONTH_ATTEND 기준 급여 일괄 생성 -->
+    <!-- 7. MONTH_ATTEND 기준 급여 일괄 생성 -->
     <insert id="insertSalaryByMonth" parameterType="string">
         INSERT INTO SAL (
             SAL_NUM,
@@ -118,18 +151,20 @@
             SAL_BASE,
             SAL_BONUS,
             SAL_PLUS,
+            OVERTIME_PAY,
             INSURANCE,
             TAX,
             REALPAY
         )
         SELECT
-            SAL_SEQ.NEXTVAL,
+            SAL_SEQ.NEXTVAL,                      -- 시퀀스명 확인
             T.MONTH_ATTNO,
             T.EMP_NO,
             TRUNC(T.MONTH_DATE_ATTEND, 'MM') + 14,
             T.BASE_SAL,
-            0,
-            T.OVERTIME_PAY,
+            0,                                    -- 기타 수당(자동 계산 X, 필요시 수정)
+            0,                                    -- 초기에는 기타 수당 0원
+            T.OVERTIME_PAY,                       -- 초과근무 수당
             T.INSURANCE,
             T.TAX,
             T.REALPAY
@@ -160,28 +195,28 @@
         )
     </insert>
 
-    <!-- 8. 🔹 관리자 화면용 (월 필터 + 정렬) -->
-   <select id="getAdminSalList" parameterType="map"
+    <!-- 8. 관리자 화면용 (월 필터 + 정렬) -->
+    <select id="getAdminSalList" parameterType="map"
         resultType="com.example.domain.SalVO">
 
     SELECT
-        S.SAL_NUM      AS salNum,
-        S.MONTH_ATTNO  AS monthAttno,
-        S.EMP_NO       AS empNo,
-        E.EMP_NAME     AS empName,
-        D.DEPT_NAME    AS deptName,
-       <!-- 🔹 salDate는 문자열로 ('YYYY-MM-DD') -->
-        TO_CHAR(S.SAL_DATE, 'YYYY-MM-DD') AS salDate,
-       <!-- 🔹 yearMonthLabel: "2025년 10월" 같은 표시용 라벨 -->
-        TO_CHAR(S.SAL_DATE, 'YYYY"년 "MM"월"') AS yearMonthLabel,
-        S.SAL_BASE     AS salBase,
-        S.SAL_BONUS    AS salBonus,
-        S.SAL_PLUS     AS salPlus,
-        (S.INSURANCE + S.TAX) AS deductTotal,
-        S.REALPAY      AS realPay
-    FROM SAL S
-    JOIN EMP  E ON S.EMP_NO = E.EMP_NO
-    LEFT JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
+        S.SAL_NUM      													AS salNum,
+        S.MONTH_ATTNO  											AS monthAttno,
+        S.EMP_NO       													AS empNo,
+        E.EMP_NAME     												AS empName,
+        D.DEPT_NAME    												AS deptName,
+        TO_CHAR(S.SAL_DATE, 'YYYY-MM-DD') 			AS salDate,
+        TO_CHAR(S.SAL_DATE, 'YYYY"년 "MM"월"') 		AS yearMonthLabel,
+        S.SAL_BASE     													AS salBase,
+        S.SAL_BONUS    												AS salBonus,
+        NVL(S.SAL_PLUS, 0)      									AS salPlus,
+        NVL(S.OVERTIME_PAY, 0)  								AS overtimePay,
+        (S.INSURANCE + S.TAX)   									AS deductTotal,
+        S.REALPAY               											AS realPay
+        
+    FROM 	SAL S
+    			JOIN EMP  E ON S.EMP_NO = E.EMP_NO
+    			LEFT JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
 
     <where>
         <if test="month != null and month != ''">
@@ -205,5 +240,6 @@
     </choose>
 
 </select>
+
 
 </mapper>
