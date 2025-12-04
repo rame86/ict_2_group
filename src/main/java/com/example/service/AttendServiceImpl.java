@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.domain.DayAttendVO;
+import com.example.domain.DocVO;
 import com.example.repository.AttendDAO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,4 +38,25 @@ public class AttendServiceImpl implements AttendService {
     public String fieldwork(DayAttendVO davo) {
         return attendDAO.fieldwork(davo);
     }
+
+	@Override
+	public void insertVacation(DocVO vo) {
+		
+		DayAttendVO davo = new DayAttendVO();
+		
+		String totalDayStr = vo.getTotalDays();
+		String totalDaySt = totalDayStr.replaceAll("[^0-9]", "");
+		Integer totalDays = 0;
+	    if (!totalDaySt.isEmpty()) {
+	        totalDays = Integer.parseInt(totalDaySt);
+	    }
+		
+	    davo.setEmpNo(vo.getEmpNo());
+		davo.setUpdateTime(vo.getStartDate());
+		davo.setMemo("연차 :" +vo.getStartDate()+"~"+vo.getEndDate()+", "+vo.getTotalDays());
+		davo.setAttStatus("연차");
+		
+		attendDAO.insertVacation(vo, totalDays);
+
+	}
 }
