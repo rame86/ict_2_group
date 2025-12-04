@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import org.springframework.stereotype.Component;
 
@@ -70,5 +71,53 @@ public class ToDate {
 		log.info("[ToDate - getFomatter : " + currentTime + "]");
 		return currentTime;
 	}
+	
+	
+	// 수정된 getFomatterDate (날짜 문자열만 필요할 경우)
+	public String getFomatterDate(String time) {
+	    log.info("[ToDate - getFomatterDate 메소드 요청 받음]");
+	    
+	    // 1. 입력 문자열이 'yyyy-MM-dd HH:mm:ss' 형식이라고 가정하고 파싱
+	    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	    LocalDateTime nowDateTime;
+	    
+	    try {
+	        // 날짜와 시간을 모두 파싱
+	        nowDateTime = LocalDateTime.parse(time, inputFormatter);
+	    } catch (DateTimeParseException e) {
+	        // 파싱 실패 시 (예: 'yyyy-MM-dd'만 들어온 경우) 대체 로직 수행
+	        DateTimeFormatter dateOnlyFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	        nowDateTime = LocalDate.parse(time, dateOnlyFormatter).atStartOfDay();
+	    }
+	    
+	    // 2. 원하는 출력 형식 (여기서는 날짜만 추출한다고 가정)
+	    DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	    String formattedDate = nowDateTime.format(outputFormatter);
+	    
+	    log.info("[ToDate - getFomatterDate 결과 : " + formattedDate + "]");
+	    return formattedDate;
+	}
+	
+	//날짜를 하루씩 증가시키는 메소드
+	public String addDay(String date) {
+        log.info("[ToDate - addDay 메소드 요청 받음]");
+        
+        // String 타입 날짜를 LocalDate 변환
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
+        log.info("원본 날짜 (LocalDate): " + localDate);
+
+        // 날짜를 1일 증가. (연말/월말/윤년 자동 처리)
+        LocalDate nextDay = localDate.plusDays(1);
+        log.info("증가된 날짜 (LocalDate): " + nextDay);
+
+        // 증가된 날짜를 다시 String으로 변환하여 반환
+        String nextDayString = nextDay.format(formatter);
+        log.info("[ToDate - addDay 결과 : " + nextDayString + "]");
+        
+        return nextDayString;
+    }
+	
+	
 
 }

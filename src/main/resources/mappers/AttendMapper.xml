@@ -99,4 +99,27 @@
 		#{dayAttno}
 	</update>
 	
+	<insert id="insertVacation" parameterType="DayAttendVO">
+		INSERT INTO DAY_ATTEND
+		(
+		DAY_ATTNO,
+		EMP_NO,	
+		FIRST_DAYTIME,
+		ATT_STATUS,
+		DATE_ATTEND,
+		MEMO
+
+		)
+		VALUES
+		(
+		day_attno_seq.NEXTVAL,
+		#{empNo},
+		SYSDATE,
+		#{attStatus},	
+		TO_DATE(#{dateAttend}, 'YYYY-MM-DD'),
+		#{memo}
+
+		)
+	</insert>
+	
 </mapper>

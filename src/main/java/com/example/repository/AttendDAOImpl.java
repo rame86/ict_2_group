@@ -124,13 +124,13 @@ public class AttendDAOImpl implements AttendDAO {
 				Duration restTime = Duration.ofHours(1); // 초단위로 변경(1시간이라 3600초 나옴)
 				// 총근무시간에 휴식시간 빼서 초기화~
 				Duration realWorkTime = workTime.minus(restTime);
-				
+
 				// 총 근무 시간이 1시간(restTime) 이상일 때만 휴식 시간을 뺌
 				if (workTime.compareTo(restTime) > 0) {
-				    realWorkTime = workTime.minus(restTime);
+					realWorkTime = workTime.minus(restTime);
 				} else {
-				    // 1시간 미만 근무 시 휴식 시간 차감 없음 (총 근무 시간이 그대로 실 근무 시간)
-				    realWorkTime = workTime;
+					// 1시간 미만 근무 시 휴식 시간 차감 없음 (총 근무 시간이 그대로 실 근무 시간)
+					realWorkTime = workTime;
 				}
 
 				// 초단위를 다시 시간, 분 단위로 분리하기위해 long 타입으로 변환~
@@ -194,10 +194,51 @@ public class AttendDAOImpl implements AttendDAO {
 		}
 		return result;
 	}
+	// end of fieldwork()
+	// =======================================================================================
 
-	@Override
-	public void insertVacation(DocVO vo, Integer totalDays) {
-		// TODO Auto-generated method stub
+	//
+
+	// =======================================================================================
+	// insertVacation() 연차 승인후 입력
+	public void insertVacation(DayAttendVO originalDavo, Integer totalDays) {
+		log.info("[AttendDAO - insertVacation 요청 받음]");
+
+		// 넘어온 dateAttend 날짜를 currentDateString에 저장
+		String currentDateString = originalDavo.getDateAttend();
 		
+		log.info("attendDAO : " + originalDavo.toString());
+		// totalDays 만큼 반복
+		for (int i = 0; i < totalDays; i++) {
+
+			// 삽입할 새로운 DayAttendVO 객체 생성 및 값 복사
+			DayAttendVO davoToInsert = new DayAttendVO();
+			
+	        davoToInsert.setEmpNo(originalDavo.getEmpNo());
+	        davoToInsert.setAttStatus(originalDavo.getAttStatus());
+	        davoToInsert.setMemo(originalDavo.getMemo());
+			davoToInsert.setDateAttend(currentDateString);
+
+			log.info("INSERT 시도 - dateAttend: " + davoToInsert.getDateAttend());
+			sess.insert("com.example.repository.DayAttendDAO.insertVacation", davoToInsert);
+			
+			// ToDate 유틸리티를 사용하여 다음 날짜를 계산하고 다시 넣어줌~		
+			currentDateString = toDate.addDay(currentDateString);
+		}
+
 	}
+	// end of insertVacation()
+	// =======================================================================================
+
+	//
+
+	// =======================================================================================
+	// commuteCorrection()
+	public void commuteCorrection(DayAttendVO davo) {
+		log.info("[AttendDAO - commuteCorrection 요청 받음]");
+
+	}
+	// end of commuteCorrection()
+	// =======================================================================================
+
 }

@@ -134,7 +134,7 @@
 		<script>
 			function openDocDetail(docNo) {
 			    const url = "documentDetailPopup?docNo=" + docNo;
-			    const options = "width=900,height=1200,top=20,left=500,scrollbars=yes,resizable=yes";
+			    const options = "width=900,height=1200,top=20,left=600,scrollbars=yes,resizable=yes";
 			    window.open(url, "documentDetailPopup", options);
 			}
 		</script>

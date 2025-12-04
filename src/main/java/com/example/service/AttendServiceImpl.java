@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.controller.ToDate;
 import com.example.domain.DayAttendVO;
 import com.example.domain.DocVO;
 import com.example.repository.AttendDAO;
@@ -15,8 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class AttendServiceImpl implements AttendService {
 
+	@Autowired
+    private ToDate toDate;
+
     @Autowired
     private AttendDAO attendDAO;
+   
 
     @Override
     public List<DayAttendVO> selectDayAttend(String empNo, String toDay) {
@@ -39,8 +45,36 @@ public class AttendServiceImpl implements AttendService {
         return attendDAO.fieldwork(davo);
     }
 
+    @Transactional
 	@Override
 	public void insertVacation(DocVO vo) {
+		log.info("[AttendService - insertVacation 요청 받음]");
+		log.info(vo.toString());
+		DayAttendVO davo = new DayAttendVO();
+		
+		String totalDayStr = vo.getTotalDays();
+		String totalDaySt = totalDayStr.replaceAll("[^0-9]", "");
+		Integer totalDays = 0;
+	    if (!totalDaySt.isEmpty()) {
+	        totalDays = Integer.parseInt(totalDaySt);
+	    }
+	    
+	    String startDate = toDate.getFomatterDate(vo.getStartDate());
+	    String endDate = toDate.getFomatterDate(vo.getEndDate());
+	    
+	    davo.setEmpNo(vo.getEmpNo());
+		davo.setUpdateTime(toDate.getToDay());
+		davo.setMemo("연차 :" +startDate+"~"+endDate+", "+vo.getTotalDays());
+		log.info("메모는??" + davo.getMemo());
+		davo.setAttStatus("연차");
+		davo.setDateAttend(startDate);
+		
+		attendDAO.insertVacation(davo, totalDays);
+
+	}
+	
+	
+	public void commuteCorrection(DocVO vo) {
 		
 		DayAttendVO davo = new DayAttendVO();
 		
@@ -56,7 +90,8 @@ public class AttendServiceImpl implements AttendService {
 		davo.setMemo("연차 :" +vo.getStartDate()+"~"+vo.getEndDate()+", "+vo.getTotalDays());
 		davo.setAttStatus("연차");
 		
-		attendDAO.insertVacation(vo, totalDays);
+		
+		attendDAO.commuteCorrection(davo);
 
 	}
 }

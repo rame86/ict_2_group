@@ -117,6 +117,7 @@
 		        <c:when test="${vo.docType == 1}">품 의 서</c:when>
 		        <c:when test="${vo.docType == 2}">기 획 서</c:when>
 		        <c:when test="${vo.docType == 3}">제 안 서</c:when>
+		        <c:when test="${vo.docType == 4}">휴 가 신 청 서</c:when>
 		        <c:otherwise>기타</c:otherwise>
 		    </c:choose>
 		</div>
@@ -161,10 +162,28 @@
 				<th>부서</th>
 				<td>${ dept }</td>
 			</tr>
-			<tr>
-				<th>제목</th>
-				<td colspan="3">${vo.docTitle}</td>
-			</tr>
+			<c:choose>
+				<c:when test="${ vo.docType == 4 }">
+					<tr>
+						<th>제목</th>
+						<td>${ vo.docTitle }</td>
+						<th>휴가 일수</th>
+						<td>${ vo.totalDays }</td>
+					</tr>
+					<tr>
+						<th>휴가 시작일</th>
+						<td>${ vo.startDate }</td>
+						<th>휴가 종료일</th>
+						<td>${ vo.endDate }</td>
+					</tr>
+				</c:when>
+				<c:otherwise>
+					<tr>
+						<th>제목</th>
+						<td colspan="3">${vo.docTitle}</td>
+					</tr>
+				</c:otherwise>
+			</c:choose>
 		</table>
 
 		<div class="section-title">품의 내용</div>
