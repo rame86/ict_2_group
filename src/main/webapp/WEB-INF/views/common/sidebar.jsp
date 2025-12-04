@@ -25,25 +25,33 @@ if (menu == null) menu = "";
 							<i class="fas fa-tachometer-alt"></i>
 						</div> 마이페이지
 					</a>
-					<div class="sb-sidenav-menu-heading">메인 메뉴</div>
+				<div class="sb-sidenav-menu-heading">메인 메뉴</div>
+					<%--근태 관리 --%>
 					<a class="nav-link" href="/attend/attend">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-columns"></i>
 						</div> 근태관리
-					</a> <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-						data-bs-target="#collapsePages" aria-expanded="false"
-						aria-controls="collapsePages">
+					</a> 
+					
+					<%--사원 관리 --%>
+					<a class="nav-link <%=menu.equals("emp") ? "active" : ""%>"
+						href="${pageContext.request.contextPath}/emp/list">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-book-open"></i>
 						</div> 사원관리
-						<div class="sb-sidenav-collapse-arrow"></div>
-					</a> <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+					</a>
+
+					<%--부서 관리 --%>
+					<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
 						aria-expanded="false" aria-controls="collapsePages">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-book-open"></i>
 						</div> 부서관리
 						<div class="sb-sidenav-collapse-arrow"></div>
-					</a> <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+					</a> 
+					
+					<%--결재 관리 --%>
+					<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
 						data-bs-target="#collapseApproval" aria-expanded="false"
 						aria-controls="collapseLayouts">
 						<div class="sb-nav-link-icon">
@@ -71,7 +79,8 @@ if (menu == null) menu = "";
 								href="/approve/createForm">문서 작성 하기</a>
 						</nav>
 					</div>
-
+					
+					<%--급여 관리 --%>
 					<a class="nav-link <%=menu.equals("salemp") ? "active" : ""%>"
 						href="${pageContext.request.contextPath}/sal/list">
 						<div class="sb-nav-link-icon">
