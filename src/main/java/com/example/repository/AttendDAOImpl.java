@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.controller.ToDate;
 import com.example.domain.DayAttendVO;
+import com.example.domain.DocVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -192,5 +193,11 @@ public class AttendDAOImpl implements AttendDAO {
 
 		}
 		return result;
+	}
+
+	@Override
+	public void insertVacation(DocVO vo, Integer totalDays) {
+		// TODO Auto-generated method stub
+		
 	}
 }

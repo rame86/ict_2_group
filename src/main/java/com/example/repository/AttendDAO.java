@@ -3,6 +3,7 @@ package com.example.repository;
 import java.util.List;
 
 import com.example.domain.DayAttendVO;
+import com.example.domain.DocVO;
 
 public interface AttendDAO {
 	public List<DayAttendVO> selectDayAttend(String empNo, String toDay);
@@ -12,5 +13,7 @@ public interface AttendDAO {
 	public String checkOut(DayAttendVO davo);
 	
 	public String fieldwork(DayAttendVO davo);
+	
+	public void insertVacation(DocVO vo, Integer totalDays);
 
 }

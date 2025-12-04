@@ -120,16 +120,16 @@ public class ApproveController {
 	public void approveDocument(@RequestParam Integer docNo,
 			@RequestParam String status,
 			@RequestParam(required = false) String rejectReason,
-			@ModelAttribute("login") LoginVO login,
-			ModelAndView mv){
+			@ModelAttribute("login") LoginVO login){
 		Integer empNo = Integer.parseInt(login.getEmpNo());
 		approveService.approveDocument(docNo, status, empNo, rejectReason);
 		
 		DocVO vo = approveService.selectDocNo(docNo);
-		mv.addObject("docNo", vo.getDocNo());
 		
-		if ("4".equals(vo.getDocType())) mv.setViewName("/attend/vacation");
-	    else if ("5".equals(vo.getDocType())) mv.setViewName("docType5Page");
+		if(vo.getDocType().equals("4")) {
+			attendService.insertVacation(vo);
+		}
+		
 
 	}
 	
