@@ -57,7 +57,7 @@
 	                                        <tr>
 	                                            <td>${ vo.docNo }</td>
 	                                            <td>${ vo.docDate }</td>
-	                                            <td>${ vo.docTitle }</td>
+	                                            <td><a href="#" onclick="openDocDetail('${ vo.docNo }'); return false;"> ${ vo.docTitle }</a></td>
 	                                            <td>
 	                                            	<c:choose>
 												        <c:when test="${ not empty vo.step1ManagerName }">
@@ -106,7 +106,7 @@
 	                                        <tr>
 	                                            <td>${ vo.docNo }</td>
 	                                            <td>${ vo.docDate }</td>
-	                                            <td>${ vo.docTitle }</td>
+	                                            <td><a href="#" onclick="openDocDetail('${ vo.docNo }'); return false;"> ${ vo.docTitle }</a></td>
 	                                            <td>
 	                                            	<c:choose>
 												        <c:when test="${ not empty vo.step1ManagerName }">
@@ -131,6 +131,15 @@
 				<jsp:include page="../common/footer.jsp" flush="true"/>
 			</div>
 		</div>
+		
+		<script>
+			function openDocDetail(docNo) {
+			    const url = "documentDetailPopup?docNo=" + docNo;
+			    const options = "width=900,height=1200,top=20,left=500,scrollbars=yes,resizable=yes";
+			    window.open(url, "documentDetailPopup", options);
+			}
+		</script>
+		
 </body>
 
 </html>

@@ -4,8 +4,7 @@
 
 <%
 String menu = (String) request.getAttribute("menu");
-if (menu == null)
-	menu = "";
+if (menu == null) menu = "";
 %>
 
 <!DOCTYPE html>
@@ -15,7 +14,6 @@ if (menu == null)
 <title>sidebar.jsp</title>
 </head>
 <body>
-
 	<div id="layoutSidenav_nav">
 		<nav class="sb-sidenav accordion sb-sidenav-light"
 			id="sidenavAccordion">

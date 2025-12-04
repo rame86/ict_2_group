@@ -6,15 +6,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>휴가 신청 폼 (통일 스타일 적용)</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Tailwind CSS CDN 로드 -->
-<script src="https://cdn.tailwindcss.com"></script>
-<!-- jQuery CDN 로드 -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-<script>
+    <meta charset="UTF-8">
+    <title>휴가 신청 폼 (통일 스타일 적용)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS CDN 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jQuery CDN 로드 -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    
+    <script>
         // Tailwind Config: 첫 번째 폼과 동일한 설정을 적용
         tailwind.config = {
             theme: {
@@ -89,42 +89,16 @@
             // --- 휴가 정보 조회 모달 로직 끝 ---
 
             // 폼 제출 이벤트 핸들러 (더미)
-            // 폼 제출 이벤트 핸들러 (AJAX 비동기 제출)
-$('#vacationForm').on('submit', function(e) {
-    e.preventDefault(); // 기본 제출을 막습니다.
-
-    // FormData 객체를 사용하여 파일 업로드까지 처리할 수 있습니다.
-    const formData = new FormData(this); 
-    
-    // '신청 일수' 필드는 읽기 전용이므로, 서버에 보내지 않거나 
-    // 필요하다면 실제 계산된 값을 추출하여 추가로 보낼 수 있습니다.
-    
-    // 비동기 통신 (AJAX) 시작
-    $.ajax({
-        url: $(this).attr('action'), // 폼 태그의 action 주소 (approve/approveDocument)를 사용
-        type: 'POST',
-        data: formData,
-        processData: false, // FormData 사용 시 필수
-        contentType: false, // FormData 사용 시 필수
-        success: function(response) {
-            // 서버 응답이 성공적으로 왔을 때의 처리
-            alert('휴가 신청이 성공적으로 접수되었습니다.');
-            console.log('서버 응답:', response);
-            
-            // 성공 후 페이지 리다이렉트 (예: 신청 목록 페이지로)
-            // window.location.href = '/vacation/list'; 
-            
-            // 또는 폼 초기화
-            // $('#vacationForm')[0].reset();
-        },
-        error: function(xhr, status, error) {
-            // 서버 통신 중 오류가 발생했을 때의 처리
-            alert('휴가 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
-            console.error('AJAX 오류:', status, error);
-            // console.log('응답 내용:', xhr.responseText);
-        }
-    });
-});
+            $('#vacationForm').on('submit', function(e) {
+                e.preventDefault();
+                console.log('휴가 신청 제출됨!');
+                const formData = new FormData(this); 
+                for (let [key, value] of formData.entries()) {
+                    console.log(key + ': ' + value);
+                }
+                alert('휴가 신청이 성공적으로 접수되었습니다.'); 
+                // this.reset();
+            });
 
             // 취소 버튼 클릭 시 동작 (더미)
             $('#cancelBtn').on('click', function() {
@@ -147,36 +121,18 @@ $('#vacationForm').on('submit', function(e) {
                 const $startDateLabel = $('#startDateLabel');
                 const $totalDaysInput = $('#totalDays');
                 const $proofUploadGroup = $('#proofUploadGroup'); // 증빙 자료 그룹
-             // 핵심 추가: 시작일(startDate) 값 가져오기
-                const startDateValue = $('#startDate').val(); 
-                // 핵심 추가: 종료일(endDate) 입력 필드 자체를 가져오기
-                const $endDateInput = $('#endDate');
-                // 반차(half_am, half_pm)인 경우
+
                 // 반차(half_am, half_pm)인 경우
                 if (selectedType === 'half_am' || selectedType === 'half_pm') {
-                    
-                    // 1. 종료일 그룹은 계속 보이게 둡니다. ($endDateGroup.show();)
-                    $endDateGroup.show(); // 이미 보이도록 설정되어 있어 이 줄은 생략 가능
-                    
-                    // 2. 신청 일수 그룹은 숨김 (반차는 0.5일 고정이므로)
+                    // 필드 숨기기
+                    $endDateGroup.hide();
                     $totalDaysGroup.hide();
-                    
-                    // 3. 시작일이 있다면, 종료일을 시작일과 같은 날짜로 자동 설정
-                    if (startDateValue) {
-                        $endDateInput.val(startDateValue);
-                    }
-                    
-                    // 4. 종료일 필드의 필수 속성은 유지 (어차피 시작일과 같게 채워지므로)
-                    $endDateInput.prop('required', true); // 변경할 필요 없음
                     
                     // 시작일 라벨을 '신청일'로 변경
                     $startDateLabel.text('신청일:');
                     
                     // 반차일 때는 증빙 자료 숨김
                     $proofUploadGroup.hide();
-                    
-                    // 일수 재계산 (0.5일 고정 반영)
-                    calculateDays();
 
                 } else {
                     // 일반 휴가(연차, 병가, 보상 휴가 등)인 경우
@@ -185,8 +141,6 @@ $('#vacationForm').on('submit', function(e) {
                     
                     // 시작일 라벨을 '시작일'로 복원
                     $startDateLabel.text('시작일:');
-                    
-                    // ⭐ 중요: 일반 휴가일 때는 종료일 값을 비우지 않습니다. (사용자가 다시 선택하도록 둡니다)
                     
                     // 일수 재계산
                     calculateDays();
@@ -238,220 +192,193 @@ $('#vacationForm').on('submit', function(e) {
             }
         });
     </script>
-<style>
-/* 버튼 스타일: 첫 번째 폼과 동일하게 둥근 모양 및 Tailwind 클래스 사용 */
-.custom-btn {
-	padding: 12px 30px;
-	border-radius: 9999px;
-	font-weight: 600;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-	transition: all 0.2s ease-in-out;
-	min-width: 120px;
-	border: none;
-}
+    <style>
+        /* 버튼 스타일: 첫 번째 폼과 동일하게 둥근 모양 및 Tailwind 클래스 사용 */
+        .custom-btn {
+            padding: 12px 30px;
+            border-radius: 9999px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.2s ease-in-out;
+            min-width: 120px;
+            border: none;
+        }
+        .custom-btn:hover {
+            background-color: #d4d4d4;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
+        
+        /* 폼 컨테이너 스타일: 첫 번째 폼과 동일하게 중앙 배치 및 크기 지정 */
+        .form-container { 
+            max-width: 500px; 
+            margin: 40px auto; 
+            padding: 30px; 
+            background-color: white;
+            border-radius: 12px; 
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1); 
+        }
+        
+        /* 텍스트 영역 크기 조절 방지 */
+        textarea {
+            resize: none; 
+        }
 
-.custom-btn:hover {
-	background-color: #d4d4d4;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-	transform: translateY(-1px);
-}
+        /* 폼 그룹 스타일: 첫 번째 폼과 동일한 flex 레이아웃 */
+        .form-group-flex {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem; /* mb-4 (1rem) */
+        }
 
-/* 폼 컨테이너 스타일: 첫 번째 폼과 동일하게 중앙 배치 및 크기 지정 */
-.form-container {
-	max-width: 500px;
-	margin: 40px auto;
-	padding: 30px;
-	background-color: white;
-	border-radius: 12px;
-	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-}
+        /* 라벨 스타일: 너비 고정 */
+        .form-label {
+            width: 140px; /* 라벨 너비 고정 */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 600; /* font-semibold */
+            color: #4b5563; /* text-gray-700 */
+            flex-shrink: 0;
+        }
 
-/* 텍스트 영역 크기 조절 방지 */
-textarea {
-	resize: none;
-}
-
-/* 폼 그룹 스타일: 첫 번째 폼과 동일한 flex 레이아웃 */
-.form-group-flex {
-	display: flex;
-	align-items: center;
-	margin-bottom: 1rem; /* mb-4 (1rem) */
-}
-
-/* 라벨 스타일: 너비 고정 */
-.form-label {
-	width: 140px; /* 라벨 너비 고정 */
-	font-size: 0.875rem; /* text-sm */
-	font-weight: 600; /* font-semibold */
-	color: #4b5563; /* text-gray-700 */
-	flex-shrink: 0;
-}
-
-/* 입력/선택 필드 스타일 */
-.form-input {
-	flex-grow: 1; /* flex-1 */
-	padding: 0.5rem; /* p-2 */
-	border: 1px solid #d1d5db; /* border border-gray-300 */
-	border-radius: 0.375rem; /* rounded-md */
-}
-
-/* 자동 입력 필드 스타일 */
-.auto-filled-input {
-	background-color: #f9fafb; /* bg-gray-50 */
-	color: #4b5563; /* text-gray-600 */
-}
-</style>
+        /* 입력/선택 필드 스타일 */
+        .form-input {
+            flex-grow: 1; /* flex-1 */
+            padding: 0.5rem; /* p-2 */
+            border: 1px solid #d1d5db; /* border border-gray-300 */
+            border-radius: 0.375rem; /* rounded-md */
+        }
+        
+        /* 자동 입력 필드 스타일 */
+        .auto-filled-input {
+            background-color: #f9fafb; /* bg-gray-50 */
+            color: #4b5563; /* text-gray-600 */
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-	<div class="form-container">
-		<h2 class="text-2xl font-bold text-gray-800 text-center mb-8 pb-2">휴가
-			신청</h2>
+    <div class="form-container">
+        <h2 class="text-2xl font-bold text-gray-800 text-center mb-8 pb-2">휴가 신청</h2>
+        
+        <form id="vacationForm" action="#" method="POST" class="space-y-6" enctype="multipart/form-data">
+        
+        	<input type="hidden" name="DocType" id="documentTypeInput" value="4">
+			<input type="hidden" name="step1ManagerNo" value="${ loginVO.managerEmpNo }">
+			<input type="hidden" name="step2ManagerNo" value="${ loginVO.parentDeptNo }">
+            
+            <!-- 1. 신청자 정보 (자동 입력) -->
+            <fieldset class="p-4 border border-gray-200 rounded-lg">
+                <legend class="text-sm font-bold text-blue-600 px-2">신청자 정보 (자동 입력)</legend>
+                
+                <div class="form-group-flex">
+                    <label for="employeeName" class="form-label text-sm font-medium text-gray-600">이름:</label> 
+                    <input type="text" id="employeeName" name="empName" value="${sessionScope.login.empName}" readonly class="form-input auto-filled-input">
+                </div>
+                
+                <div class="form-group-flex">
+                    <label for="employeeId" class="form-label text-sm font-medium text-gray-600">사번:</label> 
+                    <input type="text" id="employeeId" name="empNo" value="${sessionScope.login.empNo}" readonly class="form-input auto-filled-input">
+                </div>
+                
+                <div class="form-group-flex">
+                    <label for="department" class="form-label text-sm font-medium text-gray-600">부서:</label> 
+                    <input type="text" id="department" name="deptName" value="${sessionScope.login.deptName}" readonly class="form-input auto-filled-input">
+                </div>
+                
+            </fieldset>
+            
+            <!-- 휴가 정보 조회 버튼 추가 -->
+            <div class="flex justify-end pt-2 mb-4">
+                <button type="button" id="viewVacationInfoBtn" class="bg-blue-primary text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-150">
+                    잔여 휴가 정보 조회
+                </button>
+            </div>
 
-		<form id="vacationForm" action="../approve/approveDocument" method="POST"
-			class="space-y-6" enctype="multipart/form-data">
+            <!-- 2. 휴가 정보 입력 -->
+            <fieldset class="p-4 border border-gray-200 rounded-lg">
+                <legend class="text-sm font-bold text-blue-600 px-2">휴가 정보 입력</legend>
 
-			<!-- 1. 신청자 정보 (자동 입력) -->
-			<fieldset class="p-4 border border-gray-200 rounded-lg">
-				<legend class="text-sm font-bold text-blue-600 px-2">신청자 정보
-					(자동 입력)</legend>
+                <!-- 휴가 종류 -->
+                <div class="form-group-flex">
+                    <label for="vacationType" class="form-label">휴가 종류:</label> 
+                    <select id="vacationType" name="vacationType" required class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
+                        <option value="" disabled selected>선택하세요</option>
+                        <option value="annual">연차</option>
+                        <option value="half_am">반차 (오전)</option>
+                        <option value="half_pm">반차 (오후)</option>
+                        <option value="sick">병가</option>
+                        <option value="compensatory">보상 휴가</option>
+                        <option value="other">기타</option>
+                    </select>
+                </div>
 
-				<div class="form-group-flex">
-					<label for="employeeName"
-						class="form-label text-sm font-medium text-gray-600">이름:</label> <input
-						type="text" id="employeeName" name="empName"
-						value="${sessionScope.login.empName}" readonly
-						class="form-input auto-filled-input">
-				</div>
+                <!-- 시작일/신청일 -->
+                <div class="form-group-flex">
+                    <label for="startDate" id="startDateLabel" class="form-label">시작일:</label>
+                    <input type="date" id="startDate" name="startDate" required class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200"> 
+                </div>
 
-				<div class="form-group-flex">
-					<label for="employeeId"
-						class="form-label text-sm font-medium text-gray-600">사번:</label> <input
-						type="text" id="employeeId" name="empNo"
-						value="${sessionScope.login.empNo}" readonly
-						class="form-input auto-filled-input">
-				</div>
-
-				<div class="form-group-flex">
-					<label for="department"
-						class="form-label text-sm font-medium text-gray-600">부서:</label> <input
-						type="text" id="department" name="deptName"
-						value="${sessionScope.login.deptName}" readonly
-						class="form-input auto-filled-input">
-				</div>
-
-			</fieldset>
-
-			<!-- 휴가 정보 조회 버튼 추가 -->
-			<div class="flex justify-end pt-2 mb-4">
-				<button type="button" id="viewVacationInfoBtn"
-					class="bg-blue-primary text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-150">
-					잔여 휴가 정보 조회</button>
-			</div>
-
-			<!-- 2. 휴가 정보 입력 -->
-			<fieldset class="p-4 border border-gray-200 rounded-lg">
-				<legend class="text-sm font-bold text-blue-600 px-2">휴가 정보
-					입력</legend>
-
-				<!-- 휴가 종류 -->
-				<div class="form-group-flex">
-					<label for="vacationType" class="form-label">휴가 종류:</label> <select
-						id="vacationType" name="vacationType" required
-						class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
-						<option value="" disabled selected>선택하세요</option>
-						<option value="annual">연차</option>
-						<option value="half_am">반차 (오전)</option>
-						<option value="half_pm">반차 (오후)</option>
-						<option value="sick">병가</option>
-						<option value="compensatory">보상 휴가</option>
-						<option value="other">기타</option>
-					</select>
-				</div>
-
-				<!-- 시작일/신청일 -->
-				<div class="form-group-flex">
-					<label for="startDate" id="startDateLabel" class="form-label">시작일:</label>
-					<input type="date" id="startDate" name="startDate" required
-						class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
-				</div>
-
-				<!-- 종료일 그룹 (JavaScript로 가시성 제어) -->
-				<div class="form-group-flex" id="endDateGroup">
-					<label for="endDate" class="form-label">종료일:</label> <input
-						type="date" id="endDate" name="endDate" required
-						class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
-				</div>
-
-				<!-- 신청 일수 그룹 (JavaScript로 가시성 제어) -->
-				<div class="form-group-flex" id="totalDaysGroup">
-					<label for="totalDays" class="form-label">신청 일수:</label> <input
-						type="text" id="totalDays" value="0 일" readonly
-						class="form-input auto-filled-input">
-				</div>
+                <!-- 종료일 그룹 (JavaScript로 가시성 제어) -->
+                <div class="form-group-flex" id="endDateGroup">
+                    <label for="endDate" class="form-label">종료일:</label>
+                    <input type="date" id="endDate" name="endDate" required class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
+                </div>
+                
+                <!-- 신청 일수 그룹 (JavaScript로 가시성 제어) -->
+                <div class="form-group-flex" id="totalDaysGroup">
+                    <label for="totalDays" class="form-label">신청 일수:</label>
+                    <input type="text" id="totalDays" value="0 일" readonly class="form-input auto-filled-input">
+                </div>
 
 				<!-- 휴가 사유 -->
 				<div class="flex flex-col mb-4">
-					<label for="reason"
-						class="text-sm font-semibold text-gray-700 mb-2">휴가 사유:</label>
-					<textarea id="reason" name="reason" rows="6"
-						placeholder="휴가 사유를 상세히 입력해 주세요." required
-						class="w-full p-2 border border-gray-300 rounded-md resize-none focus:border-blue-500 focus:ring focus:ring-blue-200"></textarea>
-				</div>
+                    <label for="reason" class="text-sm font-semibold text-gray-700 mb-2">휴가 사유:</label>
+                    <textarea id="reason" name="docContent" rows="6" placeholder="휴가 사유를 상세히 입력해 주세요." required class="w-full p-2 border border-gray-300 rounded-md resize-none focus:border-blue-500 focus:ring focus:ring-blue-200"></textarea>
+                </div>
+                
+                <!-- 비상 연락처 -->
+                <div class="form-group-flex">
+                    <label for="emergencyContact" class="form-label">비상 연락처:</label> 
+                    <input type="tel" id="emergencyContact" name="emergencyContact" placeholder="010-XXXX-XXXX" class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
+                </div>
+                
+                <!-- 증빙 자료 업로드 그룹 (병가 선택 시에만 표시) -->
+                <div class="form-group-flex" id="proofUploadGroup" style="display:none;">
+                    <label for="proofFile" class="form-label">증빙 자료 제출:</label>
+                    <input type="file" id="proofFile" name="proofFile" accept=".pdf, .jpg, .png" class="flex-1 p-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-200"> 
+                </div>
 
-				<!-- 비상 연락처 -->
-				<div class="form-group-flex">
-					<label for="emergencyContact" class="form-label">비상 연락처:</label> <input
-						type="tel" id="emergencyContact" name="emergencyContact"
-						placeholder="010-XXXX-XXXX"
-						class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
-				</div>
+            </fieldset>
 
-				<!-- 증빙 자료 업로드 그룹 (병가 선택 시에만 표시) -->
-				<div class="form-group-flex" id="proofUploadGroup"
-					style="display: none;">
-					<label for="proofFile" class="form-label">증빙 자료 제출:</label> <input
-						type="file" id="proofFile" name="proofFile"
-						accept=".pdf, .jpg, .png"
-						class="flex-1 p-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-200">
-				</div>
+            <!-- 버튼 영역 -->
+            <div class="flex justify-center pt-4 space-x-4">
+                <button type="submit" class="custom-btn bg-gray-light text-gray-800 hover:bg-primary hover:text-white">신청</button>
+                <button type="button" id="cancelBtn" class="custom-btn bg-gray-light text-gray-800">취소</button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- 잔여 휴가 정보 모달 (숨김 상태) -->
+    <div id="vacationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm transform transition-all duration-300 scale-100 opacity-100">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <h3 class="text-xl font-bold text-gray-800">잔여 휴가 정보</h3>
+                <!-- 닫기 버튼 (X 아이콘) -->
+                <button id="closeModalBtn" class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
+            </div>
+            
+            <div id="vacationInfoDisplay" class="space-y-4 text-base">
+                <!-- Data will be injected here by jQuery -->
+                <!-- 예시: <p class="text-gray-700"><span class="font-bold text-blue-primary">유급휴가 잔여:</span> 4일/15일</p> -->
+            </div>
 
-			</fieldset>
-
-			<!-- 버튼 영역 -->
-			<div class="flex justify-center pt-4 space-x-4">
-				<button type="submit"
-					class="custom-btn bg-gray-light text-gray-800 hover:bg-primary hover:text-white">신청</button>
-				<button type="button" id="cancelBtn"
-					class="custom-btn bg-gray-light text-gray-800">취소</button>
-			</div>
-		</form>
-	</div>
-
-	<!-- 잔여 휴가 정보 모달 (숨김 상태) -->
-	<div id="vacationModal"
-		class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
-		<div
-			class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm transform transition-all duration-300 scale-100 opacity-100">
-			<div class="flex justify-between items-center border-b pb-3 mb-4">
-				<h3 class="text-xl font-bold text-gray-800">잔여 휴가 정보</h3>
-				<!-- 닫기 버튼 (X 아이콘) -->
-				<button id="closeModalBtn"
-					class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
-			</div>
-
-			<div id="vacationInfoDisplay" class="space-y-4 text-base">
-				<!-- Data will be injected here by jQuery -->
-				<!-- 예시: <p class="text-gray-700"><span class="font-bold text-blue-primary">유급휴가 잔여:</span> 4일/15일</p> -->
-			</div>
-
-			<div class="mt-8 flex justify-center">
-				<button type="button" id="okModalBtn"
-					class="bg-primary text-white font-semibold py-2 px-6 rounded-lg hover:bg-orange-600 transition duration-150 shadow-md">
-					확인</button>
-			</div>
-		</div>
-	</div>
+            <div class="mt-8 flex justify-center">
+                <button type="button" id="okModalBtn" class="bg-primary text-white font-semibold py-2 px-6 rounded-lg hover:bg-orange-600 transition duration-150 shadow-md">
+                    확인
+                </button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
