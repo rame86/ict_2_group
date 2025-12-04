@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 import org.springframework.stereotype.Component;
 
@@ -69,6 +70,32 @@ public class ToDate {
 		String currentTime = nowTime.format(outputFormatter);
 		log.info("[ToDate - getFomatter : " + currentTime + "]");
 		return currentTime;
+	}
+	
+	
+	// 수정된 getFomatterDate (날짜 문자열만 필요할 경우)
+	public String getFomatterDate(String time) {
+	    log.info("[ToDate - getFomatterDate 메소드 요청 받음]");
+	    
+	    // 1. 입력 문자열이 'yyyy-MM-dd HH:mm:ss' 형식이라고 가정하고 파싱
+	    DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	    LocalDateTime nowDateTime;
+	    
+	    try {
+	        // 날짜와 시간을 모두 파싱
+	        nowDateTime = LocalDateTime.parse(time, inputFormatter);
+	    } catch (DateTimeParseException e) {
+	        // 파싱 실패 시 (예: 'yyyy-MM-dd'만 들어온 경우) 대체 로직 수행
+	        DateTimeFormatter dateOnlyFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	        nowDateTime = LocalDate.parse(time, dateOnlyFormatter).atStartOfDay();
+	    }
+	    
+	    // 2. 원하는 출력 형식 (여기서는 날짜만 추출한다고 가정)
+	    DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	    String formattedDate = nowDateTime.format(outputFormatter);
+	    
+	    log.info("[ToDate - getFomatterDate 결과 : " + formattedDate + "]");
+	    return formattedDate;
 	}
 	
 	//날짜를 하루씩 증가시키는 메소드

@@ -8,8 +8,22 @@
 	</select>
 
 	<insert id="insertDoc" parameterType="DocVO">
-		insert into DOC(DOC_NO, DOC_TYPE, DOC_TITLE, DOC_CONTENT, DOC_DATE, DOC_WRITER) 
-		values(#{docNo}, #{docType}, #{docTitle}, #{docContent}, SYSDATE, #{docWriter})
+	    INSERT INTO DOC(
+	        DOC_NO, DOC_TYPE, DOC_TITLE, DOC_CONTENT, DOC_DATE, DOC_WRITER,
+	        START_DATE, END_DATE, TOTAL_DAYS, EMERGENCY_CONTACT
+	    ) 
+	    VALUES(
+	        #{docNo}, 
+	        #{docType}, 
+	        #{docTitle, jdbcType=VARCHAR}, 
+	        #{docContent}, 
+	        SYSDATE, 
+	        #{docWriter},
+	        #{startDate}, 
+	        #{endDate}, 
+	        #{totalDays, jdbcType=DOUBLE}, 
+	        #{emergencyContact}
+	        )
 	</insert>
 	
 	<insert id="insertApprove" parameterType="ApproveVO">
@@ -208,6 +222,10 @@
 		    d.DOC_TITLE,
 		    d.DOC_CONTENT,
 		    d.DOC_DATE,
+		    d.START_DATE, 
+			d.END_DATE, 
+			d.TOTAL_DAYS, 
+			d.EMERGENCY_CONTACT, 
 		    w.EMP_NAME AS WRITER_NAME,
 		    a.STEP1_MANAGER_NO,
 		    m1.EMP_NAME AS STEP1_MANAGER_NAME,

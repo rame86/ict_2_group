@@ -125,6 +125,7 @@ public class ApproveController {
 		approveService.approveDocument(docNo, status, empNo, rejectReason);
 		
 		DocVO vo = approveService.selectDocNo(docNo);
+		log.info("approveDocument"+vo.toString());
 		
 		if(vo.getDocType().equals("4")) {
 			attendService.insertVacation(vo);
