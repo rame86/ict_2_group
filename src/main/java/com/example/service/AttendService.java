@@ -14,6 +14,4 @@ public interface AttendService {
 
 	public String fieldwork(DayAttendVO davo);
 	
-	// 🔹 전월(또는 지정 월) 기준으로 MONTH_ATTEND 생성
-    void createMonthAttendForLastMonth();
 }

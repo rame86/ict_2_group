@@ -1,7 +1,5 @@
 package com.example.controller;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +7,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -22,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Controller
-@RequestMapping("/attend")
 public class AttendController {
 
 	@Autowired
@@ -188,53 +184,4 @@ public class AttendController {
 	}
 	// end of calendar()
 	// =======================================================================================
-	
-	// ===== 기존 근태 달력 화면 =====
-    @GetMapping("/attend")
-    public String attend(LoginVO vo, Model m, HttpSession session) {
-        log.info("[AttendController-attend 요청 받음]");
-
-        Object loginInfoObj = session.getAttribute("login");
-        if (loginInfoObj instanceof LoginVO) {
-            vo = (LoginVO) loginInfoObj;
-        } else {
-            log.warn("세션에 login 정보가 없음");
-            return "redirect:/member/login";
-        }
-
-        LocalDate todayDate = LocalDate.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
-        String toDay = todayDate.format(formatter);
-        String empNo = vo.getEmpNo();
-
-        // 테스트용 강제 세팅도 있었다면 제거하거나 주석 처리
-        // toDay = "2025-11";
-
-        log.info("toDay : {}", toDay);
-        log.info("empNo : {}", empNo);
-
-        List<DayAttendVO> result = attendService.selectDayAttend(empNo, toDay);
-        m.addAttribute("result", result);
-
-        return "/attend/attend";
-    }
-
-    // ===== 🔹 MONTH_ATTEND 생성 버튼용 (배치 트리거) =====
-    @GetMapping("/makeMonth")
-    public String makeMonth(HttpSession session) {
-
-        log.info("[AttendController-makeMonth 요청 받음]");
-
-        // 필요하면 관리자만 허용하도록 권한 체크
-        LoginVO login = (LoginVO) session.getAttribute("login");
-        if (login == null || !"1".equals(login.getGradeNo())) {
-            return "error/NoAuthPage";
-        }
-
-        attendService.createMonthAttendForLastMonth();
-
-        // 작업 후 다시 근태 화면으로
-        return "redirect:/attend/attend";
-    }
 }
-
