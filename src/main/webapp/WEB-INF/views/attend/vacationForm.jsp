@@ -88,17 +88,59 @@
             });
             // --- 휴가 정보 조회 모달 로직 끝 ---
 
-            // 폼 제출 이벤트 핸들러 (더미)
-            $('#vacationForm').on('submit', function(e) {
-                e.preventDefault();
-                console.log('휴가 신청 제출됨!');
-                const formData = new FormData(this); 
-                for (let [key, value] of formData.entries()) {
-                    console.log(key + ': ' + value);
-                }
-                alert('휴가 신청이 성공적으로 접수되었습니다.'); 
-                // this.reset();
-            });
+            // 폼 제출 이벤트 핸들러 (AJAX 전송)
+$('#vacationForm').on('submit', function(e) {
+    e.preventDefault(); // 기본 폼 제출 동작 방지
+    
+    const $form = $(this);
+    const actionUrl = $form.attr('action'); // 폼의 action 속성 값 (../approve/approve-form)
+    
+    // FormData 객체를 사용하여 폼의 모든 데이터 (텍스트 필드 + 파일)를 캡처
+    const formData = new FormData(this);
+    
+    // 폼 유효성 검사 (간단 예시)
+    if ($('#vacationType').val() === "") {
+        alert("휴가 종류를 선택해 주세요.");
+        return; 
+    }
+    
+    console.log('휴가 신청 AJAX 제출 시작...');
+
+    // 로딩 스피너 등을 표시하는 코드를 여기에 추가할 수 있습니다.
+    
+    $.ajax({
+        url: actionUrl,
+        type: 'POST',
+        data: formData,
+        processData: false, // FormData 사용 시 필수: 데이터를 쿼리 문자열로 변환하지 않음
+        contentType: false, // FormData 사용 시 필수: 적절한 Content-Type 헤더를 설정하도록 브라우저에 지시 (multipart/form-data)
+        
+        success: function(response) {
+            console.log('AJAX 성공 응답:', response);
+            
+            // 서버 응답에 따라 성공/실패 메시지 처리
+            if (response && response.success) { // 서버가 { "success": true, "message": "..." } 형태로 응답한다고 가정
+                alert('✅ 휴가 신청이 성공적으로 접수되었습니다.');
+                $form[0].reset(); // 폼 초기화
+                // 필요하다면 페이지 이동: window.location.href = '/main'; 
+            } else if (response && response.message) {
+                alert('❌ 휴가 신청 실패: ' + response.message);
+            } else {
+                alert('✅ 휴가 신청이 성공적으로 접수되었습니다. (응답 메시지 없음)');
+                $form[0].reset();
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('AJAX 오류 발생:', status, error, xhr.responseText);
+            // 서버 오류(5xx), 클라이언트 오류(4xx), 네트워크 오류 등 처리
+            alert('❌ 휴가 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요. \n\n' + error);
+        },
+        complete: function() {
+            // 로딩 스피너 등을 숨기는 코드를 여기에 추가할 수 있습니다.
+            console.log('AJAX 요청 완료.');
+        }
+    });
+});
 
             // 취소 버튼 클릭 시 동작 (더미)
             $('#cancelBtn').on('click', function() {
@@ -260,9 +302,10 @@
     <div class="form-container">
         <h2 class="text-2xl font-bold text-gray-800 text-center mb-8 pb-2">휴가 신청</h2>
         
-        <form id="vacationForm" action="#" method="POST" class="space-y-6" enctype="multipart/form-data">
+        <form id="vacationForm" action="../approve/approve-form" method="POST" class="space-y-6" enctype="multipart/form-data">
         
         	<input type="hidden" name="DocType" id="documentTypeInput" value="4">
+        	<input type="hidden" name="DocTitle" value="휴가 신청">
 			<input type="hidden" name="step1ManagerNo" value="${ loginVO.managerEmpNo }">
 			<input type="hidden" name="step2ManagerNo" value="${ loginVO.parentDeptNo }">
             
@@ -327,7 +370,7 @@
                 <!-- 신청 일수 그룹 (JavaScript로 가시성 제어) -->
                 <div class="form-group-flex" id="totalDaysGroup">
                     <label for="totalDays" class="form-label">신청 일수:</label>
-                    <input type="text" id="totalDays" value="0 일" readonly class="form-input auto-filled-input">
+                    <input type="text" id="totalDays" name="totalDays" value="0 일" readonly class="form-input auto-filled-input">
                 </div>
 
 				<!-- 휴가 사유 -->

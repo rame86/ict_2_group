@@ -207,15 +207,16 @@ public class AttendDAOImpl implements AttendDAO {
 		// 넘어온 dateAttend 날짜를 currentDateString에 저장
 		String currentDateString = originalDavo.getDateAttend();
 		
+		log.info("attendDAO : " + originalDavo.toString());
 		// totalDays 만큼 반복
 		for (int i = 0; i < totalDays; i++) {
 
 			// 삽입할 새로운 DayAttendVO 객체 생성 및 값 복사
 			DayAttendVO davoToInsert = new DayAttendVO();
-			davoToInsert.setEmpNo(originalDavo.getEmpNo());
-			davoToInsert.setAttStatus(originalDavo.getAttStatus());
 			
-			// 현재 날짜 (String)를 설정
+	        davoToInsert.setEmpNo(originalDavo.getEmpNo());
+	        davoToInsert.setAttStatus(originalDavo.getAttStatus());
+	        davoToInsert.setMemo(originalDavo.getMemo());
 			davoToInsert.setDateAttend(currentDateString);
 
 			log.info("INSERT 시도 - dateAttend: " + davoToInsert.getDateAttend());
