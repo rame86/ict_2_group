@@ -192,11 +192,11 @@ public class AttendController {
 	// vacation() 외근
 	
 	@GetMapping("/attend/vacation")	
-	public String vacation(@ModelAttribute("login") Integer docNo) {
+	public String vacation(@ModelAttribute("login")Model m) {
 		log.info("[AttendController - vacation 요청 받음]");
 
-		// **임시 docNo설정** //
-		docNo = 36;
+		// Model에서 "docNo" 키로 데이터 꺼내기
+		Integer docNo = (Integer) m.getAttribute("docNo");;
 		// 문서번호로 내용 가져오기
 		DocVO docInfo = aproveService.selectDocNo(docNo);
 		log.info("[AttendController - vacation - docInfo 데이터 : " + docInfo.toString() + "]");
