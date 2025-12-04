@@ -11,12 +11,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.domain.ApproveListVO;
 import com.example.domain.ApproveVO;
 import com.example.domain.DocVO;
 import com.example.domain.LoginVO;
 import com.example.service.ApproveService;
+import com.example.service.AttendService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,8 @@ public class ApproveController {
 	
 	@Autowired
 	private ApproveService approveService;
+	@Autowired
+	private AttendService attendService;
 
 	// 로그인 세션 받아오기
 	@ModelAttribute("login")
@@ -113,9 +117,15 @@ public class ApproveController {
 	public void approveDocument(@RequestParam Integer docNo,
 			@RequestParam String status,
 			@RequestParam(required = false) String rejectReason,
-			@ModelAttribute("login") LoginVO login){
+			@ModelAttribute("login") LoginVO login,
+			RedirectAttributes redirectAttributes){
 		Integer empNo = Integer.parseInt(login.getEmpNo());
 		approveService.approveDocument(docNo, status, empNo, rejectReason);
+		
+		DocVO vo = approveService.selectDocNo(docNo);
+		if(vo.getDocType().equals("4")) redirectAttributes.addFlashAttribute("docNo", vo.getDocNo());
+		else if(vo.getDocType().equals("5")) redirectAttributes.addFlashAttribute("docNo", vo.getDocNo());
+		
 	}
 	
 	// 결재 완료된 문서들
