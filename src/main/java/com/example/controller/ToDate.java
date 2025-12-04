@@ -70,5 +70,27 @@ public class ToDate {
 		log.info("[ToDate - getFomatter : " + currentTime + "]");
 		return currentTime;
 	}
+	
+	//날짜를 하루씩 증가시키는 메소드
+	public String addDay(String date) {
+        log.info("[ToDate - addDay 메소드 요청 받음]");
+        
+        // String 타입 날짜를 LocalDate 변환
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(date, formatter);
+        log.info("원본 날짜 (LocalDate): " + localDate);
+
+        // 날짜를 1일 증가. (연말/월말/윤년 자동 처리)
+        LocalDate nextDay = localDate.plusDays(1);
+        log.info("증가된 날짜 (LocalDate): " + nextDay);
+
+        // 증가된 날짜를 다시 String으로 변환하여 반환
+        String nextDayString = nextDay.format(formatter);
+        log.info("[ToDate - addDay 결과 : " + nextDayString + "]");
+        
+        return nextDayString;
+    }
+	
+	
 
 }
