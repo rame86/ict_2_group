@@ -1,16 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.repository.EmpMapper">
 
-    <!-- 1. 사원 목록 조회 (재직상태 포함) -->
+    <!-- 사원목록 전체 조회 (사원관리·급여관리 공용) -->
     <select id="selectEmpList" resultType="com.example.domain.EmpVO">
         SELECT
             e.EMP_NO      AS empNo,
-            e.STATUS_NO   AS statusNo,   -- 숫자 코드
+            e.EMP_NAME    AS empName,
+            e.GRADE_NO    AS gradeNo,
 
-            /* 🔹 STATUS_NO → 한글 상태명 */
+            e.STATUS_NO   AS statusNo,
             CASE e.STATUS_NO
                 WHEN 0 THEN '퇴직'
                 WHEN 1 THEN '재직'
@@ -21,70 +23,23 @@
                 WHEN 6 THEN '인턴/수습'
                 WHEN 7 THEN '파견'
                 ELSE '기타'
-            END          AS statusName,
+            END AS statusName,
 
-            e.EMP_NAME    AS empName,
-            e.EMP_PHONE   AS empPhone,
-            e.EMP_REGDATE AS empRegdate,
-            e.BASE_SAL    AS baseSal,
-            d.DEPT_NAME   AS deptName
+            e.EMP_PHONE    AS empPhone,
+            e.EMP_REGDATE  AS empRegdate,
+
+            d.DEPT_NAME    AS deptName
+
         FROM EMP e
-            LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+        LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
         ORDER BY e.EMP_NO ASC
     </select>
 
-    <!-- 2. 사원 1명 조회 (급여 화면 등에서 사용) -->
-    <select id="getEmp" parameterType="String"
-            resultType="com.example.domain.EmpVO">
-        SELECT
-            e.EMP_NO      AS empNo,
-            e.STATUS_NO   AS statusNo,
-
-            /* 🔹 여기에도 동일하게 상태명 붙이기 */
-            CASE e.STATUS_NO
-                WHEN 0 THEN '퇴직'
-                WHEN 1 THEN '재직'
-                WHEN 2 THEN '휴직(자발적)'
-                WHEN 3 THEN '휴직(병가 등 복지)'
-                WHEN 4 THEN '대기'
-                WHEN 5 THEN '징계'
-                WHEN 6 THEN '인턴/수습'
-                WHEN 7 THEN '파견'
-                ELSE '기타'
-            END          AS statusName,
-
-            e.DEPT_NO     AS deptNo,
-            e.GRADE_NO    AS gradeNo,
-            e.EMP_PASS    AS empPass,
-            e.KAKAO_ID    AS kakaoId,
-            e.EMP_NAME    AS empName,
-            e.EMP_PHONE   AS empPhone,
-            e.EMP_ADDR    AS empAddr,
-            e.EMP_EMAIL   AS empEmail,
-            e.EMP_IMAGE   AS empImage,
-            e.EMP_REG_NO  AS empRegNo,
-            e.EMP_REGDATE AS empRegdate,
-            e.BASE_SAL    AS baseSal,
-            d.DEPT_NAME   AS deptName
-        FROM EMP e
-            LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
-        WHERE e.EMP_NO = #{empNo}
-    </select>
-
-    <!-- 3. 로그인 체크 (상태 안 써도 되면 그대로 둬도 OK) -->
-    <select id="loginCheck"
-            parameterType="com.example.domain.MemberVO"
-            resultType="com.example.domain.LoginVO">
-        SELECT
-            EMP_NO      AS empNo,
-            EMP_NAME    AS empName,
-            GRADE_NO    AS gradeNo,
-            DEPT_NO     AS deptNo,
-            EMP_EMAIL   AS empEmail,
-            EMP_PHONE   AS empPhone
+    <!-- 사원 상세 조회 -->
+    <select id="getEmp" parameterType="String" resultType="com.example.domain.EmpVO">
+        SELECT *
         FROM EMP
-        WHERE EMP_NO   = #{empNo}
-          AND EMP_PASS = #{empPass}
+        WHERE EMP_NO = #{empNo}
     </select>
 
 </mapper>

@@ -7,7 +7,7 @@ import com.example.domain.EmpVO;
 
 public interface EmpService {
 
-    List<EmpVO> getEmpList(EmpSearchVO search);
-	EmpVO getEmp(String empNo);
-	List<EmpVO> selectEmpList();
+    List<EmpVO> getEmpList(EmpSearchVO search); // 검색 포함 조회
+	EmpVO getEmp(String empNo);								
+	List<EmpVO> selectEmpList();									// 전체 조회
 }

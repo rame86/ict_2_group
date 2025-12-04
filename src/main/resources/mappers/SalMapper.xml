@@ -143,57 +143,58 @@
 
     <!-- 7. MONTH_ATTEND 기준 급여 일괄 생성 -->
     <insert id="insertSalaryByMonth" parameterType="string">
-        INSERT INTO SAL (
-            SAL_NUM,
-            MONTH_ATTNO,
-            EMP_NO,
-            SAL_DATE,
-            SAL_BASE,
-            SAL_BONUS,
-            SAL_PLUS,
-            OVERTIME_PAY,
-            INSURANCE,
-            TAX,
-            REALPAY
-        )
+    INSERT INTO SAL (
+        SAL_NUM,
+        MONTH_ATTNO,
+        EMP_NO,
+        SAL_DATE,
+        SAL_BASE,
+        SAL_BONUS,
+        SAL_PLUS,
+        OVERTIME_PAY,
+        INSURANCE,
+        TAX,
+        REALPAY
+    )
+    SELECT
+        SAL_SEQ.NEXTVAL,
+        T.MONTH_ATTNO,
+        T.EMP_NO,
+        TRUNC(T.MONTH_DATE_ATTEND, 'MM') + 14,
+        T.SAL_BASE,       <!-- ★ 변경 -->
+        0,
+        0,
+        T.OVERTIME_PAY,
+        T.INSURANCE,
+        T.TAX,
+        T.REALPAY
+    FROM (
         SELECT
-            SAL_SEQ.NEXTVAL,                      -- 시퀀스명 확인
-            T.MONTH_ATTNO,
-            T.EMP_NO,
-            TRUNC(T.MONTH_DATE_ATTEND, 'MM') + 14,
-            T.BASE_SAL,
-            0,                                    -- 기타 수당(자동 계산 X, 필요시 수정)
-            0,                                    -- 초기에는 기타 수당 0원
-            T.OVERTIME_PAY,                       -- 초과근무 수당
-            T.INSURANCE,
-            T.TAX,
-            T.REALPAY
-        FROM (
-            SELECT
-                M.MONTH_ATTNO,
-                M.EMP_NO,
-                M.MONTH_DATE_ATTEND,
-                E.BASE_SAL,
-                ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5) AS OVERTIME_PAY,
-                ROUND((E.BASE_SAL + ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5)) * 0.045) AS INSURANCE,
-                ROUND((E.BASE_SAL + ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5)) * 0.03)  AS TAX,
-                (
-                    E.BASE_SAL
-                  + ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5)
-                  - ROUND((E.BASE_SAL + ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5)) * 0.045)
-                  - ROUND((E.BASE_SAL + ROUND((E.BASE_SAL / 160) * M.OVERTIME * 1.5)) * 0.03)
-                ) AS REALPAY
-            FROM MONTH_ATTEND M
-            JOIN EMP E ON M.EMP_NO = E.EMP_NO
-            WHERE TO_CHAR(M.MONTH_DATE_ATTEND, 'YYYY-MM') = #{targetMonth}
-        ) T
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM SAL S
-            WHERE S.MONTH_ATTNO = T.MONTH_ATTNO
-              AND S.EMP_NO     = T.EMP_NO
-        )
-    </insert>
+            M.MONTH_ATTNO,
+            M.EMP_NO,
+            M.MONTH_DATE_ATTEND,
+            E.SAL_BASE,     <!-- ★ 전부 SAL_BASE 로 -->
+            ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5) AS OVERTIME_PAY,
+            ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.045) AS INSURANCE,
+            ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.03)  AS TAX,
+            (
+                E.SAL_BASE
+              + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)
+              - ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.045)
+              - ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.03)
+            ) AS REALPAY
+        FROM MONTH_ATTEND M
+        JOIN EMP E ON M.EMP_NO = E.EMP_NO
+        WHERE TO_CHAR(M.MONTH_DATE_ATTEND, 'YYYY-MM') = #{targetMonth}
+    ) T
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM SAL S
+        WHERE S.MONTH_ATTNO = T.MONTH_ATTNO
+          AND S.EMP_NO     = T.EMP_NO
+    )
+</insert>
+    
 
     <!-- 8. 관리자 화면용 (월 필터 + 정렬) -->
     <select id="getAdminSalList" parameterType="map"
