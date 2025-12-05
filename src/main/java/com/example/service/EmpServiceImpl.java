@@ -15,44 +15,39 @@ public class EmpServiceImpl implements EmpService {
     @Autowired
     private EmpMapper empMapper;
 
+    // 🔹 검색 포함 사원 목록 조회
     @Override
     public List<EmpVO> getEmpList(EmpSearchVO search) {
-
-        List<EmpVO> list = empMapper.selectEmpList(search);
-
-        // gradeNo → gradeName 변환
-        if (list != null) {
-            for (EmpVO emp : list) {
-                emp.setGradeName(convertGrade(emp.getGradeNo()));
-            }
-        }
-
-        return list;
+        return empMapper.getEmpList(search);
     }
 
+    // 🔹 사번으로 사원 1명 조회
     @Override
     public EmpVO getEmp(String empNo) {
         return empMapper.getEmp(empNo);
     }
 
+    // 🔹 전체 사원 목록 조회
     @Override
     public List<EmpVO> selectEmpList() {
-        EmpSearchVO search = new EmpSearchVO(); // 전체 조회
-        return getEmpList(search);              // gradeName 세팅 포함
+        return empMapper.selectEmpList();
     }
 
-    // gradeNo → gradeName 변환
-    private String convertGrade(Integer gradeNo) {
-        if (gradeNo == null) return "-";
+    // 🔹 인사카드용 상세 조회
+    @Override
+    public EmpVO selectEmpByEmpNo(String empNo) {
+        return empMapper.selectEmpByEmpNo(empNo);
+    }
 
-        switch (gradeNo) {
-            case 1: return "최고관리자";
-            case 2: return "관리자";
-            case 3:
-            case 4: return "직원";
-            case 5: return "인턴";
+    // 🔹 사원 삭제
+    @Override
+    public int deleteEmp(String empNo) {
+        return empMapper.deleteEmp(empNo);
+    }
 
-            default: return "기타";
-        }
+    // 🔹 사원 정보 수정
+    @Override
+    public int updateEmp(EmpVO vo) {
+        return empMapper.updateEmp(vo);
     }
 }
