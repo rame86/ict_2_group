@@ -21,10 +21,12 @@ public class DocVO {
     private String step2Status;
     private String rejectReason;
     
-    // 휴가신청
-    private String startDate;
-    private String endDate;
-    private String totalDays;
-    private String emergencyContact;
+    // 휴가신청 // 출퇴근 정정
     private String empNo;
+    private String startDate; //휴가시작 날짜 or 출퇴근 정정 요청 기존날짜,시간
+    private String endDate; // 휴가 끝 날짜 or 출퇴근 정정 요청 날짜,시간
+    private String totalDays;
+    private String emergencyContact; // 비상연락망
+    private String memo;
+    private String newTime;
 }

@@ -234,9 +234,10 @@ public class AttendDAOImpl implements AttendDAO {
 
 	// =======================================================================================
 	// commuteCorrection()
-	public void commuteCorrection(DayAttendVO davo) {
-		log.info("[AttendDAO - commuteCorrection 요청 받음]");
+	public void commuteCorrection(DayAttendVO originalDavo) {
+		log.info("[AttendDAO - commuteCorrection 요청 받음]");		
 
+		
 	}
 	// end of commuteCorrection()
 	// =======================================================================================

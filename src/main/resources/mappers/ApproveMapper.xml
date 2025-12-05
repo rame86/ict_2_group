@@ -10,7 +10,7 @@
 	<insert id="insertDoc" parameterType="DocVO">
 	    INSERT INTO DOC(
 	        DOC_NO, DOC_TYPE, DOC_TITLE, DOC_CONTENT, DOC_DATE, DOC_WRITER,
-	        START_DATE, END_DATE, TOTAL_DAYS, EMERGENCY_CONTACT
+	        START_DATE, END_DATE, TOTAL_DAYS, EMERGENCY_CONTACT, NEW_TIME
 	    ) 
 	    VALUES(
 	        #{docNo}, 
@@ -19,10 +19,11 @@
 	        #{docContent}, 
 	        SYSDATE, 
 	        #{docWriter},
-	        #{startDate}, 
-	        #{endDate}, 
+			#{startDate, jdbcType=DATE},        
+			#{endDate, jdbcType=DATE},
 	        #{totalDays, jdbcType=DOUBLE}, 
-	        #{emergencyContact}
+	        #{emergencyContact},
+	        #{newTime}	        
 	        )
 	</insert>
 	
