@@ -1,0 +1,91 @@
+/* =============================
+   사원 등록 페이지 - 1400px 버전
+   ============================= */
+
+#empNewForm {
+    width: 1400px;         
+    margin: 40px auto 80px;
+    padding: 32px;
+    background: #ffffff;
+    border: 1px solid #e5edff;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(15, 76, 129, 0.08);
+    font-size: 15px;
+}
+
+/* -----------------------------
+   상단 영역: PHOTO + 2열 입력칸
+   ----------------------------- */
+
+.form-top {
+    display: grid;
+    grid-template-columns: 180px 1fr 1fr;   /* 사진 / 왼쪽 입력 / 오른쪽 입력 */
+    grid-gap: 24px;
+    margin-bottom: 28px;
+}
+
+/* 사진 박스 */
+.photo-box {
+    width: 180px;
+    height: 220px;
+    border: 1px solid #d7e3ff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7a8ba3;
+    font-size: 14px;
+    background: #f8faff;
+}
+
+/* 상단 2열 공통 스타일 */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #344767;
+}
+
+.form-control,
+.form-select {
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid #d7e3ff;
+    font-size: 14px;
+}
+
+/* -----------------------------
+   하단 입력 영역 (연락처~부서번호)
+   전체 폭 사용
+   ----------------------------- */
+
+.full-width {
+    margin-top: 8px;
+}
+
+.full-width .form-control {
+    width: 100%;
+}
+
+/* -----------------------------
+   버튼 영역
+   ----------------------------- */
+
+#empNewForm .button-area {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#empNewForm .btn {
+    min-width: 110px;
+    height: 42px;
+    border-radius: 20px;
+    font-size: 15px;
+}
+
+#empNewForm .btn-primary {
+    margin-right: 14px;
+}

@@ -27,4 +27,7 @@ public interface EmpMapper {
 
 	List<EmpVO> getEmpList(EmpSearchVO search);
 
+	 // 🔹 추가: 사원 등록
+	int insertEmp(EmpVO vo);
+
 }

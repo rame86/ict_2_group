@@ -142,4 +142,48 @@ public class EmpController {
         String grade = login.getGradeNo();
         return grade != null && ("1".equals(grade) || "2".equals(grade));
     }
+    
+    /**
+     * 사원 등록 폼
+     * - 🔐 1,2 등급(관리자)만 접근 가능
+     */
+    @GetMapping("/emp/new")
+    public String empNewForm(HttpSession session, Model model) {
+
+        System.out.println("📌 /emp/new 접근됨");
+
+        if (!isAdmin(session)) {
+            System.out.println("❌ 사원 등록 권한 없음");
+            return "error/NoAuthPage";
+        }
+
+        // 폼에서 사용할 기본값 세팅 가능 (지금은 비워둠)
+        model.addAttribute("menu", "empNew");
+
+        return "emp/empNewForm";   // 새로 만들 JSP
+    }
+
+    /**
+     * 사원 등록 처리
+     * - 🔐 1,2 등급만 허용
+     * - 기본적으로 폼 submit 방식 (AJAX로 바꾸고 싶으면 나중에 변경)
+     */
+    @PostMapping("/emp/insert")
+    @ResponseBody
+    public String insertEmp(EmpVO vo, HttpSession session) {
+
+        System.out.println("📌 /emp/insert 호출, vo = " + vo);
+
+        if (!isAdmin(session)) {
+            System.out.println("❌ 사원 등록 권한 없음");
+            return "DENY";
+        }
+
+        int cnt = empService.insertEmp(vo);
+        System.out.println("✔ 사원 등록 완료, cnt = " + cnt);
+
+        // 일단 update/delete랑 맞춰서 문자열로 응답 (OK / ERROR)
+        return (cnt > 0) ? "OK" : "ERROR";
+    }
+
 }

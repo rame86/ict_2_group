@@ -24,4 +24,7 @@ public interface EmpService {
 
     // 🔹 사원 정보 수정 (재직상태, 연락처, 이메일, 주소 등)
     int updateEmp(EmpVO vo);
+
+    // 🔹 추가: 사원 등록
+	int insertEmp(EmpVO vo);
 }

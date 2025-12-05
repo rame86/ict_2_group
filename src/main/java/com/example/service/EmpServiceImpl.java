@@ -50,4 +50,10 @@ public class EmpServiceImpl implements EmpService {
     public int updateEmp(EmpVO vo) {
         return empMapper.updateEmp(vo);
     }
+    
+    // 🔹 추가: 사원 등록
+	@Override
+	public int insertEmp(EmpVO vo) {
+		return empMapper.insertEmp(vo);
+	}
 }
