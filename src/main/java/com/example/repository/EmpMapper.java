@@ -19,4 +19,12 @@ public interface EmpMapper {
     
     List<EmpVO> selectEmpList();
 
+	EmpVO selectEmpByEmpNo(String empNo);
+
+	int deleteEmp(String empNo);
+
+	int updateEmp(EmpVO vo);
+
+	List<EmpVO> getEmpList(EmpSearchVO search);
+
 }
