@@ -106,6 +106,33 @@
         DELETE FROM EMP
         WHERE EMP_NO = #{empNo}
     </delete>
+    
+    <!-- 사원등록 -->
+    
+    <insert id="insertEmp" parameterType="com.example.domain.EmpVO">
+    INSERT INTO EMP (
+        EMP_NO,
+        EMP_NAME,
+        GRADE_NO,
+        STATUS_NO,
+        EMP_PHONE,
+        EMP_EMAIL,
+        EMP_ADDR,
+        DEPT_NO,
+        EMP_REGDATE
+    )
+    VALUES (
+        #{empNo},
+        #{empName},
+        #{gradeNo},
+        #{statusNo},
+        #{empPhone},
+        #{empEmail},
+        #{empAddr},
+         #{deptNo, jdbcType=INTEGER},
+        SYSDATE
+    )
+</insert>
 
 
 </mapper>
