@@ -22,6 +22,8 @@
 	<script src="/js/datatables-simple-demo.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+	<link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 </head>
 
 	<c:if test="${not empty sessionScope.login}">
@@ -59,7 +61,7 @@
                         <li><a class="dropdown-item" href="#!">Settings</a></li>
                         <li><a class="dropdown-item" href="#!">Activity Log</a></li>
                         <li><hr class="dropdown-divider" /></li>
-                        <li><a href="/kakao/logout" style="color: red; font-weight: bold;">로그아웃</a></li>
+                        <li><a href="/kakao/logout" class="dropdown-item" style="color: #EAA8B3; font-weight: bold;">로그아웃</a></li>
                     </ul>
                 </li>
             </ul>

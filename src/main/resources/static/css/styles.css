@@ -11256,3 +11256,9 @@ body {
     color: rgb(247 202 201) !important; 
     transition: color 0.3s ease-in-out; 
 }
+
+.toast-custom-sere {
+    background-color: rgb(146, 168, 209) !important;
+    color : white;
+    box-shadow: 0 0 12px #CCCCCC;
+}

@@ -16,8 +16,27 @@ function connectWebSocket(empNo) {
 				try {
 					const data = JSON.parse(notification.body);
 					if (data.targetEmpNo === empNo) {
-						alert("[새 결재 알림] " + data.content);
-						$("#approvalIcon").addClass("icon-notify");
+						
+						const message = data.content;
+						let targetUrl = "";
+						
+						if (message.includes("새로운 결재")) {
+							targetUrl = "/approve/receiveList"; 
+						} else if (message.includes("최종 승인")) {
+							targetUrl = "/approve/finishList"; 
+						} else {
+							targetUrl = "/approve/finishList"; 
+						}
+						
+						toastr.success(message, '결재 알림', { 
+							timeOut : 5000, 
+							positionClass : 'toast-bottom-right', 
+							toastClass : 'toast-success toast-custom-sere', 
+							onclick : function(){
+								if(targetUrl) window.location.href = targetUrl;
+							} 
+						});
+						updateSidebarBadge();
 					}
 				} catch (e) {
 					console.error("수신 메시지 파싱 오류:", e, notification.body);
