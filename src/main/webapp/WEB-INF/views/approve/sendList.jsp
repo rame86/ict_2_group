@@ -28,7 +28,7 @@
                         <h3 class="mt-4">결재 받을 문서</h3><br>
                         
                         <div class="card mb-4">
-                            <div class="card-header">
+                            <div class="card-header table-Header">
                                 <i class="fas fa-table me-1"></i>
                                 결재 대기 문서
                             </div>
@@ -77,7 +77,7 @@
                         </div>
                         
                         <div class="card mb-4">
-                            <div class="card-header">
+                            <div class="card-header table-Header">
                                 <i class="fas fa-table me-1"></i>
                                 결재 반려 문서
                             </div>
