@@ -123,41 +123,49 @@
 								</div>
 
 								<!-- 사원 목록 테이블 -->
-								<div class="emp-card">
-									<table id="empTable" class="emp-table">
-										<thead>
-											<tr>
-												<th>부서명</th>
-												<th>직급</th>
-												<th>이름</th>
-												<th>사원번호</th>
-											</tr>
-										</thead>
+                            <div class="emp-card">
+                                <table id="empTable" class="emp-table">
+                                    <thead>
+                                    <tr>
+                                        <th>사원번호</th>
+                                        <th>부서명</th>
+                                        <th>직급</th>
+                                        <th>이름</th>
+                                       
+                                       
+                                    </tr>
+                                    </thead>
 
-										<tbody>
-											<c:forEach var="emp" items="${empList}">
-												<tr class="emp-row" data-empno="${emp.empNo}">
-													<td>${emp.deptName}</td>
-													<td>${emp.gradeName}</td>
-													<td>${emp.empName}</td>
-													<td>${emp.empNo}</td>
-												</tr>
-											</c:forEach>
+                                    <tbody>
+                                    <c:forEach var="emp" items="${empList}">
+                                        <tr class="emp-row" data-empno="${emp.empNo}">
+                                          <!-- 1) 사원번호 -->
+                                            <td>${emp.empNo}</td>
+                                          <!-- 2) 부서명 -->
+                                            <td>${emp.deptName}</td>
+                                          <!-- 3) 직급 -->
+                                            <td>${emp.gradeName}</td>
+                                          <!-- 4) 이름 -->
+                                            <td>${emp.empName}</td>
+                                          
+                                        </tr>
+                                    </c:forEach>
 
-											<c:if test="${empty empList}">
-												<tr class="emp-empty-row">
-													<td colspan="4">조회된 사원 정보가 없습니다.</td>
-												</tr>
-											</c:if>
-										</tbody>
-									</table>
-								</div>
+                                    <c:if test="${empty empList}">
+                                        <tr class="emp-empty-row">
+                                            <!-- 컬럼 5개이므로 colspan도 5로 -->
+                                            <td colspan="5">조회된 사원 정보가 없습니다.</td>
+                                        </tr>
+                                    </c:if>
+                                    </tbody>
+                                </table>
+                            </div>
 
-								<!-- DataTables 페이지네이션 삽입 공간 -->
-								<div class="emp-pagination-container"></div>
+                            <!-- DataTables 페이지네이션 삽입 공간 -->
+                            <div class="emp-pagination-container"></div>
 
-							</div>
-							<!-- end emp-list-area -->
+                        </div>
+                        <!-- end emp-list-area -->
 
 
 

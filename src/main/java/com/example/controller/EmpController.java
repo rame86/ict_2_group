@@ -1,14 +1,18 @@
 package com.example.controller;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
@@ -22,10 +26,12 @@ public class EmpController {
     @Autowired
     private EmpService empService;
 
-    /**
-     * 사원 목록 화면
-     * - 등급 상관없이 "로그인만 되어 있으면" 조회 가능
-     */
+    /** 🔹 사원 사진 실제 저장 경로 (외부 폴더) */
+    private static final String EMP_UPLOAD_PATH = "C:/emp_upload/emp/";
+
+    /* =========================================================
+       1. 사원 목록
+       ========================================================= */
     @GetMapping("/emp/list")
     public String empList(HttpSession session, Model model) {
 
@@ -50,11 +56,9 @@ public class EmpController {
         return "emp/empList";
     }
 
-    /**
-     * 인사카드(사원 1명 상세)
-     * - 모든 로그인 사용자 조회 가능
-     * - 수정/삭제 버튼은 canModify로 제어
-     */
+    /* =========================================================
+       2. 인사카드(사원 상세)
+       ========================================================= */
     @GetMapping("/emp/card")
     public String empCard(@RequestParam("empNo") String empNo,
                           HttpSession session,
@@ -79,14 +83,16 @@ public class EmpController {
         return "emp/empCard";
     }
 
-    /**
-     * 사원 정보 수정 처리 (AJAX)
-     * - 🔐 1,2등급만 허용
-     * - EmpServiceImpl.updateEmp() 안에서 status_no / grade_no 동기화
-     */
+    /* =========================================================
+       3. 사원 수정 (사진 포함)
+       ========================================================= */
     @PostMapping("/emp/update")
     @ResponseBody
-    public String updateEmp(EmpVO vo, HttpSession session) {
+    public String updateEmp(
+            EmpVO vo,
+            @RequestParam(value = "empImageFile", required = false) MultipartFile empImageFile,
+            @RequestParam(value = "oldEmpImage", required = false) String oldEmpImage,
+            HttpSession session) {
 
         System.out.println("📌 /emp/update 호출, vo = " + vo);
 
@@ -95,16 +101,33 @@ public class EmpController {
             return "DENY";
         }
 
-        int cnt = empService.updateEmp(vo);
-        System.out.println("✔ 사원 수정 완료, cnt = " + cnt);
+        try {
+            // 1) 새 이미지가 업로드 된 경우
+            if (empImageFile != null && !empImageFile.isEmpty()) {
+                String newFileName = saveEmpImage(empImageFile);
+                vo.setEmpImage(newFileName);  // EmpVO 필드명 empImage 기준
 
-        return (cnt > 0) ? "OK" : "FAIL";
+                // 이전 파일명 있으면 삭제
+                deleteEmpImage(oldEmpImage);
+            } else {
+                // 2) 새 파일이 없으면 기존 파일 그대로 유지
+                vo.setEmpImage(oldEmpImage);
+            }
+
+            int cnt = empService.updateEmp(vo);
+            System.out.println("✔ 사원 수정 완료, cnt = " + cnt);
+
+            return (cnt > 0) ? "OK" : "FAIL";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "ERROR";
+        }
     }
 
-    /**
-     * 사원 삭제 처리 (AJAX)
-     * - 🔐 1,2등급만 허용
-     */
+    /* =========================================================
+       4. 사원 삭제
+       ========================================================= */
     @PostMapping("/emp/delete")
     @ResponseBody
     public String deleteEmp(@RequestParam("empNo") String empNo,
@@ -117,16 +140,19 @@ public class EmpController {
             return "DENY";
         }
 
+        // 필요하다면 여기서 empNo로 사원 조회 → empImage 가져와서 파일도 같이 삭제
+        // EmpVO emp = empService.selectEmpByEmpNo(empNo);
+        // deleteEmpImage(emp.getEmpImage());
+
         empService.deleteEmp(empNo);
         System.out.println("✔ 사원 삭제 완료");
 
         return "OK";
     }
 
-    /**
-     * 사원 등록 폼
-     * - 🔐 1,2 등급(관리자)만 접근 가능
-     */
+    /* =========================================================
+       5. 사원 등록 폼
+       ========================================================= */
     @GetMapping("/emp/new")
     public String empNewForm(HttpSession session, Model model) {
 
@@ -142,31 +168,46 @@ public class EmpController {
         return "emp/empNewForm";
     }
 
-    /**
-     * 사원 등록 처리 (AJAX)
-     * - 🔐 1,2 등급만 허용
-     * - EmpServiceImpl.insertEmp() 안에서 status_no / grade_no 동기화
-     */
+    /* =========================================================
+       6. 사원 등록 (사진 포함)
+       ========================================================= */
     @PostMapping("/emp/insert")
     @ResponseBody
-    public String insertEmp(EmpVO vo, HttpSession session) {
+    public String insertEmp(
+            @ModelAttribute EmpVO vo,
+            @RequestParam(value = "empImageFile", required = false) MultipartFile empImageFile,
+            HttpSession session) {
 
         System.out.println("📌 /emp/insert 호출, vo = " + vo);
 
+        // 필요하면 관리자 권한 체크
         if (!isAdmin(session)) {
             System.out.println("❌ 사원 등록 권한 없음");
             return "DENY";
         }
 
-        int cnt = empService.insertEmp(vo);
-        System.out.println("✔ 사원 등록 완료, cnt = " + cnt);
+        try {
+            // 사진 파일이 있으면 저장
+            if (empImageFile != null && !empImageFile.isEmpty()) {
+                String savedName = saveEmpImage(empImageFile);   // C:/emp_upload/emp/ 에 저장
+                vo.setEmpImage(savedName);                       // EmpVO 필드명에 맞게 (empImage)
+            }
 
-        return (cnt > 0) ? "OK" : "ERROR";
+            int cnt = empService.insertEmp(vo);
+            System.out.println("✔ 사원 등록 완료, cnt = " + cnt);
+
+            return (cnt > 0) ? "OK" : "FAIL";
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "ERROR";
+        }
     }
 
-    /**
-     * 관리자(1,2 등급) 여부 체크
-     */
+
+    /* =========================================================
+       7. 관리자 여부 체크
+       ========================================================= */
     private boolean isAdmin(HttpSession session) {
         LoginVO login = (LoginVO) session.getAttribute("login");
 
@@ -181,5 +222,58 @@ public class EmpController {
 
         String grade = login.getGradeNo();
         return grade != null && ("1".equals(grade) || "2".equals(grade));
+    }
+
+    /* =========================================================
+       8. 사번 중복 체크 (AJAX)
+       ========================================================= */
+    @GetMapping("/emp/checkEmpNo")
+    @ResponseBody
+    public String checkEmpNo(@RequestParam("empNo") String empNo) {
+
+        boolean dup = empService.isEmpNoDuplicate(empNo);
+        return dup ? "DUP" : "OK";
+    }
+
+    /* =========================================================
+       9. 파일 저장/삭제 헬퍼 메서드
+       ========================================================= */
+
+    /** 🔹 사진 저장 (외부 폴더 C:/emp_upload/emp/) */
+    private String saveEmpImage(MultipartFile file) throws IOException {
+
+        if (file == null || file.isEmpty()) {
+            return null;
+        }
+
+        String original = file.getOriginalFilename();
+        if (original == null) original = "emp.jpg";
+
+        // "시간_원본파일명" 형식으로 저장 (중복 방지)
+        String savedName = System.currentTimeMillis() + "_" + original;
+
+        File dir = new File(EMP_UPLOAD_PATH);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        File dest = new File(dir, savedName);
+        file.transferTo(dest);
+
+        System.out.println("📁 사진 저장 경로 = " + dest.getAbsolutePath());
+
+        // DB에는 파일명만 저장 → /upload/emp/{파일명} 으로 접근
+        return savedName;
+    }
+
+    /** 🔹 사진 삭제 */
+    private void deleteEmpImage(String fileName) {
+        if (fileName == null || fileName.isBlank()) return;
+
+        File f = new File(EMP_UPLOAD_PATH, fileName);
+        if (f.exists()) {
+            boolean deleted = f.delete();
+            System.out.println("🗑 사진 삭제 (" + f.getAbsolutePath() + ") = " + deleted);
+        }
     }
 }

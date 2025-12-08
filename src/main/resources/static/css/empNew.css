@@ -36,6 +36,7 @@
     color: #7a8ba3;
     font-size: 14px;
     background: #f8faff;
+    cursor: pointer;
 }
 
 /* 상단 2열 공통 스타일 */
@@ -88,4 +89,15 @@
 
 #empNewForm .btn-primary {
     margin-right: 14px;
+}
+
+/* 🔹 placeholder를 매우 연하게 */
+input::placeholder {
+    color: #e0e0e0 !important;
+    opacity: 1 !important;
+}
+
+/* 🔹 포커스하면 사라지는 효과 */
+input:focus::placeholder {
+    color: transparent !important;
 }
