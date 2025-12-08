@@ -19,10 +19,10 @@
 	        #{docContent}, 
 	        SYSDATE, 
 	        #{docWriter},
-	        #{startDate}, 
-	        #{endDate}, 
+	        #{startDate, jdbcType=VARCHAR}, 
+	        #{endDate, jdbcType=VARCHAR}, 
 	        #{totalDays, jdbcType=DOUBLE}, 
-	        #{emergencyContact}
+	        #{emergencyContact, jdbcType=VARCHAR}
 	        )
 	</insert>
 	
@@ -224,6 +224,7 @@
 		    d.DOC_DATE,
 		    d.START_DATE, 
 			d.END_DATE, 
+			d.DOC_WRITER, 
 			d.TOTAL_DAYS, 
 			d.EMERGENCY_CONTACT, 
 		    w.EMP_NAME AS WRITER_NAME,
