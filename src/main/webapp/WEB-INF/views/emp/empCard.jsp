@@ -60,7 +60,8 @@
                 </button>
             </div>
         </c:if>
-    </div>
+
+    </div> <%-- 🔹 여기서 emp-card-view 닫기 --%>
 
 
 
@@ -81,7 +82,6 @@
                     </div>
 
                     <div class="emp-basic-info">
-                        <!-- 이름은 여기서는 읽기 전용으로 두고 싶으면 input 대신 텍스트로 -->
                         <h3>${emp.empName}</h3>
                         <p>/ 직급번호: ${emp.gradeNo}</p>
                         <p>사번 : ${emp.empNo}</p>
@@ -96,21 +96,32 @@
                         <tr>
                             <th>재직상태</th>
                             <td>
-                                <!-- 예시: 재직상태는 선택박스로 수정 -->
                                 <select name="statusNo">
                                     <option value="1" ${emp.statusNo == 1 ? 'selected' : ''}>재직</option>
+                                    <option value="7" ${emp.statusNo == 7 ? 'selected' : ''}>파견</option>
                                     <option value="2" ${emp.statusNo == 2 ? 'selected' : ''}>휴직(자발적)</option>
                                     <option value="3" ${emp.statusNo == 3 ? 'selected' : ''}>휴직(병가 등 복지)</option>
                                     <option value="4" ${emp.statusNo == 4 ? 'selected' : ''}>대기</option>
                                     <option value="5" ${emp.statusNo == 5 ? 'selected' : ''}>징계</option>
                                     <option value="6" ${emp.statusNo == 6 ? 'selected' : ''}>인턴/수습</option>
-                                    <option value="7" ${emp.statusNo == 7 ? 'selected' : ''}>파견</option>
+                                    <option value="0" ${emp.statusNo == 0 ? 'selected' : ''}>퇴직</option>
                                 </select>
                             </td>
                             <th>직급번호</th>
                             <td>
-                                <!-- 직급번호도 바꾸고 싶으면 input/select, 아니면 readonly -->
-                                <input type="text" name="gradeNo" value="${emp.gradeNo}" style="width:80px;">
+                                <select name="gradeNo">
+                                    <option value="1" ${emp.gradeNo == 1 ? 'selected' : ''}>1 - 최고관리자</option>
+                                    <option value="2" ${emp.gradeNo == 2 ? 'selected' : ''}>2 - 관리자</option>
+                                    <option value="3" ${emp.gradeNo == 3 ? 'selected' : ''}>3 - 사원</option>
+                                    <option value="4" ${emp.gradeNo == 4 ? 'selected' : ''}>4 - 계약사원</option>
+                                    <option value="5" ${emp.gradeNo == 5 ? 'selected' : ''}>5 - 인턴/수습</option>
+                                    <option value="6" ${emp.gradeNo == 6 ? 'selected' : ''}>6 - 기타</option>
+                                </select>
+                                <br/>
+                                <small class="text-muted">
+                                    ※ 재직/파견만 1~4등급 선택 가능, 인턴/수습은 5등급, <br/>
+                                       휴직·대기·징계·퇴직 등은 6등급으로 고정됩니다.
+                                </small>
                             </td>
                         </tr>
                         <tr>
@@ -150,49 +161,123 @@
     </c:if>
 
 </div>
+
 <script>
-    // 보기 모드 -> 수정 모드
+    // 🔹 재직상태/직급번호 규칙 적용 공통 함수
+    //   - 인턴/수습(6)  → 직급 5 고정
+    //   - 퇴직/휴직/대기/징계(0,2,3,4,5) → 직급 6 고정
+    //   - 재직/파견(1,7) → 직급 1~4만 선택 가능, 나머지 비활성화
+    function applyStatusGradeRule($form) {
+        const status = $form.find('select[name="statusNo"]').val();
+        const $grade = $form.find('select[name="gradeNo"]');
+
+        // 기본: select 자체는 활성화, 옵션도 다 활성화
+        $grade.prop('disabled', false);
+        $grade.find('option').prop('disabled', false);
+
+        // 1) 인턴/수습 (status 6) → 5로 고정, 선택창도 잠금
+        if (status === '6') {
+            $grade.val('5');
+            $grade.prop('disabled', true);
+            return;
+        }
+
+        // 2) 퇴직/휴직/대기/징계 (0,2,3,4,5) → 6으로 고정
+        if (status === '0' || status === '2' || status === '3' ||
+            status === '4' || status === '5') {
+            $grade.val('6');
+            $grade.prop('disabled', true);
+            return;
+        }
+
+        // 3) 재직 / 파견 (1,7) → 1~4만 허용
+        if (status === '1' || status === '7') {
+            $grade.find('option').each(function () {
+                const v = $(this).val();
+                if (v === '1' || v === '2' || v === '3' || v === '4') {
+                    $(this).prop('disabled', false);
+                } else {
+                    $(this).prop('disabled', true);
+                }
+            });
+
+            const current = $grade.val();
+            if (!(current === '1' || current === '2' || current === '3' || current === '4')) {
+                $grade.val('3');   // 기본값: 사원
+            }
+            return;
+        }
+
+        // 4) 혹시 정의되지 않은 status 값 → 안전하게 기타(6)로 고정
+        $grade.val('6');
+        $grade.prop('disabled', true);
+    }
+
+    // 🔹 보기 모드 -> 수정 모드
     function enterEmpEditMode() {
         $('.emp-card-view').hide();
         $('.emp-card-edit').show();
+
+        const $form = $('#empEditForm');
+        applyStatusGradeRule($form);   // 현재 상태에 맞춰 직급 select 보정
     }
 
-    // 수정 모드 -> 보기 모드 (값은 일단 그대로 둠)
+    // 🔹 수정 모드 -> 보기 모드 (값은 그대로, 화면만 전환)
     function cancelEmpEditMode() {
         $('.emp-card-edit').hide();
         $('.emp-card-view').show();
     }
 
-    // 저장 버튼 클릭 시 호출
+    // 🔹 수정 내용 저장
     function saveEmpEdit() {
+        const $form = $('#empEditForm');
 
-        // 1) form 데이터 모으기
-        let formData = $('#empEditForm').serialize();
-        let empNo = $('#empEditForm input[name="empNo"]').val();
+        // 저장 직전에 한 번 더 상태/직급 규칙 적용
+        applyStatusGradeRule($form);
 
-        // 2) AJAX로 서버에 업데이트 요청
+        const formData = $form.serialize();
+        const empNo = $form.find('input[name="empNo"]').val();
+
         $.ajax({
             type: 'POST',
-            url: '/emp/update',      // EmpController에서 매핑한 URL
+            url: '${pageContext.request.contextPath}/emp/update',
             data: formData,
             success: function (result) {
-                // 서버에서 "OK" 등으로 응답했다고 가정
-                // 3) 저장 성공 후, 카드 내용을 다시 읽기 모드로 새로고침
-
-                if (typeof EMP_CARD_URL !== 'undefined') {
-                    // 목록 화면에서 이미 쓰고 있는 /emp/card URL 상수 재사용
-                    $('#emp-detail-card').load(EMP_CARD_URL + '?empNo=' + empNo);
+                if (result === 'DENY') {
+                    alert('수정 권한이 없습니다.');
+                    return;
+                }
+                if (result === 'OK') {
+                    // 카드 부분만 다시 로드해서 최신 데이터로 갱신
+                    if (typeof EMP_CARD_URL !== 'undefined') {
+                        $('#emp-detail-card').load(EMP_CARD_URL + '?empNo=' + empNo);
+                    } else {
+                        alert('저장되었습니다.');
+                        location.reload();
+                    }
                 } else {
-                    // 혹시 EMP_CARD_URL이 없다면 그냥 화면만 토글
-                    alert('저장되었습니다.');
-                    cancelEmpEditMode();
+                    alert('사원 수정 중 오류가 발생했습니다.');
                 }
             },
             error: function (xhr) {
-                alert('저장 중 오류가 발생했습니다.');
                 console.log(xhr);
+                alert('저장 중 오류가 발생했습니다.');
             }
         });
     }
-</script>
 
+    // 🔹 페이지 로드 후 이벤트 바인딩
+    $(function () {
+        const $editForm = $('#empEditForm');
+
+        // 수정 모드에서 재직상태 변경 시마다 규칙 재적용
+        $editForm.on('change', 'select[name="statusNo"]', function () {
+            applyStatusGradeRule($editForm);
+        });
+
+        // 혹시 처음부터 수정 모드로 열리는 경우 대비해서 한 번 적용
+        if ($('.emp-card-edit').is(':visible')) {
+            applyStatusGradeRule($editForm);
+        }
+    });
+</script>
