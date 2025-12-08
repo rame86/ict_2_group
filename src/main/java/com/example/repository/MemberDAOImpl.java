@@ -3,16 +3,21 @@ package com.example.repository;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
+import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.domain.MemberSaveVO;
 import com.example.domain.MemberVO;
 
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
 @Repository
 public class MemberDAOImpl implements MemberDAO {
+	
 
 	@Autowired
-	private SqlSessionTemplate sess;
+	private SqlSessionTemplate sess;	
 
 	// 로그인 아이디 비번 체크
 	public LoginVO loginCheck(MemberVO vo) {
@@ -26,8 +31,10 @@ public class MemberDAOImpl implements MemberDAO {
 
 	
 	// emp넘버 조회
-	public String empNoCheck(String empNo) {
-		return sess.selectOne("com.example.repository.MemberDAO.empNoCheck", empNo);
+	public String empNoCheck(EmpVO vo) {
+		log.info("empNoCheck 요청받음 :"+vo.toString());
+
+		return sess.selectOne("com.example.repository.MemberDAO.empNoCheck", vo);
 	}
 
 	public Integer memberSave(MemberSaveVO vo) {		
