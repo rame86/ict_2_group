@@ -7,155 +7,154 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>출퇴근 시간 정정 신청</title>
+<title>commuteCorrectionForm.jsp</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <script>
-    // 폼 요소 변수를 전역/스크립트 스코프에 선언만 해둡니다.
-    let $form, $existingTimeInput, $correctionDateInput, $correctionTypeSelect;
+// =============================================================
+//                       출퇴근 정정 폼 스크립트
+// =============================================================
 
+// 폼 요소 변수를 스코프에 선언
+let $form, $existingTimeInput, $correctionDateInput, $correctionTypeSelect;
 
-    // 기존 시간 업데이트 함수 (수정됨)
-    function updateExistingTime() {
-        if (typeof appendEvents === 'undefined' || !Array.isArray(appendEvents)) {
-            console.error("근무 기록 데이터 (appendEvents)를 찾을 수 없습니다.");
-            $existingTimeInput.val('');
-            return;
-        }
-        
-        const dateValue = $correctionDateInput.val();
-        const typeValue = $correctionTypeSelect.val();
+// 시간 업데이트 함수 (날짜 또는 구분이 변경될 때 기존 시간 자동 채우기)
+function updateExistingTime() {
+	// appendEvents는 attend.jsp에서 정의됨. 전역 변수임을 가정
+	if (typeof appendEvents === 'undefined' || !Array.isArray(appendEvents)) {
+		console.error("근무 기록 데이터 (appendEvents)를 찾을 수 없음.");
+		$existingTimeInput.val('');
+		return;
+	}
 
-        if (!dateValue || !typeValue) {
-            $existingTimeInput.val('');
-            return;
-        }
+	const dateValue = $correctionDateInput.val();
+	const typeValue = $correctionTypeSelect.val();
 
-        // [attend.jsp의 appendEvents 배열 사용]
-        const record = appendEvents.find(r => r.date === dateValue);
+	if (!dateValue || !typeValue) {
+		$existingTimeInput.val('');
+		return;
+	}
 
-        if (!record) {
-            $existingTimeInput.val('');
-            return;
-        }
+	// attend.jsp의 appendEvents 배열에서 해당 날짜 기록 찾기
+	const record = appendEvents.find(r => r.date === dateValue);
 
-        let timeToDisplay = '';
-        
-        // ⭐ 이 부분을 'inTime'과 'outTime'으로 수정합니다.
-        if (typeValue === 'inTime') {
-            // HH:MM:SS -> HH:MM 변환
-            timeToDisplay = record.inTime ? record.inTime.substring(0, 5) : ''; 
-        } else if (typeValue === 'outTime') {
-            // HH:MM:SS -> HH:MM 변환
-            timeToDisplay = record.outTime ? record.outTime.substring(0, 5) : '';
-        } else {
-            // 선택된 값이 'inTime' 또는 'outTime'이 아닌 경우
-            timeToDisplay = '';
-        }
-        
-        $existingTimeInput.val(timeToDisplay);
-        
-        if (timeToDisplay === '' && typeValue !== '') {
-            const typeText = (typeValue === 'inTime' ? '출근' : '퇴근');
-            alert(`선택하신 ${typeText} 기록이 존재하지 않습니다. (예: 연차, 결근, 기록 누락)`);
-        }
-    }
-    
-    // 폼 초기화 및 이벤트 연결 함수
-    function initializeCorrectionForm() {
-        // 이 함수가 호출될 때 DOM 요소들을 찾아서 변수에 할당합니다.
-        $form = $('#correctionForm');
-        $existingTimeInput = $('#existingTime');
-        $correctionDateInput = $('#correctionDate');
-        $correctionTypeSelect = $('#correctionType');
-        
-        // 이벤트 핸들러 등록
-        $correctionDateInput.on('change', updateExistingTime);
-        $correctionTypeSelect.on('change', updateExistingTime);
-        
-        // 폼 제출 이벤트 (AJAX 사용)
-        $('#correctionForm').on('submit', function(e) {
-			    e.preventDefault(); 
-			    
-			    const $form = $(this);
-			    const actionUrl = $form.attr('action');
-			    
-			    const formData = new FormData(this);
-			    
-			    // 폼 유효성 검사 (필요에 따라 추가)
-			 
-			    
-			    console.log('출퇴근 정정 신청 AJAX 제출 시작...');
-			
-			    $.ajax({
-			        url: actionUrl,
-			        type: 'POST',
-			        data: formData,
-			        processData: false, 
-			        contentType: false, 
-			        
-			        success: function(response) {
-			            console.log('AJAX 성공 응답:', response);
-			            
-			            if (response && response.success) { 
-			                alert('✅ 출퇴근 정정 신청이 성공적으로 접수되었습니다.');
-			                $form[0].reset(); 
-			            } else if (response && response.message) {
-			                alert('❌ 출퇴근 정정 신청 실패: ' + response.message);
-			            } else {
-			                alert('✅ 출퇴근 정정 신청이 성공적으로 접수되었습니다. (응답 메시지 없음)');
-			                $form[0].reset();
-			            }
-			        },
-			        error: function(xhr, status, error) {
-			            console.error('AJAX 오류 발생:', status, error, xhr.responseText);
-			            alert('❌ 출퇴근 정정 신청 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요. \n\n' + error);
-			        },
-			        complete: function() {
-			            console.log('AJAX 요청 완료.');
-			        }
-			    });
-			});
+	if (!record) {
+		$existingTimeInput.val('');
+		return;
+	}
 
-        // 취소 버튼 이벤트
-        $('#cancelBtn').on('click', function() {
-            alert('정정 신청을 취소합니다. (실제로는 이전 페이지로 이동)');
-        });
-    }
+	let timeToDisplay = '';
 
-    // DOMContentLoaded 완료 후 실행 (jQuery 단축 문법)
-    $(function() {
-        // appendEvents 데이터 로드 대기 로직
-        if (typeof appendEvents === 'undefined') {
-             setTimeout(function() {
-                 if (typeof appendEvents !== 'undefined') {
-                     initializeCorrectionForm();
-                 } else {
-                     console.error("재시도 후에도 appendEvents를 찾을 수 없어 폼 로직을 초기화할 수 없습니다.");
-                 }
-             }, 50); 
-        } else {
-            // 이미 정의되었다면 즉시 초기화
-            initializeCorrectionForm();
-        }
+	// 'inTime' 또는 'outTime'에 따라 시간을 가져옴 (HH:MM:SS -> HH:MM)
+	if (typeValue === 'inTime') {
+		timeToDisplay = record.inTime ? record.inTime.substring(0, 5) : '';
+	} else if (typeValue === 'outTime') {
+		timeToDisplay = record.outTime ? record.outTime.substring(0, 5) : '';
+	} else {
+		timeToDisplay = '';
+	}
 
-        // Tailwind Config (기존 로직 유지)
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'Noto Sans KR', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#f69022', 
-                        'gray-light': '#e5e5e5', 
-                    }
-                }
-            }
-        }
-    });
+	$existingTimeInput.val(timeToDisplay);
+
+	if (timeToDisplay === '' && typeValue !== '') {
+		const typeText = (typeValue === 'inTime' ? '출근' : '퇴근');
+		// 기존 알림창 로직 유지
+		alert(`선택한 ${typeText} 기록이 존재하지 않아. (예: 연차, 결근, 기록 누락)`);
+	}
+}
+
+// 폼 초기화 및 이벤트 연결 함수
+function initializeCorrectionForm() {
+	// DOM 요소들을 찾아서 변수에 할당
+	$form = $('#correctionForm');
+	$existingTimeInput = $('#existingTime');
+	$correctionDateInput = $('#correctionDate');
+	$correctionTypeSelect = $('#correctionType');
+
+	// 이벤트 핸들러 등록
+	$correctionDateInput.on('change', updateExistingTime);
+	$correctionTypeSelect.on('change', updateExistingTime);
+
+	// 폼 제출 이벤트 (AJAX 유지)
+	$('#correctionForm').on('submit', function(e) {
+		e.preventDefault();
+
+		const $form = $(this);
+		const actionUrl = $form.attr('action');
+		const formData = new FormData(this);
+
+		console.log('출퇴근 정정 신청 AJAX 제출 시작...');
+
+		$.ajax({
+			url: actionUrl,
+			type: 'POST',
+			data: formData,
+			processData: false,
+			contentType: false,
+
+			success: function(response) {
+				console.log('AJAX 성공 응답:', response);
+
+				if (response && response.success) {
+					alert('✅ 출퇴근 정정 신청이 성공적으로 접수되었어.');
+					$form[0].reset();
+					// 성공 시 모달 닫기
+					window.closeModal(); // 전역 함수 호출
+				} else if (response && response.message) {
+					alert('❌ 출퇴근 정정 신청 실패: ' + response.message);
+				} else {
+					alert('✅ 출퇴근 정정 신청이 성공적으로 접수되었어. (응답 메시지 없음)');
+					$form[0].reset();
+					// 성공 시 모달 닫기
+					window.closeModal(); // 전역 함수 호출
+				}
+			},
+			error: function(xhr, status, error) {
+				console.error('AJAX 오류 발생:', status, error, xhr.responseText);
+				alert('❌ 출퇴근 정정 신청 중 오류가 발생했어. 잠시 후 다시 시도해 줘. \n\n' + error);
+			},
+			complete: function() {
+				console.log('AJAX 요청 완료.');
+			}
+		});
+	});
+}
+
+// DOMContentLoaded 완료 후 실행
+$(function() {
+	initializeCorrectionForm();
+	
+	// =============================================================
+	//                         취소 버튼 로직 (가장 확실한 모달 닫기 재조정)
+	// =============================================================
+	// 폼이 로드된 후 취소 버튼 이벤트 등록
+	$('#cancelBtn').on('click', function(e) {
+		e.preventDefault(); // 기본 폼 동작 방지
+
+		// 폼 요소 변수가 정의되었는지 확인하고 초기화
+		if ($form && $form[0]) {
+			$form[0].reset(); // 폼 초기화
+		} else {
+			// $form이 정의되지 않았을 경우, jQuery를 사용해 폼을 직접 찾아서 초기화 시도
+			$('#correctionForm')[0].reset();
+		}
+		
+		// 모달 창 닫기: 부모 페이지(attend.jsp)의 전역 함수 호출
+		if (typeof window.closeModal === 'function') {
+			window.closeModal(); // attend.jsp에 정의된 함수 호출 (X 버튼과 동일 기능)
+			console.log("✅ 취소버튼 클릭 - window.closeModal() 호출 성공");
+		} else {
+			console.error("❌ window.closeModal 함수를 찾을 수 없어.");
+			// 최후의 수단으로 모달 닫기 시도 (이 코드는 attend.jsp에서 처리하는 것이 좋지만, 모달이 안 닫힐 때를 대비)
+			$(this).closest('.modal').css('display', 'none'); 
+		}
+	});
+
+});
+
+// 불필요한 Tailwind Config 제거
 </script>
 <style>
 /* CSS 부분은 변경 없음 */
@@ -204,7 +203,6 @@ textarea {
 				value="${ loginVO.managerEmpNo }"> <input type="hidden"
 				name="step2ManagerNo" value="${ loginVO.parentDeptNo }">
 
-			<!-- 1. 신청자 정보 (자동 입력) -->
 			<fieldset class="p-4 border border-gray-200 rounded-lg">
 				<legend class="text-sm font-bold text-blue-600 px-2">신청자 정보
 					(자동 입력)</legend>
@@ -275,10 +273,9 @@ textarea {
 					<label for="correctionReason"
 						class="text-sm font-semibold text-gray-700 mb-2">정정 사유:</label>
 					<textarea id="correctionReason" name="docContent" rows="6"
-						placeholder="지각 사유, 시스템 오류 등 정정 사유를 상세히 입력해 주세요." required
+						placeholder="지각 사유, 시스템 오류 등 정정 사유를 상세히 입력해 줘." required
 						class="w-full p-2 border border-gray-300 rounded-md resize-none focus:border-blue-500 focus:ring focus:ring-blue-200"></textarea>
 				</div>
-				<!-- 비상 연락처 -->
 				<div class="form-group-flex">
 					<label for="emergencyContact" class="form-label">비상 연락처:</label> <input
 						type="tel" id="emergencyContact" name="emergencyContact"

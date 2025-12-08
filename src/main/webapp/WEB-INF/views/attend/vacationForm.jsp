@@ -7,7 +7,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>휴가 신청 폼 (통일 스타일 적용)</title>
+<title>vacationForm.jsp</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Tailwind CSS CDN 로드 -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -141,11 +141,6 @@
 			        }
 			    });
 			});
-
-            // 취소 버튼 클릭 시 동작 (더미)
-            $('#cancelBtn').on('click', function() {
-                alert('휴가 신청을 취소합니다. (실제로는 이전 페이지로 이동)');
-            });
 
             // 초기 로드 시 한 번 실행하여 폼 상태를 설정
             handleVacationTypeChange();

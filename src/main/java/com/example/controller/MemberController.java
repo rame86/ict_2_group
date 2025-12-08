@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.domain.MemberSaveVO;
 import com.example.domain.MemberVO;
@@ -28,6 +29,7 @@ public class MemberController {
 	@GetMapping("{step}")
 	public void asdf(@PathVariable String step) {
 		log.info("요청받은 step : " + step);
+	
 	}
 
 	@GetMapping("/")
@@ -41,9 +43,11 @@ public class MemberController {
 
 	@GetMapping("/member/empNoCheck")
 	@ResponseBody
-	public String empNoCheck(String empNo) {
-		log.info("MemberControll empNoCheck 요청받음. empNo :" + empNo);
-		String empCheckResult = memberService.empNoCheck(empNo);
+	public String empNoCheck(String empNo, String empName, EmpVO vo) {
+		log.info("MemberControll empNoCheck 요청받음. empNo :" + empNo);		
+		vo.setEmpNo(empNo);
+		vo.setEmpName(empName);
+		String empCheckResult = memberService.empNoCheck(vo);
 		if (empCheckResult != null) {
 			log.info("MemberControll empNoCheck 결과값 :" + empCheckResult.toString());
 		}

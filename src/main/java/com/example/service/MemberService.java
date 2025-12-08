@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.domain.MemberSaveVO;
 import com.example.domain.MemberVO;
@@ -9,7 +10,7 @@ public interface MemberService {
 
 	public String memberCheck(String kakaoId);
 
-	public String empNoCheck(String empNo);
+	public String empNoCheck(EmpVO vo);
 
 	public Integer memberSave(MemberSaveVO vo);
 

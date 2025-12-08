@@ -3,6 +3,7 @@ package com.example.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.domain.MemberSaveVO;
 import com.example.domain.MemberVO;
@@ -25,8 +26,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public String empNoCheck(String empNo) {
-        return memberDao.empNoCheck(empNo);
+    public String empNoCheck(EmpVO vo) {  
+    	return memberDao.empNoCheck(vo);
     }
 
     @Override

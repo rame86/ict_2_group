@@ -19,6 +19,15 @@
 <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
 	crossorigin="anonymous"></script>
 <script src="/js/member.js"></script>
+<style type="text/css">
+/* button[disabled] 선택자를 사용하여 비활성화된 상태를 정의합니다. */
+#submitBtn:disabled {
+	/* 투명도를 50%로 설정하여 연하게 보이게 합니다. */
+	opacity: 0.5;
+	/* (선택 사항) 커서를 not-allowed로 변경하여 클릭 불가임을 시각적으로 나타냅니다. */
+	cursor: not-allowed;
+}
+</style>
 
 
 </head>
@@ -34,51 +43,65 @@
 									<h3 class="text-center font-weight-light my-4">사원 계정 등록</h3>
 								</div>
 								<div class="card-body">
-									<form action='/member/memberSave' method='post'>
+									<%-- ⭐ Flash Attribute로 전달된 errorMessage 확인 및 출력 --%>
+									<c:if test="${not empty errorMessage}">
+										<div class="alert alert-danger" role="alert">
+											<h5 class="alert-heading">오류 발생</h5>
+											<p>${errorMessage}</p>
+											<hr>
+											<p class="mb-0">회원가입을 다시 시도해 주십시오.</p>
+										</div>
+									</c:if>
+
+									<%-- 기존 회원가입 폼 시작 --%>
+
+									<form id='registForm' action='/member/memberSave' method='post'>
 										<div class="row mb-3">
 											<div class="col-md-6">
 												<div class="form-floating mb-3 mb-md-0">
 													<input class="form-control" id="empNo" name="empNo"
-														type="number" placeholder="사원번호를 입력하세요" /> <label
-														for="inputFirstName">사원번호</label> <br>
-													<button id='empNoCheck' type="button">사번확인</button>
-													<br> <span id="empNoCheckResult" style="width: 150px;"></span>
+														type="number" placeholder="사원번호를 입력하세요" required /> <label
+														for="inputFirstName">사원ID(사원번호)</label><br> <span
+														id="empNoCheckResult" style="width: 150px;"></span>
 												</div>
 											</div>
 											<div class="col-md-6">
 												<div class="form-floating">
 													<input class="form-control" id="empName" name="empName"
-														type="text" placeholder="이름을 입력하세요" /> <label
-														for="inputLastName">이름</label>
+														type="text" placeholder="이름을 입력하세요" required /> <label
+														for="inputLastName">이름</label><br>
+													<button id='empNoCheck' type="button">사번확인</button>
+
 												</div>
 											</div>
 										</div>
 										<div class="form-floating mb-3">
 											<input class="form-control" id="empEmail" name="empEmail"
-												type="email" placeholder="name@example.com" /> <label
+												type="email" placeholder="name@example.com" required /> <label
 												for="inputEmail">이메일주소</label>
 										</div>
 										<div class="row mb-3">
 											<div class="col-md-6">
 												<div class="form-floating mb-3 mb-md-0">
 													<input class="form-control" id="empPass" name="empPass"
-														type="password" placeholder="Create a password" /> <label
-														for="inputPassword">비밀번호</label>
+														type="password" placeholder="Create a password" required />
+													<label for="inputPassword">비밀번호</label>
 												</div>
 											</div>
 											<div class="col-md-6">
 												<div class="form-floating mb-3 mb-md-0">
 													<input class="form-control" id="empPassConfirm"
-														type="password" placeholder="Confirm password" /> <label
-														for="inputPasswordConfirm">비밀번호 확인</label> <br> <span
-														id="passCheck" style="width: 150px;"></span>
+														type="password" placeholder="Confirm password" required />
+													<label for="inputPasswordConfirm">비밀번호 확인</label> <br>
+													<span id="passCheck" style="width: 150px;"></span>
 												</div>
 
 											</div>
 										</div>
 										<div class="mt-4 mb-0">
 											<div class="d-grid">
-												<button class="btn btn-primary btn-block" type="submit">회원가입</button>
+												<button class="btn btn-primary btn-block" type="submit"
+													id="submitBtn" disabled>회원가입</button>
 											</div>
 										</div>
 									</form>
@@ -114,6 +137,6 @@
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
 		crossorigin="anonymous"></script>
-	<script src="/js/scripts.js"></script>
+	<script src="../js/scripts.js"></script>
 </body>
 </html>
