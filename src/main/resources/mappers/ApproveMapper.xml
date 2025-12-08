@@ -1,10 +1,11 @@
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.repository.ApproveDAO">
 
 	<select id="selectDocSeqNextVal" resultType="int">
-	    SELECT doc_no_seq.NEXTVAL FROM DUAL
+		SELECT doc_no_seq.NEXTVAL FROM DUAL
 	</select>
 
 	<insert id="insertDoc" parameterType="DocVO">
@@ -18,294 +19,302 @@
 	        START_DATE, 
 	        END_DATE, 
 	        TOTAL_DAYS,
-	        NEWMODIFY_TIME,
+	        NEWMODIFY_TIME, 
 	        EMERGENCY_CONTACT,
 	        MEMO
 	    ) 
 	    VALUES(
 	        #{docNo}, 
 	        #{docType}, 
-	        #{docTitle, jdbcType=VARCHAR}, 
+	        #{docTitle}, 
 	        #{docContent}, 
 	        SYSDATE, 
 	        #{docWriter},
-	        #{startDate, jdbcType=VARCHAR}, 
-	        #{endDate, jdbcType=VARCHAR},
-	        #{totalDays, jdbcType=DOUBLE}, 
-	        #{newmodifyTime},  	        
-	        #{emergencyContact, jdbcType=VARCHAR},
-	        #{memo}
-	        )
-	</insert>
-	
+	        #{startDate, jdbcType=VARCHAR},             #{endDate, jdbcType=VARCHAR},               #{totalDays, jdbcType=VARCHAR},
+	        #{newmodifyTime, jdbcType=VARCHAR},  	        
+	        #{emergencyContact, jdbcType=VARCHAR},      
+	        #{memo, jdbcType=VARCHAR}             
+	    )
+</insert>
+
 	<insert id="insertApprove" parameterType="ApproveVO">
 		INSERT INTO approve(
-			approve_no, 
-			emp_no, 
-			doc_no, 
-			step1_status, 
-			step1_manager_no, 
-			step2_status, 
-			step2_manager_no 
-			)
+		approve_no,
+		emp_no,
+		doc_no,
+		step1_status,
+		step1_manager_no,
+		step2_status,
+		step2_manager_no
+		)
 		VALUES (
-	    	approve_no_seq.NEXTVAL,
-	    	#{empNo},
-	    	#{docNo},
-	    	#{step1Status},
-	    	#{step1ManagerNo, jdbcType=INTEGER},
-	    	#{step2Status},
-	    	#{step2ManagerNo}
+		approve_no_seq.NEXTVAL,
+		#{empNo},
+		#{docNo},
+		#{step1Status},
+		#{step1ManagerNo, jdbcType=INTEGER},
+		#{step2Status},
+		#{step2ManagerNo}
 		)
 	</insert>
 
 	<select id="selectManager" resultType="DeptVO">
-	    SELECT
-	    D.DEPT_NO AS DEPT_NO, 
-		M.EMP_NO AS MANAGER_EMP_NO, 
-   		M.EMP_NAME AS MANAGER_EMP_NAME 
+		SELECT
+		D.DEPT_NO AS DEPT_NO,
+		M.EMP_NO AS MANAGER_EMP_NO,
+		M.EMP_NAME AS MANAGER_EMP_NAME
 		FROM
-   	 	EMP U 
+		EMP U
 		INNER JOIN
-    	DEPT D ON U.DEPT_NO = D.DEPT_NO 
+		DEPT D ON U.DEPT_NO = D.DEPT_NO
 		INNER JOIN
-    	EMP M ON D.MANAGER_EMP_NO = M.EMP_NO 
+		EMP M ON D.MANAGER_EMP_NO = M.EMP_NO
 		WHERE
-    	U.EMP_NO = #{empNo}
+		U.EMP_NO = #{empNo}
 	</select>
 
-	<select id="selectParentDept" resultType="DeptVO" parameterType="int">
-    	SELECT 
-        D.DEPT_NO, 
-        D.DEPT_NAME, 
-        D.PARENT_DEPT_NO AS MY_PARENT_DEPT_NO,
+	<select id="selectParentDept" resultType="DeptVO"
+		parameterType="int">
+		SELECT
+		D.DEPT_NO,
+		D.DEPT_NAME,
+		D.PARENT_DEPT_NO AS MY_PARENT_DEPT_NO,
 
-        PD.DEPT_NO AS PARENT_DEPT_NO,
-        PD.MANAGER_EMP_NO AS PARENT_MANAGER_EMP_NO, 
+		PD.DEPT_NO AS PARENT_DEPT_NO,
+		PD.MANAGER_EMP_NO AS PARENT_MANAGER_EMP_NO,
 
-        M.EMP_NAME AS PARENT_MANAGER_NAME, 
-        M.EMP_PHONE AS PARENT_MANAGER_PHONE, 
-        M.EMP_EMAIL AS PARENT_MANAGER_EMAIL 
+		M.EMP_NAME AS PARENT_MANAGER_NAME,
+		M.EMP_PHONE AS PARENT_MANAGER_PHONE,
+		M.EMP_EMAIL AS PARENT_MANAGER_EMAIL
 
-    	FROM 
-        DEPT D 
-        LEFT JOIN DEPT PD ON D.PARENT_DEPT_NO = PD.DEPT_NO 
-        LEFT JOIN EMP M ON PD.MANAGER_EMP_NO = M.EMP_NO 
+		FROM
+		DEPT D
+		LEFT JOIN DEPT PD ON D.PARENT_DEPT_NO = PD.DEPT_NO
+		LEFT JOIN EMP M ON PD.MANAGER_EMP_NO = M.EMP_NO
 
-    	WHERE
-        D.DEPT_NO = #{deptNo}
+		WHERE
+		D.DEPT_NO = #{deptNo}
 	</select>
-	
-	<select id="selectReceiveApproveList" resultType="ApproveListVO" parameterType="map">
-	    SELECT * FROM (
-	        SELECT 
-	            D.DOC_NO,
-	            D.DOC_TITLE,
-	            D.DOC_DATE,
-	            U.EMP_NAME AS writerName,
-	            M1.EMP_NAME AS step1ManagerName,
-	            M2.EMP_NAME AS step2ManagerName,
-	            CASE 
-	                WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN '반려'
-	                WHEN A.STEP1_STATUS = 'W' AND A.STEP1_MANAGER_NO = #{empNo} THEN '1차 대기' 
-	                WHEN A.STEP2_STATUS = 'W' 
-	                     AND A.STEP2_MANAGER_NO = #{empNo} 
-	                     AND (A.STEP1_STATUS = 'A' OR A.STEP1_MANAGER_NO IS NULL) THEN '2차 대기' 
-	                WHEN A.STEP2_STATUS = 'A' AND (A.STEP1_STATUS = 'A' OR A.STEP1_MANAGER_NO IS NULL) THEN '최종 승인' 
-	                ELSE '진행 중'
-	            END AS progressStatus
-	        FROM APPROVE A
-	        JOIN DOC D ON A.DOC_NO = D.DOC_NO
-	        JOIN EMP U ON A.EMP_NO = U.EMP_NO
-	        LEFT JOIN EMP M1 ON A.STEP1_MANAGER_NO = M1.EMP_NO
-	        LEFT JOIN EMP M2 ON A.STEP2_MANAGER_NO = M2.EMP_NO
-	        WHERE 
-	            (
-	                (A.STEP1_MANAGER_NO = #{empNo} AND A.STEP1_STATUS = 'W')
-	                OR
-	                (A.STEP2_MANAGER_NO = #{empNo} AND A.STEP2_STATUS = 'W' AND (A.STEP1_STATUS = 'A' OR A.STEP1_MANAGER_NO IS NULL))
-	            )
-	            OR
-	            (
-	                (A.STEP1_MANAGER_NO = #{empNo} AND A.STEP1_STATUS = 'A')
-	                OR
-	                (A.STEP2_MANAGER_NO = #{empNo} AND A.STEP2_STATUS = 'A')
-	                OR
-	                (A.STEP1_MANAGER_NO = #{empNo} AND A.STEP1_STATUS = 'R')
-	                OR
-	                (A.STEP2_MANAGER_NO = #{empNo} AND A.STEP2_STATUS = 'R')
-	            )
-	        ORDER BY D.DOC_DATE DESC
-	    )
-	    <if test="limit != null">
-	        WHERE ROWNUM &lt;= #{limit}
-	    </if>
-	</select>
-	
-	<select id="selectSendApproveList" resultType="ApproveListVO" parameterType="map">
+
+	<select id="selectReceiveApproveList" resultType="ApproveListVO"
+		parameterType="map">
 		SELECT * FROM (
-	        SELECT 
-	            D.DOC_NO AS docNo,
-	            D.DOC_TITLE AS docTitle,
-	            D.DOC_DATE AS docDate,
-	            M1.EMP_NAME AS step1ManagerName,
-	            M2.EMP_NAME AS step2ManagerName,
-	            CASE 
-	                WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN '반려' 
-	                WHEN (A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'A')  
-	                     OR (A.STEP1_MANAGER_NO IS NULL AND A.STEP2_STATUS = 'A') 
-	                THEN '최종 승인' 
-	                WHEN A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'W' THEN '2차 대기' 
-	                WHEN A.STEP1_STATUS = 'X' AND A.STEP2_STATUS = 'W' THEN '2차 대기' 
-	                WHEN A.STEP1_STATUS = 'W' THEN '1차 대기' 
-	                ELSE '대기' 
-	            END AS progressStatus, 
-	            CASE
-	            	WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN 'REJECT' 
-	            	WHEN (A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'A') OR (A.STEP1_STATUS = 'X' AND A.STEP2_STATUS = 'A') THEN 'FINISH' 
-	            	ELSE 'ACTIVE' 
-	            	END AS COMPLETION_TYPE 
-	        FROM APPROVE A
-	        JOIN DOC D ON A.DOC_NO = D.DOC_NO
-	        LEFT JOIN EMP M1 ON A.STEP1_MANAGER_NO = M1.EMP_NO
-	        LEFT JOIN EMP M2 ON A.STEP2_MANAGER_NO = M2.EMP_NO
-	        WHERE A.EMP_NO = #{empNo}
-	        ORDER BY D.DOC_NO DESC
+		SELECT
+		D.DOC_NO,
+		D.DOC_TITLE,
+		D.DOC_DATE,
+		U.EMP_NAME AS writerName,
+		M1.EMP_NAME AS step1ManagerName,
+		M2.EMP_NAME AS step2ManagerName,
+		CASE
+		WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN '반려'
+		WHEN A.STEP1_STATUS = 'W' AND A.STEP1_MANAGER_NO = #{empNo} THEN '1차 대기'
+		WHEN A.STEP2_STATUS = 'W'
+		AND A.STEP2_MANAGER_NO = #{empNo}
+		AND (A.STEP1_STATUS = 'A' OR A.STEP1_MANAGER_NO IS NULL) THEN '2차 대기'
+		WHEN A.STEP2_STATUS = 'A' AND (A.STEP1_STATUS = 'A' OR
+		A.STEP1_MANAGER_NO IS NULL) THEN '최종 승인'
+		ELSE '진행 중'
+		END AS progressStatus
+		FROM APPROVE A
+		JOIN DOC D ON A.DOC_NO = D.DOC_NO
+		JOIN EMP U ON A.EMP_NO = U.EMP_NO
+		LEFT JOIN EMP M1 ON A.STEP1_MANAGER_NO = M1.EMP_NO
+		LEFT JOIN EMP M2 ON A.STEP2_MANAGER_NO = M2.EMP_NO
+		WHERE
+		(
+		(A.STEP1_MANAGER_NO = #{empNo} AND A.STEP1_STATUS = 'W')
+		OR
+		(A.STEP2_MANAGER_NO = #{empNo} AND A.STEP2_STATUS = 'W' AND (A.STEP1_STATUS = 'A' OR
+		A.STEP1_MANAGER_NO IS NULL))
+		)
+		OR
+		(
+		(A.STEP1_MANAGER_NO = #{empNo} AND A.STEP1_STATUS = 'A')
+		OR
+		(A.STEP2_MANAGER_NO = #{empNo} AND A.STEP2_STATUS = 'A')
+		OR
+		(A.STEP1_MANAGER_NO = #{empNo} AND A.STEP1_STATUS = 'R')
+		OR
+		(A.STEP2_MANAGER_NO = #{empNo} AND A.STEP2_STATUS = 'R')
+		)
+		ORDER BY D.DOC_DATE DESC
+		)
+		<if test="limit != null">
+			WHERE ROWNUM &lt;= #{limit}
+		</if>
+	</select>
+
+	<select id="selectSendApproveList" resultType="ApproveListVO"
+		parameterType="map">
+		SELECT * FROM (
+		SELECT
+		D.DOC_NO AS docNo,
+		D.DOC_TITLE AS docTitle,
+		D.DOC_DATE AS docDate,
+		M1.EMP_NAME AS step1ManagerName,
+		M2.EMP_NAME AS step2ManagerName,
+		CASE
+		WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN '반려'
+		WHEN (A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'A')
+		OR (A.STEP1_MANAGER_NO IS NULL AND A.STEP2_STATUS = 'A')
+		THEN '최종 승인'
+		WHEN A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'W' THEN '2차 대기'
+		WHEN A.STEP1_STATUS = 'X' AND A.STEP2_STATUS = 'W' THEN '2차 대기'
+		WHEN A.STEP1_STATUS = 'W' THEN '1차 대기'
+		ELSE '대기'
+		END AS progressStatus,
+		CASE
+		WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN 'REJECT'
+		WHEN (A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'A') OR (A.STEP1_STATUS =
+		'X' AND A.STEP2_STATUS = 'A') THEN 'FINISH'
+		ELSE 'ACTIVE'
+		END AS COMPLETION_TYPE
+		FROM APPROVE A
+		JOIN DOC D ON A.DOC_NO = D.DOC_NO
+		LEFT JOIN EMP M1 ON A.STEP1_MANAGER_NO = M1.EMP_NO
+		LEFT JOIN EMP M2 ON A.STEP2_MANAGER_NO = M2.EMP_NO
+		WHERE A.EMP_NO = #{empNo}
+		ORDER BY D.DOC_NO DESC
 		) RESULT_TABLE
-	    <where>
-	        <if test="statusType != null and statusType.equals('ACTIVE')">
-             	COMPLETION_TYPE = 'ACTIVE' 
-	        </if>
-	        <if test="statusType != null and statusType.equals('REJECT')">
-	             COMPLETION_TYPE = 'REJECT' 
-	        </if>
-	        <if test="statusType != null and statusType.equals('FINISH')">
-	             COMPLETION_TYPE = 'FINISH'
-	        </if>
-	        <if test="limit != null">
-	             AND ROWNUM &lt;= #{limit}
-	        </if>
-	    </where>
+		<where>
+			<if test="statusType != null and statusType.equals('ACTIVE')">
+				COMPLETION_TYPE = 'ACTIVE'
+			</if>
+			<if test="statusType != null and statusType.equals('REJECT')">
+				COMPLETION_TYPE = 'REJECT'
+			</if>
+			<if test="statusType != null and statusType.equals('FINISH')">
+				COMPLETION_TYPE = 'FINISH'
+			</if>
+			<if test="limit != null">
+				AND ROWNUM &lt;= #{limit}
+			</if>
+		</where>
 	</select>
-	
-	<select id="selectWaitingReceiveListLimit" resultType="ApproveListVO" parameterType="map">
-	    SELECT 
-	        T.*
-	    FROM (
-	        SELECT 
-	            R.*, 
-	            ROWNUM RNUM_
-	        FROM (
-	            SELECT 
-	                D.DOC_NO,
-	                D.DOC_TITLE,
-	                D.DOC_DATE,
-	                U.EMP_NAME AS writerName,
-	                M1.EMP_NAME AS step1ManagerName,
-	                M2.EMP_NAME AS step2ManagerName,
-	                CASE 
-	                    WHEN A.STEP1_STATUS = 'W' AND A.STEP1_MANAGER_NO = #{empNo} THEN '1차 대기' 
-	                    WHEN A.STEP2_STATUS = 'W' 
-	                         AND A.STEP2_MANAGER_NO = #{empNo} 
-	                         AND (A.STEP1_STATUS = 'A' OR A.STEP1_MANAGER_NO IS NULL) THEN '2차 대기' 
-	                    ELSE '대기 중' 
-	                END AS progressStatus
-	            FROM APPROVE A
-	            JOIN DOC D ON A.DOC_NO = D.DOC_NO
-	            JOIN EMP U ON A.EMP_NO = U.EMP_NO
-	            LEFT JOIN EMP M1 ON A.STEP1_MANAGER_NO = M1.EMP_NO 
-	            LEFT JOIN EMP M2 ON A.STEP2_MANAGER_NO = M2.EMP_NO 
-	            WHERE 
-	                (
-	                    (A.STEP1_MANAGER_NO = #{empNo} AND A.STEP1_STATUS = 'W')
-	                    OR
-	                    (A.STEP2_MANAGER_NO = #{empNo} AND A.STEP2_STATUS = 'W' AND (A.STEP1_STATUS = 'A' OR A.STEP1_MANAGER_NO IS NULL))
-	                )
-	            ORDER BY D.DOC_DATE DESC 
-	        ) R 
-	    ) T
-	    WHERE T.RNUM_ &lt;= #{limit}
+
+	<select id="selectWaitingReceiveListLimit"
+		resultType="ApproveListVO" parameterType="map">
+		SELECT
+		T.*
+		FROM (
+		SELECT
+		R.*,
+		ROWNUM RNUM_
+		FROM (
+		SELECT
+		D.DOC_NO,
+		D.DOC_TITLE,
+		D.DOC_DATE,
+		U.EMP_NAME AS writerName,
+		M1.EMP_NAME AS step1ManagerName,
+		M2.EMP_NAME AS step2ManagerName,
+		CASE
+		WHEN A.STEP1_STATUS = 'W' AND A.STEP1_MANAGER_NO = #{empNo} THEN '1차 대기'
+		WHEN A.STEP2_STATUS = 'W'
+		AND A.STEP2_MANAGER_NO = #{empNo}
+		AND (A.STEP1_STATUS = 'A' OR A.STEP1_MANAGER_NO IS NULL) THEN '2차 대기'
+		ELSE '대기 중'
+		END AS progressStatus
+		FROM APPROVE A
+		JOIN DOC D ON A.DOC_NO = D.DOC_NO
+		JOIN EMP U ON A.EMP_NO = U.EMP_NO
+		LEFT JOIN EMP M1 ON A.STEP1_MANAGER_NO = M1.EMP_NO
+		LEFT JOIN EMP M2 ON A.STEP2_MANAGER_NO = M2.EMP_NO
+		WHERE
+		(
+		(A.STEP1_MANAGER_NO = #{empNo} AND A.STEP1_STATUS = 'W')
+		OR
+		(A.STEP2_MANAGER_NO = #{empNo} AND A.STEP2_STATUS = 'W' AND (A.STEP1_STATUS = 'A' OR
+		A.STEP1_MANAGER_NO IS NULL))
+		)
+		ORDER BY D.DOC_DATE DESC
+		) R
+		) T
+		WHERE T.RNUM_ &lt;= #{limit}
 	</select>
-	
+
 	<select id="selectDocNo" parameterType="int" resultType="DocVO">
-		SELECT 
-		    d.DOC_NO,
-		    d.DOC_TYPE, 
-		    d.DOC_TITLE,
-		    d.DOC_CONTENT,
-		    d.DOC_DATE,
-		    d.START_DATE, 
-			d.END_DATE, 
-			d.DOC_WRITER, 
-			d.TOTAL_DAYS, 
-			d.EMERGENCY_CONTACT, 
-			d.NEWMODIFY_TIME,
-			d.MEMO,  
-		    w.EMP_NAME AS WRITER_NAME,
-		    a.STEP1_MANAGER_NO,
-		    m1.EMP_NAME AS STEP1_MANAGER_NAME,
-		    a.STEP1_STATUS,
-		    a.STEP2_MANAGER_NO,
-		    m2.EMP_NAME AS STEP2_MANAGER_NAME,
-		    a.STEP2_STATUS, 
-		    a.REJECT_REASON,
-		    a.EMP_NO
+		SELECT
+		d.DOC_NO,
+		d.DOC_TYPE,
+		d.DOC_TITLE,
+		d.DOC_CONTENT,
+		d.DOC_DATE,
+		d.START_DATE,
+		d.END_DATE,
+		d.DOC_WRITER,
+		d.TOTAL_DAYS,
+		d.EMERGENCY_CONTACT,
+		d.NEWMODIFY_TIME,
+		d.MEMO,
+		w.EMP_NAME AS WRITER_NAME,
+		a.STEP1_MANAGER_NO,
+		m1.EMP_NAME AS STEP1_MANAGER_NAME,
+		a.STEP1_STATUS,
+		a.STEP2_MANAGER_NO,
+		m2.EMP_NAME AS STEP2_MANAGER_NAME,
+		a.STEP2_STATUS,
+		a.REJECT_REASON,
+		a.EMP_NO
 		FROM DOC d
-		JOIN EMP w ON d.DOC_WRITER = w.EMP_NO 
-		LEFT JOIN APPROVE a ON d.DOC_NO = a.DOC_NO 
-		LEFT JOIN EMP m1 ON a.STEP1_MANAGER_NO = m1.EMP_NO 
-		LEFT JOIN EMP m2 ON a.STEP2_MANAGER_NO = m2.EMP_NO 
+		JOIN EMP w ON d.DOC_WRITER = w.EMP_NO
+		LEFT JOIN APPROVE a ON d.DOC_NO = a.DOC_NO
+		LEFT JOIN EMP m1 ON a.STEP1_MANAGER_NO = m1.EMP_NO
+		LEFT JOIN EMP m2 ON a.STEP2_MANAGER_NO = m2.EMP_NO
 		WHERE d.DOC_NO = #{docNo}
 	</select>
-	
+
 	<update id="updateApproveStatus" parameterType="hashmap">
 		UPDATE APPROVE
-	    <set>
-	        <choose>
-	            <when test="step == 'STEP1'">
-	                STEP1_STATUS = #{status},
-	                STEP1_APPROVE_DATE = SYSDATE
-	            </when>
-	            <when test="step == 'STEP2'">
-	                STEP2_STATUS = #{status},
-	                STEP2_APPROVE_DATE = SYSDATE
-	            </when>
-	        </choose>
-	    </set>
-	    WHERE DOC_NO = #{docNo}
+		<set>
+			<choose>
+				<when test="step == 'STEP1'">
+					STEP1_STATUS = #{status},
+					STEP1_APPROVE_DATE = SYSDATE
+				</when>
+				<when test="step == 'STEP2'">
+					STEP2_STATUS = #{status},
+					STEP2_APPROVE_DATE = SYSDATE
+				</when>
+			</choose>
+		</set>
+		WHERE DOC_NO = #{docNo}
 	</update>
-	
+
 	<update id="updateRejectStatus" parameterType="map">
 		UPDATE APPROVE
-	    <set>
-	        REJECT_REASON = #{rejectReason},
-	        <choose>
-	            <when test="step == 'STEP1'">
-	                STEP1_STATUS = #{status}
+		<set>
+			REJECT_REASON = #{rejectReason},
+			<choose>
+				<when test="step == 'STEP1'">
+					STEP1_STATUS = #{status}
 				</when>
-	            <when test="step == 'STEP2'">
-	                STEP2_STATUS = #{status}
+				<when test="step == 'STEP2'">
+					STEP2_STATUS = #{status}
 				</when>
-	        </choose>
-	    </set>
-	    WHERE DOC_NO = #{docNo}
+			</choose>
+		</set>
+		WHERE DOC_NO = #{docNo}
 	</update>
-	
-	<select id="countSendApproveStatus" resultType="map" parameterType="string">
-	    SELECT 
-	        T.COMPLETION_TYPE AS STATUSTYPE,
-	        COUNT(T.COMPLETION_TYPE) AS COUNT
-	    FROM (
-	        SELECT 
-	            CASE
-	                WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN 'REJECT' 
-	                WHEN (A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'A') OR (A.STEP1_STATUS = 'X' AND A.STEP2_STATUS = 'A') THEN 'FINISH' 
-	                ELSE 'ACTIVE' 
-	            END AS COMPLETION_TYPE 
-	        FROM APPROVE A
-	        WHERE A.EMP_NO = #{empNo}
-	    ) T
-	    GROUP BY T.COMPLETION_TYPE
+
+	<select id="countSendApproveStatus" resultType="map"
+		parameterType="string">
+		SELECT
+		T.COMPLETION_TYPE AS STATUSTYPE,
+		COUNT(T.COMPLETION_TYPE) AS COUNT
+		FROM (
+		SELECT
+		CASE
+		WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN 'REJECT'
+		WHEN (A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'A') OR (A.STEP1_STATUS =
+		'X' AND A.STEP2_STATUS = 'A') THEN 'FINISH'
+		ELSE 'ACTIVE'
+		END AS COMPLETION_TYPE
+		FROM APPROVE A
+		WHERE A.EMP_NO = #{empNo}
+		) T
+		GROUP BY T.COMPLETION_TYPE
 	</select>
-		
+
 </mapper>
