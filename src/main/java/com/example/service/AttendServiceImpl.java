@@ -75,7 +75,8 @@ public class AttendServiceImpl implements AttendService {
 	
 	
 	public void commuteCorrection(DocVO vo) {
-		
+		log.info("[AttendService - commuteCorrection 요청 받음]");
+		log.info(vo.toString());
 		DayAttendVO davo = new DayAttendVO();
 		
 		String totalDayStr = vo.getTotalDays();

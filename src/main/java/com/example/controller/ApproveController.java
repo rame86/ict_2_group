@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,7 @@ import com.example.domain.DocVO;
 import com.example.domain.LoginVO;
 import com.example.service.ApproveService;
 import com.example.service.AttendService;
+import com.example.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,8 @@ public class ApproveController {
 	private ApproveService approveService;
 	@Autowired
 	private AttendService attendService;
+	@Autowired
+	private NotificationService notificationService;
 
 	// 로그인 세션 받아오기
 	@ModelAttribute("login")
@@ -75,6 +79,31 @@ public class ApproveController {
 		
 		m.addAttribute("receive", receiveListLimit);
 		m.addAttribute("send", sendListLimit);
+		
+	}
+	
+	// 결재 현황 카드
+	@ResponseBody
+	@GetMapping("approve/simpleList")
+	public Map<String, Object> simpleList(@ModelAttribute("login") LoginVO login, @RequestParam("status") String status) {
+		
+		List<ApproveListVO> documentList = null;
+		String empNo = login.getEmpNo();
+		
+		if("receiveFinish".equals(status)) {
+			documentList = approveService.selectFinishReceiveList(empNo);
+		}else if("receiveWait".equals(status)) {
+			documentList = approveService.selectWaitingReceiveList(empNo);
+		}else {
+			Map<String, List<ApproveListVO>> sendList = approveService.selectSendApproveList(empNo);
+			documentList = sendList.get(status);
+		}
+		
+		Map<String, Object> result = new HashMap<>();
+		
+		result.put("documentList", documentList);
+		
+		return result;
 		
 	}
 	
@@ -125,13 +154,18 @@ public class ApproveController {
 		approveService.approveDocument(docNo, status, empNo, rejectReason);
 		
 		DocVO vo = approveService.selectDocNo(docNo);
-		log.info("approveDocument"+vo.toString());
+		String docWriter = vo.getDocWriter(); // 문서를 쓴 작성자
+		
+		System.out.println("DEBUG: 조회된 작성자 사번 = " + docWriter);
+		
+		notificationService.sendApprovalNotification(docWriter, "문서가 처리되었습니다.");
 		
 		if(vo.getDocType().equals("4")) {
 			attendService.insertVacation(vo);
+		}else if(vo.getDocType().equals("5")) {
+			attendService.commuteCorrection(vo);
 		}
 		
-
 	}
 	
 	// 결재 완료된 문서들
