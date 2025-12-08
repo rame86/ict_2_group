@@ -25,21 +25,41 @@ if (menu == null) menu = "";
 							<i class="fas fa-tachometer-alt"></i>
 						</div> 마이페이지
 					</a>
-				<div class="sb-sidenav-menu-heading">메인 메뉴</div>
+					<div class="sb-sidenav-menu-heading">메인 메뉴</div>
 					<%--근태 관리 --%>
 					<a class="nav-link" href="/attend/attend">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-columns"></i>
 						</div> 근태관리
-					</a> 
-					
-					<%--사원 관리 --%>
-					<a class="nav-link <%=menu.equals("emp") ? "active" : ""%>"
-						href="${pageContext.request.contextPath}/emp/list">
+					</a>
+
+					<%-- 사원 관리 --%>
+					<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+						data-bs-target="#collapseEmp" aria-expanded="false"
+						aria-controls="collapseEmp">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-book-open"></i>
 						</div> 사원관리
+						<div class="sb-sidenav-collapse-arrow">
+							<i class="fas fa-angle-down"></i>
+						</div>
 					</a>
+
+					<div
+						class="collapse <%= (menu.equals("emp") || menu.equals("empNew")) ? "show" : "" %>"
+						id="collapseEmp" aria-labelledby="headingOne"
+						data-bs-parent="#sidenavAccordion">
+
+						<nav class="sb-sidenav-menu-nested nav">
+
+							<a class="nav-link <%=menu.equals("emp") ? "active" : ""%>"
+								href="${pageContext.request.contextPath}/emp/list"> 사원 목록 </a> <a
+								class="nav-link <%=menu.equals("empNew") ? "active" : ""%>"
+								href="${pageContext.request.contextPath}/emp/new"> 사원 등록 </a>
+
+						</nav>
+					</div>
+
 
 					<%--부서 관리 --%>
 					<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
@@ -48,8 +68,8 @@ if (menu == null) menu = "";
 							<i class="fas fa-book-open"></i>
 						</div> 부서관리
 						<div class="sb-sidenav-collapse-arrow"></div>
-					</a> 
-					
+					</a>
+
 					<%--결재 관리 --%>
 					<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
 						data-bs-target="#collapseApproval" aria-expanded="false"
@@ -79,7 +99,7 @@ if (menu == null) menu = "";
 								href="/approve/createForm">문서 작성 하기</a>
 						</nav>
 					</div>
-					
+
 					<%--급여 관리 --%>
 					<a class="nav-link <%=menu.equals("salemp") ? "active" : ""%>"
 						href="${pageContext.request.contextPath}/sal/list">

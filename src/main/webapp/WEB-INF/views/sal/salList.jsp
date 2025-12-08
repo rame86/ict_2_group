@@ -156,6 +156,12 @@ $(function() {
     });
 
 });
+
+<script>
+// 컨텍스트 경로를 안전하게 쓰기 위해
+const EMP_CARD_URL = "<c:url value='/emp/card' />";
+</script>
+
 </script>
 </c:if>
 

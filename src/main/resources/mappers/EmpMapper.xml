@@ -6,7 +6,59 @@
 <mapper namespace="com.example.repository.EmpMapper">
 
     <!-- 사원목록 전체 조회 (사원관리·급여관리 공용) -->
-    <select id="selectEmpList" resultType="com.example.domain.EmpVO">
+   <select id="selectEmpList" resultType="com.example.domain.EmpVO">
+    SELECT
+        e.EMP_NO       AS empNo,
+        e.EMP_NAME     AS empName,
+
+        -- 권한등급 번호 그대로
+        e.GRADE_NO     AS gradeNo,
+
+        -- 🔹 gradeNo를 이용해서 화면에 보여줄 "직급 이름" 만들기
+        CASE e.GRADE_NO
+            WHEN 1 THEN '최고관리자'
+            WHEN 2 THEN '관리자'
+            WHEN 3 THEN '정규직'
+            WHEN 4 THEN '계약직'
+            WHEN 5 THEN '인턴'
+            ELSE '기타'
+        END            AS gradeName,   <!-- ★ 여기 포인트 -->
+
+        e.STATUS_NO    AS statusNo,
+        CASE e.STATUS_NO
+            WHEN 0 THEN '퇴직'
+            WHEN 1 THEN '재직'
+            WHEN 2 THEN '휴직(자발적)'
+            WHEN 3 THEN '휴직(병가 등 복지)'
+            WHEN 4 THEN '대기'
+            WHEN 5 THEN '징계'
+            WHEN 6 THEN '인턴/수습'
+            WHEN 7 THEN '파견'
+            ELSE '기타'
+        END            AS statusName,
+
+        e.EMP_PHONE    AS empPhone,
+        e.EMP_REGDATE  AS empRegdate,
+        d.DEPT_NAME    AS deptName
+
+    FROM EMP e
+    LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+    ORDER BY e.EMP_NO ASC
+</select>
+
+
+    <!-- (기존) 사원 단건 조회 - 지금은 안 쓰고 있을 수도 있음 -->
+    <select id="getEmp" parameterType="String" resultType="com.example.domain.EmpVO">
+        SELECT *
+        FROM EMP
+        WHERE EMP_NO = #{empNo}
+    </select>
+    
+    <!-- 🔹 인사카드용: 사번으로 사원 한 명 조회 -->
+    <select id="selectEmpByEmpNo"
+            parameterType="String"
+            resultType="com.example.domain.EmpVO">
+
         SELECT
             e.EMP_NO      AS empNo,
             e.EMP_NAME    AS empName,
@@ -32,14 +84,56 @@
 
         FROM EMP e
         LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
-        ORDER BY e.EMP_NO ASC
-    </select>
 
-    <!-- 사원 상세 조회 -->
-    <select id="getEmp" parameterType="String" resultType="com.example.domain.EmpVO">
-        SELECT *
-        FROM EMP
-        WHERE EMP_NO = #{empNo}
+        WHERE e.EMP_NO = #{empNo}
+
     </select>
+    
+    <!-- 🔹 사원 정보 수정 쿼리 (인사카드 수정용) -->
+    <update id="updateEmp" parameterType="com.example.domain.EmpVO">
+        UPDATE EMP
+           SET STATUS_NO = #{statusNo},
+               GRADE_NO  = #{gradeNo},
+               EMP_PHONE = #{empPhone},
+               EMP_EMAIL = #{empEmail},
+               EMP_ADDR  = #{empAddr}
+         WHERE EMP_NO   = #{empNo}
+    </update>
+
+    <!-- 🔹 사원 삭제 쿼리 (이미 있으면 그대로 두고, 없으면 참고용) -->
+  
+    <delete id="deleteEmp" parameterType="string">
+        DELETE FROM EMP
+        WHERE EMP_NO = #{empNo}
+    </delete>
+    
+    <!-- 사원등록 -->
+    
+    <insert id="insertEmp" parameterType="com.example.domain.EmpVO">
+    INSERT INTO EMP (
+        EMP_NO,
+        EMP_NAME,
+        GRADE_NO,
+        STATUS_NO,
+        EMP_PHONE,
+        EMP_EMAIL,
+        EMP_ADDR,
+        DEPT_NO,
+        EMP_REGDATE
+    )
+    VALUES (
+        #{empNo},
+        #{empName},
+        #{gradeNo},
+        #{statusNo},
+        #{empPhone},
+        #{empEmail},
+        #{empAddr},
+         #{deptNo, jdbcType=INTEGER},
+        SYSDATE
+    )
+</insert>
+
 
 </mapper>
+
