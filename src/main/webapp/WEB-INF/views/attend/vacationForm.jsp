@@ -163,18 +163,37 @@
                 const $startDateLabel = $('#startDateLabel');
                 const $totalDaysInput = $('#totalDays');
                 const $proofUploadGroup = $('#proofUploadGroup'); // 증빙 자료 그룹
+                
+                // ⭐ 시작일(startDate) 값과 종료일(endDate) 입력 필드를 가져옴
+                const startDateValue = $('#startDate').val(); 
+                const $endDateInput = $('#endDate'); 
+                
 
                 // 반차(half_am, half_pm)인 경우
                 if (selectedType === 'half_am' || selectedType === 'half_pm') {
-                    // 필드 숨기기
-                    $endDateGroup.hide();
+                    
+                    // 1. 종료일 그룹은 계속 보이게 유지합니다.
+                    $endDateGroup.show();
+                    
+                    // 2. 신청 일수 그룹은 숨김 (반차는 0.5일 고정이므로)
                     $totalDaysGroup.hide();
+                    
+                    // 3. 시작일이 있다면, 종료일을 시작일과 같은 날짜로 자동 설정
+                    if (startDateValue) {
+                        $endDateInput.val(startDateValue);
+                    }
+                    
+                    // 4. 종료일 필드의 필수 속성은 유지 (어차피 시작일과 같게 채워지므로 문제 없음)
+                    // $endDateInput.prop('required', true);
                     
                     // 시작일 라벨을 '신청일'로 변경
                     $startDateLabel.text('신청일:');
                     
                     // 반차일 때는 증빙 자료 숨김
                     $proofUploadGroup.hide();
+                    
+                    // 일수 재계산 (0.5일 고정 반영을 위해 호출)
+                    calculateDays();
 
                 } else {
                     // 일반 휴가(연차, 병가, 보상 휴가 등)인 경우
@@ -183,6 +202,8 @@
                     
                     // 시작일 라벨을 '시작일'로 복원
                     $startDateLabel.text('시작일:');
+                    
+                    // 일반 휴가일 때는 종료일 값을 비우지 않고 사용자가 선택하도록 둡니다.
                     
                     // 일수 재계산
                     calculateDays();
