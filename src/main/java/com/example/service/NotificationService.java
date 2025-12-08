@@ -1,13 +1,19 @@
 package com.example.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class NotificationService {
 	
 	// STOMP 메시지 브로커로 메시지를 보내는 핵심 컴포넌트
     private final SimpMessagingTemplate messagingTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
     
     // 생성자 주입
     public NotificationService(SimpMessagingTemplate messagingTemplate) {
@@ -21,19 +27,26 @@ public class NotificationService {
      */
     public void sendApprovalNotification(String empNo, String message) {
     	
-    	System.out.println("DEBUG: NotificationService 시작!"); // 👈 새 로그
-        // 메시지 보낼 구독 주소: /user/{empNo}/queue/notifications
-        // 여기서 '/queue/notifications'는 임의로 정한 알림 큐 이름입니다.
-        String destination = "/queue/notifications"; 
+    	Map<String, String> payload = new HashMap<>();
         
+    	payload.put("targetEmpNo", empNo); 
+        payload.put("content", message);
+        
+        String jsonMessage;
         try {
-            messagingTemplate.convertAndSendToUser(empNo, destination, message);
-            System.out.println("DEBUG: 메시지 전송 API 호출 성공."); // 👈 새 로그
+            jsonMessage = objectMapper.writeValueAsString(payload); // Map -> JSON 문자열
         } catch (Exception e) {
-            e.printStackTrace(); // 👈 예외 발생 시 콘솔에 무조건 찍히게 처리
+            jsonMessage = "{\"targetEmpNo\":\"" + empNo + "\", \"content\":\"" + message + "\"}";
         }
         
-        System.out.println("알림 발송 완료: 대상=" + empNo + ", 내용=" + message);
+        // 브로드 캐스팅
+        String destination = "/topic/global-notifications";
+        try {
+        	messagingTemplate.convertAndSend(destination, jsonMessage);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
     }
 
 }

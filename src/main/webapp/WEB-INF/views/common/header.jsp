@@ -6,6 +6,7 @@
 <html>
 <head>
 	<meta charset="utf-8" />
+	<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 	<meta name="description" content="" />
@@ -27,7 +28,17 @@
 		<input type="hidden" id="sessionEmp" value="${sessionScope.login}">
 	</c:if>
 	<body class="sb-nav-fixed">
-		<script src="/js/index.js"></script>
+		<script src="/js/websocket.js"></script>
+		<script>
+			const currentEmpNoFromJSP = '${ sessionScope.login.empNo }';
+			connectWebSocket(currentEmpNoFromJSP);
+			$(document).ready(function() {
+				updateSidebarBadge();
+		        
+		        // 전자결재 사이드바 알람
+				$("#collapseApproval").on('show.bs.collapse', function () {});
+		    }); 
+		</script>
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <!-- Navbar Brand-->
             <a class="navbar-brand ps-3" href="/index.html">PEOPLE CYNC</a>
