@@ -4,31 +4,34 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.example.domain.EmpSearchVO;
 import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.domain.MemberVO;
-import com.example.domain.EmpSearchVO;
-
 
 @Mapper
 public interface EmpMapper {
 
-    // 🔍 검색 포함 목록 조회
+    // 검색 포함 목록
     List<EmpVO> getEmpList(EmpSearchVO search);
 
-    // 📄 전체 사원 목록 조회 (검색 없이)
+    // 단건 조회 (기존)
+    EmpVO getEmp(String empNo);
+
+    // 로그인 체크 (기존)
+    LoginVO loginCheck(MemberVO vo);
+
+    // 전체 목록 (검색 없이)
     List<EmpVO> selectEmpList();
 
-    // 단건 조회
-    EmpVO getEmp(String empNo);
+    // 인사카드용 상세
     EmpVO selectEmpByEmpNo(String empNo);
 
-    // 등록/수정/삭제
-    int insertEmp(EmpVO vo);
-    int updateEmp(EmpVO vo);
+    // 삭제 / 수정 / 등록
     int deleteEmp(String empNo);
+    int updateEmp(EmpVO vo);
+    int insertEmp(EmpVO vo);
 
-    // 로그인
-    LoginVO loginCheck(MemberVO vo);
+    // 사번 중복 카운트
+    int isEmpNoDuplicate(String empNo);
 }
-	

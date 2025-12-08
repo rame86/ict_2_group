@@ -248,9 +248,9 @@
 		#{empPhone},
 		#{empAddr},
 		#{empEmail},
-		#{empImage, jdbcType=VARCHAR},
+		 #{empImage},
 		#{empRegNo, jdbcType=VARCHAR},
-		TO_DATE(#{empRegdate, jdbcType=VARCHAR}, 'YYYY-MM-DD'),
+		SYSDATE,
 		#{salBase, jdbcType=NUMERIC}
 		)
 	</insert>
@@ -258,16 +258,15 @@
 
 	<!-- ============================ 5) 사원 정보 수정 (UPDATE) ============================ -->
 	<update id="updateEmp" parameterType="com.example.domain.EmpVO">
-		UPDATE EMP
-		SET
-		STATUS_NO = #{statusNo},
-		GRADE_NO = #{gradeNo},
-		EMP_PHONE = #{empPhone},
-		EMP_EMAIL = #{empEmail},
-		EMP_ADDR = #{empAddr}
-		WHERE
-		EMP_NO = #{empNo}
-	</update>
+    UPDATE EMP
+       SET STATUS_NO = #{statusNo}
+         , GRADE_NO  = #{gradeNo}
+         , EMP_PHONE = #{empPhone}
+         , EMP_ADDR  = #{empAddr}
+         , EMP_EMAIL = #{empEmail}
+         , EMP_IMAGE = #{empImage}   <!-- 🔹 추가 -->
+     WHERE EMP_NO   = #{empNo}
+</update>
 
 	<!-- ============================ 6) 사원 삭제 ============================ -->
 	<delete id="deleteEmp" parameterType="string">
@@ -275,5 +274,12 @@
 		WHERE EMP_NO
 		= #{empNo}
 	</delete>
+	
+	<!-- 사번 중복 체크 -->
+	<select id="isEmpNoDuplicate" resultType="int">
+    SELECT COUNT(*)
+    FROM EMP
+    WHERE EMP_NO = #{empNo}
+</select>
 
 </mapper>
