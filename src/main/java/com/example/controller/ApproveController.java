@@ -160,6 +160,9 @@ public class ApproveController {
 		
 		notificationService.sendApprovalNotification(docWriter, "문서가 처리되었습니다.");
 		
+		
+		System.out.println("DEBUG: 알림 서비스 호출 완료. 다음 로직으로 이동.");
+		
 		if(vo.getDocType().equals("4")) {
 			attendService.insertVacation(vo);
 		}else if(vo.getDocType().equals("5")) {

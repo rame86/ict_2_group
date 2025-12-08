@@ -16,6 +16,10 @@ public interface AttendDAO {
 	
 	public void insertVacation(DayAttendVO davo, Integer totalDays);
 	
-	public void commuteCorrection(DayAttendVO davo);
+	public DayAttendVO selectDayAttend(DocVO vo);
+	
+	public void commuteCorrectionCheckIn(DayAttendVO davo);
+	
+	public void commuteCorrectionCheckOut(DayAttendVO davo);
 
 }
