@@ -24,10 +24,10 @@ public class NotificationService {
     	System.out.println("DEBUG: NotificationService 시작!"); // 👈 새 로그
         // 메시지 보낼 구독 주소: /user/{empNo}/queue/notifications
         // 여기서 '/queue/notifications'는 임의로 정한 알림 큐 이름입니다.
-        String destination = "/queue/notifications"; 
+    	String destination = "/queue/notifications";
         
         try {
-            messagingTemplate.convertAndSendToUser(empNo, destination, message);
+        	messagingTemplate.convertAndSendToUser(empNo, destination, message);
             System.out.println("DEBUG: 메시지 전송 API 호출 성공."); // 👈 새 로그
         } catch (Exception e) {
             e.printStackTrace(); // 👈 예외 발생 시 콘솔에 무조건 찍히게 처리

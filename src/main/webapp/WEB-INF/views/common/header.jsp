@@ -27,7 +27,14 @@
 		<input type="hidden" id="sessionEmp" value="${sessionScope.login}">
 	</c:if>
 	<body class="sb-nav-fixed">
-		<script src="/js/index.js"></script>
+		<script src="/js/websocket.js"></script>
+		<script>
+			const currentEmpNoFromJSP = '${ sessionScope.login.empNo }';
+			connectWebSocket(currentEmpNoFromJSP);
+/* 			$(document).ready(function() {
+		        updateSidebarBadge();
+		    }); */
+		</script>
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <!-- Navbar Brand-->
             <a class="navbar-brand ps-3" href="/index.html">PEOPLE CYNC</a>

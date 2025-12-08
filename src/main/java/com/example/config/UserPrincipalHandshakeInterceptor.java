@@ -8,11 +8,13 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
 import com.example.domain.LoginVO;
 
+@Component
 public class UserPrincipalHandshakeInterceptor implements HandshakeInterceptor {
 	
 	@Override
@@ -43,7 +45,7 @@ public class UserPrincipalHandshakeInterceptor implements HandshakeInterceptor {
 	                    attributes.put("user", new Principal() {
 	                        @Override
 	                        public String getName() {
-	                            return empNo;
+	                            return empNo.trim();
 	                        }
 	                    });
 	                    System.out.println("WebSocket Handshake 승인: User=" + empNo);

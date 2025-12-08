@@ -35,8 +35,11 @@ public class ApproveController {
 	private ApproveService approveService;
 	@Autowired
 	private AttendService attendService;
-	@Autowired
-	private NotificationService notificationService;
+	private final NotificationService notificationService;
+	
+	public ApproveController(NotificationService notificationService) {
+		this.notificationService = notificationService;
+	}
 
 	// 로그인 세션 받아오기
 	@ModelAttribute("login")
@@ -155,19 +158,16 @@ public class ApproveController {
 		
 		DocVO vo = approveService.selectDocNo(docNo);
 		String docWriter = vo.getDocWriter(); // 문서를 쓴 작성자
-		
-		System.out.println("DEBUG: 조회된 작성자 사번 = " + docWriter);
-		
-		notificationService.sendApprovalNotification(docWriter, "문서가 처리되었습니다.");
-		
-		
-		System.out.println("DEBUG: 알림 서비스 호출 완료. 다음 로직으로 이동.");
-		
+				
 		if(vo.getDocType().equals("4")) {
 			attendService.insertVacation(vo);
 		}else if(vo.getDocType().equals("5")) {
 			attendService.commuteCorrection(vo);
 		}
+		
+		System.out.println("DEBUG: 조회된 작성자 사번 = " + docWriter);
+		notificationService.sendApprovalNotification(docWriter, "문서가 처리되었습니다.");
+		System.out.println("DEBUG: 알림 서비스 호출 완료. 다음 로직으로 이동.");
 		
 	}
 	

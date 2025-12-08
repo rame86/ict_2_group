@@ -184,12 +184,12 @@ $(document).ready(function(){
 				type : "post",
 				data : postData,
 				success : function(){
-					alert("승인이 완료되었습니다😍");
-					window.location.href = "receiveList";
+					console.log("승인이 완료되었습니다😍");
+					/* window.location.href = "receiveList"; */
 				},
 				error : function(xhr, status, error){
 					console.error("AJAX Error:", status, error);
-					alert("서버 통신 중 오류가 발생했습니다.");
+					console.log("서버 통신 중 오류가 발생했습니다.");
                     stamp.removeClass("show");
 				}
 			});

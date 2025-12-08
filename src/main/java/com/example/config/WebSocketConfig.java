@@ -10,11 +10,17 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 	
+	private final UserPrincipalHandshakeInterceptor handshakeInterceptor;
+	
+	public WebSocketConfig(UserPrincipalHandshakeInterceptor handshakeInterceptor) {
+        this.handshakeInterceptor = handshakeInterceptor;
+    }
+	
 	@Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // 1. 서버 -> 클라이언트로 메시지 발송 시 prefix
         // 1:1 알림 메시지를 위한 /user/queue/ 설정
-        config.enableSimpleBroker("/topic", "/queue"); 
+		config.enableSimpleBroker("/topic", "/queue", "/user");
         
         // 2. 클라이언트 -> 서버로 메시지 발송 시 prefix (Handler로 라우팅)
         config.setApplicationDestinationPrefixes("/app"); 
@@ -34,7 +40,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
         .setSessionCookieNeeded(true) 
         
         // 커스텀 인터셉터 유지
-        .setInterceptors(new UserPrincipalHandshakeInterceptor());
+        .setInterceptors(this.handshakeInterceptor);
     }
     
 }
