@@ -34,7 +34,7 @@ public class EmpController {
         LoginVO login = (LoginVO) session.getAttribute("login");
         if (login == null) {
             System.out.println("❌ 로그인 정보 없음 → 로그인 페이지로 이동");
-            return "redirect:/login/loginForm";   // 프로젝트 경로에 맞게 수정
+            return "redirect:/login/loginForm";
         }
 
         boolean canModify = isAdmin(session);
@@ -44,8 +44,8 @@ public class EmpController {
 
         model.addAttribute("empList", list);
         model.addAttribute("menu", "emp");
-        model.addAttribute("loginGradeNo", login.getGradeNo()); // 원하면 화면에서 사용
-        model.addAttribute("canModify", canModify);             // 필요하면 사용
+        model.addAttribute("loginGradeNo", login.getGradeNo());
+        model.addAttribute("canModify", canModify);
 
         return "emp/empList";
     }
@@ -74,36 +74,35 @@ public class EmpController {
         boolean canModify = isAdmin(session);
 
         model.addAttribute("emp", emp);
-        model.addAttribute("canModify", canModify); // JSP에서 버튼 노출 조건으로 사용
+        model.addAttribute("canModify", canModify);
 
         return "emp/empCard";
     }
 
     /**
-     * 사원 정보 수정 처리 (예: 수정 폼에서 submit)
+     * 사원 정보 수정 처리 (AJAX)
      * - 🔐 1,2등급만 허용
+     * - EmpServiceImpl.updateEmp() 안에서 status_no / grade_no 동기화
      */
     @PostMapping("/emp/update")
-    @ResponseBody   // 🔹 AJAX 응답용
+    @ResponseBody
     public String updateEmp(EmpVO vo, HttpSession session) {
 
         System.out.println("📌 /emp/update 호출, vo = " + vo);
 
-        // 권한 체크
         if (!isAdmin(session)) {
             System.out.println("❌ 수정 권한 없음");
-            return "DENY";          // (원하면 JS에서 이 값 보고 alert 띄워도 됨)
+            return "DENY";
         }
 
         int cnt = empService.updateEmp(vo);
         System.out.println("✔ 사원 수정 완료, cnt = " + cnt);
 
-        // 성공/실패 여부에 따라 값 다르게 내려주고 싶으면 이렇게
         return (cnt > 0) ? "OK" : "FAIL";
     }
 
     /**
-     * 사원 삭제 처리 (AJAX 호출을 가정)
+     * 사원 삭제 처리 (AJAX)
      * - 🔐 1,2등급만 허용
      */
     @PostMapping("/emp/delete")
@@ -115,13 +114,54 @@ public class EmpController {
 
         if (!isAdmin(session)) {
             System.out.println("❌ 삭제 권한 없음");
-            return "DENY";   // 프론트에서 이 값 보고 "권한 없음" 안내
+            return "DENY";
         }
 
         empService.deleteEmp(empNo);
         System.out.println("✔ 사원 삭제 완료");
 
         return "OK";
+    }
+
+    /**
+     * 사원 등록 폼
+     * - 🔐 1,2 등급(관리자)만 접근 가능
+     */
+    @GetMapping("/emp/new")
+    public String empNewForm(HttpSession session, Model model) {
+
+        System.out.println("📌 /emp/new 접근됨");
+
+        if (!isAdmin(session)) {
+            System.out.println("❌ 사원 등록 권한 없음");
+            return "error/NoAuthPage";
+        }
+
+        model.addAttribute("menu", "empNew");
+
+        return "emp/empNewForm";
+    }
+
+    /**
+     * 사원 등록 처리 (AJAX)
+     * - 🔐 1,2 등급만 허용
+     * - EmpServiceImpl.insertEmp() 안에서 status_no / grade_no 동기화
+     */
+    @PostMapping("/emp/insert")
+    @ResponseBody
+    public String insertEmp(EmpVO vo, HttpSession session) {
+
+        System.out.println("📌 /emp/insert 호출, vo = " + vo);
+
+        if (!isAdmin(session)) {
+            System.out.println("❌ 사원 등록 권한 없음");
+            return "DENY";
+        }
+
+        int cnt = empService.insertEmp(vo);
+        System.out.println("✔ 사원 등록 완료, cnt = " + cnt);
+
+        return (cnt > 0) ? "OK" : "ERROR";
     }
 
     /**
@@ -142,48 +182,4 @@ public class EmpController {
         String grade = login.getGradeNo();
         return grade != null && ("1".equals(grade) || "2".equals(grade));
     }
-    
-    /**
-     * 사원 등록 폼
-     * - 🔐 1,2 등급(관리자)만 접근 가능
-     */
-    @GetMapping("/emp/new")
-    public String empNewForm(HttpSession session, Model model) {
-
-        System.out.println("📌 /emp/new 접근됨");
-
-        if (!isAdmin(session)) {
-            System.out.println("❌ 사원 등록 권한 없음");
-            return "error/NoAuthPage";
-        }
-
-        // 폼에서 사용할 기본값 세팅 가능 (지금은 비워둠)
-        model.addAttribute("menu", "empNew");
-
-        return "emp/empNewForm";   // 새로 만들 JSP
-    }
-
-    /**
-     * 사원 등록 처리
-     * - 🔐 1,2 등급만 허용
-     * - 기본적으로 폼 submit 방식 (AJAX로 바꾸고 싶으면 나중에 변경)
-     */
-    @PostMapping("/emp/insert")
-    @ResponseBody
-    public String insertEmp(EmpVO vo, HttpSession session) {
-
-        System.out.println("📌 /emp/insert 호출, vo = " + vo);
-
-        if (!isAdmin(session)) {
-            System.out.println("❌ 사원 등록 권한 없음");
-            return "DENY";
-        }
-
-        int cnt = empService.insertEmp(vo);
-        System.out.println("✔ 사원 등록 완료, cnt = " + cnt);
-
-        // 일단 update/delete랑 맞춰서 문자열로 응답 (OK / ERROR)
-        return (cnt > 0) ? "OK" : "ERROR";
-    }
-
 }

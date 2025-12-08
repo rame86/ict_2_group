@@ -20,7 +20,7 @@ public class EmpVO {
 	private String empRegNo;
 	private String empRegdate;	
 	
-	private Integer baseSal;
+	private Integer salBase;
 	
 	
 	 // === DB에는 없고, 조인 결과를 담기 위한 '화면용' 필드들 ===
