@@ -62,7 +62,7 @@ public class ToDate {
 	}
 	
 	//인자값을 받아 HH:mm:ss 형식으로 변환해주는 메소드
-	public String getFomatter(String time) {
+	public String getFomatterHHmmss(String time) {
 		log.info("[ToDate - getFomatter 메소드 요청 받음]");
 		DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 		LocalDateTime nowTime = LocalDateTime.parse(time, inputFormatter);
@@ -118,6 +118,44 @@ public class ToDate {
         return nextDayString;
     }
 	
-	
+	// yyyy-MM-dd 형식 String과 HH:mm:ss 형식 스트링을 합치는 메소드
+	public String combineDateAndTime(String dateString, String timeString) {
+        log.info("[ToDate - combineDateAndTime 메소드 요청 받음]");        
+        log.info("  -> dateString: " + dateString + ", timeString: " + timeString);
+
+        if (dateString == null || dateString.isEmpty() || timeString == null || timeString.isEmpty()) {
+            log.warn("날짜 또는 시간 문자열이 비어있어 결합 불가");
+            return null;
+        }
+
+        // 1. LocalDate 파싱 (yyyy-MM-dd)
+        LocalDate date = LocalDate.parse(dateString, DateTimeFormatter.ISO_LOCAL_DATE);
+        // 2. LocalTime 파싱 (HH:mm 또는 HH:mm:ss 형태 모두 지원)
+        LocalTime time;
+        
+        try {
+            // HH:mm 형식으로 먼저 시도
+            time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm"));
+        } catch (DateTimeParseException e) {
+            try {
+                // HH:mm:ss 형식으로 다시 시도
+                time = LocalTime.parse(timeString, DateTimeFormatter.ofPattern("HH:mm:ss"));
+            } catch (DateTimeParseException ex) {
+                log.error("시간 문자열 파싱 실패: " + timeString, ex);
+                return null; // 파싱 실패 시 null 반환
+            }
+        }
+        // 3. LocalDateTime 결합
+        LocalDateTime combinedDateTime = date.atTime(time);
+        
+        // 4. 원하는 형식(yyyy-MM-dd HH:mm:ss)으로 포맷하여 반환
+        // DATE/TIMESTAMP 컬럼에 입력위해 초단위로 포맷
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateTime = combinedDateTime.format(outputFormatter);
+        
+        log.info("[ToDate - combineDateAndTime 결과 : " + formattedDateTime + "]");        
+        return formattedDateTime;
+    }
+   
 
 }

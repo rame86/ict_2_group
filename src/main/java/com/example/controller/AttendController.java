@@ -189,8 +189,7 @@ public class AttendController {
 	// =======================================================================================
 
 	// =======================================================================================
-	// vacation() 외근
-	
+	// vacation() 외근	
 	@GetMapping("/attend/vacation")	
 	public String vacation(@ModelAttribute("login")Model m) {
 		log.info("[AttendController - vacation 요청 받음]");

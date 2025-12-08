@@ -166,7 +166,7 @@ public class AttendDAOImpl implements AttendDAO {
 	public String fieldwork(DayAttendVO davo) {
 		log.info("[AttendDAO - fieldwork 요청 받음]");
 
-		String result = toDate.getFomatter(davo.getOutTime());
+		String result = toDate.getFomatterHHmmss(davo.getOutTime());
 		davo.setMemo("외근(" + result + ")");
 
 		// 데이터가 있는지 먼저 확인~
@@ -206,23 +206,23 @@ public class AttendDAOImpl implements AttendDAO {
 
 		// 넘어온 dateAttend 날짜를 currentDateString에 저장
 		String currentDateString = originalDavo.getDateAttend();
-		
+
 		log.info("attendDAO : " + originalDavo.toString());
 		// totalDays 만큼 반복
 		for (int i = 0; i < totalDays; i++) {
 
 			// 삽입할 새로운 DayAttendVO 객체 생성 및 값 복사
 			DayAttendVO davoToInsert = new DayAttendVO();
-			
-	        davoToInsert.setEmpNo(originalDavo.getEmpNo());
-	        davoToInsert.setAttStatus(originalDavo.getAttStatus());
-	        davoToInsert.setMemo(originalDavo.getMemo());
+
+			davoToInsert.setEmpNo(originalDavo.getEmpNo());
+			davoToInsert.setAttStatus(originalDavo.getAttStatus());
+			davoToInsert.setMemo(originalDavo.getMemo());
 			davoToInsert.setDateAttend(currentDateString);
 
 			log.info("INSERT 시도 - dateAttend: " + davoToInsert.getDateAttend());
 			sess.insert("com.example.repository.DayAttendDAO.insertVacation", davoToInsert);
-			
-			// ToDate 유틸리티를 사용하여 다음 날짜를 계산하고 다시 넣어줌~		
+
+			// ToDate 유틸리티를 사용하여 다음 날짜를 계산하고 다시 넣어줌~
 			currentDateString = toDate.addDay(currentDateString);
 		}
 
@@ -233,10 +233,34 @@ public class AttendDAOImpl implements AttendDAO {
 	//
 
 	// =======================================================================================
-	// commuteCorrection()
-	public void commuteCorrection(DayAttendVO davo) {
-		log.info("[AttendDAO - commuteCorrection 요청 받음]");
+	// selectDayAttend()
+	public DayAttendVO selectDayAttend(DocVO vo) {
+		log.info("[AttendDAO - selectDayAttend 요청 받음]");
+		DayAttendVO davo = sess.selectOne("com.example.repository.DayAttendDAO.selectDayAttend", vo);
+		log.info("[select 결과 - " + davo.toString());
+		return davo;
+	}
+	// end of selectDayAttend()
+	// =======================================================================================
 
+	//
+
+	// =======================================================================================
+	// commuteCorrection()
+	public void commuteCorrectionCheckIn(DayAttendVO davo) {
+		log.info("[AttendDAO - commuteCorrectionCheckIn 요청 받음]");
+sess.update("com.example.repository.DayAttendDAO.commuteCorrectionCheckIn", davo);
+	}
+	// end of commuteCorrection()
+	// =======================================================================================
+
+	//
+	
+	// =======================================================================================
+	// commuteCorrection()
+	public void commuteCorrectionCheckOut(DayAttendVO davo) {
+		log.info("[AttendDAO - commuteCorrectionCheckOut 요청 받음]");
+		sess.update("com.example.repository.DayAttendDAO.commuteCorrectionCheckOut", davo);
 	}
 	// end of commuteCorrection()
 	// =======================================================================================
