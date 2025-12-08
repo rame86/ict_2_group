@@ -185,7 +185,7 @@ $(document).ready(function(){
 				data : postData,
 				success : function(){
 					console.log("승인이 완료되었습니다😍");
-					/* window.location.href = "receiveList"; */
+					window.location.href = "receiveList";
 				},
 				error : function(xhr, status, error){
 					console.error("AJAX Error:", status, error);

@@ -118,6 +118,13 @@ public class ApproveController {
 		return "approve/receiveList";
 	}
 	
+	// 결재 할 문서들의 수(뱃지)
+	@GetMapping("approve/getWaitingCount")
+	@ResponseBody
+	public Integer getWaitingCount(@ModelAttribute("login") LoginVO login){
+		return approveService.selectWaitingReceiveList(login.getEmpNo()).size();
+	}
+	
 	// 결재 신청한 문서들이 있는곳
 	@GetMapping("approve/sendList")
 	public String sendList(@ModelAttribute("login") LoginVO login, Model m) {
@@ -134,8 +141,8 @@ public class ApproveController {
 	// 문서 작성
 	@PostMapping("approve/approve-form")
 	public String approveForm(DocVO dvo, ApproveVO avo){
-		System.out.println("approve-form 도착" + dvo.toString() + avo.toString());
 		approveService.ApprovalApplication(dvo, avo);
+		notificationService.sendApprovalNotification(Integer.toString(avo.getStep1ManagerNo()), "새로운 결재가 도착했습니다");
 		return "redirect:statusList";
 	}
 	
@@ -153,11 +160,14 @@ public class ApproveController {
 			@RequestParam String status,
 			@RequestParam(required = false) String rejectReason,
 			@ModelAttribute("login") LoginVO login){
+		
 		Integer empNo = Integer.parseInt(login.getEmpNo());
 		approveService.approveDocument(docNo, status, empNo, rejectReason);
 		
-		DocVO vo = approveService.selectDocNo(docNo);
+		DocVO vo = approveService.selectDocNo(docNo); // 문서조회
 		String docWriter = vo.getDocWriter(); // 문서를 쓴 작성자
+		Integer step2Manager = vo.getStep2ManagerNo(); // 2차결재자의 사번
+		String step2Status = vo.getStep2Status(); // 2차결재의 상태
 				
 		if(vo.getDocType().equals("4")) {
 			attendService.insertVacation(vo);
@@ -165,9 +175,13 @@ public class ApproveController {
 			attendService.commuteCorrection(vo);
 		}
 		
-		System.out.println("DEBUG: 조회된 작성자 사번 = " + docWriter);
-		notificationService.sendApprovalNotification(docWriter, "문서가 처리되었습니다.");
-		System.out.println("DEBUG: 알림 서비스 호출 완료. 다음 로직으로 이동.");
+		notificationService.sendApprovalNotification(docWriter, "결재신청을 완료했습니다.");
+		notificationService.sendApprovalNotification(Integer.toString(empNo), "결재가 성공적으로 완료되었습니다.");
+		
+		if(step2Manager != null && step2Status.equals("W")) {
+			String manager = Integer.toString(step2Manager);
+			notificationService.sendApprovalNotification(manager, "새로운 결재가 도착했습니다");
+		}
 		
 	}
 	
