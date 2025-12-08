@@ -195,8 +195,8 @@ textarea {
 		<h2 class="text-2xl font-bold text-gray-800 text-center mb-8 pb-2">출.퇴근
 			시간 정정 신청</h2>
 
-		<form id="correctionForm" class="space-y-6"
-			action="../approve/approve-form" method="POST">
+		<form id="correctionForm" action="../approve/approve-form"
+			method="POST" class="space-y-6">
 
 			<input type="hidden" name="DocType" id="documentTypeInput" value="5">
 			<input type="hidden" name="DocTitle" value="출퇴근 정정 신청"> <input
@@ -265,9 +265,9 @@ textarea {
 				</div>
 
 				<div class="flex items-center mb-4">
-					<label for="newTime"
+					<label for="modifyTime"
 						class="w-28 text-sm font-semibold text-gray-700">정정할 시간:</label> <input
-						type="time" id="newTime" name="newTime" required
+						type="time" id="newTime" name="newmodifyTime" required
 						class="flex-1 p-2 border border-gray-300 rounded-md focus:border-blue-500 focus:ring focus:ring-blue-200">
 				</div>
 

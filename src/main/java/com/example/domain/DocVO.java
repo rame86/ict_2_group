@@ -28,5 +28,5 @@ public class DocVO {
     private String totalDays;
     private String emergencyContact; // 비상연락망
     private String memo;
-    private String newTime;
+    private String newmodifyTime;
 }

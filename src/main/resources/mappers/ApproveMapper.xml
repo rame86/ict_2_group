@@ -18,8 +18,9 @@
 	        START_DATE, 
 	        END_DATE, 
 	        TOTAL_DAYS,
-	        NEW_TIME,
-	        EMERGENCY_CONTACT
+	        NEWMODIFY_TIME,
+	        EMERGENCY_CONTACT,
+	        MEMO
 	    ) 
 	    VALUES(
 	        #{docNo}, 
@@ -31,8 +32,9 @@
 	        #{startDate, jdbcType=VARCHAR}, 
 	        #{endDate, jdbcType=VARCHAR},
 	        #{totalDays, jdbcType=DOUBLE}, 
-	        #{newTime}	        
-	        #{emergencyContact, jdbcType=VARCHAR}
+	        #{newmodifyTime},  	        
+	        #{emergencyContact, jdbcType=VARCHAR},
+	        #{memo}
 	        )
 	</insert>
 	
@@ -237,6 +239,8 @@
 			d.DOC_WRITER, 
 			d.TOTAL_DAYS, 
 			d.EMERGENCY_CONTACT, 
+			d.NEWMODIFY_TIME,
+			d.MEMO,  
 		    w.EMP_NAME AS WRITER_NAME,
 		    a.STEP1_MANAGER_NO,
 		    m1.EMP_NAME AS STEP1_MANAGER_NAME,

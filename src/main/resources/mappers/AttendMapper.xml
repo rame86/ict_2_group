@@ -73,22 +73,24 @@
 		DAY_ATTNO =
 		#{dayAttno}
 	</update>
-	
+
 	<update id="updateDayFullTime" parameterType="DayAttendVO">
 		UPDATE DAY_ATTEND
 		SET
-		DAY_FULLTIME = NUMTODSINTERVAL(            
-            TO_NUMBER(SUBSTR(#{dayFulltime}, 1, 2)) * 3600 +      
-            TO_NUMBER(SUBSTR(#{dayFulltime}, 4, 2)) * 60 +      
-            TO_NUMBER(SUBSTR(#{dayFulltime}, 7, 2)),          
-            'SECOND'
-        ),
-		UPDATE_TIME = SYSDATE
+		DAY_FULLTIME = NUMTODSINTERVAL(
+		TO_NUMBER(SUBSTR(#{dayFulltime}, 1,
+		2)) * 3600 +
+		TO_NUMBER(SUBSTR(#{dayFulltime}, 4, 2)) * 60 +
+		TO_NUMBER(SUBSTR(#{dayFulltime}, 7, 2)),
+		'SECOND'
+		),
+		UPDATE_TIME =
+		SYSDATE
 		WHERE
 		DAY_ATTNO =
 		#{dayAttno}
 	</update>
-	
+
 	<update id="updateFieldwork" parameterType="DayAttendVO">
 		UPDATE DAY_ATTEND
 		SET
@@ -98,12 +100,12 @@
 		DAY_ATTNO =
 		#{dayAttno}
 	</update>
-	
+
 	<insert id="insertVacation" parameterType="DayAttendVO">
 		INSERT INTO DAY_ATTEND
 		(
 		DAY_ATTNO,
-		EMP_NO,	
+		EMP_NO,
 		FIRST_DAYTIME,
 		ATT_STATUS,
 		DATE_ATTEND,
@@ -115,11 +117,48 @@
 		day_attno_seq.NEXTVAL,
 		#{empNo},
 		SYSDATE,
-		#{attStatus},	
+		#{attStatus},
 		TO_DATE(#{dateAttend}, 'YYYY-MM-DD'),
 		#{memo}
 
 		)
 	</insert>
-	
+	<select id="selectDayAttend" parameterType="DocVO"
+		resultType="DayAttendVO">
+		SELECT *
+		FROM DAY_ATTEND
+		WHERE EMP_NO =#{empNo} AND
+		TO_CHAR(DATE_ATTEND,
+		'YYYY-MM-DD') = #{startDate}
+	</select>
+
+	<update id="commuteCorrectionCheckIn"
+		parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND
+		SET
+		IN_TIME = #{inTime},
+		ATT_STATUS =
+		#{attStatus},
+		MEMO = #{memo},
+		UPDATE_TIME = SYSDATE
+		WHERE
+		DAY_ATTNO =
+		#{dayAttno}
+	</update>
+
+	<update id="commuteCorrectionCheckOut"
+		parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND
+		SET
+		OUT_TIME = #{outTime},
+		ATT_STATUS =
+		#{attStatus},
+		MEMO = #{memo},
+		UPDATE_TIME = SYSDATE
+		WHERE
+		DAY_ATTNO =
+		#{dayAttno}
+	</update>
+
+
 </mapper>
