@@ -79,8 +79,10 @@ public class AttendServiceImpl implements AttendService {
 		String nowTime = toDate.getFomatterHHmmss(newModifyTime);
 		vo.setStartDate(date);
 		vo.setNewmodifyTime(newModifyTime);
-
+		// 이전에 저장되어 있는 데이터 불러오기
 		DayAttendVO davo = attendDAO.selectDayAttend(vo);
+		// 이전 데이터에 따라 상태값 입력
+		String davoStatus = davo.getAttStatus();
 
 		// 출근시간 정정 요청시
 		if (vo.getMemo().equals("inTime")) {
@@ -88,9 +90,9 @@ public class AttendServiceImpl implements AttendService {
 			davo.setMemo("출근시간 변경");
 			// 수정시간이 기준시간보다 늦을 경우 지각~
 			String standardTime = "09:00:00";
-			if (nowTime.compareTo(standardTime) < 0) {
+			if (nowTime.compareTo(standardTime) < 0 && !davoStatus.equals("조퇴") && !davoStatus.equals("외근")) {
 				davo.setAttStatus("출근");
-			} else {
+			} else if (nowTime.compareTo(standardTime) > 0 && !davoStatus.equals("조퇴") && !davoStatus.equals("외근")) {
 				davo.setAttStatus("지각");
 			}
 			attendDAO.commuteCorrectionCheckIn(davo);
@@ -101,8 +103,10 @@ public class AttendServiceImpl implements AttendService {
 			davo.setMemo("퇴근시간 변경");
 			// 역시나 퇴근시간이 기준시간보다 이르면 조퇴~
 			String standardTime = "18:00:00";
-			if (nowTime.compareTo(standardTime) < 0) {
+			if (nowTime.compareTo(standardTime) < 0 && !davoStatus.equals("지각") && !davoStatus.equals("외근")) {
 				davo.setAttStatus("조퇴");
+			} else if (nowTime.compareTo(standardTime) > 0 && !davoStatus.equals("지각") && !davoStatus.equals("외근")) {
+				davo.setAttStatus("출근");
 			}
 
 			attendDAO.commuteCorrectionCheckOut(davo);
