@@ -42,16 +42,7 @@
 								<div class="card-header">
 									<h3 class="text-center font-weight-light my-4">사원 계정 등록</h3>
 								</div>
-								<div class="card-body">
-									<%-- ⭐ Flash Attribute로 전달된 errorMessage 확인 및 출력 --%>
-									<c:if test="${not empty errorMessage}">
-										<div class="alert alert-danger" role="alert">
-											<h5 class="alert-heading">오류 발생</h5>
-											<p>${errorMessage}</p>
-											<hr>
-											<p class="mb-0">회원가입을 다시 시도해 주십시오.</p>
-										</div>
-									</c:if>
+								<div class="card-body">									
 
 									<%-- 기존 회원가입 폼 시작 --%>
 
@@ -61,8 +52,8 @@
 												<div class="form-floating mb-3 mb-md-0">
 													<input class="form-control" id="empNo" name="empNo"
 														type="number" placeholder="사원번호를 입력하세요" required /> <label
-														for="inputFirstName">사원ID(사원번호)</label><br> <span
-														id="empNoCheckResult" style="width: 150px;"></span>
+														for="inputFirstName">사원ID(사원번호)</label><br>
+													<button id='empNoCheck' type="button">사번확인</button>
 												</div>
 											</div>
 											<div class="col-md-6">
@@ -70,12 +61,13 @@
 													<input class="form-control" id="empName" name="empName"
 														type="text" placeholder="이름을 입력하세요" required /> <label
 														for="inputLastName">이름</label><br>
-													<button id='empNoCheck' type="button">사번확인</button>
+													<span id="empNoCheckResult" style="width: 150px;"></span>
+
 
 												</div>
 											</div>
 										</div>
-										<div class="form-floating mb-3">
+										<div class="form-floating mb-3" id="empEmailDiv">
 											<input class="form-control" id="empEmail" name="empEmail"
 												type="email" placeholder="name@example.com" required /> <label
 												for="inputEmail">이메일주소</label>

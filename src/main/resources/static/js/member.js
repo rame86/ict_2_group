@@ -6,15 +6,14 @@ $(function() {
 
 	$('#empPass').on('input', checkPassword);
 	$('#empPassConfirm').on('input', checkPassword);
-	
-	
+
+
 	function updateSubmitButtonState() {
 		if (formIdCheck && formPassCheck) {
-			$submitBtn.prop('disabled', false);
-			alert("가입 버튼 활성화")
+			$submitBtn.prop('disabled', false);			
 		} else {
 			$submitBtn.prop('disabled', true);
-			
+
 		}
 	}
 
@@ -33,15 +32,29 @@ $(function() {
 			, url: '/member/empNoCheck'
 			, success: function(result) {
 				// 아이디 유효성 검사
-				if (result) {
-					empNoCheckResult.css('color', 'blue');
-					empNoCheckResult.text("사원ID가 확인되었습니다.")
-					formIdCheck = true;
-				} else {
+				if (result === "2") {
+					empNoCheckResult.css('color', 'red');
+					empNoCheckResult.text("해당 사원ID는 이미 가입되었습니다.")
+					formIdCheck = false;
+				}
+				if (result === "3") {
 					empNoCheckResult.css('color', 'red');
 					empNoCheckResult.text("사원ID와 이름이 일치하지 않습니다.")
 					formIdCheck = false;
 				}
+				if (result === "1") {
+					empNoCheckResult.css('color', 'blue');
+					empNoCheckResult.text("사원ID가 확인되었습니다.")
+					formIdCheck = true;
+				}
+				if (result === "4"){
+					$("#empEmailDiv").css('display', 'none');
+					$("#empEmail").removeAttr('required');
+					empNoCheckResult.css('color', 'blue');					
+					empNoCheckResult.text("카카오ID 연동 시작.")
+					formIdCheck = true;
+				}
+
 				updateSubmitButtonState();
 			},
 			error: function(err) {
@@ -59,13 +72,13 @@ $(function() {
 		let pass = $("#empPass").val();
 		let pass2 = $('#empPassConfirm').val();
 		let passCheck = $('#passCheck');
-	    
-	    // 1. 초기 상태: 두 필드 모두 비어있을 때
-	    // 'pass.length === 0'만 확인해도 됩니다.
-	    if (pass.length === 0) { 
-	        passCheck.text(""); // 메시지 삭제
-	        formPassCheck = false;
-	    }
+
+		// 1. 초기 상태: 두 필드 모두 비어있을 때
+		// 'pass.length === 0'만 확인해도 됩니다.
+		if (pass.length === 0) {
+			passCheck.text(""); // 메시지 삭제
+			formPassCheck = false;
+		}
 		// 2. 비밀번호 길이 검사 (pass 필드 기준)
 		else if (pass.length < 8) {
 			passCheck.css('color', 'red');
@@ -83,14 +96,14 @@ $(function() {
 			passCheck.css('color', 'red');
 			passCheck.text("비밀번호가 일치하지 않습니다.");
 			formPassCheck = false;
-		} 
-	    // 5. 최종 성공
-	    else {
+		}
+		// 5. 최종 성공
+		else {
 			passCheck.css('color', 'blue');
 			passCheck.text("비밀번호가 일치합니다.");
 			formPassCheck = true;
 		}
-		
+
 		updateSubmitButtonState();
 	}
 

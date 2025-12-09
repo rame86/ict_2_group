@@ -25,6 +25,15 @@
 						<div class="col-lg-5">
 							<div class="card shadow-lg border-0 rounded-lg mt-5">
 								<div class="card-header">
+								<%-- ⭐ Flash Attribute로 전달된 errorMessage 확인 및 출력 --%>
+									<c:if test="${not empty errorMessage}">
+										<div class="alert alert-danger" role="alert">
+											<h5 class="alert-heading">오류 발생</h5>
+											
+											<hr>
+											<p class="mb-0">로그인을 다시 시도해 주십시오.</p>
+										</div>
+									</c:if>
 									<h3 class="text-center font-weight-light my-4">PEOPLE CYNC 로그인</h3>
 								</div>
 								<div class="card-body">
