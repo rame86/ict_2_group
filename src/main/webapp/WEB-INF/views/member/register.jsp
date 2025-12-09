@@ -42,16 +42,7 @@
 								<div class="card-header">
 									<h3 class="text-center font-weight-light my-4">사원 계정 등록</h3>
 								</div>
-								<div class="card-body">
-									<%-- ⭐ Flash Attribute로 전달된 errorMessage 확인 및 출력 --%>
-									<c:if test="${not empty errorMessage}">
-										<div class="alert alert-danger" role="alert">
-											<h5 class="alert-heading">오류 발생</h5>
-											<p>${errorMessage}</p>
-											<hr>
-											<p class="mb-0">회원가입을 다시 시도해 주십시오.</p>
-										</div>
-									</c:if>
+								<div class="card-body">									
 
 									<%-- 기존 회원가입 폼 시작 --%>
 

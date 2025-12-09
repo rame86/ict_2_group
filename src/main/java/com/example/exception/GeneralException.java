@@ -18,7 +18,7 @@ public class GeneralException {
 		
 		// 2. 리다이렉트할 경로를 반환.
 		// /member/register 매핑 메소드를 호출. (MemberController 참고)
-		return "redirect:/member/register"; 
+		return "redirect:/";
 		
 	}
 }

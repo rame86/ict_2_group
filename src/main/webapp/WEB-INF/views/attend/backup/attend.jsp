@@ -2,8 +2,6 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
-<c:set var="menu" value="status" scope="request" />
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,6 +17,7 @@
 <script
 	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales-all.min.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script src="/js/attend.js"></script>
 
 <script type="text/javascript">
@@ -83,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function(){
         },
         locale: 'ko', // 한국어 설정.
         events: appendEvents, // 초기 로딩된 근태 이벤트 목록 사용.
-        
+        fixedWeekCount: false, // 해당 월의 주차 수만큼만 표시
         // 캘린더 날짜 클릭 시 이벤트 핸들러.
         dateClick: function(info) {
              const clickedDate = info.dateStr; 
@@ -137,6 +136,61 @@ document.addEventListener('DOMContentLoaded', function(){
         updateDonutChart(appendEvents, initialDate); 
     }, 100);
 });
+
+//=============================================================
+//							모달 제어 함수
+//=============================================================
+
+$(document).ready(function() {
+ 
+ // 모달 변수 설정
+ const vacationModal = $('#vacationModal');
+ const correctionModal = $('#commuteCorrectionModal');
+ 
+ // 모달 닫기 버튼 (X 버튼) 이벤트 설정
+ $('.modal .close').on('click', function() {
+     $(this).closest('.modal').css('display', 'none');
+ });
+ 
+ // 1. 휴가 신청 버튼 클릭 시
+ $('#btnVacation').on('click', function() {
+     vacationModal.css('display', 'block');
+ });
+ 
+ // 2. 출/퇴근 정정 신청 버튼 클릭 시 (여기서 모달이 열림)
+ $('#btnCommuteCorrection').on('click', function() {
+     correctionModal.css('display', 'block');
+     // 모달 열 때 폼 초기화
+     $('#correctionForm')[0].reset();
+     $('#existingTime').val('');
+ });
+ 
+ // 모달 외부 클릭 시 닫기
+ $(window).on('click', function(event) {
+     if ($(event.target).is(vacationModal)) {
+         vacationModal.css('display', 'none');
+     }
+     if ($(event.target).is(correctionModal)) {
+         correctionModal.css('display', 'none');
+     }
+ });
+
+ // 전역 함수로 closeModal 정의: commuteCorrectionForm.jsp에서 호출됨
+ window.closeModal = function() {
+	      correctionModal.css('display', 'none');
+	  }
+ 
+ $(document).on('click', '#cancelBtn', function(event) {
+     event.preventDefault(); // 기본 폼 동작 방지
+     
+     // 취소 버튼이 속한 모달을 찾아서 닫음 (correctionModal 변수와 동일한 기능)
+     $(this).closest('.modal').css('display', 'none');
+     
+     // 선택 사항: 폼 초기화를 위해 correctionForm을 찾아서 reset
+     $('#correctionForm')[0].reset(); 
+ });
+ 
+});
 </script>
 </head>
 
@@ -166,6 +220,9 @@ document.addEventListener('DOMContentLoaded', function(){
 									<p id="fieldworkDisplay"></p>
 								</div>
 								<button class="btn-fieldwork" id="fieldwork">외 근</button>
+							<!-- 임시 월근무 계산기 버튼 -->
+								<button class="btn-fieldwork" id="monthAttend">임시 월근무 계산기</button>
+							<!-- /임시 월근무 계산기 버튼 -->	
 							</div>
 							<div class="calendar">
 								<div id="calendar"></div>
