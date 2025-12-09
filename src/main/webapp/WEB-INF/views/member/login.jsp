@@ -25,7 +25,7 @@
 						<div class="col-lg-5">
 							<div class="card shadow-lg border-0 rounded-lg mt-5">
 								<div class="card-header">
-									<h3 class="text-center font-weight-light my-4">로그인</h3>
+									<h3 class="text-center font-weight-light my-4">PEOPLE CYNC 로그인</h3>
 								</div>
 								<div class="card-body">
 									<form action="loginCheck" method="post">
@@ -55,7 +55,8 @@
 
 										<div
 											class="d-flex align-items-center justify-content-between mt-4 mb-0">
-											<a class="small" href="password.html">비밀번호가 기억나지 않나요?</a> <input
+											<span class="small" >비밀번호 분실 시 관리자에게 문의하세요.</span>
+											<input
 												class="btn btn-primary" type="submit" value="로그인">
 										</div>
 									</form>

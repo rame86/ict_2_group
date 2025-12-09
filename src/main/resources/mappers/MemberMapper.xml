@@ -6,7 +6,7 @@
 	<select id="kakaoLoginInfo" parameterType="String"
 		resultType="loginVO">
 		SELECT
-		E.*, 
+		E.*,
 		D.MANAGER_EMP_NO,
 		D.DEPT_NAME,
 		D.PARENT_DEPT_NO,
@@ -24,7 +24,7 @@
 	<select id="loginCheck" parameterType="MemberVO"
 		resultType="loginVO">
 		SELECT
-		E.*, 
+		E.*,
 		D.MANAGER_EMP_NO,
 		D.DEPT_NAME,
 		D.PARENT_DEPT_NO,
@@ -36,14 +36,16 @@
 		DEPT D ON E.DEPT_NO = D.DEPT_NO
 		WHERE
 		E.EMP_NO = #{empNo}
-		AND E.EMP_PASS = #{empPass}
+		AND E.EMP_PASS
+		= #{empPass}
 	</select>
 
 	<select id="empNoCheck" parameterType="String"
 		resultType="String">
 		SELECT *
 		FROM EMP
-		WHERE EMP_NO = #{empNo}
+		WHERE EMP_NO = #{empNo} AND EMP_NAME =
+		#{empName}
 	</select>
 
 	<select id="memberCheck" parameterType="String"
@@ -62,8 +64,7 @@
 	<insert id="insertMember" parameterType="MemberSaveVO">
 		UPDATE EMP
 		SET
-		KAKAO_ID =
-		#{kakaoId},
+		KAKAO_ID = #{kakaoId, jdbcType=VARCHAR},
 		EMP_PASS = #{empPass},
 		EMP_EMAIL = #{empEmail}
 		WHERE EMP_NO =
