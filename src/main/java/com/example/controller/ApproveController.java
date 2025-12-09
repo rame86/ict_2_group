@@ -208,9 +208,4 @@ public class ApproveController {
 		m.addAttribute("vo", vo);
 	}
 	
-	@GetMapping("/message/messageList")
-	public void messageList() {
-		
-	}
-		
 }

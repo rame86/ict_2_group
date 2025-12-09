@@ -58,9 +58,9 @@ small {
 				                    <h6 class="m-0 font-weight-bold text-primary">대화 상대 목록</h6>
 				                </div>
 				                
-				                <div class="list-group list-group-flush" style="max-height: 700px; overflow-y: auto;">
-    
-								    <a href="#" class="list-group-item list-group-item-action active py-3">
+				                <div class="list-group list-group-flush" id="conversationListContainer" style="max-height: 700px; overflow-y: auto;">
+    								<div class="p-3 text-center text-muted">대화 목록을 불러오는 중...</div>
+								    <!-- <a href="#" class="list-group-item list-group-item-action active py-3">
 								        <div class="d-flex align-items-center">
 								            <img src="https://via.placeholder.com/45" class="rounded-circle profile-img-small" alt="프로필">
 								            
@@ -93,7 +93,7 @@ small {
 								                </p>
 								            </div>
 								        </div>
-								    </a>
+								    </a> -->
 								    
 								</div>
 				            </div>
@@ -102,7 +102,7 @@ small {
 				        <div class="col-xl-8 col-lg-7">
 				            <div class="card shadow mb-4">
 				                <div class="card-header py-3">
-				                    <h6 class="m-0 font-weight-bold text-primary">김철수 사원과의 대화</h6>
+				                    <h6 class="m-0 font-weight-bold text-primary" id="chatWindowHeader">김철수 사원과의 대화</h6>
 				                </div>
 				                
 				                <div class="card-body" style="height: 500px; overflow-y: auto;">
@@ -125,18 +125,163 @@ small {
 				
 				                <div class="card-footer">
 				                    <div class="input-group">
-				                        <input type="text" class="form-control" placeholder="메시지를 입력하세요...">
-				                        <button class="btn btn-primary" type="button">전송</button>
+				                        <input type="text" class="form-control" id="messageInput" placeholder="메시지를 입력하세요">
+				                        <button class="btn btn-primary" type="button" id="sendMessageBtn" onclick="sendMessage()">전송</button>
 				                    </div>
 				                </div>
 				            </div>
 				        </div>
 				    </div>
 				</div>
+				<input type="hidden" id="sessionEmpNo" value="${login.empNo}">
 			</main>
+
 			<!-- 푸터 -->
 			<jsp:include page="../common/footer.jsp" flush="true"/>
 		</div>
 	</div>
 </body>
+<script>
+$(document).ready(function(){
+	const currentEmpNo = $('#sessionEmpNo').val();
+	if(currentEmpNo) loadConversationList(currentEmpNo);
+	else $('#conversationListContainer').html('<div class="p-3 text-center text-danger">로그인 정보가 유효하지 않습니다.</div>');
+});
+
+function loadConversationList(empNo) {
+	$.ajax({
+		url : '/api/message/conversationList',
+		type : 'get',
+		dataType : 'json',
+		success: function(response) {
+			renderConversationList(response);
+		}, 
+		error: function(xhr, status, error) {
+            console.error("대화 목록 로드 실패:", status, error);
+            $('#conversationListContainer').html('<div class="p-3 text-center text-muted">목록을 불러오는 데 실패했습니다. 서버 상태를 확인해주세요.</div>');
+        }
+	});
+}
+
+function renderConversationList(list) {
+	const container = $('#conversationListContainer');
+    container.empty();
+    
+    if(!list || list.length === 0) {
+    	container.html('<div class="p-3 text-center text-muted">대화 내역이 없습니다.</div>');
+        return;
+    }
+    
+ // conv는 MessageVO 객체 하나에 해당함
+	list.forEach(conv => {
+        
+        // 1. 읽지 않은 메시지 뱃지 처리
+        const unreadCount = conv.unreadCount || 0;
+        const unreadBadge = unreadCount > 0 
+            ? `<span class="badge bg-danger unread-count-badge ms-2">${unreadCount}</span>`
+            : '';
+            
+        // 2. 항목 디자인 클래스 처리 (읽지 않은 메시지가 있으면 배경 강조)
+        const unreadClass = unreadCount > 0 ? 'unread' : '';
+        
+        // 3. 시간 형식 변환 (Date 객체 -> 사람이 읽을 수 있는 형식)
+        // ISO 8601 문자열을 Date 객체로 변환하여 로컬 시간으로 표시
+        const date = new Date(conv.latestMessageTime); 
+        const timeString = date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+        
+        // 4. HTML 항목 생성 (이전에 디자인했던 구조 사용)
+        const itemHtml = `
+            <a href="javascript:void(0);" 
+               class="list-group-item list-group-item-action py-3 ${unreadClass}" 
+               data-other-id="${conv.otherUserId}"
+               onclick="loadChatWindow('${conv.otherUserId}', '${conv.otherUserName}')">
+                
+                <div class="d-flex align-items-center">
+                    <img src="/img/profile_placeholder.png" class="rounded-circle profile-img-small" alt="프로필">
+                    
+                    <div class="w-100">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <h6 class="mb-0 fw-bold d-flex align-items-center">
+                                ${conv.otherUserName} (${conv.otherUserPosition}) ${unreadBadge}
+                            </h6>
+                            <small class="text-muted">${timeString}</small>
+                        </div>
+                        <p class="mb-0 text-muted text-truncate" style="max-width: 90%;">
+                            ${conv.latestMessageContent}
+                        </p>
+                    </div>
+                </div>
+            </a>
+        `;
+        container.append(itemHtml);
+    });
+    
+}
+
+let currentReceiverEmpNo = null;
+
+function loadChatWindow(otherUserId, otherUserName) {
+	
+	console.log("선택된 상대방:", otherUserName, otherUserId);
+	
+	currentReceiverEmpNo = otherUserId;
+	$('.list-group-item').removeClass('active'); 
+	$(`.list-group-item[data-other-id='${otherUserId}']`).addClass('active');
+	$('#chatWindowHeader').text(`${otherUserName}과의 대화`);
+	
+	// TODO: 여기에 해당 사원과의 대화 기록을 가져오는 AJAX 코드가 들어갑니다.
+}
+
+function sendMessage(){
+	
+	const senderEmpNo = $('#sessionEmpNo').val();
+	const content = $('#messageInput').val().trim();
+	const receiverEmpNo = currentReceiverEmpNo;
+	
+	if (!content) {
+        alert("메시지 내용을 입력해 주세요.");
+        return;
+    }
+	
+	if (!receiverEmpNo) {
+        alert("대화 상대를 먼저 선택해 주세요.");
+        return;
+    }
+	
+    const messageData = {
+        receiverEmpNo: receiverEmpNo,
+        msgContent: content
+    };
+    
+    $.ajax({
+        url: '/api/message/send',
+        type: 'POST',
+        // Spring이 @RequestBody로 받도록 content-type과 JSON.stringify를 사용
+        contentType: 'application/json',
+        data: JSON.stringify(messageData),
+        dataType: 'json', // 서버가 'success' 문자열을 JSON으로 보내든 String으로 보내든 처리
+        success: function(response) {
+            if (response === 'success') {
+                // 전송 성공 후 처리
+                console.log("쪽지 전송 성공!");
+                
+                // 1) 입력창 비우기
+                $('#messageInput').val(''); 
+                
+                // 2) [핵심] 채팅창 및 목록 업데이트 (추가 구현 필요)
+                // - loadChatWindow(receiverEmpNo)를 다시 호출하여 새로운 메시지를 화면에 반영
+                // - loadConversationList()를 다시 호출하여 왼쪽 목록의 최신 메시지/시간을 업데이트
+                
+            } else {
+                alert("쪽지 전송에 실패했습니다.");
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("전송 오류:", status, error);
+            alert("서버 통신 중 오류가 발생했습니다.");
+        }
+    });
+}
+
+</script>
 </html>
