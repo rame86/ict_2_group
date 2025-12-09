@@ -207,5 +207,10 @@ public class ApproveController {
 		m.addAttribute("dept", login.getDeptName());
 		m.addAttribute("vo", vo);
 	}
+	
+	@GetMapping("/message/messageList")
+	public void messageList() {
+		
+	}
 		
 }

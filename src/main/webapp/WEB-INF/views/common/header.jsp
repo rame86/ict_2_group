@@ -53,9 +53,41 @@
                     <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
                 </div>
             </form>
+            
             <!-- Navbar-->
             <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            
+            	<li class="nav-item dropdown">
+                    <a class="nav-link" id="alertsDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell fa-fw"></i>
+                        <span class="badge rounded-pill badge-notification bg-warning" id="alertBadge">0</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="alertsDropdown">
+                        <li><h6 class="dropdown-header">새로운 알림</h6></li>
+                        <li><a class="dropdown-item" href="#">알림 없음</a></li>
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item text-secondary" href="#!">모든 알림 보기</a></li>
+                    </ul>
+                </li>
+                
                 <li class="nav-item dropdown">
+                    <a class="nav-link" id="messagesDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                         <i class="fas fa-envelope fa-fw"></i> 
+                        <span class="badge rounded-pill badge-notification bg-danger" id="messageBadge">0</span> 
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="messagesDropdown">
+                        <li><h6 class="dropdown-header">새로운 쪽지</h6></li>
+                        
+                        <div id="latestMessagesContainer">
+                            <li><a class="dropdown-item" href="#">새로운 쪽지가 없습니다.</a></li>
+                        </div>
+                        
+                        <li><hr class="dropdown-divider" /></li>
+                        <li><a class="dropdown-item text-primary" href="/message/messageList">전체 쪽지함 보기</a></li>
+                    </ul>
+                </li>
+            	
+                <li class="nav-item dropdown ps-3 border-left">
                     <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="fas fa-user fa-fw"></i></a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item" href="#!">Settings</a></li>
@@ -64,7 +96,9 @@
                         <li><a href="/kakao/logout" class="dropdown-item" style="color: #EAA8B3; font-weight: bold;">로그아웃</a></li>
                     </ul>
                 </li>
+                
             </ul>
+            
         </nav>
 
 </body>

@@ -11262,3 +11262,51 @@ body {
     color : white;
     box-shadow: 0 0 12px #CCCCCC;
 }
+
+.border-left {
+    border-left: 1px solid rgba(0, 0, 0, .125) !important; 
+    margin-left : 1.2em;
+}
+
+.nav-item .badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    padding: 0; 
+    font-size: 0.6rem;
+    line-height: 15px;
+    text-align: center;
+    border-radius: 50% !important;
+}
+
+/* 1. 프로필 이미지와 기본적인 대화 목록 항목 스타일 */
+.profile-img-small {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+.unread-count-badge {
+    font-size: 0.7rem;
+    padding: 0.3em 0.6em;
+}
+
+/* 2. SB Admin 2의 list-group-item.active 스타일을 부드럽게 재정의 */
+.list-group-item.active {
+    /* SB Admin 2의 파란색 대신 부드러운 강조색 사용 (SB Admin Pro 톤) */
+    background-color: #e9ecef !important; 
+    border-color: #e9ecef !important;
+    color: #343a40 !important; /* 활성화된 항목의 글자색을 어둡게 유지 */
+    font-weight: bold;
+}
+.list-group-item.active .text-white {
+    /* 활성화된 항목의 시간 글자색을 템플릿 기본색으로 변경 */
+    color: #6c757d !important;
+}
+
+/* 3. 읽지 않은 메시지 항목에 연한 배경색 적용 (약한 강조) */
+.list-group-item.unread {
+    background-color: #f8f9fa; /* 연한 회색 배경 */
+}
