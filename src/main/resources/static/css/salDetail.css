@@ -183,7 +183,7 @@ table.sal-table tbody tr:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 8px 0 4px 0;
+    margin: 8px 0 10px 0;
 }
 
 /* 월별 검색 폼 */
@@ -306,4 +306,8 @@ table.dataTable thead .sorting_asc:after {
 table.dataTable thead .sorting_desc:after {
     content: "▼";
     color: #666;
+}
+
+h4 {
+    margin-bottom: 12px;   /* 8~16px 정도가 가장 자연스러움 */
 }

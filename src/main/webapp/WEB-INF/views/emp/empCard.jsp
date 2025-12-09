@@ -9,8 +9,17 @@
     <div class="emp-card-view">
 
         <div class="emp-card-header">
-            <div class="emp-photo-placeholder">
-                PHOTO
+            <div class="emp-photo-placeholder" >
+                <c:choose>
+                    <c:when test="${not empty emp.empImage}">
+                        <img src="${pageContext.request.contextPath}/upload/emp/${emp.empImage}"
+                             alt="${emp.empName}"
+                             style="width:100%; height:100%; object-fit:cover; border-radius:16px;">
+                    </c:when>
+                    <c:otherwise>
+                        PHOTO
+                    </c:otherwise>
+                </c:choose>
             </div>
 
             <div class="emp-basic-info">
@@ -60,8 +69,7 @@
                 </button>
             </div>
         </c:if>
-
-    </div> <%-- 🔹 여기서 emp-card-view 닫기 --%>
+    </div>
 
 
 
@@ -72,14 +80,38 @@
     <c:if test="${canModify}">
         <div class="emp-card-edit" style="display:none;">
 
-            <form id="empEditForm">
+            <form id="empEditForm"
+                  method="post"
+                  enctype="multipart/form-data">
                 <!-- 어떤 직원을 수정하는지 구분용 -->
                 <input type="hidden" name="empNo" value="${emp.empNo}"/>
 
+                <!-- 🔹 기존 이미지 파일명 보관 -->
+                <input type="hidden" name="oldEmpImage" value="${emp.empImage}" />
+
                 <div class="emp-card-header">
-                    <div class="emp-photo-placeholder">
-                        PHOTO
+
+                    <!-- 🔹 사진 수정 가능 영역 -->
+                    <div class="emp-photo-placeholder" id="empEditPhotoBox">
+                        <c:choose>
+                            <c:when test="${not empty emp.empImage}">
+                                <img id="empEditPhotoPreview"
+                                     src="${pageContext.request.contextPath}/upload/emp/${emp.empImage}"
+                                     alt="${emp.empName}"
+                                     style="width:100%; height:100%; object-fit:cover; border-radius:16px;">
+                            </c:when>
+                            <c:otherwise>
+                                <span id="empEditPhotoText">PHOTO</span>
+                                <img id="empEditPhotoPreview"
+                                     style="display:none; width:100%; height:100%; object-fit:cover; border-radius:16px;"
+                                     alt="사진 미리보기">
+                            </c:otherwise>
+                        </c:choose>
                     </div>
+
+                    <!-- 실제 파일 선택 input (숨김) -->
+                    <input type="file" name="empImageFile" id="empEditImageFile"
+                           accept="image/*" style="display:none;">
 
                     <div class="emp-basic-info">
                         <h3>${emp.empName}</h3>
@@ -119,7 +151,7 @@
                                 </select>
                                 <br/>
                                 <small class="text-muted">
-                                    ※ 재직/파견만 1~4등급 선택 가능, 인턴/수습은 5등급, <br/>
+                                    ※ 재직/파견만 1~4등급 선택 가능, 인턴/수습은 5등급,
                                        휴직·대기·징계·퇴직 등은 6등급으로 고정됩니다.
                                 </small>
                             </td>
@@ -163,92 +195,118 @@
 </div>
 
 <script>
-    // 🔹 재직상태/직급번호 규칙 적용 공통 함수
-    //   - 인턴/수습(6)  → 직급 5 고정
-    //   - 퇴직/휴직/대기/징계(0,2,3,4,5) → 직급 6 고정
-    //   - 재직/파견(1,7) → 직급 1~4만 선택 가능, 나머지 비활성화
+    // 🔹 재직상태/직급번호 규칙 (등록폼이랑 동일)
     function applyStatusGradeRule($form) {
         const status = $form.find('select[name="statusNo"]').val();
         const $grade = $form.find('select[name="gradeNo"]');
 
-        // 기본: select 자체는 활성화, 옵션도 다 활성화
         $grade.prop('disabled', false);
         $grade.find('option').prop('disabled', false);
 
-        // 1) 인턴/수습 (status 6) → 5로 고정, 선택창도 잠금
+        // 1) 인턴/수습 → 등급 5 고정
         if (status === '6') {
             $grade.val('5');
             $grade.prop('disabled', true);
             return;
         }
 
-        // 2) 퇴직/휴직/대기/징계 (0,2,3,4,5) → 6으로 고정
-        if (status === '0' || status === '2' || status === '3' ||
-            status === '4' || status === '5') {
+        // 2) 퇴직(0), 휴직/대기/징계(2,3,4,5) → 등급 6 고정
+        if (['0','2','3','4','5'].includes(status)) {
             $grade.val('6');
             $grade.prop('disabled', true);
             return;
         }
 
-        // 3) 재직 / 파견 (1,7) → 1~4만 허용
+        // 3) 재직 / 파견 (1,7) → 1~4만 선택 가능
         if (status === '1' || status === '7') {
             $grade.find('option').each(function () {
                 const v = $(this).val();
-                if (v === '1' || v === '2' || v === '3' || v === '4') {
-                    $(this).prop('disabled', false);
-                } else {
-                    $(this).prop('disabled', true);
-                }
+                $(this).prop('disabled', !['1','2','3','4'].includes(v));
             });
-
-            const current = $grade.val();
-            if (!(current === '1' || current === '2' || current === '3' || current === '4')) {
-                $grade.val('3');   // 기본값: 사원
+            const now = $grade.val();
+            if (!['1','2','3','4'].includes(now)) {
+                $grade.val('3');
             }
             return;
         }
 
-        // 4) 혹시 정의되지 않은 status 값 → 안전하게 기타(6)로 고정
+        // 기본: 기타 → 6등급 고정
         $grade.val('6');
         $grade.prop('disabled', true);
     }
 
-    // 🔹 보기 모드 -> 수정 모드
+    // 보기 모드 -> 수정 모드
     function enterEmpEditMode() {
         $('.emp-card-view').hide();
         $('.emp-card-edit').show();
 
         const $form = $('#empEditForm');
-        applyStatusGradeRule($form);   // 현재 상태에 맞춰 직급 select 보정
+        applyStatusGradeRule($form);
+        
+        // 🔹 수정 모드로 들어왔을 때만 손가락 커서 활성화
+        $('#empEditPhotoBox').css('cursor', 'pointer');
     }
 
-    // 🔹 수정 모드 -> 보기 모드 (값은 그대로, 화면만 전환)
+    // 수정 모드 -> 보기 모드
     function cancelEmpEditMode() {
         $('.emp-card-edit').hide();
         $('.emp-card-view').show();
     }
 
-    // 🔹 수정 내용 저장
-    function saveEmpEdit() {
+    // 🔹 사진 클릭 시 파일 선택창
+    $(function () {
         const $form = $('#empEditForm');
 
-        // 저장 직전에 한 번 더 상태/직급 규칙 적용
+        $('#empEditPhotoBox').on('click', function () {
+            $('#empEditImageFile').click();
+        });
+
+        $('#empEditImageFile').on('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (ev) {
+                $('#empEditPhotoPreview')
+                    .attr('src', ev.target.result)
+                    .show();
+                $('#empEditPhotoText').hide();
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // 상태 변경 시 규칙 적용
+        $form.on('change', 'select[name="statusNo"]', function () {
+            applyStatusGradeRule($form);
+        });
+
+        // 혹시 수정 모드로 바로 들어온 경우
+        if ($('.emp-card-edit').is(':visible')) {
+            applyStatusGradeRule($form);
+        }
+    });
+
+    // 🔹 저장 (파일 포함 → FormData 사용)
+    function saveEmpEdit() {
+        const $form = $('#empEditForm');
         applyStatusGradeRule($form);
 
-        const formData = $form.serialize();
         const empNo = $form.find('input[name="empNo"]').val();
+        const formData = new FormData($form[0]);
 
         $.ajax({
-            type: 'POST',
-            url: '${pageContext.request.contextPath}/emp/update',
-            data: formData,
-            success: function (result) {
+            type        : 'POST',
+            url         : '${pageContext.request.contextPath}/emp/update',
+            data        : formData,
+            processData : false,
+            contentType : false,
+            success     : function (result) {
                 if (result === 'DENY') {
                     alert('수정 권한이 없습니다.');
                     return;
                 }
                 if (result === 'OK') {
-                    // 카드 부분만 다시 로드해서 최신 데이터로 갱신
+                    // 카드 다시 로드 (상위 JSP에서 EMP_CARD_URL과 #emp-detail-card 정의해둔 경우)
                     if (typeof EMP_CARD_URL !== 'undefined') {
                         $('#emp-detail-card').load(EMP_CARD_URL + '?empNo=' + empNo);
                     } else {
@@ -259,25 +317,9 @@
                     alert('사원 수정 중 오류가 발생했습니다.');
                 }
             },
-            error: function (xhr) {
-                console.log(xhr);
+            error       : function () {
                 alert('저장 중 오류가 발생했습니다.');
             }
         });
     }
-
-    // 🔹 페이지 로드 후 이벤트 바인딩
-    $(function () {
-        const $editForm = $('#empEditForm');
-
-        // 수정 모드에서 재직상태 변경 시마다 규칙 재적용
-        $editForm.on('change', 'select[name="statusNo"]', function () {
-            applyStatusGradeRule($editForm);
-        });
-
-        // 혹시 처음부터 수정 모드로 열리는 경우 대비해서 한 번 적용
-        if ($('.emp-card-edit').is(':visible')) {
-            applyStatusGradeRule($editForm);
-        }
-    });
 </script>
