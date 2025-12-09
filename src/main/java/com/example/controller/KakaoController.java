@@ -76,8 +76,7 @@ public class KakaoController {
             log.info("로그인 한 사람의 kakaoId 값 : "+kakaoId.toString());
             
             // (DAO 저장이 필요하다면, 여기서 DAO를 호출하는 Service 메서드를 추가 호출)
-            String memberCheckResult = memberService.memberCheck(kakaoId);
-            
+            String memberCheckResult = memberService.memberCheck(kakaoId);         
             
             
             if(memberCheckResult != null && memberCheckResult.equals(kakaoId)) {
@@ -87,8 +86,9 @@ public class KakaoController {
     			log.info("로그인 성공" + loginInfo.toString());
     			return "index";
             }
-            else {
-            	 return "/member/register";
+            else {            	
+            	log.info("회원가입으로 이동");
+            	return "/member/register";
             }
             
             // 성공 페이지 반환

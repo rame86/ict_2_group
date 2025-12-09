@@ -40,15 +40,15 @@
 		= #{empPass}
 	</select>
 
-	<select id="empNoCheck" parameterType="String"
-		resultType="String">
+	<select id="empNoCheck" parameterType="EmpVO"
+		resultType="EmpVO">
 		SELECT *
 		FROM EMP
 		WHERE EMP_NO = #{empNo} AND EMP_NAME =
 		#{empName}
 	</select>
 
-	<select id="memberCheck" parameterType="String"
+	<select id="KakaoMemberCheck" parameterType="String"
 		resultType="String">
 		SELECT KAKAO_ID
 		FROM EMP
