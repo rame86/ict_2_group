@@ -61,8 +61,8 @@
 												<div class="form-floating mb-3 mb-md-0">
 													<input class="form-control" id="empNo" name="empNo"
 														type="number" placeholder="사원번호를 입력하세요" required /> <label
-														for="inputFirstName">사원ID(사원번호)</label><br> <span
-														id="empNoCheckResult" style="width: 150px;"></span>
+														for="inputFirstName">사원ID(사원번호)</label><br>
+													<button id='empNoCheck' type="button">사번확인</button>
 												</div>
 											</div>
 											<div class="col-md-6">
@@ -70,12 +70,13 @@
 													<input class="form-control" id="empName" name="empName"
 														type="text" placeholder="이름을 입력하세요" required /> <label
 														for="inputLastName">이름</label><br>
-													<button id='empNoCheck' type="button">사번확인</button>
+													<span id="empNoCheckResult" style="width: 150px;"></span>
+
 
 												</div>
 											</div>
 										</div>
-										<div class="form-floating mb-3">
+										<div class="form-floating mb-3" id="empEmailDiv">
 											<input class="form-control" id="empEmail" name="empEmail"
 												type="email" placeholder="name@example.com" required /> <label
 												for="inputEmail">이메일주소</label>

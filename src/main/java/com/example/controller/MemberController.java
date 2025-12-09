@@ -29,7 +29,7 @@ public class MemberController {
 	@GetMapping("{step}")
 	public void asdf(@PathVariable String step) {
 		log.info("요청받은 step : " + step);
-	
+
 	}
 
 	@GetMapping("/")
@@ -43,13 +43,22 @@ public class MemberController {
 
 	@GetMapping("/member/empNoCheck")
 	@ResponseBody
-	public String empNoCheck(String empNo, String empName, EmpVO vo) {
-		log.info("MemberControll empNoCheck 요청받음. empNo :" + empNo);		
+	public String empNoCheck(String empNo, String empName, EmpVO vo, HttpSession session) {
+		log.info("MemberControll empNoCheck 요청받음. empNo :" + empNo);
 		vo.setEmpNo(empNo);
 		vo.setEmpName(empName);
+
+		// 세션에서 넘겨받은 카카오id가 있는지 체크
+		String kakaoId = (String) session.getAttribute("kakaoId");
+		if (kakaoId != null) {
+			vo.setKakaoId(kakaoId);
+		}
+
+		// 아이디 와 이름 확인 시도
 		String empCheckResult = memberService.empNoCheck(vo);
+
 		if (empCheckResult != null) {
-			log.info("MemberControll empNoCheck 결과값 :" + empCheckResult.toString());
+			log.info("MemberControll empNoCheck 결과값 :" + empCheckResult);
 		}
 		return empCheckResult;
 
