@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.domain.EmpVO;
+import com.example.domain.DeptVO;
 import com.example.domain.LoginVO;
+import com.example.service.DeptService;
 import com.example.service.EmpService;
 
 import jakarta.servlet.http.HttpSession;
@@ -25,6 +27,9 @@ public class EmpController {
 
     @Autowired
     private EmpService empService;
+    
+    @Autowired
+    private DeptService deptService;
 
     /** 🔹 사원 사진 실제 저장 경로 (외부 폴더) */
     private static final String EMP_UPLOAD_PATH = "C:/emp_upload/emp/";
@@ -162,9 +167,16 @@ public class EmpController {
             System.out.println("❌ 사원 등록 권한 없음");
             return "error/NoAuthPage";
         }
+        
+     // 1) 부서 목록 조회 (DEPT 테이블 → DeptVO 리스트)
+        List<DeptVO> deptList = deptService.getDeptList();   // 🔹 새로 추가
+        System.out.println("📌 사원등록용 부서 개수 = " + (deptList == null ? 0 : deptList.size()));
 
+        // 2) 화면에서 사용할 데이터 세팅
+        model.addAttribute("deptList", deptList);            // 🔹 새로 추가
         model.addAttribute("menu", "empNew");
 
+        // 3) 사원 등록 JSP로 이동
         return "emp/empNewForm";
     }
 

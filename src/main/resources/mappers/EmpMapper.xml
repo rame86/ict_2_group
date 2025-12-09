@@ -82,142 +82,173 @@
 
 	<!-- ============================ 2) 검색 포함 사원 목록 (EmpSearchVO 사용) ============================ -->
 	<select id="getEmpList"
-		parameterType="com.example.domain.EmpSearchVO" resultMap="empMap">
+        parameterType="com.example.domain.EmpSearchVO"
+        resultMap="empMap">
 
-		SELECT
-		e.EMP_NO,
-		e.STATUS_NO,
-		e.DEPT_NO,
-		e.GRADE_NO,
-		e.EMP_PASS,
-		e.KAKAO_ID,
-		e.EMP_NAME,
-		e.EMP_PHONE,
-		e.EMP_ADDR,
-		e.EMP_EMAIL,
-		e.EMP_IMAGE,
-		e.EMP_REG_NO,
-		TO_CHAR(e.EMP_REGDATE, 'YYYY-MM-DD') AS EMP_REGDATE,
-		e.BASE_SAL,
-		d.DEPT_NAME,
-		s.STATUS_NAME,
-		g.GRADE_NAME
-		FROM EMP e
-		LEFT JOIN
-		DEPT d ON e.DEPT_NO = d.DEPT_NO
-		LEFT JOIN EMP_STATUS s ON e.STATUS_NO =
-		s.STATUS_NO
-		LEFT JOIN EMP_GRADE g ON e.GRADE_NO = g.GRADE_NO
+    SELECT
+        e.EMP_NO,
+        e.STATUS_NO,
+        e.DEPT_NO,
+        e.GRADE_NO,
+        e.EMP_PASS,
+        e.KAKAO_ID,
+        e.EMP_NAME,
+        e.EMP_PHONE,
+        e.EMP_ADDR,
+        e.EMP_EMAIL,
+        e.EMP_IMAGE,
+        e.EMP_REG_NO,
+        TO_CHAR(e.EMP_REGDATE, 'YYYY-MM-DD') AS EMP_REGDATE,
+        e.SAL_BASE,
+        d.DEPT_NAME,
 
-		<where>
-			<!-- 예시: EmpSearchVO에 이런 필드가 있다고 가정 -->
-			<!-- keyword: 이름/전화/이메일 통합 검색 -->
-			<if test="keyword != null and keyword != ''">
-				AND ( e.EMP_NAME LIKE '%' || #{keyword} || '%'
-				OR
-				e.EMP_PHONE LIKE '%' || #{keyword} || '%'
-				OR e.EMP_EMAIL LIKE '%' ||
-				#{keyword} || '%'
-				)
-			</if>
+        -- 재직 상태 한글 이름
+        CASE e.STATUS_NO
+            WHEN 0 THEN '퇴직'
+            WHEN 1 THEN '재직'
+            WHEN 2 THEN '휴직(자발적)'
+            WHEN 3 THEN '휴직(병가 등 복지)'
+            WHEN 4 THEN '대기'
+            WHEN 5 THEN '징계'
+            WHEN 6 THEN '인턴/수습'
+            WHEN 7 THEN '파견'
+        END AS STATUS_NAME,
 
-			<!-- 부서필터 -->
-			<if test="deptNo != null and deptNo != 0">
-				AND e.DEPT_NO = #{deptNo}
-			</if>
+        -- 권한/직급 한글 이름
+        CASE e.GRADE_NO
+            WHEN 1 THEN '최고관리자'
+            WHEN 2 THEN '관리자'
+            WHEN 3 THEN '사원'
+            WHEN 4 THEN '계약사원'
+            WHEN 5 THEN '인턴/수습'
+            WHEN 6 THEN '기타'
+        END AS GRADE_NAME
 
-			<!-- 재직상태 필터 -->
-			<if test="statusNo != null and statusNo != -1">
-				AND e.STATUS_NO = #{statusNo}
-			</if>
+    FROM EMP e
+    LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
 
-			<!-- 권한 등급 필터 -->
-			<if test="gradeNo != null and gradeNo != -1">
-				AND e.GRADE_NO = #{gradeNo}
-			</if>
-		</where>
+    <where>
+        <!-- keyword: 이름/전화/이메일 통합 검색 -->
+        <if test="keyword != null and keyword != ''">
+            AND (
+                    e.EMP_NAME  LIKE '%' || #{keyword} || '%'
+                OR  e.EMP_PHONE LIKE '%' || #{keyword} || '%'
+                OR  e.EMP_EMAIL LIKE '%' || #{keyword} || '%'
+            )
+        </if>
 
-		ORDER BY e.EMP_NO
-	</select>
+        <!-- 부서필터 -->
+        <if test="deptNo != null and deptNo != 0">
+            AND e.DEPT_NO = #{deptNo}
+        </if>
+
+        <!-- 재직상태 필터 -->
+        <if test="statusNo != null and statusNo != -1">
+            AND e.STATUS_NO = #{statusNo}
+        </if>
+
+        <!-- 권한 등급 필터 -->
+        <if test="gradeNo != null and gradeNo != -1">
+            AND e.GRADE_NO = #{gradeNo}
+        </if>
+    </where>
+
+    ORDER BY e.EMP_NO
+</select>
+
 
 	<!-- ============================ 3) 사번으로 단건 조회 ============================ -->
 	<select id="getEmp" parameterType="string" resultMap="empMap">
-		SELECT
-		e.EMP_NO,
-		e.STATUS_NO,
-		e.DEPT_NO,
-		e.GRADE_NO,
-		e.EMP_PASS,
-		e.KAKAO_ID,
-		e.EMP_NAME,
-		e.EMP_PHONE,
-		e.EMP_ADDR,
-		e.EMP_EMAIL,
-		e.EMP_IMAGE,
-		e.EMP_REG_NO,
-		TO_CHAR(e.EMP_REGDATE, 'YYYY-MM-DD') AS EMP_REGDATE,
-		e.BASE_SAL,
-		d.DEPT_NAME,
-		s.STATUS_NAME,
-		g.GRADE_NAME
-		FROM EMP e
-		LEFT JOIN
-		DEPT d ON e.DEPT_NO = d.DEPT_NO
-		LEFT JOIN EMP_STATUS s ON e.STATUS_NO =
-		s.STATUS_NO
-		LEFT JOIN EMP_GRADE g ON e.GRADE_NO = g.GRADE_NO
-		WHERE
-		e.EMP_NO = #{empNo}
-	</select>
+    SELECT
+        e.EMP_NO,
+        e.STATUS_NO,
+        e.DEPT_NO,
+        e.GRADE_NO,
+        e.EMP_PASS,
+        e.KAKAO_ID,
+        e.EMP_NAME,
+        e.EMP_PHONE,
+        e.EMP_ADDR,
+        e.EMP_EMAIL,
+        e.EMP_IMAGE,
+        e.EMP_REG_NO,
+        TO_CHAR(e.EMP_REGDATE, 'YYYY-MM-DD') AS EMP_REGDATE,
+        e.SAL_BASE,
+        d.DEPT_NAME,
 
-	<!-- 필요하다면 selectEmpByEmpNo도 getEmp와 동일하게 사용 가능 -->
-	<select id="selectEmpByEmpNo" parameterType="string"
-		resultMap="empMap">
+        -- 재직 상태 한글 이름
+        CASE e.STATUS_NO
+            WHEN 0 THEN '퇴직'
+            WHEN 1 THEN '재직'
+            WHEN 2 THEN '휴직(자발적)'
+            WHEN 3 THEN '휴직(병가 등 복지)'
+            WHEN 4 THEN '대기'
+            WHEN 5 THEN '징계'
+            WHEN 6 THEN '인턴/수습'
+            WHEN 7 THEN '파견'
+        END AS STATUS_NAME,
 
-		SELECT
-		e.EMP_NO,
-		e.STATUS_NO,
-		e.DEPT_NO,
-		e.GRADE_NO,
-		e.EMP_PASS,
-		e.KAKAO_ID,
-		e.EMP_NAME,
-		e.EMP_PHONE,
-		e.EMP_ADDR,
-		e.EMP_EMAIL,
-		e.EMP_IMAGE,
-		e.EMP_REG_NO,
-		TO_CHAR(e.EMP_REGDATE, 'YYYY-MM-DD') AS EMP_REGDATE,
-		e.SAL_BASE, -- ✅ 컬럼명 SAL_BASE로 맞추기
-		d.DEPT_NAME,
+        -- 권한/직급 한글 이름
+        CASE e.GRADE_NO
+            WHEN 1 THEN '최고관리자'
+            WHEN 2 THEN '관리자'
+            WHEN 3 THEN '사원'
+            WHEN 4 THEN '계약사원'
+            WHEN 5 THEN '인턴/수습'
+            WHEN 6 THEN '기타'
+        END AS GRADE_NAME
 
-		-- 재직 상태 한글 이름
-		CASE e.STATUS_NO
-		WHEN 0 THEN '퇴직'
-		WHEN 1 THEN '재직'
-		WHEN 2 THEN '휴직(자발적)'
-		WHEN 3 THEN '휴직(병가 등 복지)'
-		WHEN 4 THEN '대기'
-		WHEN 5 THEN '징계'
-		WHEN 6 THEN '인턴/수습'
-		WHEN 7 THEN '파견'
-		END AS STATUS_NAME,
+    FROM EMP e
+    LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+    WHERE e.EMP_NO = #{empNo}
+</select>
 
-		-- 권한/직급 한글 이름
-		CASE e.GRADE_NO
-		WHEN 1 THEN '최고관리자'
-		WHEN 2 THEN '관리자'
-		WHEN 3 THEN '사원'
-		WHEN 4 THEN '계약사원'
-		WHEN 5 THEN '인턴/수습'
-		WHEN 6 THEN '기타'
-		END AS GRADE_NAME
+    <!-- ============================ 3-1) 사번으로 단건 조회 (인사카드용) ============================ -->
+    <select id="selectEmpByEmpNo" parameterType="string" resultMap="empMap">
+        SELECT
+            e.EMP_NO,
+            e.STATUS_NO,
+            e.DEPT_NO,
+            e.GRADE_NO,
+            e.EMP_PASS,
+            e.KAKAO_ID,
+            e.EMP_NAME,
+            e.EMP_PHONE,
+            e.EMP_ADDR,
+            e.EMP_EMAIL,
+            e.EMP_IMAGE,
+            e.EMP_REG_NO,
+            TO_CHAR(e.EMP_REGDATE, 'YYYY-MM-DD') AS EMP_REGDATE,
+            e.SAL_BASE,
+            d.DEPT_NAME,
 
-		FROM EMP e
-		LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
-		WHERE e.EMP_NO = #{empNo}
+            -- 재직 상태 한글 이름
+            CASE e.STATUS_NO
+                WHEN 0 THEN '퇴직'
+                WHEN 1 THEN '재직'
+                WHEN 2 THEN '휴직(자발적)'
+                WHEN 3 THEN '휴직(병가 등 복지)'
+                WHEN 4 THEN '대기'
+                WHEN 5 THEN '징계'
+                WHEN 6 THEN '인턴/수습'
+                WHEN 7 THEN '파견'
+            END AS STATUS_NAME,
 
-	</select>
+            -- 권한/직급 한글 이름
+            CASE e.GRADE_NO
+                WHEN 1 THEN '최고관리자'
+                WHEN 2 THEN '관리자'
+                WHEN 3 THEN '사원'
+                WHEN 4 THEN '계약사원'
+                WHEN 5 THEN '인턴/수습'
+                WHEN 6 THEN '기타'
+            END AS GRADE_NAME
+
+        FROM EMP e
+        LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+        WHERE e.EMP_NO = #{empNo}
+    </select>
+
 
 
 	<!-- ============================ 4) 사원 등록 (INSERT) ============================ -->

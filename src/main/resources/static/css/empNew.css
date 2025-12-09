@@ -3,8 +3,7 @@
    ============================= */
 
 #empNewForm {
-    width: 1400px;         
-    margin: 40px auto 80px;
+    width: 100%;
     padding: 32px;
     background: #ffffff;
     border: 1px solid #e5edff;
@@ -101,3 +100,46 @@ input::placeholder {
 input:focus::placeholder {
     color: transparent !important;
 }
+
+/* ============================
+   🔹 사원등록 상단 레이아웃 정리
+   ============================ */
+
+/* PHOTO + 오른쪽 영역을 가로배치 */
+.emp-new-wrapper .form-top {
+    display: flex;
+    gap: 24px;
+}
+
+/* 오른쪽 전체 박스 (사번/부서/이름/주민/권한/재직) */
+.emp-new-wrapper .form-top-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;   /* 줄 간격 */
+}
+
+/* 한 줄에 여러 개 필드를 가로로 배치 */
+.emp-new-wrapper .form-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* 단일 줄(full-width) 간 간격 */
+.emp-new-wrapper .full-width {
+    margin-bottom: 24px;
+}
+
+/* 한 줄의 각각 input 박스는 균등 너비 */
+.emp-new-wrapper .form-row .form-group {
+    flex: 1;
+}
+
+/* 사원 등록 카드 전체 박스 */
+.emp-new-wrapper {
+    width: 1200px;        /* 👉 원하는 고정 폭 (예: 1200px, 1300px 등) */
+    margin: 24px 0 60px 280px;  /* 위/좌우/아래 여백, auto가 가로 가운데 정렬 */
+   /*  margin: 40px auto 80px;  이거는 창 크기 상관없이 따라다니면서 가운데 정렬*/ 
+}
+
