@@ -253,38 +253,39 @@
 
 	<!-- ============================ 4) 사원 등록 (INSERT) ============================ -->
 	<insert id="insertEmp" parameterType="com.example.domain.EmpVO">
-		INSERT INTO EMP (
-		EMP_NO,
-		STATUS_NO,
-		DEPT_NO,
-		GRADE_NO,
-		EMP_PASS,
-		KAKAO_ID,
-		EMP_NAME,
-		EMP_PHONE,
-		EMP_ADDR,
-		EMP_EMAIL,
-		EMP_IMAGE,
-		EMP_REG_NO,
-		EMP_REGDATE,
-		SAL_BASE
-		) VALUES (
-		#{empNo},
-		#{statusNo},
-		#{deptNo},
-		#{gradeNo},
-		#{empPass, jdbcType=VARCHAR},   <!-- 🔹 여기에 타입 지정 -->
-		#{kakaoId, jdbcType=VARCHAR},
-		#{empName},
-		#{empPhone},
-		#{empAddr},
-		#{empEmail},
-		 #{empImage, jdbcType=VARCHAR},
-		#{empRegNo, jdbcType=VARCHAR},
-		SYSDATE,
-		#{salBase, jdbcType=NUMERIC}
-		)
-	</insert>
+    INSERT INTO EMP (
+        EMP_NO,
+        STATUS_NO,
+        DEPT_NO,
+        GRADE_NO,
+        EMP_PASS,
+        KAKAO_ID,
+        EMP_NAME,
+        EMP_PHONE,
+        EMP_ADDR,
+        EMP_EMAIL,
+        EMP_IMAGE,
+        EMP_REG_NO,
+        EMP_REGDATE,
+        SAL_BASE
+    )
+    VALUES (
+        #{empNo},
+        #{statusNo},
+        #{deptNo},
+        #{gradeNo},
+        #{empPass},
+        #{kakaoId},
+        #{empName},
+        #{empPhone},
+        #{empAddr},
+        #{empEmail},
+        #{empImage, jdbcType=VARCHAR},   <!-- ✅ NULL 허용 + 타입 명시 -->
+        #{empRegno},
+        SYSDATE,
+        #{salBase}
+    )
+</insert>
 
 
 	<!-- ============================ 5) 사원 정보 수정 (UPDATE) ============================ -->
