@@ -30,11 +30,9 @@
 	margin-bottom: 5px;
 }
 
-/* getBoardList.jsp 상단 <style> 태그 내부에 추가 */
+/* 🚨 수정됨: 공지 내용 모달의 텍스트 왼쪽 정렬 (가운데 정렬 문제 해결) */
 #boardModal .modal-body {
-	/* 기존 스타일 유지 */
 	white-space: pre-wrap;
-	/* 텍스트 왼쪽 정렬 강제 지정 */
 	text-align: left;
 }
 </style>
@@ -118,12 +116,12 @@
 							</div>
 
 							<form action="/board/insertNoticeBoard" method="post">
-								<div class="modal-body" style="white-space: pre-wrap; text-align: left;">
+								<div class="modal-body">
 									<div class="mb-3">
 										<label for="writer" class="form-label">작성자</label> <input
 											type="text" class="form-control" id="writer"
-											name="noticeWriter" value="${ sessionScope.login.empName }"
-											readonly> <input type="hidden" name="empNo"
+											name="noticeWriter" value="${ sessionScope.login.empName }">
+										<input type="hidden" name="empNo"
 											value="${ sessionScope.login.empNo }">
 									</div>
 									<div class="mb-3">
@@ -146,6 +144,7 @@
 						</div>
 					</div>
 				</div>
+
 				<div class="modal fade" id="modifyModal" tabindex="-1"
 					aria-labelledby="modifyModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-lg">
@@ -164,8 +163,8 @@
 									<div class="mb-3">
 										<label for="modifyWriter" class="form-label">작성자</label> <input
 											type="text" class="form-control" id="modifyWriter"
-											name="noticeWriter" value="${ sessionScope.login.empName }"
-											readonly> <input type="hidden" name="empNo"
+											name="noticeWriter" value="${ sessionScope.login.empName }">
+										<input type="hidden" name="empNo"
 											value="${ sessionScope.login.empNo }">
 									</div>
 
@@ -191,6 +190,7 @@
 						</div>
 					</div>
 				</div>
+
 				<div class="modal fade" id="boardModal" tabindex="-1"
 					aria-labelledby="boardModalLabel" aria-hidden="true">
 					<div class="modal-dialog modal-lg">
@@ -200,9 +200,8 @@
 								<button type="button" class="btn-close" data-bs-dismiss="modal"
 									aria-label="Close"></button>
 							</div>
-							<div class="modal-body"
-								style="white-space: pre-wrap; text-align: left;">
-								<span id="modalContentText" style="display: block; text-align: left;"></span>
+							<div class="modal-body">
+								<span id="modalContentText" style="display: block;"></span>
 							</div>
 							<div class="modal-footer">
 								<c:if
@@ -224,127 +223,117 @@
 	</div>
 
 	<script>
-		document
-				.addEventListener(
-						'DOMContentLoaded',
-						function() {
-							var boardModal = document
-									.getElementById('boardModal');
-							var btnModify = document
-									.getElementById('btnModify');
+		$(document).ready(
+				function() {
 
-							// 등록/작성 폼 요소 가져오기
-							var writeForm = document
-									.querySelector('#writeModal form');
-							// 수정 폼 요소 가져오기 (이미 id="modifyForm"이 부여되어 있음)
-							var modifyForm = document
-									.getElementById('modifyForm');
+					var $boardModal = $('#boardModal');
+					var $btnModify = $('#btnModify');
+					var $writeForm = $('#writeModal form');
+					var $modifyForm = $('#modifyForm');
 
-							// -------------------------------------------------------------
-							// 3. 등록 폼 제출 시 확인창 띄우기
-							// -------------------------------------------------------------
-							writeForm.addEventListener('submit',
-									function(event) {
-										// 폼의 기본 제출 동작을 막음
-										event.preventDefault();
+					// -------------------------------------------------------------
+					// 등록 폼 제출 시 확인창 띄우기 (jQuery Submit Event)
+					// -------------------------------------------------------------
+					$writeForm.on('submit', function(event) {
+						event.preventDefault(); // 폼의 기본 제출 동작을 막음
 
-										// 사용자에게 확인 메시지 표시
-										if (confirm('새 공지를 작성하시겠습니까?')) {
-											// '확인'을 눌렀을 경우, 폼을 실제로 제출
-											this.submit();
-										}
-										// '취소'를 누르면 아무 동작도 하지 않고 폼 제출이 취소됨
-									});
+						if (confirm('새 공지를 작성하시겠습니까?')) {
+							// '확인'을 눌렀을 경우, 폼을 실제로 제출
+							this.submit();
+						}
+					});
 
-							// -------------------------------------------------------------
-							// 4. 수정 폼 제출 시 확인창 띄우기
-							// -------------------------------------------------------------
-							modifyForm.addEventListener('submit', function(
-									event) {
-								// 폼의 기본 제출 동작을 막음
-								event.preventDefault();
+					// -------------------------------------------------------------
+					// 수정 폼 제출 시 확인창 띄우기 (jQuery Submit Event)
+					// -------------------------------------------------------------
+					$modifyForm.on('submit', function(event) {
+						event.preventDefault(); // 폼의 기본 제출 동작을 막음
 
-								// 사용자에게 확인 메시지 표시
-								if (confirm('공지 내용을 수정하시겠습니까?')) {
-									// '확인'을 눌렀을 경우, 폼을 실제로 제출
-									this.submit();
+						if (confirm('공지 내용을 수정하시겠습니까?')) {
+							// '확인'을 눌렀을 경우, 폼을 실제로 제출
+							this.submit();
+						}
+					});
+
+					// -------------------------------------------------------------
+					// 1. 글 상세 보기 모달이 열릴 때 데이터 설정
+					// -------------------------------------------------------------
+					$boardModal.on('show.bs.modal', function(event) {
+						var button = $(event.relatedTarget);
+
+						// 글 목록에서 전달된 데이터 가져오기
+						var noticeNo = button.data('no');
+						var title = button.data('title');
+						// var content = button.data('content'); // 기존: 내용 미리 가져오기 (삭제)
+
+						// 상세 모달에 제목 표시
+						$boardModal.find('.modal-title').text(title);
+						$boardModal.find('#modalContentText').text(
+								'내용을 불러오는 중...'); // 로딩 메시지
+
+						// Controller로 AJAX 요청 (noticeNo를 이용해 내용 조회)
+						$.ajax({
+							url : '/board/getContentNoticeBoard',
+							type : 'POST',
+							data : {
+								noticeNo : noticeNo
+							},
+							dataType : 'json', // Controller가 JSON을 반환한다고 가정
+							success : function(response) {
+								// Controller에서 받은 데이터 (response) 처리
+								if (response && response.noticeContent) {
+									var content = response.noticeContent;
+
+									// 모달 내용 업데이트
+									$boardModal.find('#modalContentText').text(
+											content);
+
+									// (관리자 권한이 있는 경우) 수정 버튼을 위해 글 번호와 내용들을 저장
+									if ($btnModify.length) {
+										$('#currentNoticeNo').val(noticeNo); // 글 번호 저장
+										$btnModify.data('title', title);
+										$btnModify.data('content', content); // AJAX로 가져온 내용 저장
+									}
+								} else {
+									$boardModal.find('#modalContentText').text(
+											'내용을 가져오지 못했습니다.');
 								}
-								// '취소'를 누르면 아무 동작도 하지 않고 폼 제출이 취소됨
-							});
-
-							// -------------------------------------------------------------
-							// 기존 상세/수정 모달 로직 (1, 2번 로직)
-							// -------------------------------------------------------------
-
-							// 1. 글 상세 보기 모달이 열릴 때 데이터 설정
-							boardModal
-									.addEventListener(
-											'show.bs.modal',
-											function(event) {
-												var button = event.relatedTarget;
-
-												// 글 목록에서 전달된 데이터 가져오기
-												var noticeNo = button
-														.getAttribute('data-no');
-												var title = button
-														.getAttribute('data-title');
-												var content = button
-														.getAttribute('data-content');
-
-												// 상세 모달에 데이터 표시
-												boardModal
-														.querySelector('.modal-title').textContent = title;
-												boardModal
-														.querySelector('#modalContentText').textContent = content;
-
-												// (관리자 권한이 있는 경우) 수정 버튼을 위해 글 번호와 내용들을 저장
-												if (btnModify) {
-													document
-															.getElementById('currentNoticeNo').value = noticeNo; // 글 번호 저장
-													btnModify
-															.setAttribute(
-																	'data-title',
-																	title);
-													btnModify.setAttribute(
-															'data-content',
-															content);
-												}
-											});
-
-							// 2. 수정 버튼을 클릭했을 때 수정 모달 띄우기
-							if (btnModify) {
-								btnModify
-										.addEventListener(
-												'click',
-												function() {
-													// 1) 상세 모달 닫기
-													var boardModalInstance = bootstrap.Modal
-															.getInstance(boardModal);
-													boardModalInstance.hide();
-
-													// 2) 수정 모달에 데이터 채우기
-													var noticeNo = document
-															.getElementById('currentNoticeNo').value;
-													var title = btnModify
-															.getAttribute('data-title');
-													var content = btnModify
-															.getAttribute('data-content');
-
-													document
-															.getElementById('modifyNoticeNo').value = noticeNo;
-													document
-															.getElementById('modifyTitle').value = title;
-													document
-															.getElementById('modifyContent').value = content;
-
-													// 3) 수정 모달 띄우기
-													var modifyModal = new bootstrap.Modal(
-															document
-																	.getElementById('modifyModal'));
-													modifyModal.show();
-												});
+							},
+							error : function(xhr, status, error) {
+								console.error("AJAX Error:", status, error);
+								$boardModal.find('#modalContentText').text(
+										'데이터 로드 중 오류가 발생했습니다.');
 							}
 						});
+
+					});
+
+					// -------------------------------------------------------------
+					// 수정 버튼을 클릭했을 때 수정 모달 띄우기 (jQuery Click Event)
+					// -------------------------------------------------------------
+					$btnModify.on('click', function() {
+						var $this = $(this);
+
+						// 1) 상세 모달 닫기
+						var boardModalInstance = bootstrap.Modal
+								.getInstance($boardModal[0]);
+						boardModalInstance.hide();
+
+						// 2) 수정 모달에 데이터 채우기
+						var noticeNo = $('#currentNoticeNo').val();
+						var title = $this.data('title');
+						var content = $this.data('content');
+
+						$('#modifyNoticeNo').val(noticeNo);
+						$('#modifyTitle').val(title);
+						$('#modifyContent').val(content);
+
+						// 3) 수정 모달 띄우기
+						var modifyModal = new bootstrap.Modal(
+								$('#modifyModal')[0]);
+						modifyModal.show();
+					});
+				});
 	</script>
 </body>
 

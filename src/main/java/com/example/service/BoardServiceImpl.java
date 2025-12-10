@@ -28,5 +28,10 @@ public class BoardServiceImpl implements BoardService {
 	public String updateNoticeBoard(NoticeBoardVO vo) {
 		return boardDAO.updateNoticeBoard(vo);
 	};
-
+	
+	public NoticeBoardVO getContentNoticeBoard(String noticeNo) {		
+		// 게시글 카운트 증가~
+		boardDAO.updateNoticeCnt(noticeNo);		
+		return boardDAO.getContentNoticeBoard(noticeNo);		
+	}
 }

@@ -14,12 +14,17 @@ public interface AttendDAO {
 	
 	public String fieldwork(DayAttendVO davo);
 	
-	public void insertVacation(DayAttendVO davo, Integer totalDays);
+	public void insertVacation(DayAttendVO davo, Double totalDays);
 	
 	public DayAttendVO selectDayAttend(DocVO vo);
 	
 	public void commuteCorrectionCheckIn(DayAttendVO davo);
 	
 	public void commuteCorrectionCheckOut(DayAttendVO davo);
+	
+	public List<String> getAllEmpNos();
 
+	public int insertAbsenceRecords();
+	
+	public int updateIncompleteAttendanceToAbsence();
 }
