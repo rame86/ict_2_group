@@ -270,20 +270,7 @@ function loadChatWindow(otherUserId, otherUserName) {
         success: function(response) {
             if (response === "success") {
                 console.log("읽음 처리 성공: 뱃지 및 스타일 갱신 필요");
-                
-                // 3. 🚨 클라이언트 화면에서 뱃지/강조 스타일 즉시 제거 (시각적 갱신)
-                
-                // a. 뱃지를 0으로 숨김
-                var unreadBadge = $('a[data-other-name="' + otherUserName + '"]').find('.badge');
-                if (unreadBadge.length) {
-                    unreadBadge.text('0').removeClass('bg-danger').hide();
-                }
-                
-                // b. 항목의 굵은 글씨 등 강조 스타일 제거
-                $('a[data-other-name="' + otherUserName + '"]').removeClass('unread-item').removeClass('fw-bold'); 
-                
-                // 주의: 'unread-item' 클래스는 실제 CSS에 사용되는 클래스로 대체해야 합니다.
-                
+                loadConversationList($('#sessionEmpNo').val());
             } else {
                 console.error("읽음 처리 서버 응답 오류:", response);
             }
@@ -464,8 +451,25 @@ function appendNewMessageToChat(messageVO, myEmpNo) {
         '</div>';
         
     chatContainer.append(messageHtml);
-    // 가장 아래로 스크롤
     chatContainer.scrollTop(chatContainer[0].scrollHeight);
+    
+    if (!isMyMessage) {
+        if (currentReceiverEmpNo) {
+            $.ajax({
+                url: '/chat/markAsRead',
+                type: 'POST',
+                data: { otherUserId: currentReceiverEmpNo },
+                success: function(response) {
+                    if (response === "success") {
+                        console.log("✅ 채팅 중 실시간 읽음 처리 성공.");
+                        loadConversationList(myEmpNo); 
+                    }
+                }
+
+            });
+        }
+    }
+    
 }
 
 </script>
