@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.repository.MessageDAO">
+
+	<select id="selectMessageList" parameterType="string" resultType="MessageVO">
+		WITH LAST_MESSAGE AS (
+		-- 1. 각 대화방의 메시지에 순번을 부여
+		SELECT
+		T.*,
+		ROW_NUMBER() OVER (
+		PARTITION BY
+		CASE
+		WHEN SENDER_EMP_NO = #{empNo} THEN RECEIVER_EMP_NO
+		ELSE SENDER_EMP_NO
+		END
+		ORDER BY SEND_DATE DESC, MSG_NO DESC
+		) AS RN
+		FROM MESSAGE T
+		WHERE (SENDER_EMP_NO = #{empNo} AND SENDER_DEL_YN = 'N')
+		OR (RECEIVER_EMP_NO = #{empNo} AND RECEIVER_DEL_YN = 'N')
+		),
+		LATEST_MSG_NO AS (
+		-- 2. RN=1 (가장 최근 메시지)인 행만 추출하고, OTHER_USER_ID를 미리 정의
+		SELECT
+		LAST_MESSAGE.*,
+		CASE
+		WHEN SENDER_EMP_NO = #{empNo} THEN RECEIVER_EMP_NO
+		ELSE SENDER_EMP_NO
+		END AS OTHER_USER_ID -- VARCHAR2
+		FROM LAST_MESSAGE WHERE RN = 1
+		),
+		UNREAD_COUNT AS (
+		-- 3. 미확인 메시지 개수 카운트
+		SELECT SENDER_EMP_NO AS OTHER_USER_ID, COUNT(MSG_NO) AS UNREAD_COUNT
+		FROM MESSAGE
+		WHERE RECEIVER_EMP_NO = #{empNo} AND IS_READ = 'N' AND RECEIVER_DEL_YN = 'N'
+		GROUP BY SENDER_EMP_NO
+		)
+	
+		-- 4. 최종 목록 조합 및 사용자 정보 조인
+		SELECT
+		T1.OTHER_USER_ID,
+		NVL(E.EMP_NAME, '알 수 없음') AS otherUserName,
+		-- 💡 NUMBER인 DEPT_NO를 VARCHAR2로 변환 후 출력
+		NVL(TO_CHAR(D.DEPT_NAME), '미정') AS otherUserPosition,
+		T1.MSG_CONTENT AS latestMessageContent,
+		T1.SEND_DATE AS latestMessageTime,
+		NVL(U.UNREAD_COUNT, 0) AS unreadCount
+		FROM LATEST_MSG_NO T1
+		-- 💡 JOIN: VARCHAR2인 OTHER_USER_ID를 NUMBER로 변환하여 EMP_NO(NUMBER)와 조인
+		LEFT JOIN EMP E ON TO_NUMBER(T1.OTHER_USER_ID) = E.EMP_NO
+		-- DEPT_NO (NUMBER)와 DEPT_NO (NUMBER) 조인
+		LEFT JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
+		LEFT JOIN UNREAD_COUNT U ON T1.OTHER_USER_ID = U.OTHER_USER_ID
+	
+		ORDER BY T1.SEND_DATE DESC
+	</select>
+	
+	<insert id="insertMessage" parameterType="MessageVO">
+	    <selectKey keyProperty="msgNo" resultType="int" order="BEFORE">
+	        SELECT SEQ_MSG_NO.NEXTVAL FROM DUAL
+	    </selectKey>
+	    INSERT INTO MESSAGE (
+	        MSG_NO, SENDER_EMP_NO, RECEIVER_EMP_NO, MSG_CONTENT, SEND_DATE
+	        ) VALUES (
+	        #{msgNo},
+	        #{senderEmpNo},
+	        #{receiverEmpNo},
+	        #{msgContent},
+	        SYSDATE
+	    )
+	</insert>
+	
+	<select id="selectChatMessages" resultType="MessageVO" parameterType="Map">
+	    SELECT
+	        MSG_NO,
+	        SENDER_EMP_NO AS senderEmpNo,       
+	        RECEIVER_EMP_NO AS receiverEmpNo,   
+	        MSG_CONTENT AS msgContent,         
+	        SEND_DATE AS sendDate,             
+	        IS_READ
+	    FROM MESSAGE
+	    WHERE 
+	        (SENDER_EMP_NO = #{myUserId} AND RECEIVER_EMP_NO = #{otherUserId}) 
+	        OR 
+	        (SENDER_EMP_NO = #{otherUserId} AND RECEIVER_EMP_NO = #{myUserId})
+	    ORDER BY SEND_DATE ASC, MSG_NO ASC
+	</select>
+	
+	<update id="updateIsRead" parameterType="Map">
+	    UPDATE MESSAGE
+	    SET IS_READ = 'Y'
+	    WHERE 
+	        RECEIVER_EMP_NO = #{myEmpNo}
+	        AND SENDER_EMP_NO = #{otherUserId}
+	        AND IS_READ = 'N'
+	</update>
+
+</mapper>
