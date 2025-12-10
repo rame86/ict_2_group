@@ -34,7 +34,7 @@
 
                 <h3 class="mt-4">급여 관리 관리자모드</h3>
                 <br>
-                <h4>급여 명세서</h4>
+                <h4>급여 명세 목록</h4>
 				
                 <%-- 🔹 상단: 월별 필터 + (DataTables 검색창 자리) --%>
                 <div class="sal-top-bar">
@@ -118,10 +118,11 @@
 
                 </c:choose>
 
-                <jsp:include page="../common/footer.jsp" />
+               
 
             </div>
         </main>
+         <jsp:include page="../common/footer.jsp" />
     </div>
 </div>
 
