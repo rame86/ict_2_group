@@ -4,10 +4,12 @@ import lombok.Data;
 
 @Data
 public class FreeBoardVO {
-
-	private String boardNo;
 	private String empNo;
-	private String bContent;
-	private String bDate;
-
+	private String boardNo;
+	private String boardContent;	
+	private String boardDate;
+	private String boardTitle;
+	private Integer boardCnt;
+	
+	
 }

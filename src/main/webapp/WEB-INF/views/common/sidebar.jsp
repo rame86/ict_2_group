@@ -109,10 +109,10 @@ if (menu == null) menu = "";
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-chart-area"></i>
 						</div> Charts
-					</a> <a class="nav-link" href="/board/getBoardList">
+					</a> <a class="nav-link" href="/board/getNoticeBoardList">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-table"></i>
-						</div> 게시판
+						</div> 공지 게시판
 					</a>
 				</div>
 			</div>
