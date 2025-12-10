@@ -110,7 +110,7 @@
 							<div class="emp-list-area">
 
 								<div class="page-header">
-									<h2 class="page-title">사원 목록</h2>
+									<h1 class="page-title">사원 목록</h1>
 								</div>
 
 								<!-- 검색창 -->
@@ -187,11 +187,13 @@
 					<!-- end content-wrapper -->
 
 
-					<!-- 푸터 -->
-					<jsp:include page="../common/footer.jsp" />
+					
 
 				</div>
 			</main>
+			
+			<!-- 푸터 -->
+					<jsp:include page="../common/footer.jsp" />
 		</div>
 
 	</div>

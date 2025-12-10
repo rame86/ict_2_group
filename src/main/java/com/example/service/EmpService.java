@@ -1,7 +1,9 @@
 package com.example.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import com.example.domain.EditVO;
 import com.example.domain.EmpSearchVO;
 import com.example.domain.EmpVO;
 
@@ -31,4 +33,18 @@ public interface EmpService {
     // 🔹 사번 중복 여부
     //    중복이면 true, 아니면 false
     boolean isEmpNoDuplicate(String empNo);
+    
+    /** 비고 이력 저장 (한 번 호출할 때마다 EDIT 테이블에 한 줄 INSERT) */
+    void saveEmpEditHistory(String empNo,
+                            LocalDate retireDate,  // 없으면 null
+                            String eNote,
+                            String writerName);   // 수정한 사람 이름
+	
+	// 🔹사원 비고 이력 전체 조회
+	EditVO getLastEdit(String empNo);
+	
+	// 비고 히스토리(헤더까지 포함한 문자열) 조회
+    String getEditNoteHistory(String empNo);
+
+	
 }

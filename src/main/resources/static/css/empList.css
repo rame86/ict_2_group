@@ -1,6 +1,10 @@
 /* =========================================
    🔹 공통 레이아웃
    ========================================= */
+   
+   table.emp-table thead th {
+    text-align: center !important;
+}
 
 /* 페이지 전체 내부 여백 */
 .content-wrapper {
@@ -20,6 +24,24 @@
 	font-weight: 600;
 }
 
+
+/* 🔹 사원카드 보기 모드 비고창 (읽기 전용 뷰) */
+.emp-note-view {
+    width: 100%;
+    resize: vertical;      /* 필요 없으면 none 으로 */
+    border: 1px solid #ddd;
+    padding: 6px 8px;
+    background-color: #fff;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* 🔹 클릭해도 활성화처럼 안 보이게 (border/그림자 고정) */
+.emp-note-view:focus {
+    outline: none;
+    border-color: #ddd;    /* 평소랑 똑같은 색 */
+    box-shadow: none;
+}
 /* =========================================
    🔹 검색 영역
    - 타이틀 아래, 우측 정렬
@@ -76,6 +98,7 @@
 	border-collapse: collapse;
 	font-size: 14px;
 	table-layout: fixed;
+	
 }
 
 /* 헤더 */
@@ -85,6 +108,7 @@
 	background: #f9fbff;
 	font-weight: 600;
 	text-align: center;
+	
 }
 
 /* 정렬 아이콘이 있는 헤더 */
@@ -159,17 +183,25 @@
    - 나중에 오른쪽 카드 만들 때 사용
    ========================================= */
 
-/* 전체 2단 레이아웃 컨테이너 */
+/* 전체 2단 레이아웃 컨테이너 – 폭 고정 (창 늘려도 안 변하게) */
 .emp-wrapper {
-	display: flex;
-	gap: 24px;
-	align-items: flex-start;
-	margin-top: 24px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin-top: 24px;
+
+    width: 1200px;   /* ✅ 전체 레이아웃 폭 고정값 (원하는 값으로 조절 가능) */
 }
 
-/* 왼쪽 목록 영역 */
+/* 왼쪽 영역 : 제목 포함 + 아래 내용 */
 .emp-list-area {
-	flex: 0 0 40%; /* 전체 폭 중 약 40% 사용 */
+    flex: 0 0 50%;
+    padding-left: 50px;   /* ✅ 제목 포함 전체를 50px 오른쪽으로 */
+}
+
+/* 제목만 다시 왼쪽으로 당기기 → 결과적으로 제목은 그대로, 아래만 50px 오른쪽 */
+.emp-list-area .page-header {
+    margin-left: -50px;   /* ✅ 제목 위치 보정 */
 }
 
 /* 오른쪽 인사카드 영역 */
@@ -181,6 +213,7 @@
 	background: #f5f9ff; /* 연한 파란색 바탕 */
 	border-radius: 24px;
 	padding: 24px;
+	
 }
 
 /* 처음 진입했을 때 안내 문구 */
@@ -247,9 +280,19 @@
 
 /* 상세정보 테이블 */
 .emp-card-table {
-	width: 100%;
-	border-collapse: collapse;
-	margin-top: 4px;
+    width: 94%;          /* ⬅ 카드보다 살짝 좁게 */
+    margin: 4px auto 0;  /* ⬅ 가운데 정렬 */
+    border-collapse: collapse;
+}
+
+/* 라벨 칸(재직상태 / 연락처 / 주소 / 비고 등) */
+.emp-card-table col.col-label {
+    width: 120px;          /* 👉 원하는 폭으로 조절 */
+}
+
+/* 값 칸(오른쪽 칸) */
+.emp-card-table col.col-value {
+    width: 260px;          /* 👉 필요에 따라 숫자 조절 */
 }
 
 .emp-card-table th, .emp-card-table td {
@@ -328,7 +371,7 @@
 	background: #ffffff;
     border-radius: 18px;
 	position: relative;
-	padding-bottom: 80px; /* 버튼 자리 확보 */
+	padding: 24px 32px 80px;  /* ⬅ 위 24, 좌우 32, 아래 80 */
 }
 
 /* 🔹 버튼은 오른쪽 카드 안에서만 아래 중앙 고정 */
@@ -375,4 +418,31 @@
     padding: 4px 6px;
     border: 1px solid #d0d7e2;
     border-radius: 4px;
+}
+
+/* 화면 전체 높이 사용 */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/* 사이드 레이아웃 전체가 화면을 채우게 */
+#layoutSidenav {
+    min-height: 100vh;
+}
+
+/* 오른쪽 컨텐츠 영역: main + footer 세로 배치 */
+#layoutSidenav_content {
+    display: flex;
+    flex-direction: column;
+}
+
+/* main이 남는 공간을 다 차지해서 footer를 아래로 밀기 */
+#layoutSidenav_content main {
+    flex: 1 0 auto;
+}
+
+/* footer는 아래에 고정 (줄어들지 않게) */
+#layoutSidenav_content footer {
+    flex-shrink: 0;
 }
