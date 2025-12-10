@@ -160,5 +160,70 @@
 		#{dayAttno}
 	</update>
 
+	<select id="getAllEmpNos" resultType="string">
+		SELECT EMP_NO
+		FROM EMP
+		WHERE
+		STATUS_NO != 99
+	</select>
+
+	<!-- 오후 6시까지 출퇴근 정보 없으면 싹다 결근처리 -->
+	<insert id="insertAbsenceRecords">
+		INSERT INTO DAY_ATTEND
+		(
+		DAY_ATTNO,
+		EMP_NO,
+		ATT_STATUS,
+		IN_TIME,
+		OUT_TIME,
+		DAY_FULLTIME,
+		FIRST_DAYTIME,
+		UPDATE_TIME,
+		MEMO,
+		DATE_ATTEND
+		)
+		SELECT
+		DAY_ATTNO_SEQ.NEXTVAL, E.EMP_NO,
+		'10', -- ATT_STATUS
+		(10: 결근)
+		NULL, -- IN_TIME
+		NULL, -- OUT_TIME
+		NULL, -- DAY_FULLTIME
+		SYSDATE, -- FIRST_DAYTIME
+		NULL, -- UPDATE_TIME
+		'결근', -- MEMO
+		TRUNC(SYSDATE) -- DATE_ATTEND (오늘 날짜)
+		FROM
+		EMP E
+		WHERE
+		E.STATUS_NO != 99
+		AND
+		E.EMP_NO NOT IN (
+		SELECT
+		A.EMP_NO
+		FROM
+		DAY_ATTEND A
+		WHERE
+		TRUNC(A.DATE_ATTEND) = TRUNC(SYSDATE)
+		)
+	</insert>
+
+	<!-- 퇴근 정보 없는 출근, 지각 상태는 싹다 결근처리 -->
+	<update id="updateIncompleteAttendanceToAbsence">
+		UPDATE DAY_ATTEND
+		SET
+		ATT_STATUS = '10', -- 결근 상태 코드로 업데이트합니다.
+		MEMO = '미퇴근 결근 처리됨',
+		UPDATE_TIME = SYSDATE -- 처리 시간 기록
+		WHERE
+		TRUNC(DATE_ATTEND) = TRUNC(SYSDATE) -- 오늘 날짜
+		AND
+		ATT_STATUS IN ('1', '2') -- 출근,지각 상태인 경우
+		AND
+		OUT_TIME IS NULL -- 퇴근 시간이 기록되지 않은 경우
+	</update>
+
+
+
 
 </mapper>

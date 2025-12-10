@@ -141,6 +141,8 @@ public class ApproveController {
 	// 문서 작성
 	@PostMapping("approve/approve-form")
 	public String approveForm(DocVO dvo, ApproveVO avo){
+		log.info("approve/approve-form 요청받음");
+		log.info(dvo.toString());
 		approveService.ApprovalApplication(dvo, avo);
 		notificationService.sendApprovalNotification(Integer.toString(avo.getStep1ManagerNo()), "새로운 결재가 도착했습니다");
 		return "redirect:statusList";
@@ -165,6 +167,7 @@ public class ApproveController {
 		approveService.approveDocument(docNo, status, empNo, rejectReason);
 		
 		DocVO vo = approveService.selectDocNo(docNo); // 문서조회
+		log.info("approveDocument:"+vo.toString());
 		String docWriter = vo.getDocWriter(); // 문서를 쓴 작성자
 		Integer step2Manager = vo.getStep2ManagerNo(); // 2차결재자의 사번
 		String step2Status = vo.getStep2Status(); // 2차결재의 상태

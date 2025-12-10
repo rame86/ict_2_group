@@ -48,5 +48,16 @@ public class BoardDAOImpl implements BoardDAO {
 		return resultString;
 		
 	};
+	
+	public void updateNoticeCnt(String noticeNo) {
+	    log.info("[BoardDAOImpl - updateNoticeCnt()] 요청받음");
+	    sess.update("com.example.repository.BoardDAO.updateNoticeCnt", noticeNo);
+	}
+	
+	public NoticeBoardVO getContentNoticeBoard(String noticeNo) {
+		log.info("[BoardDAOImpl - getContentNoticeBoard()] 요청받음");
+		NoticeBoardVO result = sess.selectOne("com.example.repository.BoardDAO.getContentNoticeBoard", noticeNo);
+		return result;
+	}
 
 }
