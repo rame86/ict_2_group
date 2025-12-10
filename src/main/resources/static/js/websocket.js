@@ -8,6 +8,9 @@ function connectWebSocket(empNo) {
         stompClient = Stomp.over(socket); 
 
         stompClient.connect({}, function (frame) {
+			console.log('STOMP: 연결 성공 및 인증 정보 등록 완료!');
+			// STOMP
+			loadConversationList(empNo);
 
 			const globalTopic = '/topic/global-notifications';
 			

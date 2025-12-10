@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,16 @@ public class MessageDAOImpl implements MessageDAO{
 	@Override
 	public int insertMessage(MessageVO vo) {
 		return sess.insert("com.example.repository.MessageDAO.insertMessage", vo);
+	}
+
+	@Override
+	public List<MessageVO> selectChatMessages(Map<String, String> param) {
+		return sess.selectList("com.example.repository.MessageDAO.selectChatMessages", param);
+	}
+
+	@Override
+	public int updateIsRead(Map<String, String> param) {
+		return sess.update("com.example.repository.MessageDAO.updateIsRead", param);
 	}
 	
 }

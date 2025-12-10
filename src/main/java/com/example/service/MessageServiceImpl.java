@@ -1,6 +1,8 @@
 package com.example.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,32 @@ public class MessageServiceImpl implements MessageService {
 	@Transactional
 	public int sendMessage(MessageVO vo) {
 		return messageDao.insertMessage(vo);
+	}
+
+	// 선택한 사용자와의 쪽지보기
+	@Override
+	public List<MessageVO> getChatMessage(String myUserId, String otherUserId) {
+		
+		Map<String, String> param = new HashMap<>();
+		
+		param.put("myUserId", myUserId);
+		param.put("otherUserId", otherUserId);
+		
+		return messageDao.selectChatMessages(param);
+		
+	}
+
+	// 채팅 읽음
+	@Override
+	public int markAsRead(String myUserId, String otherUserId) {
+		
+		Map<String, String> param = new HashMap<>();
+		
+		param.put("myEmpNo", myUserId);
+		param.put("otherUserId", otherUserId);
+		
+		return messageDao.updateIsRead(param);
+		
 	}
 	
 }
