@@ -9,6 +9,12 @@
     margin-bottom: 15px;
 }
 
+.mt-4{
+	font-size: 30px;
+	font-weight: 600; 
+}
+
+
 /* 상단 사원/지급 정보 박스 */
 .info-card {
     border: 1px solid #dee2e6;
@@ -311,3 +317,6 @@ table.dataTable thead .sorting_desc:after {
 h4 {
     margin-bottom: 12px;   /* 8~16px 정도가 가장 자연스러움 */
 }
+
+
+

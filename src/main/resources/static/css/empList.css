@@ -1,429 +1,11 @@
 /* =========================================
-   🔹 공통 레이아웃
+   🔹 전체 배경 (SB Admin 스타일)
    ========================================= */
-   
-   table.emp-table thead th {
-    text-align: center !important;
-}
-
-/* 페이지 전체 내부 여백 */
-.content-wrapper {
-	display: flex;
-	align-items: flex-start;
-	gap: 32px;
-}
-
-/* 상단 제목 영역 */
-.page-header {
-	margin-bottom: 12px;
-}
-
-/* "사원 목록" 타이틀 */
-.page-title {
-	font-size: 22px;
-	font-weight: 600;
-}
-
-
-/* 🔹 사원카드 보기 모드 비고창 (읽기 전용 뷰) */
-.emp-note-view {
-    width: 100%;
-    resize: vertical;      /* 필요 없으면 none 으로 */
-    border: 1px solid #ddd;
-    padding: 6px 8px;
-    background-color: #fff;
-    font-size: 13px;
-    line-height: 1.4;
-}
-
-/* 🔹 클릭해도 활성화처럼 안 보이게 (border/그림자 고정) */
-.emp-note-view:focus {
-    outline: none;
-    border-color: #ddd;    /* 평소랑 똑같은 색 */
-    box-shadow: none;
-}
-/* =========================================
-   🔹 검색 영역
-   - 타이틀 아래, 우측 정렬
-   ========================================= */
-.search-area {
-	width: 100%;
-	text-align: right;
-	margin-bottom: 8px; /* 검색창 ↔ 표 사이 간격 */
-}
-
-/* 검색 폼 (한 줄에 input + 버튼) */
-.search-area form {
-	display: inline-flex;
-	gap: 8px;
-	align-items: center;
-}
-
-/* 검색 입력창 */
-.search-area input[type="text"] {
-	width: 220px;
-	padding: 6px 10px;
-	border: 1px solid #ccc;
-	border-radius: 16px;
-	outline: none;
-	font-size: 13px;
-}
-
-/* 검색 버튼 */
-.search-area button {
-	padding: 6px 14px;
-	border-radius: 16px;
-	border: none;
-	background: #2f80ff;
-	color: #fff;
-	font-size: 13px;
-	cursor: pointer;
-}
-
-.search-area button:hover {
-	background: #1b63d8;
-}
-
-/* =========================================
-   🔹 사원 목록 테이블
-   ========================================= */
-.emp-table-wrapper {
-	width: 100%;
-	margin-top: 12px;
-}
-
-/* 테이블 기본 */
-.emp-table {
-	width: 100%;
-	border-collapse: collapse;
-	font-size: 14px;
-	table-layout: fixed;
-	
-}
-
-/* 헤더 */
-.emp-table thead th {
-	padding: 10px 8px;
-	border-bottom: 1px solid #e2e6f0;
-	background: #f9fbff;
-	font-weight: 600;
-	text-align: center;
-	
-}
-
-/* 정렬 아이콘이 있는 헤더 */
-.emp-table thead th.sortable {
-	cursor: pointer;
-}
-
-/* 본문 셀 */
-.emp-table tbody td {
-	padding: 10px 8px;
-	border-bottom: 1px solid #f0f2f7;
-	text-align: center;
-}
-
-/* 홀수 / 짝수 줄 배경 */
-.emp-table tbody tr:nth-child(odd) {
-	background-color: #ffffff;
-}
-
-.emp-table tbody tr:nth-child(even) {
-	background-color: #fbfcff;
-}
-
-/* 행 호버 효과 */
-.emp-table tbody tr:hover {
-	background-color: #f1f5ff;
-}
-
-/* =========================================
-   🔹 페이징 영역
-   ========================================= */
-.pagination {
-	margin-top: 16px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 4px;
-	font-size: 13px;
-}
-
-/* 이전/다음, 페이지 번호 공통 스타일 */
-.pagination a, .pagination span {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 28px;
-	height: 28px;
-	border-radius: 50%;
-	text-decoration: none;
-	cursor: pointer;
-}
-
-/* 일반 페이지 번호 */
-.pagination a.page-link {
-	color: #333;
-}
-
-/* 현재 페이지 */
-.pagination span.page-current {
-	background: #2f80ff;
-	color: #fff;
-}
-
-/* 비활성(필요시 사용) */
-.pagination span.disabled {
-	color: #bbb;
-	cursor: default;
-}
-
-/* =========================================
-   🔹 사원 목록 + 인사카드 2단 레이아웃
-   - 나중에 오른쪽 카드 만들 때 사용
-   ========================================= */
-
-/* 전체 2단 레이아웃 컨테이너 – 폭 고정 (창 늘려도 안 변하게) */
-.emp-wrapper {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
-    margin-top: 24px;
-
-    width: 1200px;   /* ✅ 전체 레이아웃 폭 고정값 (원하는 값으로 조절 가능) */
-}
-
-/* 왼쪽 영역 : 제목 포함 + 아래 내용 */
-.emp-list-area {
-    flex: 0 0 50%;
-    padding-left: 50px;   /* ✅ 제목 포함 전체를 50px 오른쪽으로 */
-}
-
-/* 제목만 다시 왼쪽으로 당기기 → 결과적으로 제목은 그대로, 아래만 50px 오른쪽 */
-.emp-list-area .page-header {
-    margin-left: -50px;   /* ✅ 제목 위치 보정 */
-}
-
-/* 오른쪽 인사카드 영역 */
-.emp-detail-area {
-	margin-top: 80px;
-	flex: 0 0 800px; /* 폭 고정 */
-	max-width: 800px;
-	min-width: 800px;
-	background: #f5f9ff; /* 연한 파란색 바탕 */
-	border-radius: 24px;
-	padding: 24px;
-	
-}
-
-/* 처음 진입했을 때 안내 문구 */
-#emp-detail-placeholder {
-	color: #999;
-	font-size: 14px;
-	margin-top: 12px;
-}
-
-/* 목록에서 선택된 행 표시 */
-.emp-row {
-	cursor: pointer;
-}
-
-.emp-row:hover {
-	background-color: #f5f7ff;
-}
-
-.emp-row.selected {
-	background-color: #e4ecff;
-}
-
-/* =========================================
-   🔹 인사카드 카드뷰
-   - empCard.jsp 에서 사용할 디자인
-   ========================================= */
-.emp-card {
-	width: 100%;
-	font-size: 14px;
-}
-
-/* 상단 : 사진 + 기본정보 */
-.emp-card-header {
-	display: flex;
-	gap: 16px;
-	align-items: center;
-	margin-bottom: 16px;
-}
-
-/* 사진 자리 (임시 박스) */
-.emp-photo-placeholder {
-	width: 90px;
-	height: 110px;
-	border-radius: 8px;
-	border: 1px dashed #cdd4e7;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 11px;
-	color: #999;
-	background: #fff;
-}
-
-/* 기본정보 텍스트 */
-.emp-basic-info h3 {
-	font-size: 18px;
-	margin-bottom: 4px;
-}
-
-.emp-basic-info p {
-	margin: 2px 0;
-	color: #555;
-}
-
-/* 상세정보 테이블 */
-.emp-card-table {
-    width: 94%;          /* ⬅ 카드보다 살짝 좁게 */
-    margin: 4px auto 0;  /* ⬅ 가운데 정렬 */
-    border-collapse: collapse;
-}
-
-/* 라벨 칸(재직상태 / 연락처 / 주소 / 비고 등) */
-.emp-card-table col.col-label {
-    width: 120px;          /* 👉 원하는 폭으로 조절 */
-}
-
-/* 값 칸(오른쪽 칸) */
-.emp-card-table col.col-value {
-    width: 260px;          /* 👉 필요에 따라 숫자 조절 */
-}
-
-.emp-card-table th, .emp-card-table td {
-	border: 1px solid #dde3f3;
-	padding: 6px 8px;
-}
-
-.emp-card-table th {
-	background: #f1f4ff;
-	width: 120px;
-	text-align: left;
-}
-
-.emp-card-table td {
-	background: #fff;
-}
-
-/* =========================================
-   🔹 DataTables 페이징 커스터마이징
-   ========================================= */
-
-/* 페이징 전체 박스 위치/간격 */
-.emp-pagination-container {
-	margin-top: 16px;
-	display: flex; /* 🔹 한 줄로 배치 */
-	justify-content: center; /* 🔹 가로 가운데 정렬 */
-}
-
-/* DataTables가 만드는 페이징 영역 */
-.emp-pagination-container .dataTables_paginate {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px; /* 이전 / 1 / 2 / 3 / 다음 간격 */
-	font-size: 13px;
-}
-
-/* 번호/이전/다음 공통 버튼 스타일 */
-.emp-pagination-container .dataTables_paginate .paginate_button {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	min-width: 28px;
-	height: 28px;
-	border-radius: 50%;
-	padding: 0 8px;
-	text-decoration: none;
-	cursor: pointer; /* 👉 손가락 커서 */
-	color: #333 !important;
-	border: 1px solid transparent;
-}
-
-/* 마우스 오버 시 */
-.emp-pagination-container .dataTables_paginate .paginate_button:hover {
-	background: #e4ecff;
-	border-color: #c5d3ff;
-}
-
-/* 현재 페이지 */
-.emp-pagination-container .dataTables_paginate .paginate_button.current,
-	.emp-pagination-container .dataTables_paginate .paginate_button.current:hover
-	{
-	background: #2f80ff;
-	color: #fff !important;
-	border-color: #2f80ff;
-}
-
-/* 비활성(첫 페이지에서 이전, 마지막 페이지에서 다음 등) */
-.emp-pagination-container .dataTables_paginate .paginate_button.disabled
-	{
-	opacity: 0.4;
-	cursor: default;
-}
-
-/* 🔹 오른쪽 인사카드 안의 emp-card에만 적용 */
-.emp-detail-area .emp-card {
-	background: #ffffff;
-    border-radius: 18px;
-	position: relative;
-	padding: 24px 32px 80px;  /* ⬅ 위 24, 좌우 32, 아래 80 */
-}
-
-/* 🔹 버튼은 오른쪽 카드 안에서만 아래 중앙 고정 */
-.emp-detail-area .emp-card-actions {
-	position: absolute;
-	bottom: 20px;
-	left: 50%;
-	transform: translateX(-50%);
-	display: flex;
-	gap: 10px;
-}
-
-/* 버튼 공통 */
-.emp-btn {
-	min-width: 72px;
-	height: 36px;
-	border: none;
-	border-radius: 6px;
-	font-size: 14px;
-	cursor: pointer;
-}
-
-/* 수정 버튼 */
-.emp-btn-edit {
-	background: #2f80ff;
-	color: white;
-}
-
-/* 삭제 버튼 */
-.emp-btn-delete {
-	background: #ffe3e3;
-	color: #d9534f;
-}
-
-/* 페이징: 가운데 정렬 유지 */
-.emp-pagination-container {
-	justify-content: center;
-}
-
-/* 수정 모드에서 쓰는 input/select 살짝만 정리 (선택사항) */
-.emp-card-table input[type="text"],
-.emp-card-table select {
-    font-size: 13px;
-    padding: 4px 6px;
-    border: 1px solid #d0d7e2;
-    border-radius: 4px;
-}
-
-/* 화면 전체 높이 사용 */
 html, body {
     height: 100%;
     margin: 0;
+    background-color: #fcfcfc;   /* 연한 회색 배경 */
+    font-family: "SUIT", sans-serif;
 }
 
 /* 사이드 레이아웃 전체가 화면을 채우게 */
@@ -445,4 +27,646 @@ html, body {
 /* footer는 아래에 고정 (줄어들지 않게) */
 #layoutSidenav_content footer {
     flex-shrink: 0;
+}
+
+/* =========================================
+   🔹 공통 레이아웃
+   ========================================= */
+
+table.emp-table thead th {
+    text-align: center !important;
+}
+
+/* 페이지 전체 내부 여백 + 세로 레이아웃 */
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;           /* 제목 ↔ 본문 간격 */
+}
+
+/* 상단 제목 영역 */
+.page-header {
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 4px double #869ABF;   /* 사원 목록 밑 줄 두 개 */
+}
+
+/* "사원 목록" 타이틀 */
+.page-title {
+    font-family: "SUIT", sans-serif;
+    margin-top: 20px;
+    font-size: 30px;
+    font-weight: 600;
+    color: #000000;
+    letter-spacing: -0.3px;
+}
+
+/* 🔹 사원카드 보기 모드 비고창 (읽기 전용 뷰) */
+.emp-note-view {
+    width: 100%;
+    resize: vertical;
+    border: 1px solid #ddd;
+    padding: 6px 8px;
+    background-color: #fff;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+/* 🔹 클릭해도 활성화처럼 안 보이게 (border/그림자 고정) */
+.emp-note-view:focus {
+    outline: none;
+    border-color: #ddd;
+    box-shadow: none;
+}
+
+/* =========================================
+   🔹 검색 영역
+   ========================================= */
+.search-area {
+    width: 100%;
+    text-align: right;
+    margin-bottom: 8px; /* 검색창 ↔ 표 사이 간격 */
+}
+
+/* 검색 폼 (한 줄에 input + 버튼) */
+.search-area form {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* 검색 입력창 */
+.search-area input[type="text"] {
+    width: 550px;
+    padding: 6px 12px;
+    border: 1px solid #d1d3e2;
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+    background-color: #ffffff;
+}
+
+/* 검색 버튼 */
+.search-area button {
+    padding: 6px 18px;
+    border-radius: 20px;
+    border: none;
+    background: #4e73df;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+}
+
+.search-area button:hover {
+    background: #2e59d9;
+}
+
+/* =========================================
+   🔹 사원 목록 + 인사카드 2단 레이아웃
+   ========================================= */
+
+/* 전체 2단 레이아웃 컨테이너 – 폭 고정 */
+.emp-wrapper {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+   /*  margin-top: 15px; */
+
+    max-width: 1200px;
+    width: 100%;
+}
+
+/* 왼쪽 영역 : 제목 포함 + 아래 내용 */
+.emp-list-area {
+    flex: 0 0 60%;
+    padding-left: 150px;
+}
+
+/* 제목만 다시 왼쪽으로 당기기 */
+.emp-list-area .page-header {
+    margin-left: -150px;
+}
+
+/* 오른쪽 인사카드 영역 전체 */
+.emp-detail-area {
+    margin-top: 50px;
+    flex: 0 0 800px;
+    max-width: 800px;
+    min-width: 800px;
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 24px 28px;
+    border: 1px solid #e3e6f0;
+    box-shadow: 0 0.15rem 1.75rem rgba(58,59,69,.15);
+}
+
+/* 처음 진입했을 때 안내 문구 */
+#emp-detail-placeholder {
+    color: #858796;
+    font-size: 14px;
+    margin-top: 12px;
+}
+
+/* 목록에서 선택된 행 표시 */
+.emp-row {
+    cursor: pointer;
+}
+
+.emp-row:hover {
+    background-color: #eef3ff;
+}
+
+/* 선택된 행 (파란 줄) */
+.emp-row.selected {
+    background-color: #d1d7fe;
+    color: #ffffff;
+}
+
+.emp-row.selected td {
+    color: #ffffff;
+}
+
+/* =========================================
+   🔹 사원 목록 테이블
+   ========================================= */
+
+/* 사원목록 전체를 감싸는 카드 */
+.emp-table-wrapper {
+    width: 100%;
+    margin-top: 12px;
+
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e3e6f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+
+    padding: 16px 18px 14px;
+}
+
+/* 테이블 기본 */
+.emp-table {
+    width: 100%;
+    border-collapse: separate;
+    font-size: 16px;
+    table-layout: fixed;
+}
+
+/* 헤더 */
+.emp-table thead th {
+    padding: 12px 8px;
+    border-bottom: 1px solid #eaecf4;
+    background: #f8f9fc;
+    font-weight: 600;
+    text-align: center;
+    color: #4e73df;
+}
+
+/* 정렬 아이콘이 있는 헤더 */
+.emp-table thead th.sortable {
+    cursor: pointer;
+}
+
+/* 본문 셀 */
+.emp-table tbody td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #eaecf4;
+    text-align: center;
+    color: #5a5c69;
+}
+
+/* 홀수 / 짝수 줄 배경 */
+.emp-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.emp-table tbody tr:nth-child(even) {
+    background-color: #fbfbff;
+}
+
+/* 행 호버 효과(살짝 떠보이게) */
+.emp-table tbody tr:hover {
+    background-color: #eef3ff;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* =========================================
+   🔹 페이징 영역
+   ========================================= */
+.pagination {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    font-size: 15px;
+}
+
+/* 이전/다음, 페이지 번호 공통 스타일 */
+.pagination a,
+.pagination span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* 일반 페이지 번호 */
+.pagination a.page-link {
+    color: #5a5c69;
+}
+
+/* 현재 페이지 */
+.pagination span.page-current {
+    background: #4e73df;
+    color: #fff;
+}
+
+/* 비활성 */
+.pagination span.disabled {
+    color: #bbb;
+    cursor: default;
+}
+
+/* =========================================
+   🔹 인사카드 카드뷰 (오른쪽)
+   ========================================= */
+.emp-card {
+    width: 100%;
+    font-size: 16px;
+}
+
+/* 상단 : 사진 + 기본정보 */
+.emp-card-header {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/* 사진 자리 */
+.emp-photo-placeholder {
+    width: 90px;
+    height: 110px;
+    border-radius: 8px;
+    border: 1px dashed #d1d3e2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #858796;
+    background: #f8f9fc;
+}
+
+/* 기본정보 텍스트 */
+.emp-basic-info h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+    color: #5a5c69;
+}
+
+.emp-basic-info p {
+    margin: 2px 0;
+    color: #858796;
+}
+
+/* 상세정보 테이블 */
+.emp-card-table {
+    width: 94%;
+    margin: 4px auto 0;
+    border-collapse: collapse;
+}
+
+.emp-card-table col.col-label {
+    width: 120px;
+}
+
+.emp-card-table col.col-value {
+    width: 260px;
+}
+
+.emp-card-table th,
+.emp-card-table td {
+    border: 1px solid #eaecf4;
+    padding: 6px 8px;
+}
+
+.emp-card-table th {
+    background: #f1f4ff;
+    width: 120px;
+    text-align: left;
+    color: #4e73df;
+    font-weight: 600;
+}
+
+.emp-card-table td {
+    background: #fff;
+    color: #5a5c69;
+}
+
+/* 수정 모드에서 쓰는 input/select */
+.emp-card-table input[type="text"],
+.emp-card-table select {
+    font-size: 13px;
+    padding: 4px 6px;
+    border: 1px solid #d0d7e2;
+    border-radius: 4px;
+}
+
+/* =========================================
+   🔹 DataTables 페이징 커스터마이징
+   ========================================= */
+.emp-pagination-container {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+}
+
+.emp-pagination-container .dataTables_paginate {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.emp-pagination-container .dataTables_paginate .paginate_button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    padding: 0 8px;
+    text-decoration: none;
+    cursor: pointer;
+    color: #333 !important;
+    border: 1px solid transparent;
+}
+
+.emp-pagination-container .dataTables_paginate .paginate_button:hover {
+    background: #e4ecff;
+    border-color: #c5d3ff;
+}
+
+.emp-pagination-container .dataTables_paginate .paginate_button.current,
+.emp-pagination-container .dataTables_paginate .paginate_button.current:hover {
+    background: #4e73df;
+    color: #fff !important;
+    border-color: #4e73df;
+}
+
+.emp-pagination-container .dataTables_paginate .paginate_button.disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+/* 오른쪽 인사카드 안의 emp-card */
+.emp-detail-area .emp-card {
+    background: #ffffff;
+    border-radius: 18px;
+    position: relative;
+    padding: 24px 32px 80px;
+}
+
+/* 버튼 영역 */
+.emp-detail-area .emp-card-actions {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+}
+
+/* 버튼 공통 */
+.emp-btn {
+    min-width: 72px;
+    height: 36px;
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* 수정 버튼 */
+.emp-btn-edit {
+    background: #4e73df;
+    color: white;
+}
+
+/* 삭제 버튼 */
+.emp-btn-delete {
+    background: #e74a3b;
+    color: #ffffff;
+}
+
+/* =========================================
+   🔹 DataTables 선택 색상 변수
+   ========================================= */
+:root {
+    --dt-row-selected: 146, 168, 209 !important;        /* #92A8D1 */
+    --dt-row-selected-text: 255, 255, 255 !important;   /* #ffffff */
+}
+
+/* ===============================
+   🔹 왼쪽 사원목록 카드 테두리
+   =============================== */
+.emp-list-card {
+    margin-top: 50px;
+    padding: 16px 20px 18px;
+    background: #ffffff;
+    border: 1px solid #e3e6f0;
+    border-radius: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.emp-list-card .search-area {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.emp-list-card .emp-card {
+    margin-top: 0;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+}
+
+.emp-list-card .emp-pagination-container {
+    margin-top: 14px;
+}
+
+/* =========================================
+   🔹 재직 상태 배지 (status-badge)
+   ========================================= */
+
+.status-badge {
+    display: inline-block;
+    min-width: 52px;
+    padding: 2px 10px;
+    border-radius: 999px;          /* pill 형태 */
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: -0.2px;
+    border: 1px solid transparent;
+}
+
+/* 재직 */
+.status-active {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border-color: #c8e6c9;
+}
+
+/* 퇴직 */
+.status-retired {
+    background: #ffebee;
+    color: #c62828;
+    border-color: #ffcdd2;
+}
+
+/* 휴직 (자발적/복지) */
+.status-leave {
+    background: #fff8e1;
+    color: #ef6c00;
+    border-color: #ffe0b2;
+}
+
+/* 인턴/수습 */
+.status-intern {
+    background: #e3f2fd;
+    color: #1565c0;
+    border-color: #bbdefb;
+}
+
+/* 기타 */
+.status-etc {
+    background: #eceff1;
+    color: #455a64;
+    border-color: #cfd8dc;
+}
+
+/* =========================================
+   🔹 이름 앞 아바타 (emp-avatar)
+   ========================================= */
+
+.emp-name-cell {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.emp-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e3ebff;
+    color: #4e73df;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.emp-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.emp-name-text {
+    display: inline-block;
+    font-weight: 500;
+    color: #2f3542;
+}
+
+/* =========================================
+   🔹 상단 요약 바 (Summary Bar)
+   ========================================= */
+
+.emp-summary-bar {
+    margin-top: 12px;
+    /* margin-bottom: 4px; */
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #f2f4ff;
+    color: #4e5a7d;
+    font-size: 16px;
+}
+
+.emp-summary-item strong {
+    font-weight: 700;
+}
+
+.emp-summary-item + .emp-summary-item {
+    position: relative;
+}
+
+/* 항목 사이 구분 점 */
+.emp-summary-item + .emp-summary-item::before {
+    content: "·";
+    margin-right: 8px;
+}
+
+/* 색상 강조 */
+.emp-summary-active strong {
+    color: #2e7d32;
+}
+
+.emp-summary-leave strong {
+    color: #ef6c00;
+}
+
+.emp-summary-retired strong {
+    color: #c62828;
+}
+
+
+/* =========================================
+   🔹 DataTables 정렬 아이콘 커스터마이징
+   ========================================= */
+
+/* 정렬 가능한 헤더 기본 */
+table.dataTable thead th {
+    position: relative;
+    padding-right: 18px;  /* 아이콘 들어갈 공간 */
+}
+
+/* 기본(정렬 안 된 상태) */
+table.dataTable thead th.sorting:after {
+    content: "↕";
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: #b8bfd4;   /* 연한 회색 */
+}
+
+/* 오름차순 */
+table.dataTable thead th.sorting_asc:after {
+    content: "▲";
+    color: #4e73df;   /* 파란색 강조 */
+}
+
+/* 내림차순 */
+table.dataTable thead th.sorting_desc:after {
+    content: "▼";
+    color: #4e73df;
 }
