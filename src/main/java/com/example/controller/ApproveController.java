@@ -168,6 +168,7 @@ public class ApproveController {
 		String docWriter = vo.getDocWriter(); // 문서를 쓴 작성자
 		Integer step2Manager = vo.getStep2ManagerNo(); // 2차결재자의 사번
 		String step2Status = vo.getStep2Status(); // 2차결재의 상태
+		String writeNotificationMessage;
 				
 		if(vo.getDocType().equals("4")) {
 			attendService.insertVacation(vo);
@@ -175,8 +176,13 @@ public class ApproveController {
 			attendService.commuteCorrection(vo);
 		}
 		
-		notificationService.sendApprovalNotification(docWriter, "결재신청을 완료했습니다.");
 		notificationService.sendApprovalNotification(Integer.toString(empNo), "결재가 성공적으로 완료되었습니다.");
+		
+		if(step2Status != null && step2Status.equals("A")) writeNotificationMessage = "문서가 최종 승인 되었습니다.";
+		else if(status.equals("R")) writeNotificationMessage = "문서가 반려되었습니다";
+		else writeNotificationMessage = "문서결재가 진행되고있습니다.";
+		
+		notificationService.sendApprovalNotification(docWriter, writeNotificationMessage);
 		
 		if(step2Manager != null && step2Status.equals("W")) {
 			String manager = Integer.toString(step2Manager);
@@ -201,5 +207,5 @@ public class ApproveController {
 		m.addAttribute("dept", login.getDeptName());
 		m.addAttribute("vo", vo);
 	}
-		
+	
 }

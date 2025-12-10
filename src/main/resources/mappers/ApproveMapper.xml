@@ -30,7 +30,9 @@
 	        #{docContent}, 
 	        SYSDATE, 
 	        #{docWriter},
-	        #{startDate, jdbcType=VARCHAR},             #{endDate, jdbcType=VARCHAR},               #{totalDays, jdbcType=VARCHAR},
+	        #{startDate, jdbcType=VARCHAR}, 
+	        #{endDate, jdbcType=VARCHAR}, 
+	        #{totalDays, jdbcType=VARCHAR},
 	        #{newmodifyTime, jdbcType=VARCHAR},  	        
 	        #{emergencyContact, jdbcType=VARCHAR},      
 	        #{memo, jdbcType=VARCHAR}             

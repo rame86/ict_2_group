@@ -4,10 +4,11 @@ import lombok.Data;
 
 @Data
 public class NoticeBoardVO {
-
-	private String noticeNo;
 	private String empNo;
-	private String nContent;
-	private String nDate;
-
+	private String noticeNo;
+	private String noticeContent;
+	private String noticeWriter;
+	private String noticeDate;
+	private String noticeTitle;
+	private Integer noticeCnt;
 }
