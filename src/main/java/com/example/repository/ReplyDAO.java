@@ -1,6 +1,8 @@
-package com.example.board;
+package com.example.repository;
 
 import java.util.List;
+
+import com.example.domain.ReplyVO;
 
 
 public interface ReplyDAO {

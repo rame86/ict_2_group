@@ -1,10 +1,12 @@
-package com.example.board;
+package com.example.repository;
 
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.domain.BoardVO;
+
 public interface BoardDAO {
-	public List<BoardVO> getBoardList(BoardVO vo);
+	public List<BoardVO> getFreeBoardList();
 
 	public HashMap getBoard(BoardVO vo);
 

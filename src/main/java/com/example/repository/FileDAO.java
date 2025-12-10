@@ -1,5 +1,6 @@
-package com.example.board;
+package com.example.repository;
 
+import com.example.domain.FileVO;
 
 public interface FileDAO {
 	public void insertFile(FileVO vo);

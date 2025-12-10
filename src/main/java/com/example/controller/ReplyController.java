@@ -1,4 +1,4 @@
-package com.example.board;
+package com.example.controller;
 
 import java.util.List;
 
@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.domain.ReplyVO;
+import com.example.service.ReplyService;
 
 import lombok.extern.slf4j.Slf4j;
 

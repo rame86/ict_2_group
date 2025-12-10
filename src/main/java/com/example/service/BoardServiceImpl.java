@@ -1,4 +1,4 @@
-package com.example.board;
+package com.example.service;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.domain.BoardVO;
+import com.example.domain.FileVO;
+import com.example.repository.BoardDAO;
+import com.example.repository.FileDAO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,8 +28,8 @@ public class BoardServiceImpl implements BoardService {
 	//
 
 	// getBoardList() ------------------------------------
-	public List<BoardVO> getBoardList(BoardVO vo) {
-		return boardDAO.getBoardList(vo);
+	public List<BoardVO> getFreeBoardList() {
+		return boardDAO.getFreeBoardList();
 	} // end of getBoardList() ---------------------------
 
 	//

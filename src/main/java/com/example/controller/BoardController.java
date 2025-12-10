@@ -1,4 +1,4 @@
-package com.example.board;
+package com.example.controller;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.domain.BoardVO;
+import com.example.domain.FileVO;
+import com.example.service.BoardService;
 import com.example.util.MD5Generator;
 
 import jakarta.servlet.http.HttpSession;
@@ -26,33 +29,39 @@ public class BoardController {
 
 	// -- 의존성 주입(Dependency Injection, DI) --
 	@Autowired
-	private final BoardService boardService;
-
-	public BoardController(BoardService boardService) {
-		this.boardService = boardService;
-	}
+	private BoardService boardService;
 
 	//
 
 	// getBoardList() --------------------
 	@GetMapping("/board/getBoardList")
-	public String getBoardList(BoardVO vo, Model m, HttpSession session) {
+	public String getFreeBoardList(BoardVO vo, Model m, HttpSession session) {
 		log.info("BoardController - getBoardList 요청됨");
 		Object login = session.getAttribute("login");
-		
-		if (login == null) {			
+
+		if (login == null) {
 			return "redirect:/";
 		}
 
-		log.info(login.toString());		
+		log.info(login.toString());
 
-		//List<BoardVO> result = boardService.getBoardList(vo);
+		List<BoardVO> result = boardService.getFreeBoardList();
 
-		//m.addAttribute("boardList", result);
+		m.addAttribute("freeBoardList", result);
+		
+		
+		
+
+		log.info("--- FreeBoard List Start ---");
+		for (BoardVO board : result) {
+			log.info(board.toString());
+		}
+		log.info("--- FreeBoard List End ---");
 
 		log.info("getBoardList로");
+
 		return "/board/getBoardList";
-		
+
 	}// end of getBoardList()
 
 	//
@@ -83,7 +92,7 @@ public class BoardController {
 		log.info("[BoardController - board/updateBoard] 요청 :" + vo.toString());
 		boardService.updateBoard(vo);
 
-		return "redirect:/board/getBoard?seq=" + vo.getSeq();
+		return "redirect:/board/getBoard?seq=" + vo.getBoardNo();
 	}// end of updateBoard()
 
 	//
@@ -98,7 +107,7 @@ public class BoardController {
 	}// end of deleteBoard()
 
 	//
-	
+
 	// saveBoard() --------------------
 	@PostMapping("/board/saveBoard")
 	public String saveBoard(@RequestParam("file") MultipartFile files, BoardVO vo) {

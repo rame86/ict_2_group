@@ -1,4 +1,4 @@
-package com.example.board;
+package com.example.repository;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.domain.BoardVO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,10 +26,9 @@ public class BoardDAOImpl implements BoardDAO {
 	//
 
 	// getBoardList() --------------------
-	public List<BoardVO> getBoardList(BoardVO vo) {
-		List<BoardVO> result = sess.selectList("com.example.dao.BoardDAO.getBoardList", vo);
-		
-		log.info("[BoardDAOImpl - getBoardList()] 요청" + result);
+	public List<BoardVO> getFreeBoardList() {
+		log.info("[BoardDAOImpl - getBoardList()] 요청");
+		List<BoardVO> result = sess.selectList("com.example.repository.BoardDAO.getFreeBoardList");
 		
 		return result;
 	} // end of getBoardList()

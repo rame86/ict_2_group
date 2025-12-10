@@ -1,10 +1,13 @@
-package com.example.board;
+package com.example.service;
 
 import java.util.HashMap;
 import java.util.List;
 
+import com.example.domain.BoardVO;
+import com.example.domain.FileVO;
+
 public interface BoardService {
-	public List<BoardVO> getBoardList(BoardVO vo);
+	public List<BoardVO> getFreeBoardList();
 
 	public HashMap getBoard(BoardVO vo);
 
