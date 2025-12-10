@@ -11256,3 +11256,59 @@ body {
     color: rgb(247 202 201) !important; 
     transition: color 0.3s ease-in-out; 
 }
+
+.toast-custom-sere {
+    background-color: rgb(146, 168, 209) !important;
+    color : white;
+    box-shadow: 0 0 12px #CCCCCC;
+}
+
+.border-left {
+    border-left: 1px solid rgba(0, 0, 0, .125) !important; 
+    margin-left : 1.2em;
+}
+
+.nav-item .badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    padding: 0; 
+    font-size: 0.6rem;
+    line-height: 15px;
+    text-align: center;
+    border-radius: 50% !important;
+}
+
+/* 1. 프로필 이미지와 기본적인 대화 목록 항목 스타일 */
+.profile-img-small {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+.unread-count-badge {
+    font-size: 0.7rem;
+    padding: 0.3em 0.6em;
+}
+
+/* 2. SB Admin 2의 list-group-item.active 스타일을 부드럽게 재정의 */
+.list-group-item.active {
+    background-color: #e9ecef !important; 
+    border-color: #e9ecef !important;
+    color: #343a40 !important;
+    font-weight: bold;
+}
+.list-group-item.active .text-white {
+    color: #6c757d !important;
+}
+
+.list-group-item.unread {
+    background-color: #f8f9fa;
+}
+
+.message-bubble-container {
+    display: inline-block; 
+    max-width: 70%; 
+}

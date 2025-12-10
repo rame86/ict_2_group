@@ -58,7 +58,7 @@
                                 <div class="card bg-danger text-white mb-4">
                                 	<div class="card-header d-flex align-items-center justify-content-between">
                                         <a class="small text-white d-flex align-items-center justify-content-between w-100" href="finishList">
-                                        결재 받을 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
+                                        결재 받은 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
                                     </div>
                                     <div class="card-body">결재 반려</div>
                                     <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 받은 문서', 'rejectList', '결재 반려된 문서');"><h3>${ sendrejectCount }건</h3></div><br>
