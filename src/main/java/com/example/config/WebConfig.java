@@ -20,10 +20,6 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/upload/emp/**")
                 .addResourceLocations("classpath:/static/upload/emp/");
         
-        // 외부 폴더 C:/emp_upload/emp/ 를
-        // URL /upload/emp/** 와 연결
-        registry.addResourceHandler("/upload/emp/**")
-                .addResourceLocations("file:///C:/emp_upload/emp/");
-        //   
+      
     }
 }
