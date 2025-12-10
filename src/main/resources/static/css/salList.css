@@ -12,6 +12,12 @@
     font-size: 14px;
 }
 
+.mt-4{
+	font-size: 30px;
+	font-weight: 600; 
+}
+
+
 .emp-info-box span {
     margin-right: 12px;
 }
@@ -138,4 +144,9 @@ table.dataTable thead .sorting_asc:after {
 table.dataTable thead .sorting_desc:after {
     content: "▼";
     color: #666;
+}
+
+/* footer는 아래에 고정 (줄어들지 않게) */
+#layoutSidenav_content footer {
+    flex-shrink: 0;
 }

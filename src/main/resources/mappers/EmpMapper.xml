@@ -279,7 +279,7 @@
 		#{empPhone},
 		#{empAddr},
 		#{empEmail},
-		 #{empImage},
+		 #{empImage, jdbcType=VARCHAR},
 		#{empRegNo, jdbcType=VARCHAR},
 		SYSDATE,
 		#{salBase, jdbcType=NUMERIC}

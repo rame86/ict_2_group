@@ -2,12 +2,13 @@ package com.example.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
 import java.time.LocalDate;
-import org.springframework.format.annotation.DateTimeFormat;
+import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,13 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.domain.EmpVO;
 import com.example.domain.DeptVO;
 import com.example.domain.EditVO;
+import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.service.DeptService;
 import com.example.service.EmpService;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -31,12 +33,33 @@ public class EmpController {
 
     @Autowired
     private EmpService empService;
-    
+
     @Autowired
     private DeptService deptService;
 
-    /** 🔹 사원 사진 실제 저장 경로 (외부 폴더) */
-    private static final String EMP_UPLOAD_PATH = "C:/emp_upload/emp/";
+    // 🔹 실제 저장할 디렉터리 (classpath:/static/upload/emp → 빌드 후 target/classes 기준)
+    private File empUploadDir;
+
+    /* =========================================================
+       0. 업로드 디렉터리 초기화
+       ========================================================= */
+    @PostConstruct
+    public void initUploadDir() throws IOException {
+
+        // classpath:/static/upload/emp/ 실제 경로 얻기
+        ClassPathResource resource = new ClassPathResource("static/upload/emp/");
+        File dir = resource.getFile();   // target/classes/static/upload/emp/
+
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        empUploadDir = dir;
+
+        System.out.println("[EmpController] 사진 업로드 경로 = " + dir.getAbsolutePath());
+    }
+
+ 
 
     /* =========================================================
        1. 사원 목록
@@ -83,10 +106,9 @@ public class EmpController {
         EmpVO emp = empService.selectEmpByEmpNo(empNo);
         boolean canModify = isAdmin(session);
 
-     // 🔹 비고 히스토리 문자열 조회
+        // 🔹 비고 히스토리 문자열 조회
         String editNoteHistory = empService.getEditNoteHistory(empNo);
         System.out.println("📌 editNoteHistory = \n" + editNoteHistory);
-
 
         model.addAttribute("emp", emp);
         model.addAttribute("canModify", canModify);
@@ -96,8 +118,8 @@ public class EmpController {
     }
 
     /* =========================================================
-    3. 사원 수정 (사진 포함)
-    ========================================================= */
+       3. 사원 수정 (사진 포함)
+       ========================================================= */
     @PostMapping("/emp/update")
     @ResponseBody
     public String updateEmp(
@@ -120,8 +142,8 @@ public class EmpController {
         try {
             // 1) 사진 처리
             if (empImageFile != null && !empImageFile.isEmpty()) {
-                String newFileName = saveEmpImage(empImageFile);
-                vo.setEmpImage(newFileName);      // 새 이미지로 교체
+                String newFileName = saveEmpImage(empImageFile);  // 새 파일 저장
+                vo.setEmpImage(newFileName);                      // 새 이미지로 교체
 
                 // 이전 파일 삭제
                 deleteEmpImage(oldEmpImage);
@@ -131,7 +153,7 @@ public class EmpController {
             }
 
             // 2) EMP 테이블 기본정보 수정
-            int cnt = empService.updateEmp(vo);   // ★ 여기서 cnt 선언
+            int cnt = empService.updateEmp(vo);
 
             // 3) 비고 이력 저장 (EDIT 테이블에 INSERT)
             if (vo.getENote() != null && !vo.getENote().isBlank()) {
@@ -148,7 +170,6 @@ public class EmpController {
         }
     }
 
-
     /* =========================================================
        4. 사원 삭제
        ========================================================= */
@@ -164,9 +185,11 @@ public class EmpController {
             return "DENY";
         }
 
-        // 필요하다면 여기서 empNo로 사원 조회 → empImage 가져와서 파일도 같이 삭제
-        // EmpVO emp = empService.selectEmpByEmpNo(empNo);
-        // deleteEmpImage(emp.getEmpImage());
+        // 🔹 삭제 전에 사진 파일도 함께 삭제
+        EmpVO emp = empService.selectEmpByEmpNo(empNo);
+        if (emp != null) {
+            deleteEmpImage(emp.getEmpImage());
+        }
 
         empService.deleteEmp(empNo);
         System.out.println("✔ 사원 삭제 완료");
@@ -186,13 +209,13 @@ public class EmpController {
             System.out.println("❌ 사원 등록 권한 없음");
             return "error/NoAuthPage";
         }
-        
-     // 1) 부서 목록 조회 (DEPT 테이블 → DeptVO 리스트)
-        List<DeptVO> deptList = deptService.getDeptList();   // 🔹 새로 추가
+
+        // 1) 부서 목록 조회 (DEPT 테이블 → DeptVO 리스트)
+        List<DeptVO> deptList = deptService.getDeptList();
         System.out.println("📌 사원등록용 부서 개수 = " + (deptList == null ? 0 : deptList.size()));
 
         // 2) 화면에서 사용할 데이터 세팅
-        model.addAttribute("deptList", deptList);            // 🔹 새로 추가
+        model.addAttribute("deptList", deptList);
         model.addAttribute("menu", "empNew");
 
         // 3) 사원 등록 JSP로 이동
@@ -220,8 +243,8 @@ public class EmpController {
         try {
             // 사진 파일이 있으면 저장
             if (empImageFile != null && !empImageFile.isEmpty()) {
-                String savedName = saveEmpImage(empImageFile);   // C:/emp_upload/emp/ 에 저장
-                vo.setEmpImage(savedName);                       // EmpVO 필드명에 맞게 (empImage)
+                String savedName = saveEmpImage(empImageFile);   // classpath:/static/upload/emp/ 에 저장
+                vo.setEmpImage(savedName);                       // DB에는 파일명만 저장
             }
 
             int cnt = empService.insertEmp(vo);
@@ -234,7 +257,6 @@ public class EmpController {
             return "ERROR";
         }
     }
-
 
     /* =========================================================
        7. 관리자 여부 체크
@@ -270,41 +292,44 @@ public class EmpController {
        9. 파일 저장/삭제 헬퍼 메서드
        ========================================================= */
 
-    /** 🔹 사진 저장 (외부 폴더 C:/emp_upload/emp/) */
+    /** 🔹 사진 저장 – classpath:/static/upload/emp/ 경로 사용 */
     private String saveEmpImage(MultipartFile file) throws IOException {
 
         if (file == null || file.isEmpty()) {
             return null;
         }
 
-        String original = file.getOriginalFilename();
-        if (original == null) original = "emp.jpg";
-
-        // "시간_원본파일명" 형식으로 저장 (중복 방지)
-        String savedName = System.currentTimeMillis() + "_" + original;
-
-        File dir = new File(EMP_UPLOAD_PATH);
-        if (!dir.exists()) {
-            dir.mkdirs();
+        String originalName = file.getOriginalFilename();
+        String ext = "";
+        int dot = (originalName != null) ? originalName.lastIndexOf('.') : -1;
+        if (dot > -1) {
+            ext = originalName.substring(dot);
         }
 
-        File dest = new File(dir, savedName);
+        String savedName = UUID.randomUUID().toString() + ext;
+
+        // ✅ 실제 저장 위치: classpath:/static/upload/emp/
+        if (empUploadDir == null) {
+            throw new IllegalStateException("empUploadDir 가 초기화되지 않았습니다.");
+        }
+
+        File dest = new File(empUploadDir, savedName);
         file.transferTo(dest);
 
-        System.out.println("📁 사진 저장 경로 = " + dest.getAbsolutePath());
-
-        // DB에는 파일명만 저장 → /upload/emp/{파일명} 으로 접근
-        return savedName;
+        return savedName;   // DB에는 파일명만 저장
     }
 
-    /** 🔹 사진 삭제 */
+    /** 🔹 사진 삭제 – 업로드 디렉터리에서 파일 제거 */
     private void deleteEmpImage(String fileName) {
         if (fileName == null || fileName.isBlank()) return;
+        if (empUploadDir == null) return;  // 방어 코드
 
-        File f = new File(EMP_UPLOAD_PATH, fileName);
+        File f = new File(empUploadDir, fileName);
         if (f.exists()) {
             boolean deleted = f.delete();
             System.out.println("🗑 사진 삭제 (" + f.getAbsolutePath() + ") = " + deleted);
+        } else {
+            System.out.println("⚠ 삭제 대상 파일이 존재하지 않습니다: " + f.getAbsolutePath());
         }
     }
 }
