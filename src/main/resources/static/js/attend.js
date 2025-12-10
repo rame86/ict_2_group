@@ -135,9 +135,9 @@ function updateDonutChart(events, currentDisplayDate) {
 function convertVoToFullCalendarEvents(voList) {
 	// 근태 상태별 색상 맵 정의됨.
 	const colorMapLocal = {
-		'출근': '#4CAF50', '연차': '#2196F3', '반차': '#00BCD4',
-		'휴가': '#2196F3', '결근': '#FF9800', '지각': '#FFC107',
-		'조퇴': '#FFC107', '출장': '#9E9E9E', '외근': '#9E9E9E'
+		'퇴근': '#2196F3', '출근': '#4CAF50', '지각': '#FFC107', '조퇴': '#FFC107',
+		'외근': '#9E9E9E', '연차': '#2196F3', '오전반차': '#00BCD4', '오후반차': '#00BCD4',
+		'결근': '#FF9800', '출장': '#9E9E9E'
 	};
 
 	return voList.filter(vo => vo.dateAttend).map(vo => { // 날짜 정보가 있는 VO만 필터링 후 매핑함.

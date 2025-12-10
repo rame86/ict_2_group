@@ -10,4 +10,8 @@ public interface BoardDAO {
 	public String insertNoticeBoard(NoticeBoardVO vo);
 	
 	public String updateNoticeBoard(NoticeBoardVO vo);
+	
+	public NoticeBoardVO getContentNoticeBoard(String noticeNo);
+	
+	public void updateNoticeCnt(String noticeNo);
 }

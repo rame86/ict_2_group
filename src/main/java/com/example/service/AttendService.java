@@ -14,10 +14,13 @@ public interface AttendService {
 	public String checkOut(DayAttendVO davo);
 
 	public String fieldwork(DayAttendVO davo);
-	
+
 	public void insertVacation(DocVO vo);
-	
+
 	public void commuteCorrection(DocVO vo);
-	
-	
+
+	public int processDailyAbsence();
+
+	public int processIncompleteAttendance();
+
 }

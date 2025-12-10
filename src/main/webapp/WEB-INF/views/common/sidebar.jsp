@@ -25,6 +25,20 @@ if (menu == null) menu = "";
 							<i class="fas fa-tachometer-alt"></i>
 						</div> 마이페이지
 					</a>
+					
+					<div class="sb-sidenav-menu-heading">게시판</div>
+					<!-- <a class="nav-link" href="charts.html">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-chart-area"></i>
+						</div> Charts
+					</a> --> 
+					<a class="nav-link" href="/board/getNoticeBoardList">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-table"></i>
+						</div> 공지 게시판
+					</a>
+					
+					
 					<div class="sb-sidenav-menu-heading">메인 메뉴</div>
 					<%--근태 관리 --%>
 					<a class="nav-link" href="/attend/attend">
@@ -102,18 +116,7 @@ if (menu == null) menu = "";
 							<i class="fas fa-columns"></i>
 						</div> 급여관리
 					</a>
-
-
-					<div class="sb-sidenav-menu-heading">Addons</div>
-					<a class="nav-link" href="charts.html">
-						<div class="sb-nav-link-icon">
-							<i class="fas fa-chart-area"></i>
-						</div> Charts
-					</a> <a class="nav-link" href="/board/getNoticeBoardList">
-						<div class="sb-nav-link-icon">
-							<i class="fas fa-table"></i>
-						</div> 공지 게시판
-					</a>
+					
 				</div>
 			</div>
 			<div class="sb-sidenav-footer">

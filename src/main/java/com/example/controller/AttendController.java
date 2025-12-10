@@ -3,6 +3,7 @@ package com.example.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -89,9 +90,9 @@ public class AttendController {
 
 		// 기준시간보다 늦으면 지각~
 		if (nowTime.compareTo(standardTime) < 0) {
-			davo.setAttStatus("출근");
+			davo.setAttStatus("1");
 		} else {
-			davo.setAttStatus("지각");
+			davo.setAttStatus("2");
 		}
 		log.info(davo.toString());
 
@@ -124,7 +125,7 @@ public class AttendController {
 
 		// 기준시간보다 먼저가면 조퇴~
 		if (nowTime.compareTo(standardTime) < 0) {
-			davo.setAttStatus("조퇴");
+			davo.setAttStatus("3");
 		} else {
 			davo.setAttStatus("null");
 		}
@@ -189,13 +190,14 @@ public class AttendController {
 	// =======================================================================================
 
 	// =======================================================================================
-	// vacation() 외근	
-	@GetMapping("/attend/vacation")	
-	public String vacation(@ModelAttribute("login")Model m) {
+	// vacation() 외근
+	@GetMapping("/attend/vacation")
+	public String vacation(@ModelAttribute("login") Model m) {
 		log.info("[AttendController - vacation 요청 받음]");
 
 		// Model에서 "docNo" 키로 데이터 꺼내기
-		Integer docNo = (Integer) m.getAttribute("docNo");;
+		Integer docNo = (Integer) m.getAttribute("docNo");
+		;
 		// 문서번호로 내용 가져오기
 		DocVO docInfo = aproveService.selectDocNo(docNo);
 		log.info("[AttendController - vacation - docInfo 데이터 : " + docInfo.toString() + "]");
@@ -207,4 +209,39 @@ public class AttendController {
 
 	//
 
+	// =======================================================================================
+	// processAbsence() 결근처리
+	@GetMapping("/attend/processAbsence")
+	@ResponseBody
+	public ResponseEntity<String> processAbsence() {
+		try {
+			int count = attendService.processDailyAbsence();
+			String message = "결근 처리 완료. 총 " + count + "명의 사원에 대해 처리되었습니다.";
+			return ResponseEntity.ok(message);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.internalServerError().body("결근 처리 중 오류 발생: " + e.getMessage());
+		}
+	}
+	// end of processAbsence()
+	// =======================================================================================
+	
+	@GetMapping("/attend/processIncomplete")
+	@ResponseBody
+	public ResponseEntity<String> processIncompleteAttendance() {
+	    try {
+	        int updatedCount = attendService.processIncompleteAttendance();
+
+	        if (updatedCount > 0) {
+	            String message = String.format("미퇴근 처리 완료. 총 %d건의 출근/지각 기록이 결근 처리되었습니다.", updatedCount);
+	            return ResponseEntity.ok(message);
+	        } else {
+	            return ResponseEntity.ok("미퇴근 처리할 대상이 없습니다.");
+	        }
+	    } catch (Exception e) {
+	        // 실제 운영 환경에서는 e.getMessage() 대신 상세 로그를 찍어야 합니다.
+	        return ResponseEntity.status(500).body("미퇴근 결근 처리 중 서버 오류가 발생했습니다: " + e.getMessage());
+	    }
+	}
+	
 }
