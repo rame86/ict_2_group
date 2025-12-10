@@ -29,5 +29,8 @@ public class EmpVO {
 	
 	// 사원관리 페이지에서 표시할 직급명
 	private String gradeName;   
+	
+	// 🔹 비고 입력값 (새로 추가)
+    private String eNote;
 
 }

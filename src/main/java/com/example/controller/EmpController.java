@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.domain.EmpVO;
 import com.example.domain.DeptVO;
+import com.example.domain.EditVO;
 import com.example.domain.LoginVO;
 import com.example.service.DeptService;
 import com.example.service.EmpService;
@@ -73,30 +77,35 @@ public class EmpController {
 
         LoginVO login = (LoginVO) session.getAttribute("login");
         if (login == null) {
-            System.out.println("❌ 로그인 정보 없음 → 권한 없음 페이지");
             return "error/NoAuthPage";
         }
 
         EmpVO emp = empService.selectEmpByEmpNo(empNo);
-        System.out.println("📌 emp = " + emp);
-
         boolean canModify = isAdmin(session);
+
+     // 🔹 비고 히스토리 문자열 조회
+        String editNoteHistory = empService.getEditNoteHistory(empNo);
+        System.out.println("📌 editNoteHistory = \n" + editNoteHistory);
+
 
         model.addAttribute("emp", emp);
         model.addAttribute("canModify", canModify);
+        model.addAttribute("editNoteHistory", editNoteHistory);
 
         return "emp/empCard";
     }
 
     /* =========================================================
-       3. 사원 수정 (사진 포함)
-       ========================================================= */
+    3. 사원 수정 (사진 포함)
+    ========================================================= */
     @PostMapping("/emp/update")
     @ResponseBody
     public String updateEmp(
             EmpVO vo,
             @RequestParam(value = "empImageFile", required = false) MultipartFile empImageFile,
             @RequestParam(value = "oldEmpImage", required = false) String oldEmpImage,
+            @RequestParam(value = "retireDate", required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate retireDate,
             HttpSession session) {
 
         System.out.println("📌 /emp/update 호출, vo = " + vo);
@@ -106,22 +115,31 @@ public class EmpController {
             return "DENY";
         }
 
+        LoginVO login = (LoginVO) session.getAttribute("login");
+
         try {
-            // 1) 새 이미지가 업로드 된 경우
+            // 1) 사진 처리
             if (empImageFile != null && !empImageFile.isEmpty()) {
                 String newFileName = saveEmpImage(empImageFile);
-                vo.setEmpImage(newFileName);  // EmpVO 필드명 empImage 기준
+                vo.setEmpImage(newFileName);      // 새 이미지로 교체
 
-                // 이전 파일명 있으면 삭제
+                // 이전 파일 삭제
                 deleteEmpImage(oldEmpImage);
             } else {
-                // 2) 새 파일이 없으면 기존 파일 그대로 유지
+                // 새 파일이 없으면 기존 파일 유지
                 vo.setEmpImage(oldEmpImage);
             }
 
-            int cnt = empService.updateEmp(vo);
-            System.out.println("✔ 사원 수정 완료, cnt = " + cnt);
+            // 2) EMP 테이블 기본정보 수정
+            int cnt = empService.updateEmp(vo);   // ★ 여기서 cnt 선언
 
+            // 3) 비고 이력 저장 (EDIT 테이블에 INSERT)
+            if (vo.getENote() != null && !vo.getENote().isBlank()) {
+                String writerName = (login != null ? login.getEmpName() : "SYSTEM");
+                empService.saveEmpEditHistory(vo.getEmpNo(), retireDate, vo.getENote(), writerName);
+            }
+
+            // 4) 결과 리턴
             return (cnt > 0) ? "OK" : "FAIL";
 
         } catch (Exception e) {
@@ -129,6 +147,7 @@ public class EmpController {
             return "ERROR";
         }
     }
+
 
     /* =========================================================
        4. 사원 삭제
