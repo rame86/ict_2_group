@@ -39,4 +39,10 @@ public class MonthAttendServiceImpl implements MonthAttendService {
         int inserted = monthAttendMapper.insertMonthAttendByMonth(targetMonth);
         log.info("[MonthAttendServiceImpl] {} 월 데이터 생성 완료 ({} 건)", targetMonth, inserted);
     }
+
+	@Override
+	public void createDefaultForNewEmp(String empNo) throws Exception {
+		 System.out.println("📌 [MonthAttend] 신규 사원 기본 근태 생성: empNo = " + empNo);
+		
+	}
 }

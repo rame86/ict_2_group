@@ -2,7 +2,10 @@ package com.example.controller;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;   // retireDate 파라미터 타입에서 사용
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,11 +22,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.domain.DeptVO;
-import com.example.domain.EditVO;
+// import com.example.domain.EditVO;  // ⚠ 사용 안 하면 지워도 됨
 import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.service.DeptService;
 import com.example.service.EmpService;
+import com.example.service.MonthAttendService;
+import com.example.service.SalService;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpSession;
@@ -36,6 +41,12 @@ public class EmpController {
 
     @Autowired
     private DeptService deptService;
+
+    @Autowired
+    private MonthAttendService monthAttendService;
+
+    @Autowired
+    private SalService salService;
 
     // 🔹 실제 저장할 디렉터리 (classpath:/static/upload/emp → 빌드 후 target/classes 기준)
     private File empUploadDir;
@@ -58,8 +69,6 @@ public class EmpController {
 
         System.out.println("[EmpController] 사진 업로드 경로 = " + dir.getAbsolutePath());
     }
-
- 
 
     /* =========================================================
        1. 사원 목록
@@ -234,25 +243,97 @@ public class EmpController {
 
         System.out.println("📌 /emp/insert 호출, vo = " + vo);
 
-        // 필요하면 관리자 권한 체크
+        // 0) 관리자 권한 체크
         if (!isAdmin(session)) {
             System.out.println("❌ 사원 등록 권한 없음");
             return "DENY";
         }
 
         try {
-            // 사진 파일이 있으면 저장
-            if (empImageFile != null && !empImageFile.isEmpty()) {
-                String savedName = saveEmpImage(empImageFile);   // classpath:/static/upload/emp/ 에 저장
-                vo.setEmpImage(savedName);                       // DB에는 파일명만 저장
+            /* ===========================================================
+               1) 입사일 미래 날짜 금지 (String → Date 파싱)
+            =========================================================== */
+            if (vo.getEmpRegdate() != null && !vo.getEmpRegdate().isEmpty()) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    Date regDate = sdf.parse(vo.getEmpRegdate());  // "2025-12-10"
+
+                    Date today = new Date(); // 현재 시각
+
+                    if (regDate.after(today)) {
+                        System.out.println("❌ 미래 입사일 오류");
+                        return "REGDATE_FUTURE";
+                    }
+
+                } catch (ParseException e) {
+                    System.out.println("❌ 입사일 파싱 실패");
+                    return "REGDATE_PARSE_ERROR";
+                }
             }
 
+            /* ===========================================================
+               2) 사진 업로드 검증 (확장자 + 크기 제한)
+            =========================================================== */
+            if (empImageFile != null && !empImageFile.isEmpty()) {
+
+                // 🔹 2MB 제한
+                long maxSize = 2 * 1024 * 1024;
+                if (empImageFile.getSize() > maxSize) {
+                    System.out.println("❌ 파일 용량 초과");
+                    return "FILE_SIZE";
+                }
+
+                // 🔹 확장자 검사
+                String fileName = empImageFile.getOriginalFilename();
+                String lower = (fileName == null) ? "" : fileName.toLowerCase();
+
+                if (!(lower.endsWith(".jpg") || lower.endsWith(".jpeg")
+                        || lower.endsWith(".png") || lower.endsWith(".gif"))) {
+                    System.out.println("❌ 허용되지 않는 파일 타입");
+                    return "FILE_TYPE";
+                }
+
+                // 🔹 통과 → 저장
+                String savedName = saveEmpImage(empImageFile);
+                vo.setEmpImage(savedName);
+            }
+
+            /* ===========================================================
+               3) 사원 정보 DB 저장
+            =========================================================== */
             int cnt = empService.insertEmp(vo);
             System.out.println("✔ 사원 등록 완료, cnt = " + cnt);
 
-            return (cnt > 0) ? "OK" : "FAIL";
+            if (cnt <= 0) return "FAIL";
+
+            /* ===========================================================
+               4) 활동 로그 기록 (선택 – 나중에 logService 붙이기)
+            =========================================================== */
+            try {
+                LoginVO login = (LoginVO) session.getAttribute("login");
+                System.out.println(
+                    "📘 LOG : 등록자 = " + (login != null ? login.getEmpNo() : "UNKNOWN")
+                    + ", 대상사번 = " + vo.getEmpNo()
+                );
+                // logService.logNewEmp(login.getEmpNo(), vo.getEmpNo()); // TODO: 나중에 구현
+            } catch (Exception logEx) {
+                System.out.println("⚠ 활동 로그 기록 중 오류 (치명적이지 않음): " + logEx.getMessage());
+            }
+
+            /* ===========================================================
+               5) 신규 사원 → 기본 근태/급여 생성
+            =========================================================== */
+            try {
+                monthAttendService.createDefaultForNewEmp(vo.getEmpNo());
+                salService.createBaseSalaryForNewEmp(vo.getEmpNo());
+            } catch (Exception initEx) {
+                System.out.println("⚠ 기본 근태/급여 생성 중 오류 (등록은 성공): " + initEx.getMessage());
+            }
+
+            return "OK";
 
         } catch (Exception e) {
+            System.out.println("❌ 등록 중 서버 오류");
             e.printStackTrace();
             return "ERROR";
         }
