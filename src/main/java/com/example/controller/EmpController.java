@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.domain.DeptVO;
-// import com.example.domain.EditVO;  // ⚠ 사용 안 하면 지워도 됨
 import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.service.DeptService;
@@ -151,6 +150,23 @@ public class EmpController {
         try {
             // 1) 사진 처리
             if (empImageFile != null && !empImageFile.isEmpty()) {
+
+                // ✅ (추가) 수정 시에도 파일 검증
+                long maxSize = 2 * 1024 * 1024;
+                if (empImageFile.getSize() > maxSize) {
+                    System.out.println("❌ 파일 용량 초과");
+                    return "FILE_SIZE";
+                }
+
+                String fileName = empImageFile.getOriginalFilename();
+                String lower = (fileName == null) ? "" : fileName.toLowerCase();
+
+                if (!(lower.endsWith(".jpg") || lower.endsWith(".jpeg")
+                        || lower.endsWith(".png") || lower.endsWith(".gif"))) {
+                    System.out.println("❌ 허용되지 않는 파일 타입");
+                    return "FILE_TYPE";
+                }
+
                 String newFileName = saveEmpImage(empImageFile);  // 새 파일 저장
                 vo.setEmpImage(newFileName);                      // 새 이미지로 교체
 
