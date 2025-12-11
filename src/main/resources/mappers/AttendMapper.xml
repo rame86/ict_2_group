@@ -9,7 +9,7 @@
 		SELECT * FROM DAY_ATTEND
 		WHERE EMP_NO = #{empNo}
 		AND
-		TO_CHAR(FIRST_DAYTIME, 'YYYY-MM') = #{toDay}
+		TO_CHAR(DATE_ATTEND, 'YYYY-MM') = #{toDay}
 	</select>
 
 	<select id="dateCheck" parameterType="DayAttendVO"
@@ -43,7 +43,7 @@
 		)
 		VALUES
 		(
-		day_attno_seq.NEXTVAL,
+		DAY_ATTEND_SEQ.NEXTVAL,
 		#{empNo},
 		SYSDATE,
 		SYSDATE,
@@ -114,7 +114,7 @@
 		)
 		VALUES
 		(
-		day_attno_seq.NEXTVAL,
+		DAY_ATTEND_SEQ.NEXTVAL,
 		#{empNo},
 		SYSDATE,
 		#{attStatus},
@@ -183,17 +183,9 @@
 		DATE_ATTEND
 		)
 		SELECT
-		DAY_ATTNO_SEQ.NEXTVAL, E.EMP_NO,
-		'10', -- ATT_STATUS
-		(10: 결근)
-		NULL, -- IN_TIME
-		NULL, -- OUT_TIME
-		NULL, -- DAY_FULLTIME
-		SYSDATE, -- FIRST_DAYTIME
-		NULL, -- UPDATE_TIME
-		'결근', -- MEMO
-		TRUNC(SYSDATE) -- DATE_ATTEND (오늘 날짜)
-		FROM
+		DAY_ATTEND_SEQ.NEXTVAL,
+		E.EMP_NO,
+		'10', NULL, NULL, NULL, SYSDATE, NULL, '결근', TRUNC(SYSDATE) FROM
 		EMP E
 		WHERE
 		E.STATUS_NO != 99
@@ -212,13 +204,15 @@
 	<update id="updateIncompleteAttendanceToAbsence">
 		UPDATE DAY_ATTEND
 		SET
-		ATT_STATUS = '10', -- 결근 상태 코드로 업데이트합니다.
+		ATT_STATUS = '10', -- 결근 상태 코드로
+		업데이트합니다.
 		MEMO = '미퇴근 결근 처리됨',
 		UPDATE_TIME = SYSDATE -- 처리 시간 기록
 		WHERE
 		TRUNC(DATE_ATTEND) = TRUNC(SYSDATE) -- 오늘 날짜
 		AND
-		ATT_STATUS IN ('1', '2') -- 출근,지각 상태인 경우
+		ATT_STATUS IN ('1',
+		'2') -- 출근,지각 상태인 경우
 		AND
 		OUT_TIME IS NULL -- 퇴근 시간이 기록되지 않은 경우
 	</update>

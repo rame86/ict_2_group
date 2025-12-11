@@ -26,16 +26,15 @@ if (menu == null) menu = "";
 						</div> 마이페이지
 					</a>
 					
-					<div class="sb-sidenav-menu-heading">게시판</div>
-					<!-- <a class="nav-link" href="charts.html">
-						<div class="sb-nav-link-icon">
-							<i class="fas fa-chart-area"></i>
-						</div> Charts
-					</a> --> 
+					<div class="sb-sidenav-menu-heading">게시판</div>					
 					<a class="nav-link" href="/board/getNoticeBoardList">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-table"></i>
 						</div> 공지 게시판
+					</a><a class="nav-link" href="/board/getFreeBoardList">
+						<div class="sb-nav-link-icon">
+							<i class="fas fa-table"></i>
+						</div> 자유 게시판
 					</a>
 					
 					
