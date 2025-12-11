@@ -40,11 +40,62 @@ public class AttendDAOImpl implements AttendDAO {
 		// 3. Map을 Mybatis에 전달
 		List<DayAttendVO> result = sess.selectList("com.example.repository.DayAttendDAO.dayAttend", param);
 
+		for (DayAttendVO vo : result) {
+			String attStatusCode = vo.getAttStatus();
+			String koreanStatus;
+
+			switch (attStatusCode) {
+			case "0":
+				koreanStatus = "퇴근";
+				break;
+			case "1":
+				koreanStatus = "출근";
+				break;
+			case "2":
+				koreanStatus = "지각";
+				break;
+			case "3":
+				koreanStatus = "조퇴";
+				break;
+			case "4":
+				koreanStatus = "외근";
+				break;
+			case "5":
+				koreanStatus = "연차";
+				break;
+			case "6":
+				koreanStatus = "오전반차";
+				break;
+			case "7":
+				koreanStatus = "오후반차";
+				break;
+			case "8":
+				koreanStatus = "병가";
+				break;
+			case "9":
+				koreanStatus = "보상휴가";
+				break;
+			case "10":
+				koreanStatus = "결근";
+				break;
+			case "11":
+				koreanStatus = "출장";
+				break;
+			default:
+				koreanStatus = "알 수 없음";
+				break;
+			}
+
+			// 3. 변환된 한글 값을 VO 객체에 설정
+			vo.setAttStatus(koreanStatus);
+		}
 		return result;
 	}
 	// end of selectDayAttend()
 	// =======================================================================================
 
+	//
+	
 	// =======================================================================================
 	// checkIn()
 	public String checkIn(DayAttendVO davo) {
@@ -74,6 +125,8 @@ public class AttendDAOImpl implements AttendDAO {
 	// end of checkIn()
 	// =======================================================================================
 
+	//
+	
 	// =======================================================================================
 	// checkOut()
 	public String checkOut(DayAttendVO davo) {
@@ -161,13 +214,15 @@ public class AttendDAOImpl implements AttendDAO {
 	// end of checkOut()
 	// =======================================================================================
 
+	//
+	
 	// =======================================================================================
 	// fieldwork()
 	public String fieldwork(DayAttendVO davo) {
 		log.info("[AttendDAO - fieldwork 요청 받음]");
 
 		String result = toDate.getFomatterHHmmss(davo.getOutTime());
-		davo.setMemo("외근(" + result + ")");
+		davo.setMemo("외근 (" + result + ")");
 
 		// 데이터가 있는지 먼저 확인~
 		DayAttendVO dateCheck = sess.selectOne("com.example.repository.DayAttendDAO.dateCheck", davo);
@@ -181,8 +236,8 @@ public class AttendDAOImpl implements AttendDAO {
 			String checkStatus = dateCheck.getAttStatus();
 			davo.setDayAttno(dateCheck.getDayAttno());
 			// 정상출근일 경우에
-			if (checkStatus.equals("출근") || checkStatus.equals("퇴근")) {
-				davo.setAttStatus("외근");
+			if (checkStatus.equals("1") || checkStatus.equals("0")) {
+				davo.setAttStatus("4");
 				sess.update("com.example.repository.DayAttendDAO.updateFieldwork", davo);
 			}
 			// 지각등의 사유가 있을 시
@@ -201,16 +256,16 @@ public class AttendDAOImpl implements AttendDAO {
 
 	// =======================================================================================
 	// insertVacation() 연차 승인후 입력
-	public void insertVacation(DayAttendVO originalDavo, Integer totalDays) {
+	public void insertVacation(DayAttendVO originalDavo, Double totalDays) {
 		log.info("[AttendDAO - insertVacation 요청 받음]");
 
 		// 넘어온 dateAttend 날짜를 currentDateString에 저장
 		String currentDateString = originalDavo.getDateAttend();
 
 		log.info("attendDAO : " + originalDavo.toString());
+		log.info("totalDays : " + totalDays.toString());
 		// totalDays 만큼 반복
 		for (int i = 0; i < totalDays; i++) {
-
 			// 삽입할 새로운 DayAttendVO 객체 생성 및 값 복사
 			DayAttendVO davoToInsert = new DayAttendVO();
 
@@ -249,13 +304,13 @@ public class AttendDAOImpl implements AttendDAO {
 	// commuteCorrection()
 	public void commuteCorrectionCheckIn(DayAttendVO davo) {
 		log.info("[AttendDAO - commuteCorrectionCheckIn 요청 받음]");
-sess.update("com.example.repository.DayAttendDAO.commuteCorrectionCheckIn", davo);
+		sess.update("com.example.repository.DayAttendDAO.commuteCorrectionCheckIn", davo);
 	}
 	// end of commuteCorrection()
 	// =======================================================================================
 
 	//
-	
+
 	// =======================================================================================
 	// commuteCorrection()
 	public void commuteCorrectionCheckOut(DayAttendVO davo) {
@@ -265,4 +320,35 @@ sess.update("com.example.repository.DayAttendDAO.commuteCorrectionCheckIn", davo
 	// end of commuteCorrection()
 	// =======================================================================================
 
+	//
+
+	// =======================================================================================
+	// getAllEmpNos()
+	public List<String> getAllEmpNos() {
+		return sess.selectList("com.example.repository.DayAttendDAO.getAllEmpNos");
+	}
+	// end of getAllEmpNos()
+	// =======================================================================================
+
+	//
+
+	// =======================================================================================
+	// insertAbsenceRecords()
+	public int insertAbsenceRecords() {
+		// insertAbsenceRecords 쿼리 실행
+		return sess.insert("com.example.repository.DayAttendDAO.insertAbsenceRecords");
+	}
+	// end of insertAbsenceRecords()
+	// =======================================================================================
+
+	//
+
+	// =======================================================================================
+	// updateIncompleteAttendanceToAbsence()
+	public int updateIncompleteAttendanceToAbsence() {
+		log.info("[AttendDAO - updateIncompleteAttendanceToAbsence 요청 받음]");
+		return sess.update("com.example.repository.DayAttendDAO.updateIncompleteAttendanceToAbsence");
+	}
+	// end of updateIncompleteAttendanceToAbsence()
+	// =======================================================================================
 }

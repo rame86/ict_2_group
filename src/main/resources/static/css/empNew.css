@@ -2,6 +2,13 @@
    사원 등록 페이지 - 1400px 버전
    ============================= */
 
+html, body {
+    height: 100%;
+    margin: 0;
+    background-color: #fcfcfc;   /* 대시보드와 동일한 연회색 배경 */
+    font-family: "SUIT", sans-serif;
+}
+
 #empNewForm {
     width: 100%;
     padding: 32px;
@@ -9,16 +16,17 @@
     border: 1px solid #e5edff;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(15, 76, 129, 0.08);
-    font-size: 15px;
+    font-size: 16px;
+    font-family: "SUIT", sans-serif;
 }
 
 /* -----------------------------
-   상단 영역: PHOTO + 2열 입력칸
+   상단 영역: PHOTO + 오른쪽 입력칸
    ----------------------------- */
 
 .form-top {
     display: grid;
-    grid-template-columns: 180px 1fr 1fr;   /* 사진 / 왼쪽 입력 / 오른쪽 입력 */
+    grid-template-columns: 180px 1fr 1fr;
     grid-gap: 24px;
     margin-bottom: 28px;
 }
@@ -36,6 +44,18 @@
     font-size: 14px;
     background: #f8faff;
     cursor: pointer;
+
+    /* 🔹 사진 원형 & 크롭 */
+    overflow: hidden;
+}
+
+/* 사진이 있을 때 원형 + 그림자 */
+.photo-box img {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 6px 15px rgba(15, 76, 129, 0.25);
 }
 
 /* 상단 2열 공통 스타일 */
@@ -55,11 +75,12 @@
     border-radius: 8px;
     border: 1px solid #d7e3ff;
     font-size: 14px;
+    padding: 0 12px;
+    box-shadow: none;
 }
 
 /* -----------------------------
-   하단 입력 영역 (연락처~부서번호)
-   전체 폭 사용
+   하단 입력 영역 (연락처~주소)
    ----------------------------- */
 
 .full-width {
@@ -96,7 +117,7 @@ input::placeholder {
     opacity: 1 !important;
 }
 
-/* 🔹 포커스하면 사라지는 효과 */
+/* 🔹 포커스하면 placeholder 사라지는 효과 */
 input:focus::placeholder {
     color: transparent !important;
 }
@@ -109,6 +130,23 @@ input:focus::placeholder {
 .emp-new-wrapper .form-top {
     display: flex;
     gap: 24px;
+}
+
+/* 상단 제목 영역 */
+.page-header {
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 4px double #869ABF;
+}
+
+/* 사원등록 타이틀 */
+.mt-4{
+    font-family: "SUIT", sans-serif;
+    margin-top: 20px;
+    font-size: 30px;
+    font-weight: 600;
+    color: #000000;
+    letter-spacing: -0.3px;
 }
 
 /* 오른쪽 전체 박스 (사번/부서/이름/주민/권한/재직) */
@@ -138,8 +176,185 @@ input:focus::placeholder {
 
 /* 사원 등록 카드 전체 박스 */
 .emp-new-wrapper {
-    width: 1200px;        /* 👉 원하는 고정 폭 (예: 1200px, 1300px 등) */
-    margin: 24px 0 60px 280px;  /* 위/좌우/아래 여백, auto가 가로 가운데 정렬 */
-   /*  margin: 40px auto 80px;  이거는 창 크기 상관없이 따라다니면서 가운데 정렬*/ 
+    width: 1200px;        /* 고정 폭 */
+    margin: 24px 0 60px 280px;
+}
+
+footer.py-4.bg-light.mt-auto {
+    margin: 24px 0 0 220px;
+}
+
+/* ============================
+   🔹 실시간 유효성 스타일
+   ============================ */
+
+.error-text {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #e74a3b;
+}
+
+/* 유효한 상태 */
+.is-valid {
+    border-color: #2ecc71 !important;
+    background-color: #f6fffb;
+}
+
+/* 에러 상태 */
+.is-invalid {
+    border-color: #e74a3b !important;
+    background-color: #fff6f6;
+}
+
+/* ============================
+   🔹 주소 입력 + 버튼
+   ============================ */
+
+.addr-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.addr-row .form-control {
+    flex: 1;
+}
+
+.btn-addr {
+    height: 40px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid #cbd5ff;
+    background: #f1f4ff;
+    font-size: 13px;
+    color: #4e5ba6;
+    cursor: pointer;
+}
+
+.btn-addr:hover {
+    background: #e0e7ff;
+}
+
+/* ============================
+   🔹 토스트 메시지
+   ============================ */
+
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 40px;
+    transform: translateX(-50%);
+    min-width: 260px;
+    max-width: 360px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    background: rgba(146, 168, 209, 1);
+    color: #fff;
+    font-size: 14px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+    z-index: 9999;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px);
+}
+
+.emp-date {
+    background-color: #fff;
+    border-radius: 999px;
+    text-align: center;
+}
+
+/* ============================
+   🔹 flatpickr 달력 커스텀
+   ============================ */
+
+/* 달력 전체 박스 */
+.flatpickr-calendar {
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(15, 76, 129, 0.15);
+    border: 1px solid #e5edff;
+    font-family: "SUIT", sans-serif;
+}
+
+/* 상단 월/연도 영역 */
+.flatpickr-months .flatpickr-month {
+    padding-top: 8px;
+    color: #4e5ba6;
+    font-weight: 600;
+}
+
+/* 요일 헤더 */
+.flatpickr-weekdays {
+    background: #f8faff;
+    border-bottom: 1px solid #e5edff;
+}
+
+span.flatpickr-weekday {
+    color: #9aa4c6;
+    font-weight: 500;
+}
+
+/* 오늘 날짜 테두리 색 */
+.flatpickr-day.today {
+    border-color: #ffb3c7;
+}
+
+/* 선택된 날짜 색상 (초록 → 프로젝트 핑크톤) */
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected.inRange,
+.flatpickr-day.startRange.inRange,
+.flatpickr-day.endRange.inRange {
+    background: #ff9fb8;
+    border-color: #ff9fb8;
+    color: #ffffff;
+}
+
+/* hover 색상 */
+.flatpickr-day:hover {
+    background: #ffe7f0;
+}
+
+/* 입력 박스 주변 초록 테두리 제거 + 우리 스타일 유지 */
+.emp-date.flatpickr-input {
+    border-radius: 999px;
+    border: 1px solid #d7e3ff;
+    box-shadow: none;
+}
+.emp-date.flatpickr-input:focus {
+    border-color: #ff9fb8;
+    outline: none;
+}
+
+/* ============================
+   🔹 flatpickr 헤더(년/월) 정렬 수정
+   ============================ */
+
+/* 년월 영역을 가운데 정렬 + 좌우 여백 확보 */
+.flatpickr-current-month {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;                /* "11월"과 "2025" 사이 간격 */
+    padding: 0 24px;         /* 좌우 여백 */
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* 연도 입력 칸 폭을 넉넉하게 */
+.flatpickr-current-month .numInput.cur-year {
+    width: 60px;
+}
+
+/* 혹시 잘 안 맞으면 월 텍스트도 살짝 여백 */
+.flatpickr-current-month .cur-month {
+    margin-right: 2px;
 }
 

@@ -5,10 +5,17 @@
 <mapper namespace="com.example.repository.BoardDAO">
 
 	<select id="getNoticeBoardList" resultType="NoticeBoardVO">
-		SELECT *
+		SELECT
+		NOTICE_NO,
+		EMP_NO,
+		NOTICE_DATE,
+		NOTICE_TITLE,
+		NOTICE_CNT,
+		NOTICE_WRITER
 		FROM
 		NOTICE_BOARD
-		ORDER BY NOTICE_NO DESC
+		ORDER BY
+		NOTICE_NO DESC
 	</select>
 
 	<insert id="insertNoticeBoard" parameterType="NoticeBoardVO">
@@ -40,7 +47,83 @@
 		SET
 		NOTICE_TITLE = #{noticeTitle},
 		NOTICE_CONTENT = #{noticeContent}
-		WHERE
-		NOTICE_NO = #{noticeNo}
+		WHERE NOTICE_NO = #{noticeNo}
 	</update>
+
+	<select id="getContentNoticeBoard" resultType="NoticeBoardVO">
+		SELECT *
+		FROM
+		NOTICE_BOARD
+		WHERE NOTICE_NO = #{noticeNo}
+	</select>
+
+	<select id="getFreeBoardList" resultType="FreeBoardVO">
+		SELECT
+		BOARD_NO,
+		EMP_NO,
+		BOARD_DATE,
+		BOARD_TITLE,
+		BOARD_CNT,
+		BOARD_WRITER
+		FROM
+		FREE_BOARD
+		ORDER BY
+		BOARD_NO DESC
+	</select>
+	
+	<insert id="insertFreeBoard" parameterType="FreeBoardVO">
+		INSERT INTO
+		FREE_BOARD
+		(
+		BOARD_NO,
+		EMP_NO,
+		BOARD_CONTENT,
+		BOARD_DATE,
+		BOARD_TITLE,
+		BOARD_CNT,
+		BOARD_WRITER
+		)
+		VALUES
+		(
+		BOARD_NO_SEQ.NEXTVAL ,
+		#{empNo} ,
+		#{boardContent},
+		SYSDATE,
+		#{boardTitle},
+		0,
+		#{boardWriter}
+		)
+	</insert>
+
+	<update id="updateFreeBoard" parameterType="FreeBoardVO">
+		UPDATE FREE_BOARD
+		SET
+		BOARD_TITLE = #{boardTitle},
+		BOARD_CONTENT = #{boardContent}
+		WHERE
+		BOARD_NO = #{boardNo}
+	</update>
+	
+	<select id="getContentFreeBoard" resultType="FreeBoardVO"
+		parameterType="string">
+		SELECT *
+		FROM
+		FREE_BOARD
+		WHERE BOARD_NO = #{boardNo}
+	</select>
+
+
+	<update id="updateNoticeCnt" parameterType="string">
+		UPDATE NOTICE_BOARD
+		SET
+		NOTICE_CNT = NOTICE_CNT + 1
+		WHERE NOTICE_NO = #{noticeNo}
+	</update>
+	<update id="updateFreeBoardCnt" parameterType="string">
+		UPDATE FREE_BOARD
+		SET
+		BOARD_CNT = BOARD_CNT + 1
+		WHERE BOARD_NO = #{boardNo}
+	</update>
+
 </mapper>

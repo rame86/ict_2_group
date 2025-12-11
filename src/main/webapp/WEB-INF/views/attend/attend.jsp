@@ -17,7 +17,6 @@
 <script
 	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales-all.min.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script src="/js/attend.js"></script>
 
 <script type="text/javascript">
@@ -143,53 +142,144 @@ document.addEventListener('DOMContentLoaded', function(){
 
 $(document).ready(function() {
  
- // 모달 변수 설정
- const vacationModal = $('#vacationModal');
- const correctionModal = $('#commuteCorrectionModal');
- 
- // 모달 닫기 버튼 (X 버튼) 이벤트 설정
- $('.modal .close').on('click', function() {
-     $(this).closest('.modal').css('display', 'none');
- });
- 
- // 1. 휴가 신청 버튼 클릭 시
- $('#btnVacation').on('click', function() {
-     vacationModal.css('display', 'block');
- });
- 
- // 2. 출/퇴근 정정 신청 버튼 클릭 시 (여기서 모달이 열림)
- $('#btnCommuteCorrection').on('click', function() {
-     correctionModal.css('display', 'block');
-     // 모달 열 때 폼 초기화
-     $('#correctionForm')[0].reset();
-     $('#existingTime').val('');
- });
- 
- // 모달 외부 클릭 시 닫기
- $(window).on('click', function(event) {
-     if ($(event.target).is(vacationModal)) {
-         vacationModal.css('display', 'none');
-     }
-     if ($(event.target).is(correctionModal)) {
-         correctionModal.css('display', 'none');
-     }
- });
+    // 모달 변수 설정
+    const vacationModal = $('#vacationModal');
+    const correctionModal = $('#commuteCorrectionModal');
+    
+    // 모달 닫기 버튼 (X 버튼) 이벤트 설정
+    $('.modal .close').on('click', function() {
+        $(this).closest('.modal').css('display', 'none');
+    });
+    
+    // 1. 휴가 신청 버튼 클릭 시
+    $('#btnVacation').on('click', function() {
+        vacationModal.css('display', 'block');
+    });
+    
+    // 2. 출/퇴근 정정 신청 버튼 클릭 시 (여기서 모달이 열림)
+    $('#btnCommuteCorrection').on('click', function() {
+        correctionModal.css('display', 'block');
+        // 모달 열 때 폼 초기화
+        $('#correctionForm')[0].reset();
+        $('#existingTime').val('');
+    });
+    
+    // 모달 외부 클릭 시 닫기
+    $(window).on('click', function(event) {
+        if ($(event.target).is(vacationModal)) {
+            vacationModal.css('display', 'none');
+        }
+        if ($(event.target).is(correctionModal)) {
+            correctionModal.css('display', 'none');
+        }
+    });
 
- // 전역 함수로 closeModal 정의: commuteCorrectionForm.jsp에서 호출됨
- window.closeModal = function() {
-	      correctionModal.css('display', 'none');
-	  }
- 
- $(document).on('click', '#cancelBtn', function(event) {
-     event.preventDefault(); // 기본 폼 동작 방지
-     
-     // 취소 버튼이 속한 모달을 찾아서 닫음 (correctionModal 변수와 동일한 기능)
-     $(this).closest('.modal').css('display', 'none');
-     
-     // 선택 사항: 폼 초기화를 위해 correctionForm을 찾아서 reset
-     $('#correctionForm')[0].reset(); 
- });
- 
+    // 전역 함수로 closeModal 정의: commuteCorrectionForm.jsp에서 호출됨
+    window.closeModal = function() {
+        correctionModal.css('display', 'none');
+    }
+    
+    $(document).on('click', '#cancelBtn', function(event) {
+        event.preventDefault(); // 기본 폼 동작 방지
+        
+        // 취소 버튼이 속한 모달을 찾아서 닫음 (correctionModal 변수와 동일한 기능)
+        $(this).closest('.modal').css('display', 'none');
+        
+        // 선택 사항: 폼 초기화를 위해 correctionForm을 찾아서 reset
+        $('#correctionForm')[0].reset(); 
+    });
+    
+    //------------------- 임시버튼 이용 결근처리 (추가된 로직) -------------------------
+    // 2. 버튼의 ID를 사용하여 요소 선택
+    const attendButton = document.getElementById('processAbsence');
+
+    if (attendButton) {
+        // 3. 버튼에 클릭 이벤트 리스너 추가
+        attendButton.addEventListener('click', function() {
+            // 사용자에게 확인 메시지 띄우기 (실수로 실행 방지)
+            if (!confirm('오늘 날짜의 결근 처리 로직을 실행하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
+                return; // 사용자가 취소를 누르면 함수 종료
+            }
+            
+            // 버튼 비활성화 (중복 클릭 방지)
+            attendButton.disabled = true;
+            attendButton.textContent = '처리 중...';
+
+            // 4. AJAX를 사용하여 서버의 엔드포인트 호출
+            fetch('/attend/processAbsence', {
+                method: 'GET' // 컨트롤러가 GET 요청으로 설정되어 있음
+            })
+            .then(response => {
+                // HTTP 상태 코드가 200~299 범위가 아니면 오류 처리
+                if (!response.ok) {
+                    throw new Error(`서버 오류 발생: ${response.status} ${response.statusText}`);
+                }
+                return response.text(); // 응답 본문을 텍스트로 받음 (처리 결과 메시지)
+            })
+            .then(data => {
+                // 5. 성공 시 결과 알림
+                alert('성공적으로 처리되었습니다!\n\n' + data);
+                console.log('서버 응답:', data);
+            })
+            .catch(error => {
+                // 6. 실패 시 오류 알림
+                alert('처리 중 심각한 오류가 발생했습니다. 콘솔을 확인해주세요.');
+                console.error('결근 처리 AJAX 오류:', error);
+            })
+            .finally(() => {
+                // 7. 처리 완료 후 버튼 상태 복구
+                attendButton.disabled = false;
+                attendButton.textContent = '테스트버튼';
+            });
+        });
+    }
+    //---------------------------------------------
+    
+    //------------------- 미퇴근 결근처리 버튼 로직 -------------------------
+const incompleteButton = document.getElementById('incompleteAttendCheck');
+
+if (incompleteButton) {
+    incompleteButton.addEventListener('click', function() {
+        if (!confirm('미퇴근 상태의 출근/지각 기록을 오늘 날짜로 결근 처리하시겠습니까?')) {
+            return;
+        }
+        
+        // 버튼 상태 변경 및 비활성화
+        incompleteButton.disabled = true;
+        incompleteButton.textContent = '처리 중...';
+        
+        const contextPath = "${pageContext.request.contextPath}"; 
+
+        // 4. 새로운 AJAX 엔드포인트 호출
+        fetch(contextPath + '/attend/processIncomplete', {
+            method: 'GET' 
+        })
+        .then(response => {
+            if (!response.ok) {
+                // 서버에서 500 오류가 발생한 경우도 처리
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.text(); 
+        })
+        .then(data => {
+            alert('결과:\n\n' + data);
+            console.log('서버 응답:', data);
+            // 성공 시 캘린더 새로고침이 필요할 수 있습니다.
+            // window.location.reload(); 
+        })
+        .catch(error => {
+            alert('처리 중 오류가 발생했습니다. 콘솔을 확인해주세요.');
+            console.error('미퇴근 처리 AJAX 오류:', error.message);
+        })
+        .finally(() => {
+            // 처리 완료 후 버튼 상태 복구
+            incompleteButton.disabled = false;
+            incompleteButton.textContent = '미퇴근 결근 처리';
+        });
+    });
+}
+//---------------------------------------------
+    
 });
 </script>
 </head>
@@ -220,10 +310,9 @@ $(document).ready(function() {
 									<p id="fieldworkDisplay"></p>
 								</div>
 								<button class="btn-fieldwork" id="fieldwork">외 근</button>
-							<!-- 임시 월근무 계산기 버튼 -->
-								<button class="btn-fieldwork" id="monthAttend">임시 월근무 계산기</button>
-							<!-- /임시 월근무 계산기 버튼 -->	
-							</div>
+								<button class="btn-fieldwork" id="processAbsence">미출근 결근 처리</button>
+								<button class="btn-fieldwork" id="incompleteAttendCheck">미퇴근 결근 처리</button>
+								</div>
 							<div class="calendar">
 								<div id="calendar"></div>
 							</div>

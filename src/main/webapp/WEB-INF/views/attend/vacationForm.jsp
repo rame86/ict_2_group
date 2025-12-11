@@ -9,9 +9,7 @@
 <meta charset="UTF-8">
 <title>vacationForm.jsp</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- Tailwind CSS CDN 로드 -->
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- jQuery CDN 로드 -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 <script>
@@ -103,6 +101,12 @@
 			        alert("휴가 종류를 선택해 주세요.");
 			        return; 
 			    }
+                // **********************************************
+                // 서버 전송 전 '일' 텍스트 제거 (서버 처리를 위해)
+                const totalDaysVal = $('#totalDays').val().replace(' 일', '').trim();
+                // 폼 데이터에 최종 숫자 값으로 덮어쓰기
+                formData.set('totalDays', totalDaysVal);
+                // **********************************************
 			    
 			    console.log('휴가 신청 AJAX 제출 시작...');
 			
@@ -119,15 +123,20 @@
 			            console.log('AJAX 성공 응답:', response);
 			            
 			            // 서버 응답에 따라 성공/실패 메시지 처리
-			            if (response && response.success) { // 서버가 { "success": true, "message": "..." } 형태로 응답한다고 가정
-			                alert('✅ 휴가 신청이 성공적으로 접수되었습니다.');
-			                $form[0].reset(); // 폼 초기화
-			                // 필요하다면 페이지 이동: window.location.href = '/main'; 
+			            if (response && response.success) { // 휴가 신청 성공 시
+			                alert('✅ 휴가 신청이 성공적으로 접수되었습니다. 창을 닫습니다.');
+			                
+			                // ⭐⭐⭐ 요청하신 기능: 성공 시 현재 창을 닫습니다. ⭐⭐⭐
+			                window.close();
+			                
 			            } else if (response && response.message) {
 			                alert('❌ 휴가 신청 실패: ' + response.message);
 			            } else {
-			                alert('✅ 휴가 신청이 성공적으로 접수되었습니다. (응답 메시지 없음)');
-			                $form[0].reset();
+			                // 응답 메시지가 없더라도 성공으로 간주
+			                alert('✅ 휴가 신청이 성공적으로 접수되었습니다. (응답 메시지 없음) 창을 닫습니다.');
+			                
+			                // ⭐⭐⭐ 요청하신 기능: 성공 시 현재 창을 닫습니다. ⭐⭐⭐
+			                window.close(); 
 			            }
 			        },
 			        error: function(xhr, status, error) {
@@ -138,6 +147,8 @@
 			        complete: function() {
 			            // 로딩 스피너 등을 숨기는 코드를 여기에 추가할 수 있습니다.
 			            console.log('AJAX 요청 완료.');
+			            // 폼 초기화 후 상태 재설정 (반차 상태 해제) - 창이 닫히면 이 코드는 실행되지 않지만, 실패 시를 대비해 유지
+			            handleVacationTypeChange(); 
 			        }
 			    });
 			});
@@ -159,46 +170,53 @@
                 const $totalDaysInput = $('#totalDays');
                 const $proofUploadGroup = $('#proofUploadGroup'); // 증빙 자료 그룹
                 
-                // ⭐ 시작일(startDate) 값과 종료일(endDate) 입력 필드를 가져옴
-                const startDateValue = $('#startDate').val(); 
+                // ⭐ 입력 필드 요소들
+                const $startDateInput = $('#startDate'); 
                 const $endDateInput = $('#endDate'); 
+                const startDateValue = $startDateInput.val(); 
                 
+                // 초기화: 모든 필드를 일단 활성화/표시 상태로 시작
+                $endDateGroup.show();
+                $totalDaysGroup.show();
+                $endDateInput.prop('disabled', false).prop('required', true); // 종료일 활성화 및 필수 설정
+                $startDateLabel.text('시작일:');
+                $proofUploadGroup.hide();
+
 
                 // 반차(half_am, half_pm)인 경우
                 if (selectedType === 'half_am' || selectedType === 'half_pm') {
                     
-                    // 1. 종료일 그룹은 계속 보이게 유지합니다.
-                    $endDateGroup.show();
+                    // 1. 종료일 그룹 숨김 및 비활성화
+                    $endDateGroup.hide();
+                    $endDateInput.prop('disabled', true).prop('required', false);
                     
-                    // 2. 신청 일수 그룹은 숨김 (반차는 0.5일 고정이므로)
+                    // 2. 신청 일수 그룹은 숨김
                     $totalDaysGroup.hide();
                     
-                    // 3. 시작일이 있다면, 종료일을 시작일과 같은 날짜로 자동 설정
+                    // 3. 시작일(신청일)이 있다면, 종료일 값을 시작일과 같은 날짜로 자동 설정 (서버 전송을 위해)
                     if (startDateValue) {
                         $endDateInput.val(startDateValue);
+                    } else {
+                        $endDateInput.val(''); // 시작일이 없다면 종료일 값도 비움
                     }
                     
-                    // 4. 종료일 필드의 필수 속성은 유지 (어차피 시작일과 같게 채워지므로 문제 없음)
-                    // $endDateInput.prop('required', true);
-                    
-                    // 시작일 라벨을 '신청일'로 변경
+                    // 4. 시작일 라벨을 '신청일'로 변경
                     $startDateLabel.text('신청일:');
                     
-                    // 반차일 때는 증빙 자료 숨김
+                    // 5. 반차일 때는 증빙 자료 숨김
                     $proofUploadGroup.hide();
                     
-                    // 일수 재계산 (0.5일 고정 반영을 위해 호출)
+                    // 6. 일수 재계산 (0.5일 고정 반영)
                     calculateDays();
 
                 } else {
-                    // 일반 휴가(연차, 병가, 보상 휴가 등)인 경우
-                    $endDateGroup.show();
-                    $totalDaysGroup.show();
+                    // 일반 휴가(연차, 병가, 보상 휴가, 기타)인 경우
+                    // 종료일 그룹 표시, 활성화, 필수 설정 (초기화 상태 유지)
+                    // 신청 일수 그룹 표시 (초기화 상태 유지)
+                    $endDateInput.prop('disabled', false).prop('required', true); 
                     
-                    // 시작일 라벨을 '시작일'로 복원
+                    // 시작일 라벨을 '시작일'로 복원 (초기화 상태 유지)
                     $startDateLabel.text('시작일:');
-                    
-                    // 일반 휴가일 때는 종료일 값을 비우지 않고 사용자가 선택하도록 둡니다.
                     
                     // 일수 재계산
                     calculateDays();
@@ -220,7 +238,8 @@
 
                 // 반차일 경우 일수 계산 로직을 건너뜀
                 if (selectedType === 'half_am' || selectedType === 'half_pm') {
-                    $totalDaysInput.val('0.5 일'); // 반차는 0.5일로 고정
+                    // 서버 전송을 위해 name="totalDays"인 필드에 '0.5' 값을 설정
+                    $totalDaysInput.val('0.5 일'); 
                     return;
                 }
 
@@ -329,7 +348,6 @@ textarea {
 				value="${ loginVO.managerEmpNo }"> <input type="hidden"
 				name="step2ManagerNo" value="${ loginVO.parentDeptNo }">
 
-			<!-- 1. 신청자 정보 (자동 입력) -->
 			<fieldset class="p-4 border border-gray-200 rounded-lg">
 				<legend class="text-sm font-bold text-blue-600 px-2">신청자 정보
 					(자동 입력)</legend>
@@ -360,55 +378,47 @@ textarea {
 
 			</fieldset>
 
-			<!-- 휴가 정보 조회 버튼 추가 -->
 			<div class="flex justify-end pt-2 mb-4">
 				<button type="button" id="viewVacationInfoBtn"
 					class="bg-blue-primary text-white text-sm font-medium py-2 px-4 rounded-lg shadow-md hover:bg-blue-700 transition duration-150">
 					잔여 휴가 정보 조회</button>
 			</div>
 
-			<!-- 2. 휴가 정보 입력 -->
 			<fieldset class="p-4 border border-gray-200 rounded-lg">
 				<legend class="text-sm font-bold text-blue-600 px-2">휴가 정보
 					입력</legend>
 
-				<!-- 휴가 종류 -->
 				<div class="form-group-flex">
 					<label for="vacationType" class="form-label">휴가 종류:</label> <select
-						id="vacationType" name="vacationType" required
+						id="vacationType" name="attStatus" required
 						class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
 						<option value="" disabled selected>선택하세요</option>
 						<option value="annual">연차</option>
 						<option value="half_am">반차 (오전)</option>
 						<option value="half_pm">반차 (오후)</option>
 						<option value="sick">병가</option>
-						<option value="compensatory">보상 휴가</option>
-						<option value="other">기타</option>
+						<option value="compensatory">보상 휴가</option>						
 					</select>
 				</div>
 
-				<!-- 시작일/신청일 -->
 				<div class="form-group-flex">
 					<label for="startDate" id="startDateLabel" class="form-label">시작일:</label>
 					<input type="date" id="startDate" name="startDate" required
 						class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
 				</div>
 
-				<!-- 종료일 그룹 (JavaScript로 가시성 제어) -->
 				<div class="form-group-flex" id="endDateGroup">
 					<label for="endDate" class="form-label">종료일:</label> <input
 						type="date" id="endDate" name="endDate" required
 						class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
 				</div>
 
-				<!-- 신청 일수 그룹 (JavaScript로 가시성 제어) -->
 				<div class="form-group-flex" id="totalDaysGroup">
 					<label for="totalDays" class="form-label">신청 일수:</label> <input
 						type="text" id="totalDays" name="totalDays" value="0 일" readonly
 						class="form-input auto-filled-input">
 				</div>
 
-				<!-- 휴가 사유 -->
 				<div class="flex flex-col mb-4">
 					<label for="reason"
 						class="text-sm font-semibold text-gray-700 mb-2">휴가 사유:</label>
@@ -417,7 +427,6 @@ textarea {
 						class="w-full p-2 border border-gray-300 rounded-md resize-none focus:border-blue-500 focus:ring focus:ring-blue-200"></textarea>
 				</div>
 
-				<!-- 비상 연락처 -->
 				<div class="form-group-flex">
 					<label for="emergencyContact" class="form-label">비상 연락처:</label> <input
 						type="tel" id="emergencyContact" name="emergencyContact"
@@ -425,7 +434,6 @@ textarea {
 						class="form-input focus:border-blue-500 focus:ring focus:ring-blue-200">
 				</div>
 
-				<!-- 증빙 자료 업로드 그룹 (병가 선택 시에만 표시) -->
 				<div class="form-group-flex" id="proofUploadGroup"
 					style="display: none;">
 					<label for="proofFile" class="form-label">증빙 자료 제출:</label> <input
@@ -436,7 +444,6 @@ textarea {
 
 			</fieldset>
 
-			<!-- 버튼 영역 -->
 			<div class="flex justify-center pt-4 space-x-4">
 				<button type="submit"
 					class="custom-btn bg-gray-light text-gray-800 hover:bg-primary hover:text-white">신청</button>
@@ -446,22 +453,18 @@ textarea {
 		</form>
 	</div>
 
-	<!-- 잔여 휴가 정보 모달 (숨김 상태) -->
 	<div id="vacationModal"
 		class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
 		<div
 			class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm transform transition-all duration-300 scale-100 opacity-100">
 			<div class="flex justify-between items-center border-b pb-3 mb-4">
 				<h3 class="text-xl font-bold text-gray-800">잔여 휴가 정보</h3>
-				<!-- 닫기 버튼 (X 아이콘) -->
 				<button id="closeModalBtn"
 					class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
 			</div>
 
 			<div id="vacationInfoDisplay" class="space-y-4 text-base">
-				<!-- Data will be injected here by jQuery -->
-				<!-- 예시: <p class="text-gray-700"><span class="font-bold text-blue-primary">유급휴가 잔여:</span> 4일/15일</p> -->
-			</div>
+				</div>
 
 			<div class="mt-8 flex justify-center">
 				<button type="button" id="okModalBtn"

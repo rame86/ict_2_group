@@ -29,4 +29,5 @@ public class DocVO {
     private String emergencyContact; // 비상연락망
     private String memo;
     private String newmodifyTime;
+    private String attStatus;
 }
