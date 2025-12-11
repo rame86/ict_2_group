@@ -264,7 +264,7 @@ footer.py-4.bg-light.mt-auto {
 .toast {
     position: fixed;
     left: 50%;
-    top: 200px;
+    top: 500px;
     transform: translateX(-50%);
     min-width: 260px;
     max-width: 360px;
