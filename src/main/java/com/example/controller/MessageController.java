@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.domain.MessageVO;
 import com.example.service.MessageService;
@@ -75,5 +77,13 @@ public class MessageController {
 		return result;
 		
 	}
-
+	
+	@ResponseBody
+	@GetMapping("/api/message/emp")
+	public List<EmpVO> getSelectEmp(@RequestParam(required = false, defaultValue = "") String keyword,
+			@ModelAttribute("login") LoginVO login){
+		System.out.println("메세지보낼사람찾기요청");
+		return messageService.getSelectEmpList(keyword, login.getEmpNo());
+	}
+	
 }
