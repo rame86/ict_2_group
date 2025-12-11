@@ -103,7 +103,7 @@ public class MemberController {
 		Integer result = memberService.memberSave(vo);
 
 		if (result != null) {
-			return "/member/login";
+			return "redirect:/";
 
 		} else {
 			log.info("회원가입 실패");

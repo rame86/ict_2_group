@@ -112,13 +112,40 @@ public class AttendServiceImpl implements AttendService {
 		davo.setUpdateTime(toDate.getToDay());
 		davo.setMemo(status + ":" + startDate + "~" + endDate + ", " + vo.getTotalDays());
 		davo.setAttStatus(status);
-		davo.setDateAttend(startDate);
-		attendDAO.insertVacation(davo, totalDays);
+		davo.setDateAttend(startDate);// --- 🚨 여기서부터 중복 체크 로직 추가 시작 🚨 ---
+	    
+	    // 넘어온 dateAttend 날짜를 currentDateString에 저장
+	    String currentDateString = davo.getDateAttend();
 
+	    // totalDays 만큼 반복
+	    for (int i = 0; i < totalDays; i++) {
+	        DayAttendVO davoToInsert = new DayAttendVO();
+	        
+	        davoToInsert.setEmpNo(davo.getEmpNo());
+	        davoToInsert.setAttStatus(davo.getAttStatus());
+	        davoToInsert.setMemo(davo.getMemo());
+	        davoToInsert.setDateAttend(currentDateString); // 현재 날짜 설정
+
+	        // 💡 1. 해당 날짜에 이미 근태 기록이 있는지 확인
+	        int recordCount = attendDAO.countAttendRecordByDate(davoToInsert);
+
+	        if (recordCount == 0) {
+	            // 2. 기록이 없을 경우에만 삽입
+	            log.info("INSERT 시도 - dateAttend: " + davoToInsert.getDateAttend());
+	            // attendDAO.insertVacation(davoToInsert, 1.0); // DAO 메서드를 1일 단위로 호출하도록 변경 필요 (아래 3번 참고)
+	            attendDAO.insertVacation(davoToInsert); // DAO의 기존 insertVacation이 이미 1일 단위 삽입 로직이므로, 반복문 내에서 호출
+	            
+	        } else {
+	            // 2-1. 기록이 이미 있을 경우: 삽입 건너뛰기
+	            log.warn("날짜 {} 에 이미 근태 기록({})이 존재하여 휴가 삽입을 건너뜁니다.", currentDateString, davo.getEmpNo());
+	        }
+
+	        // ToDate 유틸리티를 사용하여 다음 날짜를 계산하고 다시 넣어줌~
+	        currentDateString = toDate.addDay(currentDateString);
+	    }
 	}
 	// end of insertVacation()
 	// =======================================================================================
-
 	//
 	
 	// =======================================================================================

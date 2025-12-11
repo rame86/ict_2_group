@@ -292,7 +292,12 @@ if (incompleteButton) {
 		<jsp:include page="../common/sidebar.jsp" flush="true" />
 
 		<div id="layoutSidenav_content">
+			<div class="container-fluid px-4">
+				<h3 class="mt-4 custom-title">근태 현황</h3>
+				<hr />
+			</div>
 			<main id="content-area">
+
 				<div class="main-layout-container">
 
 					<div class="report-section">
@@ -310,9 +315,11 @@ if (incompleteButton) {
 									<p id="fieldworkDisplay"></p>
 								</div>
 								<button class="btn-fieldwork" id="fieldwork">외 근</button>
-								<button class="btn-fieldwork" id="processAbsence">미출근 결근 처리</button>
-								<button class="btn-fieldwork" id="incompleteAttendCheck">미퇴근 결근 처리</button>
-								</div>
+								<button class="btn-fieldwork" id="processAbsence">미출근
+									결근 처리</button>
+								<button class="btn-fieldwork" id="incompleteAttendCheck">미퇴근
+									결근 처리</button>
+							</div>
 							<div class="calendar">
 								<div id="calendar"></div>
 							</div>

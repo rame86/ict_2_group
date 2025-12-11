@@ -95,7 +95,7 @@ public class AttendDAOImpl implements AttendDAO {
 	// =======================================================================================
 
 	//
-	
+
 	// =======================================================================================
 	// checkIn()
 	public String checkIn(DayAttendVO davo) {
@@ -104,18 +104,37 @@ public class AttendDAOImpl implements AttendDAO {
 		String checkInTime = "";
 		DayAttendVO currentData;
 		log.info("인자값 - davo 내용: " + davo.toString());
+
 		// 데이터가 있는지 먼저 확인~
 		DayAttendVO dateCheck = sess.selectOne("com.example.repository.DayAttendDAO.dateCheck", davo);
+
 		if (dateCheck == null) {
+			// 1. 해당 날짜에 데이터가 아예 없는 경우: 새로 출근 기록 INSERT
+			log.info("오늘 출근 기록이 없으므로 새로운 레코드를 삽입합니다.");
 			sess.insert("com.example.repository.DayAttendDAO.insertCheckIn", davo);
+
+			// 삽입 후 현재 데이터 다시 조회하여 IN_TIME 반환
 			currentData = sess.selectOne("com.example.repository.DayAttendDAO.dateCheck", davo);
 			checkInTime = currentData.getInTime();
+
 		} else {
-			log.info("dateInTimeCheck 내용: " + dateCheck.toString());
-			checkInTime = dateCheck.getInTime();
+			// 2. 해당 날짜에 데이터가 이미 있는 경우
 			davo.setDayAttno(dateCheck.getDayAttno());
-			if (checkInTime == null) {
+
+			// 2-1. IN_TIME이 이미 존재하는 경우: 중복 출근 체크를 방지하고 기존 시간 반환
+			if (dateCheck.getInTime() != null) {
+				log.warn("이미 출근 시간이 기록되어 있습니다. 중복 처리를 방지합니다.");
+				// dateCheck에서 실제 출근 시간을 가져와 반환 (쿼리에서 'IN_TIME'은 TO_CHAR된 값, 'inTime'은
+				// TIMESTAMP)
+				checkInTime = dateCheck.getInTime();
+			}
+
+			// 2. IN_TIME이 NULL인 경우 (예: 결근처리, 휴가 등에 출근을 시도할 때)
+			else {
+				log.info("기존 레코드가 있으나 IN_TIME이 NULL입니다. 출근 시간 및 상태를 업데이트합니다.");
 				sess.update("com.example.repository.DayAttendDAO.updateCheckIn", davo);
+
+				// 업데이트 후 현재 데이터 다시 조회하여 IN_TIME 반환
 				currentData = sess.selectOne("com.example.repository.DayAttendDAO.dateCheck", davo);
 				checkInTime = currentData.getInTime();
 			}
@@ -126,7 +145,7 @@ public class AttendDAOImpl implements AttendDAO {
 	// =======================================================================================
 
 	//
-	
+
 	// =======================================================================================
 	// checkOut()
 	public String checkOut(DayAttendVO davo) {
@@ -215,7 +234,7 @@ public class AttendDAOImpl implements AttendDAO {
 	// =======================================================================================
 
 	//
-	
+
 	// =======================================================================================
 	// fieldwork()
 	public String fieldwork(DayAttendVO davo) {
@@ -255,32 +274,22 @@ public class AttendDAOImpl implements AttendDAO {
 	//
 
 	// =======================================================================================
-	// insertVacation() 연차 승인후 입력
-	public void insertVacation(DayAttendVO originalDavo, Double totalDays) {
-		log.info("[AttendDAO - insertVacation 요청 받음]");
+	// countAttendRecordByDate() 해당 날짜에 기록이 있는지 카운트
+	public int countAttendRecordByDate(DayAttendVO davo) {
+		log.info("[AttendDAO - countAttendRecordByDate 요청 받음]");
+		return sess.selectOne("com.example.repository.DayAttendDAO.countAttendRecordByDate", davo);
+	}
+	// end of countAttendRecordByDate()
+	// =======================================================================================
 
-		// 넘어온 dateAttend 날짜를 currentDateString에 저장
-		String currentDateString = originalDavo.getDateAttend();
+	//
 
-		log.info("attendDAO : " + originalDavo.toString());
-		log.info("totalDays : " + totalDays.toString());
-		// totalDays 만큼 반복
-		for (int i = 0; i < totalDays; i++) {
-			// 삽입할 새로운 DayAttendVO 객체 생성 및 값 복사
-			DayAttendVO davoToInsert = new DayAttendVO();
-
-			davoToInsert.setEmpNo(originalDavo.getEmpNo());
-			davoToInsert.setAttStatus(originalDavo.getAttStatus());
-			davoToInsert.setMemo(originalDavo.getMemo());
-			davoToInsert.setDateAttend(currentDateString);
-
-			log.info("INSERT 시도 - dateAttend: " + davoToInsert.getDateAttend());
-			sess.insert("com.example.repository.DayAttendDAO.insertVacation", davoToInsert);
-
-			// ToDate 유틸리티를 사용하여 다음 날짜를 계산하고 다시 넣어줌~
-			currentDateString = toDate.addDay(currentDateString);
-		}
-
+	// =======================================================================================
+	// insertVacation() 연차 승인후 입력 (단일 날짜 처리로 변경)
+	public void insertVacation(DayAttendVO davo) {
+	    log.info("[AttendDAO - insertVacation 요청 받음]");
+	    log.info("INSERT 시도 - dateAttend: " + davo.getDateAttend());
+	    sess.insert("com.example.repository.DayAttendDAO.insertVacation", davo);
 	}
 	// end of insertVacation()
 	// =======================================================================================
@@ -351,4 +360,6 @@ public class AttendDAOImpl implements AttendDAO {
 	}
 	// end of updateIncompleteAttendanceToAbsence()
 	// =======================================================================================
+	
+	
 }
