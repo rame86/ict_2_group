@@ -12,9 +12,10 @@
             <div class="emp-photo-placeholder">
                 <c:choose>
                     <c:when test="${not empty emp.empImage}">
-                        <img src="${pageContext.request.contextPath}/upload/emp/${emp.empImage}"
-                             alt="${emp.empName}"
-                             style="width:100%; height:100%; object-fit:cover; border-radius:16px;">
+                        <img
+                            src="${pageContext.request.contextPath}/upload/emp/${emp.empImage}"
+                            alt="${emp.empName}"
+                            style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
                     </c:when>
                     <c:otherwise>
                         PHOTO
@@ -35,18 +36,14 @@
         <div class="emp-card-body">
             <table class="emp-card-table">
 
-				<colgroup>
-					<col class="col-label">
-					<!-- 재직상태 / 연락처 / 주소 / 비고 -->
-					<col class="col-value">
-					<!-- 값 -->
-					<col class="col-label">
-					<!-- 직급번호 / 이메일 ... -->
-					<col class="col-value">
-					<!-- 값 -->
-				</colgroup>
-				
-				<tr>
+                <colgroup>
+                    <col class="col-label">
+                    <col class="col-value">
+                    <col class="col-label">
+                    <col class="col-value">
+                </colgroup>
+
+                <tr>
                     <th>재직상태</th>
                     <td>${emp.statusName}</td>
                     <th>직급번호</th>
@@ -67,10 +64,9 @@
                 <tr>
                     <th>비고</th>
                     <td colspan="3">
-                        <textarea class="emp-note-view"
-                                  rows="10"	
-                                  style="width:100%; resize:vertical;"
-                                  readonly><c:out value="${editNoteHistory}" />
+                        <textarea class="emp-note-view" rows="10"
+                                  style="width: 100%; resize: vertical;" readonly><c:out
+                                value="${editNoteHistory}" />
                         </textarea>
                     </td>
                 </tr>
@@ -80,17 +76,11 @@
         <%-- 관리 등급(1,2)에게만 수정/삭제 버튼 노출 --%>
         <c:if test="${canModify}">
             <div class="emp-card-actions">
-                <button type="button"
-                        class="emp-btn emp-btn-edit"
-                        onclick="enterEmpEditMode()">
-                    수정
-                </button>
+                <button type="button" class="emp-btn emp-btn-edit"
+                        onclick="enterEmpEditMode()">수정</button>
 
-                <button type="button"
-                        class="emp-btn emp-btn-delete"
-                        onclick="deleteEmp('${emp.empNo}')">
-                    삭제
-                </button>
+                <button type="button" class="emp-btn emp-btn-delete"
+                        onclick="deleteEmp('${emp.empNo}')">삭제</button>
             </div>
         </c:if>
     </div>
@@ -102,11 +92,9 @@
          - 처음에는 숨김
        ========================== --%>
     <c:if test="${canModify}">
-        <div class="emp-card-edit" style="display:none;">
+        <div class="emp-card-edit" style="display: none;">
 
-            <form id="empEditForm"
-                  method="post"
-                  enctype="multipart/form-data">
+            <form id="empEditForm" method="post" enctype="multipart/form-data">
 
                 <!-- 어떤 직원을 수정하는지 구분용 -->
                 <input type="hidden" name="empNo" value="${emp.empNo}" />
@@ -123,12 +111,12 @@
                                 <img id="empEditPhotoPreview"
                                      src="${pageContext.request.contextPath}/upload/emp/${emp.empImage}"
                                      alt="${emp.empName}"
-                                     style="width:100%; height:100%; object-fit:cover; border-radius:16px;">
+                                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
                             </c:when>
                             <c:otherwise>
                                 <span id="empEditPhotoText">PHOTO</span>
                                 <img id="empEditPhotoPreview"
-                                     style="display:none; width:100%; height:100%; object-fit:cover; border-radius:16px;"
+                                     style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 16px;"
                                      alt="사진 미리보기">
                             </c:otherwise>
                         </c:choose>
@@ -136,7 +124,7 @@
 
                     <!-- 실제 파일 선택 input (숨김) -->
                     <input type="file" name="empImageFile" id="empEditImageFile"
-                           accept="image/*" style="display:none;">
+                           accept="image/*" style="display: none;">
 
                     <div class="emp-basic-info">
                         <h3>${emp.empName}</h3>
@@ -176,17 +164,19 @@
                                 </select>
                                 <br/>
                                 <small class="text-muted">
-                                    ※ 재직/파견만 1~4등급 선택 가능, 인턴/수습은 5등급,
+                                    ※ 재직/파견만 1~4등급 선택 가능,
+                                       인턴/수습은 5등급,
                                        휴직·대기·징계·퇴직 등은 6등급으로 고정됩니다.
                                 </small>
                             </td>
                         </tr>
 
                         <!-- 퇴직일용 달력 행 (처음엔 숨김) -->
-                        <tr id="retireDateRow" style="display:none;">
+                        <tr id="retireDateRow" style="display: none;">
                             <th>퇴사일</th>
                             <td>
-                                <input type="date" id="retireDate" name="retireDate" class="form-control">
+                                <input type="date" id="retireDate" name="retireDate"
+                                       class="form-control">
                             </td>
                             <td colspan="2"></td>
                         </tr>
@@ -194,61 +184,90 @@
                         <tr>
                             <th>연락처</th>
                             <td>
-                                <input type="text" name="empPhone" value="${emp.empPhone}" style="width:100%;">
+                                <input type="text" name="empPhone"
+                                       value="${emp.empPhone}" style="width: 100%;">
                             </td>
                             <th>이메일</th>
                             <td>
-                                <input type="text" name="empEmail" value="${emp.empEmail}" style="width:100%;">
+                                <input type="text" name="empEmail"
+                                       value="${emp.empEmail}" style="width: 100%;">
                             </td>
                         </tr>
+
+                        <!-- 🔹 주소: 우편번호 / 도로명 / 상세 + hidden -->
                         <tr>
                             <th>주소</th>
                             <td colspan="3">
-                                <input type="text" name="empAddr" value="${emp.empAddr}" style="width:100%;">
+                                <!-- 1줄: 우편번호 + 검색 버튼 -->
+                                <div class="addr-row">
+                                    <input type="text" id="editPostcode"
+                                           class="form-control addr-postcode"
+                                           placeholder="우편번호">
+                                    <button type="button" id="btnEditAddrSearch" class="btn-addr">
+                                        주소 검색
+                                    </button>
+                                </div>
+
+                                <!-- 2줄: 도로명(또는 지번) 주소 -->
+                                <div class="addr-row" style="margin-top: 8px;">
+                                    <input type="text" id="editAddrRoad"
+                                           class="form-control"
+                                           placeholder="도로명 주소"
+                                           value="${emp.empAddr}">
+                                </div>
+
+                                <!-- 3줄: 상세 주소 -->
+                                <div class="addr-row" style="margin-top: 8px;">
+                                    <input type="text" id="editAddrDetail"
+                                           class="form-control"
+                                           placeholder="상세 주소를 입력하세요">
+                                </div>
+
+                                <!-- 🔹 실제 서버로 보낼 값 (기존 empAddr 컬럼 유지) -->
+                                <input type="hidden"
+                                       name="empAddr" id="editEmpAddrHidden"
+                                       value="${emp.empAddr}">
                             </td>
                         </tr>
 
                         <!-- 비고 전체 수정 가능 -->
                         <tr>
-							<th>비고</th>
-							<td colspan="3">
-								<%-- 1) 지금까지의 비고 이력 (읽기 전용, name 없음 → 서버로 안 감) --%> 
-								<textarea id="eNoteHistoryView" class="emp-note-view" rows="8"
-									style="width: 100%; resize: vertical; margin-bottom: 6px;"
-									readonly><c:out value="${editNoteHistory}" />
-								</textarea> 
-									
-								<%-- 2) 새로 추가할 비고 (이 값만 서버로 전송됨) --%>
-								<textarea id="eNote" name="eNote" rows="3"
-									style="width: 100%; resize: vertical;"
-									placeholder="추가로 남길 비고를 입력하세요.">
-								</textarea>
-							</td>
-						</tr>
+                            <th>비고</th>
+                            <td colspan="3">
+                                <%-- 1) 지금까지의 비고 이력 (읽기 전용, name 없음 → 서버로 안 감) --%>
+                                <textarea id="eNoteHistoryView" class="emp-note-view" rows="8"
+                                          style="width: 100%; resize: vertical; margin-bottom: 6px;"
+                                          readonly><c:out value="${editNoteHistory}" />
+                                </textarea>
+
+                                <%-- 2) 새로 추가할 비고 (이 값만 서버로 전송됨) --%>
+                                <textarea id="eNote" name="eNote" rows="3"
+                                          style="width: 100%; resize: vertical;"
+                                          placeholder="추가로 남길 비고를 입력하세요.">
+                                </textarea>
+                            </td>
+                        </tr>
                     </table>
                 </div>
             </form>
 
             <div class="emp-card-actions">
-                <button type="button"
-                        class="emp-btn emp-btn-edit"
-                        onclick="saveEmpEdit()">
-                    저장
-                </button>
+                <button type="button" class="emp-btn emp-btn-edit"
+                        onclick="saveEmpEdit()">저장</button>
 
-                <button type="button"
-                        class="emp-btn emp-btn-delete"
-                        onclick="cancelEmpEditMode()">
-                    취소
-                </button>
+                <button type="button" class="emp-btn emp-btn-delete"
+                        onclick="cancelEmpEditMode()">취소</button>
             </div>
         </div>
     </c:if>
 
 </div>
 
+<%-- Daum 주소 검색 API 추가 (empCard에서도 필요) --%>
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 <script>
-    // 재직상태/직급번호 규칙
+    // 🔹 재직상태/직급번호 규칙
     function applyStatusGradeRule($form) {
         const status = $form.find('select[name="statusNo"]').val();
         const $grade = $form.find('select[name="gradeNo"]');
@@ -288,7 +307,7 @@
         $grade.prop('disabled', true);
     }
 
-    // 퇴직 선택 시 퇴사일 달력 보이기/숨기기
+    // 🔹 퇴직 선택 시 퇴사일 달력 보이기/숨기기
     function toggleRetireDate($form) {
         const status = $form.find('select[name="statusNo"]').val();
 
@@ -300,7 +319,52 @@
         }
     }
 
-    // 보기 모드 -> 수정 모드
+    // 🔹 수정 모드 주소 hidden(empAddr) 갱신
+    function updateEditEmpAddrHidden() {
+        const postcode = $('#editPostcode').val().trim();
+        const road     = $('#editAddrRoad').val().trim();
+        const detail   = $('#editAddrDetail').val().trim();
+
+        const parts = [];
+        if (postcode) parts.push('(' + postcode + ')');
+        if (road)     parts.push(road);
+        if (detail)   parts.push(detail);
+
+        $('#editEmpAddrHidden').val(parts.join(' '));
+    }
+
+    // 🔹 수정 모드에서 Daum 우편번호 팝업 열기
+    function openPostcodeEdit() {
+        new daum.Postcode({
+            oncomplete: function (data) {
+                let addr = '';
+
+                // 도로명 / 지번 구분
+                if (data.userSelectedType === 'R') {
+                    addr = data.roadAddress;
+                } else {
+                    addr = data.jibunAddress;
+                }
+
+                const extra = [];
+                if (data.bname)        extra.push(data.bname);
+                if (data.buildingName) extra.push(data.buildingName);
+                if (extra.length > 0) {
+                    addr += ' (' + extra.join(', ') + ')';
+                }
+
+                // 화면에 값 채우기
+                $('#editPostcode').val(data.zonecode);  // 우편번호
+                $('#editAddrRoad').val(addr);           // 도로명/지번
+                $('#editAddrDetail').focus();           // 상세주소 입력 포커스
+
+                // hidden(empAddr)도 같이 업데이트
+                updateEditEmpAddrHidden();
+            }
+        }).open();
+    }
+
+    // 🔹 보기 모드 -> 수정 모드
     function enterEmpEditMode() {
         $('.emp-card-view').hide();
         $('.emp-card-edit').show();
@@ -313,15 +377,21 @@
         $('#empEditPhotoBox').css('cursor', 'pointer');
     }
 
-    // 수정 모드 -> 보기 모드
+    // 🔹 수정 모드 -> 보기 모드
     function cancelEmpEditMode() {
         $('.emp-card-edit').hide();
         $('.emp-card-view').show();
     }
 
-    // 초기 설정
+    // 🔹 초기 설정
     $(function () {
         const $form = $('#empEditForm');
+
+        // 주소 초기값: hidden에 값 있고 도로명칸이 비었으면 채워주기
+        const existingAddr = $('#editEmpAddrHidden').val();
+        if (existingAddr && !$('#editAddrRoad').val()) {
+            $('#editAddrRoad').val(existingAddr);
+        }
 
         // 사진 클릭 시 파일 선택창
         $('#empEditPhotoBox').on('click', function () {
@@ -353,28 +423,40 @@
             applyRetireDateToNote();
         });
 
-        // 혹시 수정 모드로 바로 들어온 경우
+        // 🔹 주소 검색 버튼 클릭 → Daum API 실행
+        $('#btnEditAddrSearch').on('click', function () {
+            openPostcodeEdit();
+        });
+
+        // 🔹 도로명/상세주소 입력 시 hidden(empAddr) 갱신
+        $('#editAddrRoad, #editAddrDetail').on('input blur', function () {
+            updateEditEmpAddrHidden();
+        });
+
+        // 🔹 비고 입력창 포커스 시 커서를 항상 맨 앞(왼쪽 위)로
+        $('#eNote').on('focus click', function () {
+            const textarea = this;
+            setTimeout(function () {
+                textarea.setSelectionRange(0, 0);
+                textarea.scrollTop = 0;
+            }, 0);
+        });
+
+        // 수정 모드로 바로 들어온 경우 대비
         if ($('.emp-card-edit').is(':visible')) {
             applyStatusGradeRule($form);
             toggleRetireDate($form);
         }
-        
-     // 🔹 비고 입력창 클릭/포커스 시 커서를 항상 맨 앞(왼쪽 위)로 이동
-        $('#eNote').on('focus click', function () {
-            const textarea = this;
-            // 바로 setSelectionRange를 호출하면 브라우저가 덮어쓰는 경우가 있어서 약간 딜레이
-            setTimeout(function () {
-                textarea.setSelectionRange(0, 0);  // 커서를 0번째 위치로
-                textarea.scrollTop = 0;            // 스크롤도 맨 위로
-            }, 0);
-        });
     });
 
-    // 저장 (파일 포함 → FormData 사용)
+    // 🔹 저장 (파일 포함 → FormData 사용)
     function saveEmpEdit() {
         const $form = $('#empEditForm');
         applyStatusGradeRule($form);
         toggleRetireDate($form);
+
+        // 주소 hidden 최신화
+        updateEditEmpAddrHidden();
 
         const empNo = $form.find('input[name="empNo"]').val();
         const formData = new FormData($form[0]);
@@ -407,7 +489,7 @@
         });
     }
 
-    // 퇴사일이 선택되면 eNote에 '퇴사일 : yyyy-MM-dd' 자동 반영
+    // 🔹 퇴사일이 선택되면 eNote에 '퇴사일 : yyyy-MM-dd' 자동 반영
     function applyRetireDateToNote() {
         const date = $('#retireDate').val();
         const $note = $('#eNote');
