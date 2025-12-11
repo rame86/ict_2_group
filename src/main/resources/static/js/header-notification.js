@@ -29,12 +29,10 @@ $(document).ready(function(){
         connectSocket();
     }
 	
-	// 🚨🚨 [핵심] 3. 드롭다운이 열릴 때 로드 함수 호출 🚨🚨
 	$(document).on('shown.bs.dropdown', '#messagesDropdown', function () {
 		console.log("✅ 드롭다운 이벤트 발생! loadLatestMessages() 호출 시도.");
 	    loadLatestMessages();
 	});
-    // Note: 나머지 UI 초기화 로직은 messageList.jsp에 남겨둡니다.
 });
 
 // 🚨🚨 [핵심] 1. 전역 뱃지 업데이트 기능이 추가된 목록 로드 함수 🚨🚨
@@ -90,10 +88,12 @@ function createMessageItemHtml(msg) {
             formattedTime = date.toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit' });
         } catch (e) {}
     }
+	
+	const otherEmpNo = msg.senderEmpNo;
     
     // HTML 구조: SB Admin 2 스타일
     return '<a class="list-group-item list-group-item-action d-flex align-items-start py-3" ' + 
-        'href="javascript:void(0);" onclick="window.location.href=\'/message/messageList\';">' + 
+        	'href="/message/messageList?otherEmpNo=' + otherEmpNo + '">' + 
             '<div class="me-3" style="width: 40px; height: 40px;">' +
                 '<img class="rounded-circle w-100 h-100" src="/img/profile_placeholder.png" alt="프로필">' +
             '</div>' +

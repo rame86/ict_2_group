@@ -53,23 +53,26 @@ small {
 					<div class="row">
     
 				        <div class="col-xl-4 col-lg-5">
-				            <div class="card shadow mb-4">
-				                <div class="card-header py-3">
-				                    <h6 class="m-0 font-weight-bold text-primary">대화 상대 목록</h6>
-				                    <button class="btn btn-sm btn-outline-primary" 
-								            data-bs-toggle="modal" data-bs-target="#newChatModal">
-								        <i class="fas fa-plus fa-fw"></i> 새 대화
-								    </button>
-				                </div>
-				                
-				                <div class="list-group list-group-flush" id="conversationListContainer" style="max-height: 700px; overflow-y: auto;">
-    								<div class="p-3 text-center text-muted">대화 목록을 불러오는 중...</div>
-								</div>
-				            </div>
-				        </div>
+						    <div class="card shadow mb-4" style="height: 700px;">
+						        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+						            
+						            <h6 class="m-0 font-weight-bold text-primary">대화 목록</h6>
+						            
+						            <button class="btn btn-sm btn-outline-primary" 
+						                    data-bs-toggle="modal" data-bs-target="#newChatModal">
+						                <i class="fas fa-plus fa-fw"></i> 새 대화
+						            </button>
+						            
+						        </div>
+						        
+						        <div class="list-group list-group-flush" id="conversationListContainer" style="max-height: 700px; overflow-y: auto;">
+						            <div class="p-3 text-center text-muted">대화 목록을 불러오는 중...</div>
+						        </div>
+						    </div>
+						</div>
 
 				        <div class="col-xl-8 col-lg-7">
-				            <div class="card shadow mb-4">
+				            <div class="card shadow mb-4" style="height: 700px;">
 				                <div class="card-header py-3">
 				                    <h6 class="m-0 font-weight-bold text-primary" id="chatWindowHeader">김철수 사원과의 대화</h6>
 				                </div>
@@ -368,27 +371,34 @@ function renderChatMessages(messages, currentOtherUserId) {
 //메시지 전송 (유지)
 function sendMessage(){
 	
- const content = $('#messageInput').val().trim();
- const receiverEmpNo = currentReceiverEmpNo;
-	
- if (!content) {
-     alert("메시지 내용을 입력해 주세요.");
-     return;
- }
-	
- if (!receiverEmpNo) {
-     alert("대화 상대를 먼저 선택해 주세요.");
-     return;
- }
-	
- const messageData = {
-     receiverEmpNo: receiverEmpNo,
-     msgContent: content
- };
- 
- // 💡 stompClient는 header-notifications.js에 정의된 전역 변수를 사용합니다.
-stompClient.send("/app/chat/send", {}, JSON.stringify(messageData));
+	 const content = $('#messageInput').val().trim();
+	 const receiverEmpNo = currentReceiverEmpNo;
+	 const myEmpNo = $('#sessionEmpNo').val();
+		
+	 if (!content) {
+	     alert("메시지 내용을 입력해 주세요.");
+	     return;
+	 }
+		
+	 if (!receiverEmpNo) {
+	     alert("대화 상대를 먼저 선택해 주세요.");
+	     return;
+	 }
+		
+	 const messageData = {
+	     receiverEmpNo: receiverEmpNo,
+	     msgContent: content
+	 };
+	 
+	 // 💡 stompClient는 header-notifications.js에 정의된 전역 변수를 사용합니다.
+	stompClient.send("/app/chat/send", {}, JSON.stringify(messageData));
 	$('#messageInput').val('');
+	
+	setTimeout(function() {
+	     console.log("메시지 전송 지연 후 목록 갱신 요청");
+	     loadConversationList(myEmpNo); 
+	 }, 200);
+
 }
 
 //새 메시지 추가 및 실시간 읽음 처리 (유지)
@@ -537,13 +547,6 @@ function selectAndStartChat(empNo, empName) {
         $('#newChatModal').modal('hide');
     }
     
-    // 3. 모달이 완전히 닫힌 후 검색 상태 초기화
-    $('#newChatModal').on('hidden.bs.modal', function () {
-    	const resultsContainer = $('#employeeSearchResults');
-    	searchAndRenderEmployees('');
-    	$('#employeeSearchInput').val('');
-    });
-    
 }
 
 
@@ -552,6 +555,15 @@ function selectAndStartChat(empNo, empName) {
 //------------------------------------
 
 $(document).ready(function() {
+	
+	const urlParams = new URLSearchParams(window.location.search);
+    const initialEmpNo = urlParams.get('otherEmpNo'); // URL 파라미터 읽기
+    
+    if (initialEmpNo) {
+        // 💡 중요: initialEmpNo가 있다면, 해당 상대방과의 채팅창을 엽니다.
+        // loadChatWindow는 이름 대신 사번만으로도 작동해야 합니다.
+        loadChatWindow(initialEmpNo, '알림 상대'); // loadChatWindow 호출
+    }
 	
 	$('#newChatModal').on('shown.bs.modal', function () {
         console.log("👉 모달 열림 이벤트 발생: 직원 검색 시작"); // 🚨 이 메시지를 추가하고 콘솔 확인
@@ -565,11 +577,9 @@ $(document).ready(function() {
     });
 
     // 2. 검색 입력창에서 Enter 키 입력 이벤트
-    $('#employeeSearchInput').on('keypress', function(e) {
-        if (e.which === 13) { // Enter 키 코드
-            e.preventDefault(); // 기본 submit 동작 방지
-            searchAndRenderEmployees();
-        }
+    $('#employeeSearchInput').on('input', function() {
+        const keyword = $(this).val();
+        searchAndRenderEmployees(keyword); 
     });
 
     // 3. 메시지 입력창에서 Enter 키 입력 이벤트
