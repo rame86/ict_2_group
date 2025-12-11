@@ -7,6 +7,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.example.domain.EmpVO;
 import com.example.domain.MessageVO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +37,16 @@ public class MessageDAOImpl implements MessageDAO{
 	@Override
 	public int updateIsRead(Map<String, String> param) {
 		return sess.update("com.example.repository.MessageDAO.updateIsRead", param);
+	}
+
+	@Override
+	public List<MessageVO> selectUnreadMessages(String empNo) {
+		return sess.selectList("com.example.repository.MessageDAO.selectUnreadMessages", empNo);
+	}
+
+	@Override
+	public List<EmpVO> selectEmpDept(Map<String, Object> param) {
+		return sess.selectList("com.example.repository.MessageDAO.selectEmpDept", param);
 	}
 	
 }

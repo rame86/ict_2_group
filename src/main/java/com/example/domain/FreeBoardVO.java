@@ -6,10 +6,10 @@ import lombok.Data;
 public class FreeBoardVO {
 	private String empNo;
 	private String boardNo;
-	private String boardContent;	
-	private String boardDate;
+	private String boardContent;
+	private String boardWriter;
+	private String boardDate;	
 	private String boardTitle;
 	private Integer boardCnt;
-	
-	
+
 }

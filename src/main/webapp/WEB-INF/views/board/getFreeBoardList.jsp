@@ -6,7 +6,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>getBoardList.jsp - 공지 게시판 목록</title>
+<title>getFreeBoardList.jsp - 자유 게시판 목록</title>
 <style>
 /* -------------------- [공통 모달: 상세 보기(boardModal)] -------------------- */
 #boardModal .modal-header {
@@ -30,7 +30,7 @@
 	margin-bottom: 5px;
 }
 
-/* 🚨 수정됨: 공지 내용 모달의 텍스트 왼쪽 정렬 (가운데 정렬 문제 해결) */
+/* 🚨 수정됨: 게시글 내용 모달의 텍스트 왼쪽 정렬 (가운데 정렬 문제 해결) */
 #boardModal .modal-body {
 	white-space: pre-wrap;
 	text-align: left;
@@ -50,12 +50,12 @@
 			<main>
 				<div class="container-fluid px-4">
 
-					<h3 class="mt-4">공지 게시판</h3>
+					<h3 class="mt-4">자유 게시판</h3>
 					<br>
 
 					<div class="card mb-4">
 						<div class="card-header table-Header">
-							<i class="fas fa-table me-1"></i> 전체공지 게시판
+							<i class="fas fa-table me-1"></i> 전체 자유 게시판
 						</div>
 
 						<div class="card-body">
@@ -79,23 +79,23 @@
 									</tr>
 								</tfoot>
 								<tbody>
-									<c:forEach var="vo" items="${ noticeBoardList }">
+									<c:forEach var="vo" items="${ freeBoardList }">
 										<tr>
-											<td>${ vo.noticeNo }</td>
+											<td>${ vo.boardNo }</td>
 											<td><a href="#" data-bs-toggle="modal"
-												data-bs-target="#boardModal" data-no="${ vo.noticeNo }"
-												data-title="<c:out value='${vo.noticeTitle}'/>"
-												data-content="<c:out value='${vo.noticeContent}'/>"> ${ vo.noticeTitle }
+												data-bs-target="#boardModal" data-no="${ vo.boardNo }"
+												data-title="<c:out value='${vo.boardTitle}'/>"
+												data-content="<c:out value='${vo.boardContent}'/>"> ${ vo.boardTitle }
 											</a></td>
-											<td><a href="#">${ vo.noticeWriter }</a></td>
-											<td>${ vo.noticeDate }</td>
-											<td>${ vo.noticeCnt }</td>
+											<td><a href="#">${ vo.boardWriter }</a></td>
+											<td>${ vo.boardDate }</td>
+											<td>${ vo.boardCnt }</td>
 										</tr>
 									</c:forEach>
 								</tbody>
 							</table>
 							<c:if
-								test="${not empty sessionScope.login && sessionScope.login.gradeNo <= 2}">
+								test="${not empty sessionScope.login && sessionScope.login.gradeNo <= 4}">
 								<div style="text-align: left; margin-top: 10px;">
 									<a href="#" class="btn btn-primary" data-bs-toggle="modal"
 										data-bs-target="#writeModal">글쓰기</a>
@@ -110,29 +110,29 @@
 					<div class="modal-dialog modal-lg">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="writeModalLabel">새 공지 작성</h5>
+								<h5 class="modal-title" id="writeModalLabel">새 글 작성</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal"
 									aria-label="Close"></button>
 							</div>
 
-							<form action="/board/insertNoticeBoard" method="post">
+							<form action="/board/insertFreeBoard" method="post">
 								<div class="modal-body">
 									<div class="mb-3">
 										<label for="writer" class="form-label">작성자</label> <input
 											type="text" class="form-control" id="writer"
-											name="noticeWriter" value="${ sessionScope.login.empName }">
+											name="boardWriter" value="${ sessionScope.login.empName }">
 										<input type="hidden" name="empNo"
 											value="${ sessionScope.login.empNo }">
 									</div>
 									<div class="mb-3">
-										<label for="title" class="form-label">공지 제목</label> <input
+										<label for="title" class="form-label">글 제목</label> <input
 											type="text" class="form-control" id="title"
-											name="noticeTitle" required>
+											name="boardTitle" required>
 									</div>
 									<div class="mb-3">
-										<label for="content" class="form-label">공지 내용</label>
+										<label for="content" class="form-label">글 내용</label>
 										<textarea class="form-control" id="content"
-											name="noticeContent" rows="10" required></textarea>
+											name="boardContent" rows="10" required></textarea>
 									</div>
 								</div>
 								<div class="modal-footer">
@@ -150,34 +150,34 @@
 					<div class="modal-dialog modal-lg">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="modifyModalLabel">공지 수정</h5>
+								<h5 class="modal-title" id="modifyModalLabel">게시글 수정</h5>
 								<button type="button" class="btn-close" data-bs-dismiss="modal"
 									aria-label="Close"></button>
 							</div>
 
-							<form action="/board/insertNoticeBoard" method="post"
+							<form action="/board/insertFreeBoard" method="post"
 								id="modifyForm">
 								<div class="modal-body">
-									<input type="hidden" name="noticeNo" id="modifyNoticeNo">
+									<input type="hidden" name="boardNo" id="modifyBoardNo">
 
 									<div class="mb-3">
 										<label for="modifyWriter" class="form-label">작성자</label> <input
 											type="text" class="form-control" id="modifyWriter"
-											name="noticeWriter" value="${ sessionScope.login.empName }">
+											name="boardWriter" value="${ sessionScope.login.empName }">
 										<input type="hidden" name="empNo"
 											value="${ sessionScope.login.empNo }">
 									</div>
 
 									<div class="mb-3">
-										<label for="modifyTitle" class="form-label">공지 제목</label> <input
+										<label for="modifyTitle" class="form-label">글 제목</label> <input
 											type="text" class="form-control" id="modifyTitle"
-											name="noticeTitle" required>
+											name="boardTitle" required>
 									</div>
 
 									<div class="mb-3">
-										<label for="modifyContent" class="form-label">공지 내용</label>
+										<label for="modifyContent" class="form-label">글 내용</label>
 										<textarea class="form-control" id="modifyContent"
-											name="noticeContent" rows="10" required></textarea>
+											name="boardContent" rows="10" required></textarea>
 									</div>
 
 								</div>
@@ -204,12 +204,10 @@
 								<span id="modalContentText" style="display: block;"></span>
 							</div>
 							<div class="modal-footer">
-								<c:if
-									test="${not empty sessionScope.login && sessionScope.login.gradeNo <= 2}">
-									<input type="hidden" id="currentNoticeNo">
-									<button type="button" class="btn btn-primary me-2"
-										id="btnModify">수정</button>
-								</c:if>
+                                <input type="hidden" id="currentBoardNo">
+								<button type="button" class="btn btn-primary me-2"
+									id="btnModify" style="display:none;">수정</button> 
+									
 								<button type="button" class="btn btn-secondary"
 									data-bs-dismiss="modal">닫기</button>
 							</div>
@@ -230,6 +228,11 @@
 					var $btnModify = $('#btnModify');
 					var $writeForm = $('#writeModal form');
 					var $modifyForm = $('#modifyForm');
+                    
+                    // 로그인된 사용자의 empNo를 EL로 가져와 JS 변수에 저장
+                    // (주의: 로그인되어 있지 않으면 빈 문자열이 될 수 있음)
+                    var LOGIN_EMP_NO = '${ sessionScope.login.empNo }';
+
 
 					// -------------------------------------------------------------
 					// 등록 폼 제출 시 확인창 띄우기 (jQuery Submit Event)
@@ -237,7 +240,7 @@
 					$writeForm.on('submit', function(event) {
 						event.preventDefault(); // 폼의 기본 제출 동작을 막음
 
-						if (confirm('새 공지를 작성하시겠습니까?')) {
+						if (confirm('새 글을 작성하시겠습니까?')) {
 							// '확인'을 눌렀을 경우, 폼을 실제로 제출
 							this.submit();
 						}
@@ -249,51 +252,67 @@
 					$modifyForm.on('submit', function(event) {
 						event.preventDefault(); // 폼의 기본 제출 동작을 막음
 
-						if (confirm('공지 내용을 수정하시겠습니까?')) {
+						if (confirm('게시글 내용을 수정하시겠습니까?')) {
 							// '확인'을 눌렀을 경우, 폼을 실제로 제출
 							this.submit();
 						}
 					});
 
 					// -------------------------------------------------------------
-					// 1. 글 상세 보기 모달이 열릴 때 데이터 설정
+					// 글 상세 보기 모달이 열릴 때 데이터 설정
 					// -------------------------------------------------------------
 					$boardModal.on('show.bs.modal', function(event) {
 						var button = $(event.relatedTarget);
+                        
+                        // 모달이 열릴 때마다 수정 버튼 숨김 처리부터 시작
+                        $btnModify.hide(); 
 
 						// 글 목록에서 전달된 데이터 가져오기
-						var noticeNo = button.data('no');
+						var boardNo = button.data('no');
 						var title = button.data('title');
-						// var content = button.data('content'); // 기존: 내용 미리 가져오기 (삭제)
 
 						// 상세 모달에 제목 표시
 						$boardModal.find('.modal-title').text(title);
 						$boardModal.find('#modalContentText').text(
 								'내용을 불러오는 중...'); // 로딩 메시지
 
-						// Controller로 AJAX 요청 (noticeNo를 이용해 내용 조회)
+						// Controller로 AJAX 요청 (boardNo를 이용해 내용 조회)
 						$.ajax({
-							url : '/board/getContentNoticeBoard',
+							url : '/board/getContentFreeBoard', // AJAX URL 변경
 							type : 'POST',
 							data : {
-								noticeNo : noticeNo
+								boardNo : boardNo // 파라미터 이름 변경
 							},
 							dataType : 'json', // Controller가 JSON을 반환한다고 가정
 							success : function(response) {
 								// Controller에서 받은 데이터 (response) 처리
-								if (response && response.noticeContent) {
-									var content = response.noticeContent;
-
+								if (response && response.boardContent) { 
+									var content = response.boardContent;
+                                    var writerEmpNo = response.empNo; // 🚨 게시글 작성자의 empNo
+                                    
 									// 모달 내용 업데이트
 									$boardModal.find('#modalContentText').text(
 											content);
 
-									// (관리자 권한이 있는 경우) 수정 버튼을 위해 글 번호와 내용들을 저장
-									if ($btnModify.length) {
-										$('#currentNoticeNo').val(noticeNo); // 글 번호 저장
-										$btnModify.data('title', title);
-										$btnModify.data('content', content); // AJAX로 가져온 내용 저장
-									}
+									// 수정 버튼을 위해 글 번호와 내용들을 저장
+									$('#currentBoardNo').val(boardNo); // 글 번호 저장
+									$btnModify.data('title', title);
+									$btnModify.data('content', content); // AJAX로 가져온 내용 저장
+
+                                    // -------------------------------------------------------------
+                                    // 작성자 일치 여부 확인 후 수정 버튼 노출 
+                                    // -------------------------------------------------------------
+                                    
+                                    // 1. 로그인되어 있어야 하고
+                                    // 2. 로그인된 사용자의 empNo와 게시글 작성자의 empNo가 같으면 버튼 노출
+                                    if (LOGIN_EMP_NO && LOGIN_EMP_NO === writerEmpNo) {
+                                        $btnModify.show(); // 수정 버튼 노출
+                                    } else {
+                                        // 같지 않다면 다시 숨김 처리
+                                        $btnModify.hide(); 
+                                    }
+                                    // -------------------------------------------------------------
+                                    
 								} else {
 									$boardModal.find('#modalContentText').text(
 											'내용을 가져오지 못했습니다.');
@@ -320,11 +339,11 @@
 						boardModalInstance.hide();
 
 						// 2) 수정 모달에 데이터 채우기
-						var noticeNo = $('#currentNoticeNo').val();
+						var boardNo = $('#currentBoardNo').val();
 						var title = $this.data('title');
 						var content = $this.data('content');
 
-						$('#modifyNoticeNo').val(noticeNo);
+						$('#modifyBoardNo').val(boardNo);
 						$('#modifyTitle').val(title);
 						$('#modifyContent').val(content);
 

@@ -67,7 +67,7 @@ public class AttendDAOImpl implements AttendDAO {
 				koreanStatus = "오전반차";
 				break;
 			case "7":
-				koreanStatus = "오후반차"; // 7.이 아니라 7이라고 가정하고 처리
+				koreanStatus = "오후반차";
 				break;
 			case "8":
 				koreanStatus = "병가";
@@ -82,7 +82,7 @@ public class AttendDAOImpl implements AttendDAO {
 				koreanStatus = "출장";
 				break;
 			default:
-				koreanStatus = "알 수 없음"; // 정의되지 않은 값이 들어왔을 경우
+				koreanStatus = "알 수 없음";
 				break;
 			}
 
@@ -94,6 +94,8 @@ public class AttendDAOImpl implements AttendDAO {
 	// end of selectDayAttend()
 	// =======================================================================================
 
+	//
+	
 	// =======================================================================================
 	// checkIn()
 	public String checkIn(DayAttendVO davo) {
@@ -123,6 +125,8 @@ public class AttendDAOImpl implements AttendDAO {
 	// end of checkIn()
 	// =======================================================================================
 
+	//
+	
 	// =======================================================================================
 	// checkOut()
 	public String checkOut(DayAttendVO davo) {
@@ -210,6 +214,8 @@ public class AttendDAOImpl implements AttendDAO {
 	// end of checkOut()
 	// =======================================================================================
 
+	//
+	
 	// =======================================================================================
 	// fieldwork()
 	public String fieldwork(DayAttendVO davo) {
@@ -314,18 +320,35 @@ public class AttendDAOImpl implements AttendDAO {
 	// end of commuteCorrection()
 	// =======================================================================================
 
+	//
+
+	// =======================================================================================
+	// getAllEmpNos()
 	public List<String> getAllEmpNos() {
-        return sess.selectList("com.example.repository.DayAttendDAO.getAllEmpNos");
-    }
-	
+		return sess.selectList("com.example.repository.DayAttendDAO.getAllEmpNos");
+	}
+	// end of getAllEmpNos()
+	// =======================================================================================
+
+	//
+
+	// =======================================================================================
+	// insertAbsenceRecords()
 	public int insertAbsenceRecords() {
-        // insertAbsenceRecords 쿼리 실행
-        return sess.insert("com.example.repository.DayAttendDAO.insertAbsenceRecords");
-    }
-	
+		// insertAbsenceRecords 쿼리 실행
+		return sess.insert("com.example.repository.DayAttendDAO.insertAbsenceRecords");
+	}
+	// end of insertAbsenceRecords()
+	// =======================================================================================
+
+	//
+
+	// =======================================================================================
+	// updateIncompleteAttendanceToAbsence()
 	public int updateIncompleteAttendanceToAbsence() {
 		log.info("[AttendDAO - updateIncompleteAttendanceToAbsence 요청 받음]");
 		return sess.update("com.example.repository.DayAttendDAO.updateIncompleteAttendanceToAbsence");
 	}
-	
+	// end of updateIncompleteAttendanceToAbsence()
+	// =======================================================================================
 }
