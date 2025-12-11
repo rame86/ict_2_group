@@ -17,54 +17,74 @@ $(function() {
 		}
 	}
 
-	// idCheck - 아이디 중복 체크
+	// idCheck - 아이디 중복 체크 (사원번호 + 이름 일치 확인)
 	$('#empNoCheck').on('click', function(evt) {
-		// 이벤트버블링 막기
-		evt.preventDefault();
+	    // 이벤트버블링 막기
+	    evt.preventDefault();
 
-		let param = { empNo: $('#empNo').val(), empName: $('#empName').val() }
+	    let empNoVal = $('#empNo').val();
+	    let empNameVal = $('#empName').val();
 
-		let empNoCheckResult = $('#empNoCheckResult');
+	    // 1. 사원번호 입력 확인
+	    if (!empNoVal) {
+	        alert("사원번호를 입력해주세요.");
+	        $('#empNo').focus();
+	        return;
+	    }
 
-		$.ajax({
-			type: 'get'
-			, data: param
-			, url: '/member/empNoCheck'
-			, success: function(result) {
-				// 아이디 유효성 검사
-				if (result === "2") {
-					empNoCheckResult.css('color', 'red');
-					empNoCheckResult.text("해당 사원ID는 이미 가입되었습니다.")
-					formIdCheck = false;
-				}
-				if (result === "3") {
-					empNoCheckResult.css('color', 'red');
-					empNoCheckResult.text("사원ID와 이름이 일치하지 않습니다.")
-					formIdCheck = false;
-				}
-				if (result === "1") {
-					empNoCheckResult.css('color', 'blue');
-					empNoCheckResult.text("사원ID가 확인되었습니다.")
-					formIdCheck = true;
-				}
-				if (result === "4"){
-					$("#empEmailDiv").css('display', 'none');
-					$("#empEmail").removeAttr('required');
-					empNoCheckResult.css('color', 'blue');					
-					empNoCheckResult.text("카카오ID 연동 시작.")
-					formIdCheck = true;
-				}
+	    // ⭐ 2. 이름 입력 확인 (이 부분이 핵심입니다!)
+	    if (!empNameVal) {
+	        alert("일치 여부 확인을 위해 이름을 먼저 입력해주세요.");
+	        $('#empName').focus();
+	        return;
+	    }
 
-				updateSubmitButtonState();
-			},
-			error: function(err) {
-				console.log(err.responseText)
-				alert('실패:' + err.responseText)
-				formIdCheck = false;
-				updateSubmitButtonState();
-			}
-		})
-	}) //end of idCheck
+	    let param = { empNo: empNoVal, empName: empNameVal };
+	    let empNoCheckResult = $('#empNoCheckResult');
+
+	    $.ajax({
+	        type: 'get',
+	        data: param,
+	        url: '/member/empNoCheck',
+	        success: function(result) {
+	            console.log("서버 응답 결과: " + result); // 디버깅용 로그
+
+	            // 아이디 유효성 검사
+	            if (result === "2") {
+	                empNoCheckResult.css('color', 'red');
+	                empNoCheckResult.text("해당 사원ID는 이미 가입되었습니다.");
+	                formIdCheck = false;
+	            } else if (result === "3") {
+	                empNoCheckResult.css('color', 'red');
+	                empNoCheckResult.text("사원ID와 이름이 일치하지 않습니다."); // DB값과 입력값이 다를 때
+	                formIdCheck = false;
+	            } else if (result === "1") {
+	                empNoCheckResult.css('color', 'blue');
+	                empNoCheckResult.text("사원ID가 확인되었습니다.");
+	                formIdCheck = true;
+	            } else if (result === "4") {
+	                $("#empEmailDiv").css('display', 'none');
+	                $("#empEmail").removeAttr('required');
+	                empNoCheckResult.css('color', 'blue');
+	                empNoCheckResult.text("카카오ID 연동 시작.");
+	                formIdCheck = true;
+	            } else {
+	                // 예상치 못한 결과값 처리
+	                empNoCheckResult.css('color', 'red');
+	                empNoCheckResult.text("확인 중 오류가 발생했습니다.");
+	                formIdCheck = false;
+	            }
+
+	            updateSubmitButtonState();
+	        },
+	        error: function(err) {
+	            console.log(err.responseText);
+	            alert('통신 실패: ' + err.status);
+	            formIdCheck = false;
+	            updateSubmitButtonState();
+	        }
+	    });
+	}); // end of idCheck
 
 
 	// checkPassword - 아이디 중복 체크
