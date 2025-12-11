@@ -11341,19 +11341,16 @@ body {
     padding-bottom: 0.5rem !important; /* 하단 패딩 축소 (기존 py-3 대신) */
 }
 
-/* 2. 프로필 이미지 크기 줄이기 */
 #latestMessagesContainer .list-group-item .me-3 {
     width: 35px !important;            /* 너비 40px -> 35px */
     height: 35px !important;           /* 높이 40px -> 35px */
     flex-shrink: 0;                    /* 크기 고정 */
 }
 
-/* 3. 발신자 이름 및 시간 폰트 크기 조정 */
 #latestMessagesContainer .list-group-item .small.text-gray-500 {
     font-size: 0.75rem; /* 기존보다 더 작게 */
 }
 
-/* 4. 메시지 내용 폰트 크기 조정 (가장 중요한 부분) */
 #latestMessagesContainer .list-group-item .text-truncate {
     font-size: 0.85rem; /* 메시지 내용 폰트 크기 지정 (약간 작게) */
     font-weight: bold !important; /* 볼드체 해제 */
