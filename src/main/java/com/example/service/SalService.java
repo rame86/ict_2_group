@@ -18,4 +18,6 @@ public interface SalService {
 
     // 관리자용 급여 목록 (월 필터 + 정렬)
     List<SalVO> getAdminSalList(Map<String, String> param);
+
+	void createBaseSalaryForNewEmp(String empNo)throws Exception;
 }

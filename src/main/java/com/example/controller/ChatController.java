@@ -2,13 +2,14 @@ package com.example.controller;
 
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,8 +18,6 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import com.example.domain.LoginVO;
 import com.example.domain.MessageVO;
 import com.example.service.MessageService;
-
-import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class ChatController {
@@ -87,6 +86,7 @@ public class ChatController {
         
     }
     
+    // 뱃지
     @PostMapping("/chat/markAsRead")
     @ResponseBody
     public String markMessagesAsRead(@RequestParam String otherUserId, @SessionAttribute("login") LoginVO login) {
@@ -102,6 +102,15 @@ public class ChatController {
             return "error: DB_UPDATE_FAILED";
         }
     	
+    }
+    
+    // 헤더부분
+    @GetMapping("/api/message/latestUnread")
+    @ResponseBody
+    public List<MessageVO> getUnreadMessage(@SessionAttribute("login") LoginVO login){
+    	List<MessageVO> list = messageService.getUnreadMessage(login.getEmpNo());
+    	System.out.println(list.toString());
+    	return list;
     }
     
 }

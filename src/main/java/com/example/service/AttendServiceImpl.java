@@ -23,23 +23,47 @@ public class AttendServiceImpl implements AttendService {
 	@Autowired
 	private AttendDAO attendDAO;
 
+	// =======================================================================================
+	// selectDayAttend()
 	public List<DayAttendVO> selectDayAttend(String empNo, String toDay) {
 		log.info("[AttendService - selectDayAttend 요청 받음]");
 		return attendDAO.selectDayAttend(empNo, toDay);
 	}
+	// end of selectDayAttend()
+	// =======================================================================================
 
+	//
+	
+	// =======================================================================================
+	// checkIn()
 	public String checkIn(DayAttendVO davo) {
 		return attendDAO.checkIn(davo);
 	}
+	// end of checkIn()
+	// =======================================================================================
 
+	//
+	
+	// =======================================================================================
+	// checkOut()
 	public String checkOut(DayAttendVO davo) {
 		return attendDAO.checkOut(davo);
 	}
+	// end of checkOut()
+	// =======================================================================================
 
+	//
+	
+	// =======================================================================================
+	// fieldwork()
 	public String fieldwork(DayAttendVO davo) {
 		return attendDAO.fieldwork(davo);
 	}
+	// end of fieldwork()
+	// =======================================================================================
 
+	// =======================================================================================
+	// insertVacation()
 	@Transactional
 	public void insertVacation(DocVO vo) {
 		log.info("[AttendService - insertVacation 요청 받음]");
@@ -81,7 +105,7 @@ public class AttendServiceImpl implements AttendService {
 
 		String endDate = "";
 		if (vo.getEndDate() != null) {
-			toDate.getFomatterDate(vo.getEndDate());
+			endDate = toDate.getFomatterDate(vo.getEndDate());
 		}
 
 		davo.setEmpNo(vo.getEmpNo());
@@ -92,7 +116,13 @@ public class AttendServiceImpl implements AttendService {
 		attendDAO.insertVacation(davo, totalDays);
 
 	}
+	// end of insertVacation()
+	// =======================================================================================
 
+	//
+	
+	// =======================================================================================
+	// commuteCorrection()
 	public void commuteCorrection(DocVO vo) {
 		log.info("[AttendService - commuteCorrection 요청 받음]");
 		log.info(vo.toString());
@@ -118,7 +148,7 @@ public class AttendServiceImpl implements AttendService {
 			String standardTime = "09:00:00";
 			if (nowTime.compareTo(standardTime) < 0 && !davoStatus.equals("3") && !davoStatus.equals("4")) {
 				davo.setAttStatus("1");
-			} else if (nowTime.compareTo(standardTime) > 0 && !davoStatus.equals("3") && !davoStatus.equals("4")) {
+			} else if (nowTime.compareTo(standardTime) >= 0 && !davoStatus.equals("3") && !davoStatus.equals("4")) {
 				davo.setAttStatus("2");
 			}
 			attendDAO.commuteCorrectionCheckIn(davo);
@@ -131,7 +161,7 @@ public class AttendServiceImpl implements AttendService {
 			String standardTime = "18:00:00";
 			if (nowTime.compareTo(standardTime) < 0 && !davoStatus.equals("2") && !davoStatus.equals("4")) {
 				davo.setAttStatus("3");
-			} else if (nowTime.compareTo(standardTime) > 0 && !davoStatus.equals("2") && !davoStatus.equals("4")) {
+			} else if (nowTime.compareTo(standardTime) >= 0 && !davoStatus.equals("2") && !davoStatus.equals("4")) {
 				davo.setAttStatus("1");
 			}
 
@@ -139,7 +169,13 @@ public class AttendServiceImpl implements AttendService {
 		}
 
 	}
+	// end of commuteCorrection()
+	// =======================================================================================
 
+	//
+	
+	// =======================================================================================
+	// processDailyAbsence()
 	@Transactional
 	public int processDailyAbsence() {
 		log.info("[AttendService] 결근자 일괄 처리 시작...");
@@ -149,17 +185,25 @@ public class AttendServiceImpl implements AttendService {
 
 		return insertedCount;
 	}
+	// end of processDailyAbsence()
+	// =======================================================================================
+
+	//
 	
-	
+	// =======================================================================================
+	// processIncompleteAttendance()
 	@Transactional
 	public int processIncompleteAttendance() {
 
-	    log.info("[AttendService] 미퇴근 결근자 일괄 처리 시작...");     
-	  
-	    int updatedCount = attendDAO.updateIncompleteAttendanceToAbsence();	    
+		log.info("[AttendService] 미퇴근 결근자 일괄 처리 시작...");
 
-	    log.info("[AttendService] 미퇴근 결근 처리 완료. 업데이트된 레코드 수: {}", updatedCount);
-        
-	    return updatedCount;
+		int updatedCount = attendDAO.updateIncompleteAttendanceToAbsence();
+
+		log.info("[AttendService] 미퇴근 결근 처리 완료. 업데이트된 레코드 수: {}", updatedCount);
+
+		return updatedCount;
 	}
+	// end of processIncompleteAttendance()
+	// =======================================================================================
+
 }

@@ -80,13 +80,14 @@ public class AttendController {
 		// 출근 기준시간 설정
 		String standardTime = "09:00:00";
 
-		String toDay = toDate.getToDay();
-		davo.setDateAttend(toDay);
-		String empNo = login.getEmpNo();
-		davo.setEmpNo(empNo);
+		// yyyy-MM-dd 형식 오늘 날짜 저장
+		davo.setDateAttend(toDate.getToDay());
+		// empNo 저장
+		davo.setEmpNo(login.getEmpNo());
+		// HH:mm:ss 형식 현재시간 저장
 		String nowTime = toDate.getCurrentTime();
-		String nowDateTime = toDate.getCurrentDateTime();
-		davo.setInTime(nowDateTime);
+		// yyyy-MM-dd HH:mm:ss 형식 데이터 inTime에 넣기
+		davo.setInTime(toDate.getCurrentDateTime());
 
 		// 기준시간보다 늦으면 지각~
 		if (nowTime.compareTo(standardTime) < 0) {
@@ -173,10 +174,8 @@ public class AttendController {
 		log.info("[AttendController - calendar 요청 받음]");
 		log.info("[AttendController - date : " + toDay + "]");
 		String empNo = login.getEmpNo();
-
 		log.info("toDay : " + toDay);
 		log.info("empNo : " + empNo);
-
 		// vo.empNo에 유효한 값이 설정되었으므로 DB 쿼리 실행
 		List<DayAttendVO> result = attendService.selectDayAttend(empNo, toDay);
 
@@ -189,6 +188,8 @@ public class AttendController {
 	// end of calendar()
 	// =======================================================================================
 
+	//
+	
 	// =======================================================================================
 	// vacation() 외근
 	@GetMapping("/attend/vacation")
@@ -225,23 +226,29 @@ public class AttendController {
 	}
 	// end of processAbsence()
 	// =======================================================================================
-	
+
+	//
+
+	// =======================================================================================
+	// processIncompleteAttendance()
 	@GetMapping("/attend/processIncomplete")
 	@ResponseBody
 	public ResponseEntity<String> processIncompleteAttendance() {
-	    try {
-	        int updatedCount = attendService.processIncompleteAttendance();
+		try {
+			int updatedCount = attendService.processIncompleteAttendance();
 
-	        if (updatedCount > 0) {
-	            String message = String.format("미퇴근 처리 완료. 총 %d건의 출근/지각 기록이 결근 처리되었습니다.", updatedCount);
-	            return ResponseEntity.ok(message);
-	        } else {
-	            return ResponseEntity.ok("미퇴근 처리할 대상이 없습니다.");
-	        }
-	    } catch (Exception e) {
-	        // 실제 운영 환경에서는 e.getMessage() 대신 상세 로그를 찍어야 합니다.
-	        return ResponseEntity.status(500).body("미퇴근 결근 처리 중 서버 오류가 발생했습니다: " + e.getMessage());
-	    }
+			if (updatedCount > 0) {
+				String message = String.format("미퇴근 처리 완료. 총 %d건의 출근/지각 기록이 결근 처리되었습니다.", updatedCount);
+				return ResponseEntity.ok(message);
+			} else {
+				return ResponseEntity.ok("미퇴근 처리할 대상이 없습니다.");
+			}
+		} catch (Exception e) {
+			// 실제 운영 환경에서는 e.getMessage() 대신 상세 로그를 찍어야 합니다.
+			return ResponseEntity.status(500).body("미퇴근 결근 처리 중 서버 오류가 발생했습니다: " + e.getMessage());
+		}
 	}
-	
+	// end of processIncompleteAttendance()
+	// =======================================================================================
+
 }

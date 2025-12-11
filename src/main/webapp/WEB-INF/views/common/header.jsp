@@ -24,8 +24,8 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 	<link href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+	<script src="/js/header-notification.js"></script>
 </head>
-
 	<c:if test="${not empty sessionScope.login}">
 		<input type="hidden" id="sessionEmp" value="${sessionScope.login}">
 	</c:if>
@@ -41,6 +41,7 @@
 				$("#collapseApproval").on('show.bs.collapse', function () {});
 		    }); 
 		</script>
+		<input type="hidden" id="sessionEmpNo" value="${login.empNo}">
         <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
             <!-- Navbar Brand-->
             <a class="navbar-brand ps-3" href="/index.html">PEOPLE CYNC</a>
@@ -75,16 +76,31 @@
                          <i class="fas fa-envelope fa-fw"></i> 
                         <span class="badge rounded-pill badge-notification bg-danger" id="messageBadge">0</span> 
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="messagesDropdown">
-                        <li><h6 class="dropdown-header">새로운 쪽지</h6></li>
-                        
-                        <div id="latestMessagesContainer">
-                            <li><a class="dropdown-item" href="#">새로운 쪽지가 없습니다.</a></li>
-                        </div>
-                        
-                        <li><hr class="dropdown-divider" /></li>
-                        <li><a class="dropdown-item text-primary" href="/message/messageList">전체 쪽지함 보기</a></li>
-                    </ul>
+                    <ul class="dropdown-menu dropdown-menu-end p-0 shadow border-0" 
+				        aria-labelledby="messagesDropdown" style="width: 300px;"> 
+				        
+				        <li><h6 class="dropdown-header text-center py-3 bg-primary text-white border-0 rounded-top">
+				            MESSAGE CENTER
+				        </h6></li>
+				        
+				        <div id="latestMessagesContainer" class="list-group list-group-flush"> 
+				            
+				            <a class="list-group-item list-group-item-action d-flex align-items-start py-3" href="/message/messageList">
+				                
+				                <div class="me-3" style="width: 40px; height: 40px;">
+				                    <img class="rounded-circle w-100 h-100" src="/img/profile_placeholder.png" alt="프로필">
+				                    </div>
+				                
+				                <div class="w-100">
+				                    <div class="small text-gray-500 mb-1">Emily Fowler · 58m</div>
+				                    <div class="fw-bold text-truncate" style="max-width: 250px;">Hi there! I am wondering if you ...</div>
+				                </div>
+				            </a>
+				            </div>
+				        
+				        <li><hr class="dropdown-divider my-0" /></li>
+				        <li><a class="dropdown-item text-center small text-gray-500 py-2" href="/message/messageList">Read More Messages</a></li>
+				    </ul>
                 </li>
             	
                 <li class="nav-item dropdown ps-3 border-left">
