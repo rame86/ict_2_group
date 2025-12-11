@@ -240,6 +240,13 @@ function renderConversationList(list) {
 //메세지로드 + STOMP 구독/해제 (유지)
 function loadChatWindow(otherUserId, otherUserName) {
 	
+	if (!stompClient || stompClient.ws.readyState !== WebSocket.OPEN) { 
+		console.warn("STOMP 연결이 아직 준비되지 않아 채팅방 구독이 지연됩니다.");
+        
+        setTimeout(() => loadChatWindow(otherUserId, otherUserName), 200);
+        return; 
+    }
+	
 	console.log("선택된 상대방:", otherUserName, otherUserId);
 	
 	// 메세지 읽음 처리
@@ -278,11 +285,14 @@ function loadChatWindow(otherUserId, otherUserName) {
 	
  // STOMP 구독/해제
  // 1. 기존 구독 해제: 다른 채팅방을 열 때 이전 방의 구독을 끊습니다.
- if (currentSubscription) {
-     currentSubscription.unsubscribe();
-     currentSubscription = null;
-     console.log("STOMP: 이전 채팅방 구독 해제");
- }
+	if (stompClient && stompClient.ws.readyState === WebSocket.OPEN && currentSubscription) {
+		currentSubscription.unsubscribe();
+		currentSubscription = null;
+		console.log("STOMP: 이전 채팅방 구독 해제");
+	} else if (currentSubscription) {
+	    // 연결이 끊겼더라도 구독 객체는 초기화하여 메모리 누수를 방지합니다.
+		currentSubscription = null; 
+	}
  
 	// 2. 새로운 채팅방 ID 생성 및 주제(Topic) 설정
  const myEmpNo = $('#sessionEmpNo').val(); 
@@ -371,10 +381,16 @@ function renderChatMessages(messages, currentOtherUserId) {
 //메시지 전송 (유지)
 function sendMessage(){
 	
-	 const content = $('#messageInput').val().trim();
-	 const receiverEmpNo = currentReceiverEmpNo;
-	 const myEmpNo = $('#sessionEmpNo').val();
+	const content = $('#messageInput').val().trim();
+	const receiverEmpNo = currentReceiverEmpNo;
+	const myEmpNo = $('#sessionEmpNo').val();
 		
+	if (!stompClient || stompClient.ws.readyState !== WebSocket.OPEN) { 
+		console.error("STOMP 연결이 아직 준비되지 않았습니다. 잠시 후 다시 시도하세요.");
+		alert("메시지 시스템이 아직 연결 중입니다. 1~2초 후 다시 시도해 주세요.");
+		return; 
+	}
+	 
 	 if (!content) {
 	     alert("메시지 내용을 입력해 주세요.");
 	     return;
@@ -390,7 +406,6 @@ function sendMessage(){
 	     msgContent: content
 	 };
 	 
-	 // 💡 stompClient는 header-notifications.js에 정의된 전역 변수를 사용합니다.
 	stompClient.send("/app/chat/send", {}, JSON.stringify(messageData));
 	$('#messageInput').val('');
 	
@@ -550,23 +565,20 @@ function selectAndStartChat(empNo, empName) {
 }
 
 
-//------------------------------------
-//💡 이벤트 리스너 (DOM Ready)
-//------------------------------------
-
+//모달창
 $(document).ready(function() {
 	
-	const urlParams = new URLSearchParams(window.location.search);
-    const initialEmpNo = urlParams.get('otherEmpNo'); // URL 파라미터 읽기
+/* 	const urlParams = new URLSearchParams(window.location.search);
+    const initialEmpNo = urlParams.get('otherEmpNo');
+    const initialEmpNameParam = urlParams.get('otherEmpName');
     
     if (initialEmpNo) {
-        // 💡 중요: initialEmpNo가 있다면, 해당 상대방과의 채팅창을 엽니다.
-        // loadChatWindow는 이름 대신 사번만으로도 작동해야 합니다.
-        loadChatWindow(initialEmpNo, '알림 상대'); // loadChatWindow 호출
+		const initialEmpName = initialEmpNameParam ? decodeURIComponent(initialEmpNameParam) : '이름 없음';
+		loadChatWindow(initialEmpNo, initialEmpName);
     }
-	
+	 */
 	$('#newChatModal').on('shown.bs.modal', function () {
-        console.log("👉 모달 열림 이벤트 발생: 직원 검색 시작"); // 🚨 이 메시지를 추가하고 콘솔 확인
+        console.log("👉 모달 열림 이벤트 발생: 직원 검색 시작");
         searchAndRenderEmployees(''); 
         $('#employeeSearchInput').val('');
     });
