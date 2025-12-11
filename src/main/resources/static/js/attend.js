@@ -197,59 +197,75 @@ $(document).ready(function() {
 
 	// 출근버튼 - 출근 등록
 	$('#checkIn').on('click', function() {
-		// '/attend/checkIn' 경로로 AJAX GET 요청을 보냄.
-		$.ajax({
-			type: 'get'
-			, url: '/attend/checkIn'
-			, success: function(result) {
-				if (result) {
-					alert("출근시간 등록 :" + result)
-					// 출근 시간을 화면에 표시함.
-					$('#inTimeDisplay').text("출근시간: " + result);
+
+		if (confirm("출근하시겠습니까?")) {
+			// '/attend/checkIn' 경로로 AJAX GET 요청을 보냄.
+			$.ajax({
+				type: 'get'
+				, url: '/attend/checkIn'
+				, success: function(result) {
+					if (result) {
+						alert("출근시간 등록 :" + result)
+						// 출근 시간을 화면에 표시함.
+						$('#inTimeDisplay').text("출근시간: " + result);
+					}
+				},
+				error: function(err) {
+					alert('출첵 실패' + err.responseText);
 				}
-			},
-			error: function(err) {
-				alert('출첵 실패' + err.responseText);
-			}
-		})
+			})
+		} else {
+			// 사용자가 "아니오"를 선택했을 때 실행되는 로직 (원하면 추가)
+			console.log("출근 등록을 취소했습니다.");
+		}
 	});
 
 	// 퇴근버튼 - 퇴근 등록
 	$('#checkOut').on('click', function() {
-		// '/attend/checkOut' 경로로 AJAX GET 요청을 보냄.
-		$.ajax({
-			type: 'get'
-			, url: '/attend/checkOut'
-			, success: function(result) {
-				if (result) {
-					alert("퇴근시간 등록 :" + result)
-					// 퇴근 시간을 화면에 표시함.
-					$('#outTimeDisplay').text("퇴근시간: " + result);
+		if (confirm("퇴근하시겠습니까?")) {
+			// '/attend/checkOut' 경로로 AJAX GET 요청을 보냄.
+			$.ajax({
+				type: 'get'
+				, url: '/attend/checkOut'
+				, success: function(result) {
+					if (result) {
+						alert("퇴근시간 등록 :" + result)
+						// 퇴근 시간을 화면에 표시함.
+						$('#outTimeDisplay').text("퇴근시간: " + result);
+					}
+				},
+				error: function(err) {
+					alert('출첵 실패' + err.responseText);
 				}
-			},
-			error: function(err) {
-				alert('출첵 실패' + err.responseText);
-			}
-		})
+			})
+		} else {
+			// 사용자가 "아니오"를 선택했을 때 실행되는 로직 (원하면 추가)
+			console.log("퇴근 등록을 취소했습니다.");
+		}
 	});
 
 	// 외근버튼 - 외근 등록
 	$('#fieldwork').on('click', function() {
-		// '/attend/fieldwork' 경로로 AJAX GET 요청을 보냄.
-		$.ajax({
-			type: 'get'
-			, url: '/attend/fieldwork'
-			, success: function(result) {
-				if (result) {
-					alert("외근 시작시간 등록 :" + result)
-					// 외근 시작 시간을 화면에 표시함.
-					$('#fieldworkDisplay').text("외근시작: " + result);
+		if (confirm("외근을 등록하시겠습니까?")) {
+			// '/attend/fieldwork' 경로로 AJAX GET 요청을 보냄.
+			$.ajax({
+				type: 'get'
+				, url: '/attend/fieldwork'
+				, success: function(result) {
+					if (result) {
+						alert("외근 시작시간 등록 :" + result)
+						// 외근 시작 시간을 화면에 표시함.
+						$('#fieldworkDisplay').text("외근시작: " + result);
+					}
+				},
+				error: function(err) {
+					alert('외근 등록 실패' + err.responseText);
 				}
-			},
-			error: function(err) {
-				alert('외근 등록 실패' + err.responseText);
-			}
-		})
+			})
+		} else {
+			// 사용자가 "아니오"를 선택했을 때 실행되는 로직
+			console.log("외근 등록을 취소했습니다.");
+		}
 	});
 
 	// 달력 월 이동 버튼 이벤트 (FullCalendar의 툴바 청크 클릭 감지)
