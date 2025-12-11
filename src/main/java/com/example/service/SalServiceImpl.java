@@ -45,4 +45,10 @@ public class SalServiceImpl implements SalService {
     public List<SalVO> getAdminSalList(Map<String, String> param) {
         return salMapper.getAdminSalList(param);
     }
+
+	@Override
+	public void createBaseSalaryForNewEmp(String empNo) throws Exception {
+		System.out.println("📌 [Salary] 신규 사원 기본 급여 생성: empNo = " + empNo);
+		
+	}
 }

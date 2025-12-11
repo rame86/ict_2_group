@@ -25,37 +25,65 @@ html, body {
    ----------------------------- */
 
 .form-top {
-    display: grid;
-    grid-template-columns: 180px 1fr 1fr;
-    grid-gap: 24px;
+    display: flex;        /* PHOTO + 오른쪽 영역 가로 배치 */
+    gap: 24px;
     margin-bottom: 28px;
 }
 
-/* 사진 박스 */
+/* ============================
+   🔵 아바타 프레임 스타일의 사진 박스
+   ============================ */
+
+/* 바깥 큰 동그라미 프레임 */
 .photo-box {
-    width: 180px;
+    width: 220px;
     height: 220px;
-    border: 1px solid #d7e3ff;
-    border-radius: 12px;
+    border-radius: 50%;
+    padding: 18px;   /* 안쪽 사진과의 여백 */
+    background: #f4f6ff;
+    box-shadow: 0 14px 35px rgba(84, 112, 171, 0.28);
+
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+
     color: #7a8ba3;
     font-size: 14px;
-    background: #f8faff;
     cursor: pointer;
-
-    /* 🔹 사진 원형 & 크롭 */
-    overflow: hidden;
 }
 
-/* 사진이 있을 때 원형 + 그림자 */
-.photo-box img {
-    width: 140px;
-    height: 140px;
+/* 실제 프로필 사진 (안쪽 동그라미) */
+#photoPreview {
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    object-fit: cover;
+    object-fit: cover;      /* 비율 유지하면서 꽉 채우기 */
+    display: none;          /* JS에서 선택 후 .show() */
     box-shadow: 0 6px 15px rgba(15, 76, 129, 0.25);
+}
+
+/* 사진이 없을 때 보이는 "PHOTO" 텍스트 */
+#photoText {
+    position: absolute;
+    inset: 0;               /* 부모(.photo-box) 안에서 꽉 채운 뒤 가운데 정렬 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    border: 1px dashed rgba(154, 165, 196, 0.6);
+
+    font-family: "SUIT", sans-serif;
+    font-size: 14px;
+    color: #9aa5c4;
+}
+
+/* 마우스 오버 시 살짝 떠오르는 느낌 */
+.photo-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px rgba(84, 112, 171, 0.35);
+    transition: all 0.18s ease-out;
 }
 
 /* 상단 2열 공통 스타일 */
@@ -125,12 +153,6 @@ input:focus::placeholder {
 /* ============================
    🔹 사원등록 상단 레이아웃 정리
    ============================ */
-
-/* PHOTO + 오른쪽 영역을 가로배치 */
-.emp-new-wrapper .form-top {
-    display: flex;
-    gap: 24px;
-}
 
 /* 상단 제목 영역 */
 .page-header {
@@ -242,7 +264,7 @@ footer.py-4.bg-light.mt-auto {
 .toast {
     position: fixed;
     left: 50%;
-    bottom: 40px;
+    top: 500px;
     transform: translateX(-50%);
     min-width: 260px;
     max-width: 360px;
@@ -357,4 +379,65 @@ span.flatpickr-weekday {
 .flatpickr-current-month .cur-month {
     margin-right: 2px;
 }
+/* 우편번호 input은 조금 짧게 */
+.addr-postcode {
+    max-width: 160px;
+}
 
+.photo-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;  /* 사진 + 버튼 둘 다 가운데 정렬 */
+}
+
+/* 삭제버튼 상단폭 조정 */
+#btnPhotoRemove {
+    margin-top: 25px;
+}
+
+/* 파일 업로드 관련 문구 */
+.photo-help-text {
+    margin-top:30px;
+    font-size: 12px;
+    color: #888;
+    text-align: center;
+}
+
+#empPhotoPreview {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 🔹 사번 입력창 + 상태 아이콘 래퍼 */
+.input-with-status {
+    position: relative;
+}
+
+/* 🔹 오른쪽에 아이콘 들어가도록 여유 */
+.input-with-status .form-control {
+    padding-right: 32px;
+}
+
+/* 🔹 기본 아이콘 스타일 */
+.status-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    display: none;           /* 기본은 숨김 */
+}
+
+/* ✅ 정상일 때 */
+.status-icon.ok {
+    display: inline-block;
+    color: #28a745;           /* 초록색 */
+}
+
+/* ❌ 오류/중복일 때 */
+.status-icon.error {
+    display: inline-block;
+    color: #dc3545;           /* 빨간색 */
+}

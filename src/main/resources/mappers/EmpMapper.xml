@@ -258,12 +258,9 @@
         STATUS_NO,
         DEPT_NO,
         GRADE_NO,
-        EMP_PASS,
-        KAKAO_ID,
         EMP_NAME,
         EMP_PHONE,
         EMP_ADDR,
-        EMP_EMAIL,
         EMP_IMAGE,
         EMP_REG_NO,
         EMP_REGDATE,
@@ -274,16 +271,13 @@
         #{statusNo},
         #{deptNo},
         #{gradeNo},
-        #{empPass},
-        #{kakaoId},
         #{empName},
-        #{empPhone},
-        #{empAddr},
-        #{empEmail},
-        #{empImage, jdbcType=VARCHAR},   <!-- ✅ NULL 허용 + 타입 명시 -->
-        #{empRegno},
+         #{empPhone, jdbcType=VARCHAR},
+        #{empAddr, jdbcType=VARCHAR},
+         #{empImage, jdbcType=VARCHAR},   <!-- ✅ NULL 허용 + 타입 명시 -->
+        #{empRegNo, jdbcType=VARCHAR},
         SYSDATE,
-        #{salBase}
+        #{salBase, jdbcType=INTEGER}
     )
 </insert>
 
