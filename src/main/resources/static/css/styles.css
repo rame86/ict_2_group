@@ -11281,16 +11281,35 @@ body {
     border-radius: 50% !important;
 }
 
-/* 1. 프로필 이미지와 기본적인 대화 목록 항목 스타일 */
+/* 메세지 좌 */
 .profile-img-small {
-    width: 45px;
-    height: 45px;
+    width: 40px; /* 약간 축소 */
+    height: 40px; /* 약간 축소 */
     object-fit: cover;
     margin-right: 10px;
 }
-.unread-count-badge {
-    font-size: 0.7rem;
-    padding: 0.3em 0.6em;
+
+.list-group-item .conversation-name {
+    font-size: 0.95rem; 
+}
+
+.list-group-item .conversation-position {
+    font-size: 0.75rem; /* 직책을 아주 작게 */
+}
+
+.list-group-item .conversation-message {
+    font-size: 0.85rem; 
+}
+
+.list-group-item .unread-count-badge {
+    font-size: 0.6rem; 
+    padding: 0.2em 0.5em;
+    min-width: 18px;
+    margin-left: 5px; /* 메시지와 뱃지 간격 */
+}
+
+.list-group-item.unread {
+    background-color: #f8f9fa; 
 }
 
 /* 2. SB Admin 2의 list-group-item.active 스타일을 부드럽게 재정의 */
@@ -11311,4 +11330,40 @@ body {
 .message-bubble-container {
     display: inline-block; 
     max-width: 70%; 
+}
+
+.content-message2{
+	font-size : 14px;
+}
+
+#latestMessagesContainer .list-group-item {
+    padding-top: 0.5rem !important;    /* 상단 패딩 축소 (기존 py-3 대신) */
+    padding-bottom: 0.5rem !important; /* 하단 패딩 축소 (기존 py-3 대신) */
+}
+
+#latestMessagesContainer .list-group-item .me-3 {
+    width: 35px !important;            /* 너비 40px -> 35px */
+    height: 35px !important;           /* 높이 40px -> 35px */
+    flex-shrink: 0;                    /* 크기 고정 */
+}
+
+#latestMessagesContainer .list-group-item .small.text-gray-500 {
+    font-size: 0.75rem; /* 기존보다 더 작게 */
+}
+
+#latestMessagesContainer .list-group-item .text-truncate {
+    font-size: 0.85rem; /* 메시지 내용 폰트 크기 지정 (약간 작게) */
+    font-weight: bold !important; /* 볼드체 해제 */
+}
+
+.dropdown-menu .dropdown-header {
+    font-size: 0.9rem !important; 
+    padding-top: 0.6rem !important; 
+    padding-bottom: 0.6rem !important;
+    font-weight: 500; 
+}
+
+#newChatModal .modal-dialog {
+    max-width: 450px; 
+    width: 100%; 
 }

@@ -97,5 +97,45 @@
 	        AND SENDER_EMP_NO = #{otherUserId}
 	        AND IS_READ = 'N'
 	</update>
+	
+	<select id="selectUnreadMessages" resultType="MessageVO" parameterType="String">
+	    SELECT *
+	    FROM (
+	        SELECT
+	            T1.MSG_CONTENT AS msgContent,
+	            T1.SENDER_EMP_NO AS senderEmpNo,
+	            T1.SEND_DATE AS sendDate,
+	            T2.EMP_NAME AS senderName
+	        FROM
+	            MESSAGE T1  JOIN
+	            EMP T2 ON T1.SENDER_EMP_NO = T2.EMP_NO
+	        WHERE
+	            T1.RECEIVER_EMP_NO = #{empNo}
+	            AND T1.IS_READ = 'N'
+	            AND T1.RECEIVER_DEL_YN = 'N' ORDER BY
+	            T1.SEND_DATE DESC
+	    )
+	    WHERE ROWNUM &lt;= 5
+    </select>
+    
+    <select id="selectEmpDept" resultType="EmpVO" parameterType="map">
+    	SELECT
+		    E.EMP_NO,
+		    E.EMP_NAME, 
+		    E.GRADE_NO,
+		    E.EMP_EMAIL, 
+		    D.DEPT_NAME AS deptName
+		FROM
+		    EMP E
+		JOIN
+		    DEPT D ON E.DEPT_NO = D.DEPT_NO
+		WHERE
+		    (#{keyword} IS NULL OR #{keyword} = '') OR 
+		    (
+		        E.EMP_NAME LIKE '%' || #{keyword} || '%'
+		        OR E.EMP_NO LIKE '%' || #{keyword} || '%'
+		    )
+		AND E.EMP_NO != #{empNo}
+    </select>
 
 </mapper>
