@@ -13,6 +13,7 @@ import com.example.domain.ApproveListVO;
 import com.example.domain.ApproveVO;
 import com.example.domain.DeptVO;
 import com.example.domain.DocVO;
+import com.example.repository.AlertDAO;
 import com.example.repository.ApproveDAO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,8 @@ public class ApproveServiceImpl implements ApproveService {
 
 	@Autowired
 	private ApproveDAO approveDao;
+	@Autowired
+	private AlertDAO alertDao;
 	
 	// 결재 신청
 	@Override
@@ -60,6 +63,12 @@ public class ApproveServiceImpl implements ApproveService {
 		}
 				
 		approveDao.insertApprove(avo);
+		
+		if(avo.getStep1ManagerNo() != null && "W".equals(avo.getStep1Status())) {
+			sendApprovalAlert(avo.getStep1ManagerNo(), dvo.getDocNo(), "결재 요청");
+		} else if("X".equals(avo.getStep1Status()) && avo.getStep2ManagerNo() != null && "W".equals(avo.getStep2Status())) {
+			sendApprovalAlert(avo.getStep2ManagerNo(), dvo.getDocNo(), "결재 요청");
+		}
 		
 	}
 	
@@ -206,9 +215,22 @@ public class ApproveServiceImpl implements ApproveService {
 		
 		if("A".equals(status)) {
 			approveDao.updateApproveStatus(param);
+			
+			if("STEP1".equals(step)) {
+				Integer step2ManagerNo = docVo.getStep2ManagerNo();
+				if(step2ManagerNo != null && !step2ManagerNo.equals(docVo.getStep1ManagerNo())) {
+					sendApprovalAlert(step2ManagerNo, docNo, "결재 요청");
+				}
+			}
+			
 		}else if("R".equals(status)) {
 			param.put("rejectReason", rejectReason);
 			approveDao.updateRejectStatus(param);
+			
+			String writerEmpNo = docVo.getDocWriter(); 
+		    if (writerEmpNo != null) {
+		        sendApprovalAlert(Integer.parseInt(writerEmpNo), docNo, "결재 반려");
+		    }
 		}
 		
 	}
@@ -231,6 +253,11 @@ public class ApproveServiceImpl implements ApproveService {
 		}
 		
 		return result;
+		
+	}
+	
+	// 결재건 알람에 전달
+	private void sendApprovalAlert(Integer receiveEmpNo, Integer docNo, String alertTitle) {
 		
 	}
 
