@@ -122,47 +122,52 @@
 
 <c:if test="${not empty salList}">
 <script>
+
+//컨텍스트 경로가 포함된 상세 조회 URL
+const SAL_DETAIL_URL = "<c:url value='/sal/detail' />";
+
 $(function() {
 
-    // 1) DataTables 초기화 (헤더 클릭 정렬 / 페이징)
-    $('#salTable').DataTable({
-        ordering: true,              // 헤더 클릭 정렬
-        order: [[0, 'desc']],        // 기본: 지급월 내림차순
-        paging: true,
-        pageLength: 10,
-        lengthChange: false,
-        searching: false,            // 검색창 사용 안함
-        info: false,
-        language: {
-            emptyTable: "급여 정보가 없습니다.",
-            paginate: {
-                previous: "이전",
-                next: "다음"
-            }
-        }
-    });
+ // 1) DataTables 초기화
+ $('#salTable').DataTable({
+     ordering: true,              // 헤더 클릭 정렬
+     order: [[0, 'desc']],        // 기본: 지급월 내림차순
+     paging: true,
+     pageLength: 10,
+     lengthChange: false,
+     searching: false,
+     info: false,
+     language: {
+         emptyTable: "급여 정보가 없습니다.",
+         paginate: {
+             previous: "이전",
+             next: "다음"
+         }
+     }
+ });
 
-    // 2) 지급월(밑줄 링크) 클릭 시 → 급여 명세서 페이지로 이동
-    $("#salTable").on("click", "a.month-link", function(e) {
-        e.preventDefault();
+ // 2) 지급월 링크 클릭 시 → 급여 명세서 상세 페이지로 이동
+ $("#salTable").on("click", "a.month-link", function(e) {
+     e.preventDefault();
 
-        const empNo      = $(this).data("empno");
-        const monthAttno = $(this).data("monthattno");
+     const empNo      = $(this).data("empno");
+     const monthAttno = $(this).data("monthattno");
 
-        if (!empNo || !monthAttno) return;
+     if (!empNo || !monthAttno) return;
 
-        location.href = "/sal/detail?empNo=" + encodeURIComponent(empNo)
-                      + "&monthAttno=" + encodeURIComponent(monthAttno);
-    });
+     // /컨텍스트경로/sal/detail?empNo=...&monthAttno=...
+     location.href = SAL_DETAIL_URL
+         + "?empNo=" + encodeURIComponent(empNo)
+         + "&monthAttno=" + encodeURIComponent(monthAttno);
+ });
 
 });
 
-<script>
 // 컨텍스트 경로를 안전하게 쓰기 위해
 const EMP_CARD_URL = "<c:url value='/emp/card' />";
 </script>
 
-</script>
+
 </c:if>
 
 </body>

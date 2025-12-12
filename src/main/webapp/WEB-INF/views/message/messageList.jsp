@@ -53,23 +53,26 @@ small {
 					<div class="row">
     
 				        <div class="col-xl-4 col-lg-5">
-				            <div class="card shadow mb-4">
-				                <div class="card-header py-3">
-				                    <h6 class="m-0 font-weight-bold text-primary">대화 상대 목록</h6>
-				                    <button class="btn btn-sm btn-outline-primary" 
-								            data-bs-toggle="modal" data-bs-target="#newChatModal">
-								        <i class="fas fa-plus fa-fw"></i> 새 대화
-								    </button>
-				                </div>
-				                
-				                <div class="list-group list-group-flush" id="conversationListContainer" style="max-height: 700px; overflow-y: auto;">
-    								<div class="p-3 text-center text-muted">대화 목록을 불러오는 중...</div>
-								</div>
-				            </div>
-				        </div>
+						    <div class="card shadow mb-4" style="height: 700px;">
+						        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+						            
+						            <h6 class="m-0 font-weight-bold text-primary">대화 목록</h6>
+						            
+						            <button class="btn btn-sm btn-outline-primary" 
+						                    data-bs-toggle="modal" data-bs-target="#newChatModal">
+						                <i class="fas fa-plus fa-fw"></i> 새 대화
+						            </button>
+						            
+						        </div>
+						        
+						        <div class="list-group list-group-flush" id="conversationListContainer" style="max-height: 700px; overflow-y: auto;">
+						            <div class="p-3 text-center text-muted">대화 목록을 불러오는 중...</div>
+						        </div>
+						    </div>
+						</div>
 
 				        <div class="col-xl-8 col-lg-7">
-				            <div class="card shadow mb-4">
+				            <div class="card shadow mb-4" style="height: 700px;">
 				                <div class="card-header py-3">
 				                    <h6 class="m-0 font-weight-bold text-primary" id="chatWindowHeader">김철수 사원과의 대화</h6>
 				                </div>
@@ -237,6 +240,13 @@ function renderConversationList(list) {
 //메세지로드 + STOMP 구독/해제 (유지)
 function loadChatWindow(otherUserId, otherUserName) {
 	
+	if (!stompClient || stompClient.ws.readyState !== WebSocket.OPEN) { 
+		console.warn("STOMP 연결이 아직 준비되지 않아 채팅방 구독이 지연됩니다.");
+        
+        setTimeout(() => loadChatWindow(otherUserId, otherUserName), 200);
+        return; 
+    }
+	
 	console.log("선택된 상대방:", otherUserName, otherUserId);
 	
 	// 메세지 읽음 처리
@@ -275,11 +285,14 @@ function loadChatWindow(otherUserId, otherUserName) {
 	
  // STOMP 구독/해제
  // 1. 기존 구독 해제: 다른 채팅방을 열 때 이전 방의 구독을 끊습니다.
- if (currentSubscription) {
-     currentSubscription.unsubscribe();
-     currentSubscription = null;
-     console.log("STOMP: 이전 채팅방 구독 해제");
- }
+	if (stompClient && stompClient.ws.readyState === WebSocket.OPEN && currentSubscription) {
+		currentSubscription.unsubscribe();
+		currentSubscription = null;
+		console.log("STOMP: 이전 채팅방 구독 해제");
+	} else if (currentSubscription) {
+	    // 연결이 끊겼더라도 구독 객체는 초기화하여 메모리 누수를 방지합니다.
+		currentSubscription = null; 
+	}
  
 	// 2. 새로운 채팅방 ID 생성 및 주제(Topic) 설정
  const myEmpNo = $('#sessionEmpNo').val(); 
@@ -368,27 +381,39 @@ function renderChatMessages(messages, currentOtherUserId) {
 //메시지 전송 (유지)
 function sendMessage(){
 	
- const content = $('#messageInput').val().trim();
- const receiverEmpNo = currentReceiverEmpNo;
-	
- if (!content) {
-     alert("메시지 내용을 입력해 주세요.");
-     return;
- }
-	
- if (!receiverEmpNo) {
-     alert("대화 상대를 먼저 선택해 주세요.");
-     return;
- }
-	
- const messageData = {
-     receiverEmpNo: receiverEmpNo,
-     msgContent: content
- };
- 
- // 💡 stompClient는 header-notifications.js에 정의된 전역 변수를 사용합니다.
-stompClient.send("/app/chat/send", {}, JSON.stringify(messageData));
+	const content = $('#messageInput').val().trim();
+	const receiverEmpNo = currentReceiverEmpNo;
+	const myEmpNo = $('#sessionEmpNo').val();
+		
+	if (!stompClient || stompClient.ws.readyState !== WebSocket.OPEN) { 
+		console.error("STOMP 연결이 아직 준비되지 않았습니다. 잠시 후 다시 시도하세요.");
+		alert("메시지 시스템이 아직 연결 중입니다. 1~2초 후 다시 시도해 주세요.");
+		return; 
+	}
+	 
+	 if (!content) {
+	     alert("메시지 내용을 입력해 주세요.");
+	     return;
+	 }
+		
+	 if (!receiverEmpNo) {
+	     alert("대화 상대를 먼저 선택해 주세요.");
+	     return;
+	 }
+		
+	 const messageData = {
+	     receiverEmpNo: receiverEmpNo,
+	     msgContent: content
+	 };
+	 
+	stompClient.send("/app/chat/send", {}, JSON.stringify(messageData));
 	$('#messageInput').val('');
+	
+	setTimeout(function() {
+	     console.log("메시지 전송 지연 후 목록 갱신 요청");
+	     loadConversationList(myEmpNo); 
+	 }, 200);
+
 }
 
 //새 메시지 추가 및 실시간 읽음 처리 (유지)
@@ -537,24 +562,23 @@ function selectAndStartChat(empNo, empName) {
         $('#newChatModal').modal('hide');
     }
     
-    // 3. 모달이 완전히 닫힌 후 검색 상태 초기화
-    $('#newChatModal').on('hidden.bs.modal', function () {
-    	const resultsContainer = $('#employeeSearchResults');
-    	searchAndRenderEmployees('');
-    	$('#employeeSearchInput').val('');
-    });
-    
 }
 
 
-//------------------------------------
-//💡 이벤트 리스너 (DOM Ready)
-//------------------------------------
-
+//모달창
 $(document).ready(function() {
 	
+/* 	const urlParams = new URLSearchParams(window.location.search);
+    const initialEmpNo = urlParams.get('otherEmpNo');
+    const initialEmpNameParam = urlParams.get('otherEmpName');
+    
+    if (initialEmpNo) {
+		const initialEmpName = initialEmpNameParam ? decodeURIComponent(initialEmpNameParam) : '이름 없음';
+		loadChatWindow(initialEmpNo, initialEmpName);
+    }
+	 */
 	$('#newChatModal').on('shown.bs.modal', function () {
-        console.log("👉 모달 열림 이벤트 발생: 직원 검색 시작"); // 🚨 이 메시지를 추가하고 콘솔 확인
+        console.log("👉 모달 열림 이벤트 발생: 직원 검색 시작");
         searchAndRenderEmployees(''); 
         $('#employeeSearchInput').val('');
     });
@@ -565,11 +589,9 @@ $(document).ready(function() {
     });
 
     // 2. 검색 입력창에서 Enter 키 입력 이벤트
-    $('#employeeSearchInput').on('keypress', function(e) {
-        if (e.which === 13) { // Enter 키 코드
-            e.preventDefault(); // 기본 submit 동작 방지
-            searchAndRenderEmployees();
-        }
+    $('#employeeSearchInput').on('input', function() {
+        const keyword = $(this).val();
+        searchAndRenderEmployees(keyword); 
     });
 
     // 3. 메시지 입력창에서 Enter 키 입력 이벤트

@@ -82,7 +82,7 @@ public class MessageController {
 	@GetMapping("/api/message/emp")
 	public List<EmpVO> getSelectEmp(@RequestParam(required = false, defaultValue = "") String keyword,
 			@ModelAttribute("login") LoginVO login){
-		System.out.println("메세지보낼사람찾기요청");
+		System.out.println(login.getEmpNo() + "메세지보낼사람찾기요청");
 		return messageService.getSelectEmpList(keyword, login.getEmpNo());
 	}
 	

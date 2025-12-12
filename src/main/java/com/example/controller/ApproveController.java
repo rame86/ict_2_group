@@ -172,10 +172,10 @@ public class ApproveController {
 		Integer step2Manager = vo.getStep2ManagerNo(); // 2차결재자의 사번
 		String step2Status = vo.getStep2Status(); // 2차결재의 상태
 		String writeNotificationMessage;
-				
-		if(vo.getDocType().equals("4")) {
+		
+		if(vo.getDocType().equals("4") && step2Status.equals("A")) {
 			attendService.insertVacation(vo);
-		}else if(vo.getDocType().equals("5")) {
+		}else if(vo.getDocType().equals("5") && step2Status.equals("A")) {
 			attendService.commuteCorrection(vo);
 		}
 		

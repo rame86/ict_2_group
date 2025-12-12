@@ -33,7 +33,7 @@
 		<script src="/js/websocket.js"></script>
 		<script>
 			const currentEmpNoFromJSP = '${ sessionScope.login.empNo }';
-			connectWebSocket(currentEmpNoFromJSP);
+			connectSocket();
 			$(document).ready(function() {
 				updateSidebarBadge();
 		        

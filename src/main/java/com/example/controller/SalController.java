@@ -1,8 +1,7 @@
 package com.example.controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,11 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
 import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
 import com.example.domain.SalVO;
+
 import com.example.service.EmpService;
 import com.example.service.SalService;
+
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,8 @@ public class SalController {
 
     @Autowired
     private SalService salService;
+
+   
 
     /** 🔹 사원용: 본인 월별 급여 목록 */
     @GetMapping("/list")
@@ -64,8 +68,8 @@ public class SalController {
                             HttpSession session,
                             Model model) {
 
-    	log.info("[SalController-salDetail] empNo = {}, monthAttno = {}", empNo, monthAttno);
-    	
+        log.info("[SalController-salDetail] empNo = {}, monthAttno = {}", empNo, monthAttno);
+
         LoginVO login = (LoginVO) session.getAttribute("login");
         if (login == null) {
             return "redirect:/member/login";
@@ -98,6 +102,6 @@ public class SalController {
 
         return "redirect:/sal/admin/list?month=" + month;
     }
-    
 
+   
 }

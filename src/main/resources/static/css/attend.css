@@ -2,23 +2,24 @@
 
 /* 1. 배경 및 메인 영역 설정 */
 #content-area {
-	padding: 40px;
-	background-color: #eee; /* 회색 배경 */
+	padding: 10px;
+	background-color: #ffffff; /* 회색 배경 */
 	min-height: 100vh;
 }
 
 /* 2. 흰색 전체 카드 (가장 중요: Flex Row 적용) */
 .main-layout-container {
-	display: flex !important; /* 가로 배치 강제 적용 */
-	flex-direction: row !important; /* 무조건 가로로 나열 */
-	align-items: stretch; /* 높이 맞춤 */
-	background-color: #fff; /* 흰색 배경 */
-	border-radius: 15px; /* 둥근 모서리 */
+	display: flex !important;
+	flex-direction: row !important;
+	align-items: stretch;
+	/* ❌ 라운드 및 흰색 배경, 그림자 제거 ❌ */
+	background-color: transparent; /* 배경을 투명하게 변경 */
+	border-radius: 0; /* 모서리 둥글게 제거 */
 	padding: 40px;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* 그림자 */
+	box-shadow: none; /* 그림자 제거 */
 	max-width: 1400px;
-	margin: 0 auto; /* 가운데 정렬 */
-	gap: 40px; /* 왼쪽과 오른쪽 사이 간격 */
+	margin: 0 auto;
+	gap: 40px;
 }
 
 /* 4. [오른쪽] 달력 및 버튼 영역 전체 */
@@ -65,11 +66,11 @@
 
 /* 4-1-B. 진짜 달력 영역 */
 .calendar {
-	flex-grow: 1; /* 남은 공간 다 달력으로 */
+	flex-grow: 1;
 	border: 1px solid #eee;
 	border-radius: 10px;
-	background-color: #fff;
-	min-height: 400px; /* 최소 높이 확보 */
+	background-color: #fff; /* ⭐ 달력 자체는 흰색 배경 유지 ⭐ */
+	min-height: 400px;
 }
 
 /* 5. 오른쪽 하단 (신청 버튼들) */
@@ -155,14 +156,11 @@
 }
 
 /* FullCalendar의 날짜 셀과 이벤트에 마우스를 올렸을 때 손가락 모양 커서 표시 */
-.fc-daygrid-day-frame, 
-.fc-event {
-    cursor: pointer;
+.fc-daygrid-day-frame, .fc-event {
+	cursor: pointer;
 }
 
 /******************* 도우넛 그래프 영역 ********************/
-
-
 .chart-container {
 	width: 350px;
 	height: 350px;
@@ -193,5 +191,17 @@
 }
 
 .sb-sidenav-menu-nested.nav a {
-    visibility: visible !important; 
+	visibility: visible !important;
 }
+/* 컨테이너 내부의 제목 스타일 */
+.custom-title {
+	/* 기본 h3 스타일보다 굵게 */
+	font-weight: 700;
+	/* 제목 크기 조정 (원래 h3 크기 유지 또는 약간 키움) */
+	font-size: 1.8rem;
+	/* 텍스트 색상을 진한 검정색으로 지정 */
+	color: #333333;
+	/* 상단 마진을 더 명확히 주기 위해 mt-4 (부트스트랩)와 함께 사용 */
+	margin-bottom: 5px !important;
+}
+
