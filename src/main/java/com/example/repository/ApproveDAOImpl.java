@@ -100,4 +100,16 @@ public class ApproveDAOImpl implements ApproveDAO {
 		return sess.selectList("com.example.repository.ApproveDAO.countSendApproveStatus", empNo);
 	}
 
+	// 최신알람(결재해야될것)
+	@Override
+	public List<ApproveListVO> selectWaitingApproveAlerts(Map<String, Object> param) {
+		return sess.selectList("com.example.repository.ApproveDAO.selectWaitingApproveAlerts", param);
+	}
+
+	// 최신알람(결재받은것)
+	@Override
+	public List<ApproveListVO> selectSendStatusChangeAlerts(Map<String, Object> param) {
+		return sess.selectList("com.example.repository.ApproveDAO.selectSendStatusChangeAlerts", param);
+	}
+
 }
