@@ -10,16 +10,17 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-        // 1) 기본 static 리소스 매핑 (선택 사항: Boot에서는 기본으로 됨)
-        registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/");
+        String uploadPath = "file:///" + System.getProperty("user.dir")
+                + "/src/main/resources/static/upload/";
 
-        // 2) 사원 사진 업로드 경로 매핑
-        //   예: /upload/emp/xxx.jpg 로 들어오면
-        //   => classpath:/static/upload/emp/xxx.jpg 를 찾아가게 설정
-        registry.addResourceHandler("/upload/emp/**")
-                .addResourceLocations("classpath:/static/upload/emp/");
-        
-      
+        registry.addResourceHandler("/upload/**")
+                .addResourceLocations(uploadPath);
+
+        registry.addResourceHandler("/css/**")
+                .addResourceLocations("classpath:/static/css/");
+
+        registry.addResourceHandler("/js/**")
+                .addResourceLocations("classpath:/static/js/");
     }
 }
+

@@ -4,92 +4,115 @@
 
 <mapper namespace="com.example.repository.MonthAttendMapper">
 
-    <!-- 1. 특정 월(targetMonth = 'YYYY-MM') 기준 월별 근무 집계 생성 -->
-    <insert id="insertMonthAttendByMonth" parameterType="string">
-        INSERT INTO MONTH_ATTEND (
-            MONTH_ATTNO,
-            EMP_NO,
-            MONTH_DATE_ATTEND,
-            WORK_DAY,
-            WORK_HOUR,
-            OVERTIME,
-            LATE_CNT,
-            ABCENT_CNT
-        )
-        SELECT
-            MONTH_ATTEND_SEQ.NEXTVAL AS MONTH_ATTNO,
-            T.EMP_NO,
-            T.MONTH_DATE_ATTEND,
-            T.WORK_DAY,
-            T.WORK_HOUR,
-            T.OVERTIME,
-            T.LATE_CNT,
-            T.ABCENT_CNT
-        FROM (
-            SELECT
-                EMP_NO,
-                TRUNC(DATE_ATTEND, 'MM') AS MONTH_DATE_ATTEND,
-                COUNT(*) AS WORK_DAY,
-                SUM(
-                    EXTRACT(DAY FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR)) * 24
-                    + EXTRACT(HOUR FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR))
-                    + EXTRACT(MINUTE FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR)) / 60
-                ) AS WORK_HOUR,
-                NVL(SUM(OVERTIME), 0) AS OVERTIME,
-                SUM(CASE WHEN ATT_STATUS = 'LATE' THEN 1 ELSE 0 END) AS LATE_CNT,
-                SUM(CASE WHEN ATT_STATUS = 'ABSENT' THEN 1 ELSE 0 END) AS ABCENT_CNT
-            FROM DAY_ATTEND
-            WHERE DATE_ATTEND >= TO_DATE(#{targetMonth} || '-01', 'YYYY-MM-DD')
-              AND DATE_ATTEND &lt;  ADD_MONTHS(TO_DATE(#{targetMonth} || '-01','YYYY-MM-DD'),1)
-            GROUP BY EMP_NO, TRUNC(DATE_ATTEND, 'MM')
-        ) T
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM MONTH_ATTEND M
-            WHERE M.EMP_NO = T.EMP_NO
-              AND M.MONTH_DATE_ATTEND = T.MONTH_DATE_ATTEND
-        )
-    </insert>
+	<!-- 1. 특정 월(targetMonth = 'YYYY-MM') 기준 월별 근무 집계 생성 -->
+	<insert id="insertMonthAttendByMonth" parameterType="string">
+		INSERT INTO MONTH_ATTEND (
+		MONTH_ATTNO,
+		EMP_NO,
+		MONTH_DATE_ATTEND,
+		WORK_DAY,
+		WORK_HOUR,
+		OVERTIME,
+		LATE_CNT,
+		ABCENT_CNT
+		)
+		SELECT
+		MONTH_ATTEND_SEQ.NEXTVAL AS MONTH_ATTNO,
+		T.EMP_NO,
+		T.MONTH_DATE_ATTEND,
+		T.WORK_DAY,
+		T.WORK_HOUR,
+		T.OVERTIME,
+		T.LATE_CNT,
+		T.ABCENT_CNT
+		FROM (
+		SELECT
+		EMP_NO,
+		TRUNC(DATE_ATTEND, 'MM') AS MONTH_DATE_ATTEND,
+		COUNT(*) AS WORK_DAY,
 
-    <!-- 2. 특정 사번 + 특정 monthAttno 단건 조회 -->
-    <select id="getMonthAttendOne" parameterType="map"
-            resultType="com.example.domain.MonthAttendVO">
-        SELECT
-            MONTH_ATTNO         AS monthAttno,
-            EMP_NO              AS empNo,
-            MONTH_DATE_ATTEND   AS monthDateAttend,
-            WORK_DAY            AS workDay,
-            WORK_HOUR           AS workHour,
-            OVERTIME            AS overtime,
-            LATE_CNT            AS lateCnt,
-            ABCENT_CNT          AS abcentCnt
-        FROM MONTH_ATTEND
-        WHERE EMP_NO = #{empNo}
-          AND MONTH_ATTNO = #{monthAttno}
-    </select>
+		-- 🔹 월 총 근무시간(시간 단위)
+		SUM(
+		EXTRACT(DAY FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR)) * 24
+		+ EXTRACT(HOUR FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR))
+		+ EXTRACT(MINUTE FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR)) / 60
+		) AS WORK_HOUR,
 
-    <!-- 3. 특정 월 전체 조회 -->
-    <select id="selectMonthAttend" parameterType="string"
-            resultType="com.example.domain.MonthAttendVO">
-        SELECT
-            MONTH_ATTNO         AS monthAttno,
-            EMP_NO              AS empNo,
-            MONTH_DATE_ATTEND   AS monthDateAttend,
-            WORK_DAY            AS workDay,
-            WORK_HOUR           AS workHour,
-            OVERTIME            AS overtime,
-            LATE_CNT            AS lateCnt,
-            ABCENT_CNT          AS abcentCnt
-        FROM MONTH_ATTEND
-        WHERE TO_CHAR(MONTH_DATE_ATTEND, 'YYYY-MM') = #{targetMonth}
-        ORDER BY EMP_NO ASC
-    </select>
+		-- 🔹 초과근무시간 = (하루 근무시간 - 8) 이 0보다 클 때만 합산
+		SUM(
+		CASE
+		WHEN (
+		EXTRACT(DAY FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR)) * 24
+		+ EXTRACT(HOUR FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR))
+		+ EXTRACT(MINUTE FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR)) / 60
+		) > 8
+		THEN (
+		EXTRACT(DAY FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR)) * 24
+		+ EXTRACT(HOUR FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR))
+		+ EXTRACT(MINUTE FROM NVL(DAY_FULLTIME, INTERVAL '0' HOUR)) / 60
+		) - 8
+		ELSE 0
+		END
+		) AS OVERTIME,
 
-    <!-- 4. 특정 월(targetMonth)에 대한 집계 존재 여부 확인 -->
-    <select id="existsMonthAttend" parameterType="string" resultType="int">
-        SELECT COUNT(*)
-        FROM MONTH_ATTEND
-        WHERE TO_CHAR(MONTH_DATE_ATTEND, 'YYYY-MM') = #{targetMonth}
-    </select>
+		SUM(CASE WHEN ATT_STATUS = 'LATE' THEN 1 ELSE 0 END) AS LATE_CNT,
+		SUM(CASE WHEN ATT_STATUS = 'ABSENT' THEN 1 ELSE 0 END) AS ABCENT_CNT
+
+		FROM DAY_ATTEND
+		WHERE DATE_ATTEND >= TO_DATE(#{targetMonth} || '-01', 'YYYY-MM-DD')
+		AND DATE_ATTEND &lt; ADD_MONTHS(TO_DATE(#{targetMonth} ||
+		'-01','YYYY-MM-DD'),1)
+		GROUP BY EMP_NO, TRUNC(DATE_ATTEND, 'MM')
+		) T
+		WHERE NOT EXISTS (
+		SELECT 1
+		FROM MONTH_ATTEND M
+		WHERE M.EMP_NO = T.EMP_NO
+		AND M.MONTH_DATE_ATTEND = T.MONTH_DATE_ATTEND
+		)
+	</insert>
+
+
+	<!-- 2. 특정 사번 + 특정 monthAttno 단건 조회 -->
+	<select id="getMonthAttendOne" parameterType="map"
+		resultType="com.example.domain.MonthAttendVO">
+		SELECT
+		MONTH_ATTNO AS monthAttno,
+		EMP_NO AS empNo,
+		MONTH_DATE_ATTEND AS monthDateAttend,
+		WORK_DAY AS workDay,
+		WORK_HOUR AS workHour,
+		OVERTIME AS overtime,
+		LATE_CNT AS lateCnt,
+		ABCENT_CNT AS abcentCnt
+		FROM MONTH_ATTEND
+		WHERE EMP_NO = #{empNo}
+		AND MONTH_ATTNO = #{monthAttno}
+	</select>
+
+	<!-- 3. 특정 월 전체 조회 -->
+	<select id="selectMonthAttend" parameterType="string"
+		resultType="com.example.domain.MonthAttendVO">
+		SELECT
+		MONTH_ATTNO AS monthAttno,
+		EMP_NO AS empNo,
+		MONTH_DATE_ATTEND AS monthDateAttend,
+		WORK_DAY AS workDay,
+		WORK_HOUR AS workHour,
+		OVERTIME AS overtime,
+		LATE_CNT AS lateCnt,
+		ABCENT_CNT AS abcentCnt
+		FROM MONTH_ATTEND
+		WHERE TO_CHAR(MONTH_DATE_ATTEND, 'YYYY-MM') = #{targetMonth}
+		ORDER BY EMP_NO ASC
+	</select>
+
+	<!-- 4. 특정 월(targetMonth)에 대한 집계 존재 여부 확인 -->
+	<select id="existsMonthAttend" parameterType="string"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM MONTH_ATTEND
+		WHERE TO_CHAR(MONTH_DATE_ATTEND, 'YYYY-MM') = #{targetMonth}
+	</select>
 
 </mapper>

@@ -8,6 +8,8 @@ public interface MonthAttendService {
      */
     void createMonthAttendForLastMonth();
 
+	void createDefaultForNewEmp(String empNo) throws Exception;;
+
     // 나중에 월별 리스트 조회 같은 것들도 여기로:
     // List<MonthAttendVO> getMonthAttendList(String empNo, String month);
 }
