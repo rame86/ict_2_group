@@ -23,4 +23,6 @@ public interface ApproveDAO {
 	public void updateApproveStatus(Map<String, Object> param);
 	public void updateRejectStatus(Map<String, Object> param);
 	public List<Map<String, Object>> countSendApproveStatus(String empNo);
+	public List<ApproveListVO> selectWaitingApproveAlerts(Map<String, Object> param);
+	public List<ApproveListVO> selectSendStatusChangeAlerts(Map<String, Object> param);
 }

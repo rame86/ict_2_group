@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -17,13 +18,17 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.example.domain.LoginVO;
 import com.example.domain.MessageVO;
+import com.example.repository.AlertVO;
 import com.example.service.MessageService;
+import com.example.service.NotificationService;
 
 @Controller
 public class ChatController {
 	
 	private final SimpMessagingTemplate messagingTemplate;
     private final MessageService messageService;
+    @Autowired
+    private NotificationService notificationService;
     
     public ChatController(SimpMessagingTemplate messagingTemplate, MessageService messageService) {
         this.messagingTemplate = messagingTemplate;
@@ -107,10 +112,16 @@ public class ChatController {
     // 헤더부분
     @GetMapping("/api/message/latestUnread")
     @ResponseBody
-    public List<MessageVO> getUnreadMessage(@SessionAttribute("login") LoginVO login){
+    public List<MessageVO> getUnreadMessage(@SessionAttribute("login") LoginVO login) {
     	List<MessageVO> list = messageService.getUnreadMessage(login.getEmpNo());
     	System.out.println(list.toString());
     	return list;
+    }
+    
+    @GetMapping("/api/alerts/latestDocument")
+    @ResponseBody
+    public List<AlertVO> getLatestDocument(@SessionAttribute("login") LoginVO login) {
+    	return notificationService.getLatestAlert(login.getEmpNo());
     }
     
 }

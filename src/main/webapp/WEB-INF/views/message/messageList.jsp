@@ -283,46 +283,47 @@ function loadChatWindow(otherUserId, otherUserName) {
  chatContainer.empty();
  chatContainer.html('<div class="p-5 text-center text-muted">메시지 로딩 중...</div>');
 	
- // STOMP 구독/해제
- // 1. 기존 구독 해제: 다른 채팅방을 열 때 이전 방의 구독을 끊습니다.
-	if (stompClient && stompClient.ws.readyState === WebSocket.OPEN && currentSubscription) {
-		currentSubscription.unsubscribe();
-		currentSubscription = null;
-		console.log("STOMP: 이전 채팅방 구독 해제");
+ 	// STOMP 구독/해제
+ 	// 1. 기존 구독 해제: 다른 채팅방을 열 때 이전 방의 구독을 끊습니다.
+	if (stompClient && stompClient.connected && currentSubscription) {
+	    currentSubscription.unsubscribe();
+	    currentSubscription = null;
+	    console.log("STOMP: 이전 채팅방 구독 해제");
 	} else if (currentSubscription) {
-	    // 연결이 끊겼더라도 구독 객체는 초기화하여 메모리 누수를 방지합니다.
-		currentSubscription = null; 
+	    currentSubscription = null; 
 	}
  
 	// 2. 새로운 채팅방 ID 생성 및 주제(Topic) 설정
- const myEmpNo = $('#sessionEmpNo').val(); 
- const chatRoomId = getChatRoomId(myEmpNo, otherUserId);
- const roomTopic = '/topic/chat/room/' + chatRoomId;
+ 	const myEmpNo = $('#sessionEmpNo').val(); 
+ 	const chatRoomId = getChatRoomId(myEmpNo, otherUserId);
+ 	const roomTopic = '/topic/chat/room/' + chatRoomId;
  
 	// 3. 새로운 채팅방 구독 설정
- // 💡 stompClient는 header-notifications.js에 정의된 전역 변수를 사용합니다.
- if (stompClient && stompClient.connected) {
-     currentSubscription = stompClient.subscribe(roomTopic, function(messageOutput) {
-         const messageVO = JSON.parse(messageOutput.body);
-         appendNewMessageToChat(messageVO, myEmpNo);
-     });
-     console.log("STOMP: 새로운 주제 구독 완료:", roomTopic);
- }
+ 	// 💡 stompClient는 header-notifications.js에 정의된 전역 변수를 사용합니다.
+ 	if (stompClient && stompClient.connected) { // 조건 변경: .connected 사용
+	    currentSubscription = stompClient.subscribe(roomTopic, function(messageOutput) {
+	        const messageVO = JSON.parse(messageOutput.body);
+	        appendNewMessageToChat(messageVO, myEmpNo);
+	    });
+	    console.log("STOMP: 새로운 주제 구독 완료:", roomTopic);
+	} else {
+	    console.error("STOMP 연결이 순간적으로 끊겼거나 초기화에 문제가 있습니다. 구독 실패.");
+	}
  
- // 기존 AJAX요청 (메세지 로드)
+ 	// 기존 AJAX요청 (메세지 로드)
 	$.ajax({
-     url: '/api/message/chat/' + otherUserId, 
-     type: 'GET',
-     dataType: 'json',
-     success: function(response) {
-     	renderChatMessages(response.messages, otherUserId);
-     	chatContainer.scrollTop(chatContainer[0].scrollHeight);
-     },
-     error: function(xhr, status, error) {
-         console.error("대화 내용 로드 실패");
-         chatContainer.html('<div class="p-5 text-center text-danger">대화 내용을 불러오는데 실패했습니다.</div>');
-     }
- });
+		url: '/api/message/chat/' + otherUserId, 
+		type: 'GET',
+		dataType: 'json',
+		success: function(response) {
+			renderChatMessages(response.messages, otherUserId);
+			chatContainer.scrollTop(chatContainer[0].scrollHeight);
+		},
+		error: function(xhr, status, error) {
+			console.error("대화 내용 로드 실패");
+			chatContainer.html('<div class="p-5 text-center text-danger">대화 내용을 불러오는데 실패했습니다.</div>');
+		}
+	});
 	
 }
 
@@ -567,16 +568,7 @@ function selectAndStartChat(empNo, empName) {
 
 //모달창
 $(document).ready(function() {
-	
-/* 	const urlParams = new URLSearchParams(window.location.search);
-    const initialEmpNo = urlParams.get('otherEmpNo');
-    const initialEmpNameParam = urlParams.get('otherEmpName');
-    
-    if (initialEmpNo) {
-		const initialEmpName = initialEmpNameParam ? decodeURIComponent(initialEmpNameParam) : '이름 없음';
-		loadChatWindow(initialEmpNo, initialEmpName);
-    }
-	 */
+
 	$('#newChatModal').on('shown.bs.modal', function () {
         console.log("👉 모달 열림 이벤트 발생: 직원 검색 시작");
         searchAndRenderEmployees(''); 

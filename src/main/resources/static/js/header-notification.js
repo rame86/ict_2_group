@@ -17,24 +17,37 @@ function requestNotificationPermission() {
     }
 }
 
-// 🚨 변수 정의 (STOMP 연결에 필수)
+// STOPM연결 전역변수
 let stompClient = null;
 
 function connectSocket() {
+	
     const socket = new SockJS('/ws/stomp'); 
     stompClient = Stomp.over(socket);
     
     stompClient.connect({}, function(frame) {
+		
         console.log('STOMP: 연결 성공! (Header)');
         const myEmpNo = $('#sessionEmpNo').val();
-		
-		// 채팅 새알람
+        
+		// 1-1. 대화 목록 초기 로드: STOMP 연결 성공 후 반드시 실행
+        loadConversationList(myEmpNo); 
+
+        // 1-2. URL 쿼리 파라미터를 확인하여 채팅방 자동 로드
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialEmpNo = urlParams.get('otherEmpNo');
+        const initialEmpNameParam = urlParams.get('otherEmpName');
+        
+        if (initialEmpNo && typeof loadChatWindow === 'function') {
+            const initialEmpName = initialEmpNameParam ? decodeURIComponent(initialEmpNameParam) : '이름 없음';
+            loadChatWindow(initialEmpNo, initialEmpName); 
+        }
+        
+		// 2-1. 채팅 새알람 구독 (/topic/notifications/{empNo})
         const personalTopic = '/topic/notifications/' + myEmpNo;
-		
         stompClient.subscribe(personalTopic, function(notificationOutput) {
             console.log("STOMP: [채팅] 개인 알림 도착. 목록 갱신 시작.");
 			
-			// 🚨 1. 알림 표시 로직 추가 🚨
 			if ('Notification' in window && Notification.permission === 'granted') {
 				try {
 					const notificationData = JSON.parse(notificationOutput.body);
@@ -42,10 +55,9 @@ function connectSocket() {
 					const displaySenderName = senderName && senderName.trim() !== '' ? senderName : '알 수 없는 발신자';
 					const messageContent = notificationData.msgContent || '메시지 내용을 확인해주세요.';
 
-					// 새 알림 생성
 					new Notification(displaySenderName + '님에게서 온 쪽지', {
 						body: messageContent,
-						icon: '/img/profile_placeholder.png' // 아이콘 경로 확인
+						icon: '/img/profile_placeholder.png'
 					});
 				} catch (e) {
 					console.error("알림 데이터 파싱 오류:", e);
@@ -55,14 +67,13 @@ function connectSocket() {
             loadConversationList(myEmpNo); 
         });
 		
-		// 결재 알림 (전역알림)
+		// 2-2. 결재 알림 구독 (/topic/global-notifications)
 		const globalTopic = '/topic/global-notifications';
 		
 		stompClient.subscribe(globalTopic, function (notification) {
 			
 			try {
 				const data = JSON.parse(notification.body);
-				// 🚨 여기서 empNo 대신 myEmpNo 사용 (전역 변수로 접근)
 				if (data.targetEmpNo === myEmpNo) { 
 					
 					const message = data.content;
@@ -93,22 +104,12 @@ function connectSocket() {
 				console.error("수신 메시지 파싱 오류 (결재 알림):", e, notification.body);
 			}
 		});
-		
-		const urlParams = new URLSearchParams(window.location.search);
-		const initialEmpNo = urlParams.get('otherEmpNo');
-		const initialEmpNameParam = urlParams.get('otherEmpName');
-		        
-		if (initialEmpNo) {
-			const initialEmpName = initialEmpNameParam ? decodeURIComponent(initialEmpNameParam) : '이름 없음';
-			// STOMP 연결 성공을 보장받고 loadChatWindow 호출
-			loadChatWindow(initialEmpNo, initialEmpName); 
-		}
-				
-        loadConversationList(myEmpNo); // 초기 로드
         
     }, function(error) {
         console.error('STOMP: 연결 실패 또는 오류:', error);
+		setTimeout(connectSocket, 5000);
     });
+	
 }
 
 $(document).ready(function(){
@@ -116,7 +117,7 @@ $(document).ready(function(){
 	requestNotificationPermission();
 	
     const currentEmpNo = $('#sessionEmpNo').val();
-    if (currentEmpNo) {
+    if (currentEmpNo && stompClient === null) {
         connectSocket();
     }
 	
@@ -125,19 +126,22 @@ $(document).ready(function(){
 	    loadLatestMessages();
 	});
 	
+	$(document).on('shown.bs.dropdown', '#alertsDropdown', function () {
+		console.log("✅ 알림 드롭다운 이벤트 발생! loadLatestAlerts() 호출 시도.");
+		loadLatestAlerts();
+	});
+	
 });
 
-// 🚨🚨 [핵심] 1. 전역 뱃지 업데이트 기능이 추가된 목록 로드 함수 🚨🚨
 function loadConversationList(empNo) {
+	
 	$.ajax({
 		url : '/api/message/conversationList',
 		type : 'get',
 		dataType : 'json',
 		success: function(response) {
             
-            // ------------------------------------------------
-            // 🚩 전역 뱃지 카운트 계산 및 업데이트 🚩
-            // ------------------------------------------------
+			// 뱃지 카운트
             let totalUnreadCount = 0;
             if (response && response.length > 0) {
                 response.forEach(conv => {
@@ -153,24 +157,18 @@ function loadConversationList(empNo) {
             } else {
                 badgeElement.hide(); // 뱃지 숨김
             }
-            // ------------------------------------------------
-            
-            // 이 함수는 messageList.jsp에 있다면 왼쪽 목록도 렌더링합니다.
+
             if (typeof renderConversationList === 'function') {
 			    renderConversationList(response); 
             }
 		}, 
-		error: function(xhr, status, error) {
+		error: function(status, error) {
             console.error("대화 목록 로드 실패:", status, error);
         }
 	});
+	
 }
 
-// =========================================================
-// 🚨🚨 [핵심] 2. 상단 드롭다운 목록 로드 함수 (SB Admin 스타일) 🚨🚨
-// =========================================================
-
-// 단일 쪽지 항목 HTML 생성 함수 (SB Admin 2 스타일)
 function createMessageItemHtml(msg) {
 	
     let formattedTime = '시간 오류';
@@ -184,7 +182,6 @@ function createMessageItemHtml(msg) {
 	const otherEmpNo = msg.senderEmpNo;
 	const otherEmpName = msg.senderName;
     
-    // HTML 구조: SB Admin 2 스타일
     return '<a class="list-group-item list-group-item-action d-flex align-items-start py-3" ' + 
         	'href="/message/messageList?otherEmpNo=' + otherEmpNo + '&otherEmpName=' + encodeURIComponent(otherEmpName) + '">' +
             '<div class="me-3" style="width: 40px; height: 40px;">' +
@@ -199,6 +196,7 @@ function createMessageItemHtml(msg) {
 }
 
 function loadLatestMessages() {
+	
     const myEmpNo = $('#sessionEmpNo').val();
 	console.log(myEmpNo);
     if (!myEmpNo) return;
@@ -224,6 +222,38 @@ function loadLatestMessages() {
         error: function(xhr, status, error) {
             console.error("❌ 최신 쪽지 드롭다운 로드 실패:", error);
             container.html('<a class="list-group-item text-center small text-danger py-2" href="#">로드 실패</a>');
+        }
+    });
+	
+}
+
+// 최신 알람리스트
+function loadLatestAlerts() {
+    const container = $('#latestAlertsContainer');
+	container.html('<a class="list-group-item list-group-item-action text-center small text-gray-500 py-2" href="#">알림 로딩 중...</a>');
+	console.log("loadLatestAlerts() 호출됨");
+
+    $.ajax({
+        url: '/api/alerts/latestDocument', // 서버의 통합 알림 API 엔드포인트 가정
+        type: 'GET',
+        dataType: 'json',
+        success: function(alerts) {
+            container.empty();
+            
+            if (alerts && alerts.length > 0) {
+                const limitedAlerts = alerts.slice(0, 7); 
+                
+                limitedAlerts.forEach(alert => {
+                    container.append(createAlertItemHtml(alert));
+                });
+            } else {
+                container.append('<a class="list-group-item list-group-item-action text-center small text-gray-500 py-2" href="#">알림 없음</a>');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("❌ 최신 알림 드롭다운 로드 실패:", error);
+            container.empty();
+            container.append('<a class="list-group-item list-group-item-action text-danger text-center small py-2" href="#">로드 실패</a>');
         }
     });
 }
