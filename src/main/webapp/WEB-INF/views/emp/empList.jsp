@@ -8,25 +8,15 @@
 <meta charset="UTF-8">
 <title>사원관리</title>
 
-<!-- 공통 헤더 -->
 <jsp:include page="../common/header.jsp" />
 
-<!-- jQuery -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<!-- 폰트 & CSS -->
 <link href="https://cdn.jsdelivr.net/npm/suit-font/dist/suit.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard-rounded.css" />
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard/dist/web/static/pretendard.css" />
-
 <link rel="stylesheet" href="/css/empList.css">
-
-<!-- DataTables CSS/JS -->
-<link rel="stylesheet"
-      href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
 
-<!-- 🔹 AJAX에서 쓸 URL 상수 -->
 <script>
     const EMP_CARD_URL = "<c:url value='/emp/card' />";
 </script>
@@ -34,61 +24,39 @@
 <script>
     $(document).ready(function () {
 
-        /* ------------------------------------
-           1) DataTables 기본 설정
-           ------------------------------------ */
+        /* 1) DataTables 기본 설정 */
         const table = $('#empTable').DataTable({
             pageLength   : 10,
             lengthChange : false,
             info         : false,
             searching    : true,
             ordering     : true,
-            order        : [[0, 'asc'], [1, 'asc'], [2, 'asc']],
+            order        : [[0, 'asc']], // 사번순 정렬
             dom          : 't<"dt-bottom"p>',
-            language     : {
-                "zeroRecords": "일치하는 사원이 없습니다.",
-                "paginate": {
-                    "first"   : "처음",
-                    "last"    : "마지막",
-                    "next"    : "다음",
-                    "previous": "이전"
-                }
-            }
+            language     : { "zeroRecords": "일치하는 사원이 없습니다.", "paginate": { "next": "다음", "previous": "이전" } }
         });
 
-        /* ------------------------------------
-           2) DataTables 페이지네이션 위치 이동
-           ------------------------------------ */
+        /* 2) 페이지네이션 위치 이동 */
         const pagination = $('#empTable_wrapper .dt-bottom');
         $('.emp-pagination-container').append(pagination);
 
-        /* ------------------------------------
-           3) 검색창 → DataTables 검색 연동 (+ 선택 초기화)
-           ------------------------------------ */
+        /* 3) 검색창 연동 */
         $('.emp-search-form').on('submit', function (e) {
             e.preventDefault();
-
             const keyword = $.trim($('input[name="keyword"]').val());
-
             table.search(keyword).draw();
-
             table.one('draw', function () {
                 $('#empTable tbody tr.emp-row').removeClass('selected');
             });
-
             if (keyword === "") {
                 $("#emp-detail-card").hide().empty();
                 $("#emp-detail-placeholder").show();
             }
         });
 
-        /* ------------------------------------
-           4) 행 클릭 → AJAX로 인사카드 불러오기
-           ------------------------------------ */
+        /* 4) 행 클릭 → AJAX 로드 */
         $('#empTable tbody').on('click', 'tr.emp-row', function () {
-
             let empNo = $(this).data("empno");
-
             $(".emp-row").removeClass("selected");
             $(this).addClass("selected");
 
@@ -106,8 +74,35 @@
             });
         });
 
-    });
+        /* =========================================================
+         URL 파라미터 처리 (사번 자동선택 OR 키워드 검색)
+        ========================================================= */
+     const urlParams = new URLSearchParams(window.location.search);
+     
+     const autoSelectEmpNo = urlParams.get('autoSelectEmpNo');
+     const keywordParam    = urlParams.get('keyword'); 
+
+     // 1) 키워드(부서명)가 넘어왔을 경우 -> 자동 검색
+     if (keywordParam) {
+         $('input[name="keyword"]').val(keywordParam); // 검색창에 표시
+         table.search(keywordParam).draw();           // 테이블 필터링 실행
+     }
+     
+     // 2) 사번(autoSelectEmpNo)이 넘어왔을 경우 -> 검색 후 클릭
+     else if (autoSelectEmpNo) {
+         table.search(autoSelectEmpNo).draw();
+         
+         const targetRow = $('#empTable tbody tr.emp-row').first();
+         if (targetRow.length > 0) {
+             // 필요하다면 검색창에도 값 입력
+             // $('input[name="keyword"]').val(autoSelectEmpNo); 
+             targetRow.trigger('click');
+         }
+     }
+
+ });
 </script>
+
 
 </head>
 
