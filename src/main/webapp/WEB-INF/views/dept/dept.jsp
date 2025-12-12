@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!DOCTYPE html>
@@ -6,241 +7,268 @@
 <head>
 <meta charset="UTF-8">
 <title>부서 조직도</title>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/dept.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/css/dept.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body class="sb-nav-fixed">
 
-    <jsp:include page="../common/header.jsp" flush="true" />
+	<jsp:include page="../common/header.jsp" flush="true" />
 
-    <div id="layoutSidenav">
-        <jsp:include page="../common/sidebar.jsp" flush="true" />
+	<div id="layoutSidenav">
+		<jsp:include page="../common/sidebar.jsp" flush="true" />
 
-        <div id="layoutSidenav_content">
-            <main>
-                <div class="container-fluid px-4">
-                    <h1 class="mt-4">조직도</h1>
-                    <ol class="breadcrumb mb-4">
-                        <li class="breadcrumb-item active">Organization Chart</li>
-                    </ol>
-                    
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            
-                            <div class="org-tree">
-                                <ul>
-                                    <%-- CEO 영역 --%>
-                                    <c:forEach var="ceo" items="${deptList}">
-                                        <c:if test="${ceo.deptNo == 1001}">
-                                            <li>
-                                                <div class="org-node ceo" onclick="showDeptModal('${ceo.deptNo}', '${ceo.deptName}')">
-                                                    <div class="profile-pic">
-                                                        <%-- 🔹 [수정] 이미지 경로 로직 개선 --%>
-                                                        <img src="${pageContext.request.contextPath}${not empty ceo.managerImage ? '/upload/emp/' : '/images/'}${not empty ceo.managerImage ? ceo.managerImage : 'default_profile.png'}" 
-                                                             alt="CEO">
-                                                    </div>
-                                                    <span class="dept-name">${ceo.deptName}</span>
-                                                    <span class="manager-name">${ceo.managerName}</span>
-                                                    <span class="position">CEO</span>
-                                                </div>
+		<div id="layoutSidenav_content">
+			<main>
+				<div class="container-fluid px-4">
+					<h1 class="mt-4">조직도</h1>
+					<ol class="breadcrumb mb-4">
+						<li class="breadcrumb-item active">Organization Chart</li>
+					</ol>
 
-                                                <ul>
-                                                    <%-- CTO 영역 --%>
-                                                    <c:forEach var="cto" items="${deptList}">
-                                                        <c:if test="${cto.deptNo == 3000}">
-                                                            <li>
-                                                                <div class="org-node head" onclick="showDeptModal('${cto.deptNo}', '${cto.deptName}')">
-                                                                    <div class="profile-pic">
-                                                                        <%-- 🔹 [수정] CTO 이미지 경로 --%>
-                                                                        <img src="${pageContext.request.contextPath}${not empty cto.managerImage ? '/upload/emp/' : '/images/'}${not empty cto.managerImage ? cto.managerImage : 'default_profile.png'}" 
-                                                                             alt="CTO">
-                                                                    </div>
-                                                                    <span class="dept-name">${cto.deptName}</span>
-                                                                    <span class="manager-name">${cto.managerName}</span>
-                                                                    <span class="position">CTO</span>
-                                                                </div>
-                                                
-                                                                <ul class="team-grid">
-                                                                    <c:forEach var="team" items="${deptList}">
-                                                                        <c:if test="${team.parentDeptNo == 3000}">
-                                                                            <li>
-                                                                                <div class="org-node team" onclick="showDeptModal('${team.deptNo}', '${team.deptName}')">
-                                                                                    <span class="dept-name">${team.deptName}</span>
-                                                                                    <span class="manager-name">${team.managerName}</span>
-                                                                                </div>
-                                                                            </li>
-                                                                        </c:if>
-                                                                    </c:forEach>
-                                                                </ul>
-                                                            </li>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                
-                                                    <%-- COO 영역 --%>
-                                                    <c:forEach var="coo" items="${deptList}">
-                                                        <c:if test="${coo.deptNo == 2000}">
-                                                            <li>
-                                                                <div class="org-node head" onclick="showDeptModal('${coo.deptNo}', '${coo.deptName}')">
-                                                                    <div class="profile-pic">
-                                                                        <%-- 🔹 [수정] COO 이미지 경로 --%>
-                                                                        <img src="${pageContext.request.contextPath}${not empty coo.managerImage ? '/upload/emp/' : '/images/'}${not empty coo.managerImage ? coo.managerImage : 'default_profile.png'}" 
-                                                                             alt="COO">
-                                                                    </div>
-                                                                    <span class="dept-name">${coo.deptName}</span>
-                                                                    <span class="manager-name">${coo.managerName}</span>
-                                                                    <span class="position">COO</span>
-                                                                </div>
-                                                
-                                                                <ul class="team-grid">
-                                                                    <c:forEach var="team" items="${deptList}">
-                                                                        <c:if test="${team.parentDeptNo == 2000}">
-                                                                            <li>
-                                                                                <div class="org-node team" onclick="showDeptModal('${team.deptNo}', '${team.deptName}')">
-                                                                                    <span class="dept-name">${team.deptName}</span>
-                                                                                    <span class="manager-name">${team.managerName}</span>
-                                                                                </div>
-                                                                            </li>
-                                                                        </c:if>
-                                                                    </c:forEach>
-                                                                </ul>
-                                                            </li>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                
-                                                    <%-- CBO 영역 --%>
-                                                    <c:forEach var="cbo" items="${deptList}">
-                                                        <c:if test="${cbo.deptNo == 4000}">
-                                                            <li>
-                                                                <div class="org-node head" onclick="showDeptModal('${cbo.deptNo}', '${cbo.deptName}')">
-                                                                    <div class="profile-pic">
-                                                                        <%-- 🔹 [수정] CBO 이미지 경로 --%>
-                                                                        <img src="${pageContext.request.contextPath}${not empty cbo.managerImage ? '/upload/emp/' : '/images/'}${not empty cbo.managerImage ? cbo.managerImage : 'default_profile.png'}" 
-                                                                             alt="CBO">
-                                                                    </div>
-                                                                    <span class="dept-name">${cbo.deptName}</span>
-                                                                    <span class="manager-name">${cbo.managerName}</span>
-                                                                    <span class="position">CBO</span>
-                                                                </div>
-                                                
-                                                                <ul class="team-grid">
-                                                                    <c:forEach var="team" items="${deptList}">
-                                                                        <c:if test="${team.parentDeptNo == 4000}">
-                                                                            <li>
-                                                                                <div class="org-node team" onclick="showDeptModal('${team.deptNo}', '${team.deptName}')">
-                                                                                    <span class="dept-name">${team.deptName}</span>
-                                                                                    <span class="manager-name">${team.managerName}</span>
-                                                                                </div>
-                                                                            </li>
-                                                                        </c:if>
-                                                                    </c:forEach>
-                                                                </ul>
-                                                            </li>
-                                                        </c:if>
-                                                    </c:forEach>
-                                                
-                                                </ul>
+					<div class="card mb-4">
+						<div class="card-body">
+							<div class="org-tree">
+								<ul>
+									<c:forEach var="ceo" items="${deptList}">
+										<c:if test="${ceo.deptNo == 1001}">
+											<li>
+												<div
+													class="org-node ceo ${sessionScope.login.deptNo == ceo.deptNo ? 'my-dept' : ''}"
+													onclick="showDeptModal('${ceo.deptNo}', '${ceo.deptName}', '${ceo.managerName}')">
+													<div class="profile-pic">
+														<img
+															src="${pageContext.request.contextPath}${not empty ceo.managerImage ? '/upload/emp/' : '/images/'}${not empty ceo.managerImage ? ceo.managerImage : 'default_profile.png'}"
+															alt="CEO">
+													</div>
+													<span class="dept-name">${ceo.deptName}</span> <span
+														class="manager-name">${ceo.managerName}</span> <span
+														class="position">CEO</span>
+												</div>
 
-                                            </li>
-                                        </c:if>
-                                    </c:forEach>
-                                </ul> 
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-            <jsp:include page="../common/footer.jsp" flush="true" />
-        </div>
-    </div>
+												<ul>
+													<c:forEach var="sub" items="${deptList}">
+														<c:if
+															test="${sub.parentDeptNo == 1001 && sub.deptNo != 1001}">
+															<li>
+																<div
+																	class="org-node head ${sessionScope.login.deptNo == sub.deptNo ? 'my-dept' : ''}"
+																	onclick="showDeptModal('${sub.deptNo}', '${sub.deptName}', '${sub.managerName}')">
+																	<div class="profile-pic">
+																		<img
+																			src="${pageContext.request.contextPath}${not empty sub.managerImage ? '/upload/emp/' : '/images/'}${not empty sub.managerImage ? sub.managerImage : 'default_profile.png'}"
+																			alt="Manager">
+																	</div>
+																	<span class="dept-name">${sub.deptName}</span> <span
+																		class="manager-name">${sub.managerName}</span> <span
+																		class="position">${sub.deptName}장</span>
+																</div>
 
-    <div id="deptInfoModal">
-        <div class="modal-content-custom">
-            <div class="modal-header-custom">
-                <h5 style="margin:0;" id="modalDeptName">부서명</h5>
-                <span id="closeModalBtn" class="close-btn">&times;</span>
-            </div>
-            <div class="modal-body-custom">
-                <ul id="employeeList">
-                    <li style="text-align:center; padding:20px;">로딩 중...</li>
-                </ul>
-            </div>
-            <button class="btn-manage-custom" onclick="goToEmployeeMgmtByDept()">
-                <i class="fas fa-users-cog"></i> 부서원 관리 / 상세 보기
-            </button>
-        </div>
-    </div>
+																<ul class="team-grid">
+																	<c:forEach var="team" items="${deptList}">
+																		<c:if test="${team.parentDeptNo == sub.deptNo}">
+																			<li>
+																				<div
+																					class="org-node team ${sessionScope.login.deptNo == team.deptNo ? 'my-dept' : ''}"
+																					onclick="showDeptModal('${team.deptNo}', '${team.deptName}', '${team.managerName}')">
+																					<span class="dept-name">${team.deptName}</span> <span
+																						class="manager-name">${team.managerName}</span>
+																				</div>
+																			</li>
+																		</c:if>
+																	</c:forEach>
+																</ul>
+															</li>
+														</c:if>
+													</c:forEach>
+												</ul>
 
-    <script>
-        const modal = document.getElementById('deptInfoModal');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const modalDeptName = document.getElementById('modalDeptName');
-        const employeeListUl = document.getElementById('employeeList');
-        let currentDeptId = null; 
+											</li>
+										</c:if>
+									</c:forEach>
+								</ul>
+							</div>
 
-        // 🔹 [추가] JS에서 컨텍스트 경로 사용을 위한 변수
-        const contextPath = '${pageContext.request.contextPath}';
+						</div>
+					</div>
+				</div>
+			</main>
+			<jsp:include page="../common/footer.jsp" flush="true" />
+		</div>
+	</div>
 
-        function showDeptModal(deptId, deptName) {
-            currentDeptId = deptId;
-            modalDeptName.textContent = deptName;
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden'; 
-            employeeListUl.innerHTML = '<li style="text-align:center; padding:20px; color:#666;">데이터를 불러오는 중입니다...</li>';
-            loadEmployeeList(deptId); 
-        }
+	<div id="deptInfoModal" class="modal-custom">
+		<div class="modal-content-custom">
+			<div class="modal-header-custom" style="background-color: #4e73df;">
+				<h5 style="margin: 0;" id="modalDeptName">부서명</h5>
+				<span id="closeModalBtn" class="close-btn">&times;</span>
+			</div>
+			<div class="modal-body-custom">
+				<ul id="employeeList">
+					<li style="text-align: center; padding: 20px;">로딩 중...</li>
+				</ul>
+			</div>
 
-        function loadEmployeeList(deptId) {
-            $.ajax({
-                url: contextPath + '/dept/api/employees', 
-                type: 'GET',
-                data: { deptNo: deptId }, 
-                dataType: 'json',
-                success: function(data) {
-                    employeeListUl.innerHTML = ''; 
-                    if (!data || data.length === 0) {
-                        employeeListUl.innerHTML = '<li style="text-align:center; padding:20px; color:#888;">소속된 사원이 없습니다.</li>';
-                        return;
-                    }
-                    $.each(data, function(index, emp) {
-                        // 🔹 [수정] AJAX에서 이미지 경로를 /upload/emp/ 로 지정
-                        let imgSrc = emp.empImage 
-                                     ? contextPath + '/upload/emp/' + emp.empImage 
-                                     : contextPath + '/images/default_profile.png';
-                                     
-                        let jobTitle = emp.jobTitle ? emp.jobTitle : '사원';
-                        
-                        let html = `
-                            <li class="emp-item" onclick="goToEmployeeMgmt('\${emp.empNo}')">
-                                <img src="\${imgSrc}" class="emp-thumb" alt="프로필">
-                                <div class="emp-details">
-                                    <span class="emp-name">\${emp.empName}</span>
-                                    <span class="position" style="font-size:12px;">\${jobTitle}</span>
-                                </div>
-                            </li>
-                        `;
-                        employeeListUl.insertAdjacentHTML('beforeend', html);
-                    });
-                },
-                error: function() {
-                    employeeListUl.innerHTML = '<li style="text-align:center; color:red; padding:20px;">데이터 로드 실패</li>';
-                }
-            });
-        }
+			<c:choose>
+				<c:when test="${isAdmin}">
+					<button class="btn-manage-custom"
+						onclick="goToEmployeeMgmtByDept()">
+						<i class="fas fa-users-cog"></i> 부서원 관리 / 상세 보기
+					</button>
+				</c:when>
+				<c:otherwise>
+					<button class="btn-manage-custom" disabled
+						style="background-color: #ccc; cursor: not-allowed; border-color: #bbb; color: #666;">
+						<i class="fas fa-lock"></i> 관리 권한 없음
+					</button>
+				</c:otherwise>
+			</c:choose>
 
-        function closeModal() {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-        closeModalBtn.onclick = closeModal;
-        window.onclick = function(event) { if (event.target == modal) closeModal(); }
+		</div>
+	</div>
 
-        function goToEmployeeMgmt(empId) {
-            location.href = `${pageContext.request.contextPath}/emp/detail?empNo=\${empId}`;
-        }
-        function goToEmployeeMgmtByDept() {
-            if (currentDeptId) location.href = `${pageContext.request.contextPath}/emp/list?deptNo=\${currentDeptId}`;
-        }
-    </script>
+	<c:if test="${isAdmin}">
+		<div class="admin-action-area">
+			<button class="btn-float btn-create" onclick="openCreateModal()">
+				<i class="fas fa-plus"></i> 부서 생성
+			</button>
+			<button class="btn-float btn-delete" onclick="openDeleteModal()">
+				<i class="fas fa-trash"></i> 부서 삭제
+			</button>
+		</div>
+	</c:if>
+
+	<div id="deptCreateModal" class="modal-custom">
+		<div class="modal-content-custom">
+			<div class="modal-header-custom modal-header-create">
+				<h5>새 부서 생성</h5>
+				<span onclick="closeCreateModal()" class="close-btn">&times;</span>
+			</div>
+			<div class="modal-body-custom">
+				<form id="createDeptForm">
+					<div class="form-group">
+						<label for="deptNoInput">부서 번호 (숫자)</label> <input type="number"
+							id="deptNoInput" name="deptNo" placeholder="예: 5000" required>
+					</div>
+					<div class="form-group">
+						<label for="deptNameInput">부서 이름</label> <input type="text"
+							id="deptNameInput" name="deptName" placeholder="예: 신규사업팀"
+							required>
+					</div>
+					<div class="form-group">
+						<label for="parentDeptNoInput">상위 부서 번호</label> <input
+							type="number" id="parentDeptNoInput" name="parentDeptNo"
+							placeholder="예: 1001 (CEO직속)">
+					</div>
+					<div class="form-group">
+						<label for="managerEmpNoInput">부서장 사번</label> <input type="text"
+							id="managerEmpNoInput" name="managerEmpNo" placeholder="(선택)">
+					</div>
+					<button type="button" class="btn-manage-custom btn-create-submit"
+						onclick="submitCreateDept()">
+						<i class="fas fa-check"></i> 생성하기
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div id="deptDeleteModal" class="modal-custom">
+		<div class="modal-content-custom">
+			<div class="modal-header-custom modal-header-delete">
+				<h5>부서 삭제</h5>
+				<span onclick="closeDeleteModal()" class="close-btn">&times;</span>
+			</div>
+			<div class="modal-body-custom">
+				<div class="warning-text">
+					<i class="fas fa-exclamation-triangle"></i> <span>주의: 삭제 시
+						해당 부서원들은 모두 '무소속' 처리됩니다. 이 작업은 되돌릴 수 없습니다.</span>
+				</div>
+				<div class="form-group">
+					<label for="deleteDeptSelect">삭제할 부서 선택</label> <select
+						id="deleteDeptSelect" name="deptNo">
+						<option value="">부서를 선택하세요</option>
+						<c:forEach var="d" items="${deptList}">
+							<c:if test="${d.deptNo != 1001}">
+								<option value="${d.deptNo}">${d.deptName}(${d.deptNo})</option>
+							</c:if>
+						</c:forEach>
+					</select>
+				</div>
+				<button type="button" class="btn-manage-custom btn-delete-submit"
+					onclick="submitDeleteDept()">
+					<i class="fas fa-trash"></i> 삭제하기
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="deptMoveModal" class="modal-custom">
+		<div class="modal-content-custom" style="max-width: 350px;">
+			<div class="modal-header-custom" style="background: #36b9cc;">
+				<h5 style="margin: 0;">부서 이동</h5>
+				<span onclick="closeMoveModal()" class="close-btn">&times;</span>
+			</div>
+			<div class="modal-body-custom">
+				<p id="moveTargetName"
+					style="font-weight: bold; margin-bottom: 10px;"></p>
+				<input type="hidden" id="moveTargetEmpNo">
+
+				<div class="form-group">
+					<label>이동할 부서 선택</label> <select id="moveDeptSelect">
+						<c:forEach var="d" items="${deptList}">
+							<option value="${d.deptNo}">${d.deptName}(${d.deptNo})</option>
+						</c:forEach>
+					</select>
+				</div>
+				<button type="button" class="btn-manage-custom"
+					style="background: #36b9cc;" onclick="submitMoveEmp()">이동
+					확인</button>
+			</div>
+		</div>
+	</div>
+	<div id="deptAppointModal" class="modal-custom">
+		<div class="modal-content-custom" style="max-width: 350px;">
+			<div class="modal-header-custom" style="background: #4e73df;">
+				<h5 style="margin: 0;">부서장 임명 결재</h5>
+				<span onclick="closeAppointModal()" class="close-btn">&times;</span>
+			</div>
+			<div class="modal-body-custom">
+				<p style="margin-bottom: 15px; font-size: 14px; color: #555;">
+					현재 부서장이 공석입니다.<br> 부서원으로 임명할 사원을 선택해주세요.
+				</p>
+
+				<div class="form-group">
+					<label>임명할 사원 선택</label> <select id="appointEmpSelect">
+						<option value="">사원을 선택하세요</option>
+					</select>
+				</div>
+				<button type="button" class="btn-manage-custom"
+					style="background: #4e73df;" onclick="submitAppointManager()">
+					<i class="fas fa-file-signature"></i> 결재 기안 작성
+				</button>
+			</div>
+		</div>
+	</div>
+
+	<form id="approveRequestForm" action="../approve/approve-form"
+		method="POST" style="display: none;">
+		<input type="hidden" name="empNo" id="apprEmpNo"> <input
+			type="hidden" name="deptNo" id="apprDeptNo"> <input
+			type="hidden" name="type" value="APPOINTMENT">
+	</form>
+	
+	<script>
+		// JSP(서버)에서만 알 수 있는 값을 전역 변수로 설정하여 dept.js에서 사용할 수 있게 함
+		const contextPath = '${pageContext.request.contextPath}';
+		const isAdminUser = $
+		{
+			isAdmin != null ? isAdmin : false
+		};
+	</script>
+
+	<script src="${pageContext.request.contextPath}/js/dept.js"></script>
+
 </body>
 </html>

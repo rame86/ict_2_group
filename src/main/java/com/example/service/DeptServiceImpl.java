@@ -1,9 +1,12 @@
 package com.example.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.domain.DeptVO;
 import com.example.domain.EmpVO;
@@ -31,4 +34,31 @@ public class DeptServiceImpl implements DeptService {
 		return deptDAO.selectEmpListByDept(deptNo);
 	}
 
+	public void createDept(DeptVO vo) {
+		deptDAO.insertDept(vo);
+	}
+
+	@Transactional // ⭐️ 트랜잭션 필수: 사원 업데이트 후 부서 삭제가 원자적으로 일어나야 함
+	public void removeDept(int deptNo) {
+		// 1. 해당 부서원들을 무소속으로 변경
+		deptDAO.updateEmpDeptNull(deptNo);
+		// 2. 부서 삭제
+		deptDAO.deleteDept(deptNo);
+	}
+
+	@Transactional
+	public void changeEmpDept(int empNo, int newDeptNo, String writerEmpNo, String note) {
+		// 1. Map 생성 (파라미터 포장)
+		Map<String, Object> map = new HashMap<>();
+		map.put("empNo", empNo);
+		map.put("deptNo", newDeptNo);
+		map.put("writer", writerEmpNo);
+		map.put("eNote", note); // "부서 이동"
+
+		// 2. 사원 정보 업데이트
+		deptDAO.updateEmpDept(map);
+
+		// 3. 로그 저장
+		deptDAO.insertEditLog(map);
+	}
 }

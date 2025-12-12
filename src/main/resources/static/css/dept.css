@@ -198,7 +198,6 @@
 	animation: slideDown 0.3s;
 }
 
-
 keyframes slideDown {
 	from {transform: translateY(-50px);
 	opacity: 0;
@@ -314,4 +313,276 @@ to {
 	width: 0;
 	height: 20px;
 	transform: translateX(-50%); /* 정확한 중앙 정렬 */
+}
+
+/* =========================================
+       3. [추가] 내 부서 강조 스타일 (분홍색)
+   ========================================= */
+
+/* 로그인한 유저의 부서 (클래스명: my-dept) */
+.org-node.my-dept {
+	border-color: #FF8FA3 !important; /* 테두리: 연한 핫핑크 */
+	background-color: #FFF0F5; /* 배경: 아주 연한 핑크 (LavenderBlush) */
+	box-shadow: 0 0 15px rgba(255, 105, 180, 0.5); /* 분홍색 은은한 발광 효과 */
+	transform: translateY(-3px); /* 살짝 떠있는 느낌 */
+}
+
+/* 내 부서의 부서장 이름 색상 변경 */
+.org-node.my-dept .manager-name {
+	color: #D63384 !important; /* 글자: 진한 핑크 */
+}
+
+/* 부서장급(head)일 때 상단 굵은 선 색상 변경 */
+.org-node.head.my-dept {
+	border-top-color: #FF8FA3 !important;
+}
+
+/* CEO가 내 부서일 경우 (혹시 모를 상황 대비) */
+.org-node.ceo.my-dept {
+	border-color: #FF8FA3 !important;
+}
+
+/* 프로필 사진 테두리도 핑크로 변경 */
+.org-node.my-dept .profile-pic {
+	border-color: #FFB6C1;
+}
+
+/* =========================================
+       4. [수정] 관리자용 플로팅 버튼 (좌측 상단으로 이동)
+   ========================================= */
+.admin-action-area {
+    position: fixed;
+    /* 사이드바 너비(약 225~250px) + 여백 */
+    left: 280px; 
+    
+    /* 헤더 높이 + 여백 (화면 상단에서 얼마나 띄울지) */
+    top: 220px;   
+    
+    /* 기존 bottom 속성은 제거하거나 auto로 초기화 */
+    bottom: auto; 
+    
+    z-index: 99999 !important; /* ⭐️ 가장 앞으로 강제 호출 */
+    display: flex;
+    gap: 10px;
+}
+
+/* 버튼 스타일은 기존 유지 */
+.btn-float {
+    padding: 10px 16px; /* 크기 약간 조절 (선택사항) */
+    border-radius: 30px;
+    border: none;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.btn-float:hover {
+    transform: translateY(-2px);
+}
+
+.btn-create { background-color: #09C9DE; } /* 초록색 */
+.btn-delete { background-color: #E55D3D; } /* 빨간색 */
+
+/* =========================================
+       5. [수정] 모달 및 폼 스타일 개선
+   ========================================= */
+
+/* 모달 배경 오버레이 */
+.modal-custom {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검은색 배경 */
+    backdrop-filter: blur(3px); /* 배경 블러 효과 추가 */
+}
+
+/* 모달 컨텐츠 박스 */
+.modal-content-custom {
+    background-color: #fff;
+    margin: 5% auto; /* 상단 여백 조정 */
+    border-radius: 15px; /* 더 둥근 모서리 */
+    width: 90%;
+    max-width: 450px; /* 최대 너비 약간 넓힘 */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* 부드럽고 깊은 그림자 */
+    overflow: hidden; /* 자식 요소의 border-radius 넘침 방지 */
+    animation: slideDown 0.3s ease-out; /* 부드러운 등장 애니메이션 */
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* 모달 헤더 */
+.modal-header-custom {
+    padding: 20px 25px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+/* 부서 생성 모달 헤더 테마 (녹색) */
+.modal-header-create {
+    background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+}
+
+/* 부서 삭제 모달 헤더 테마 (빨간색) */
+.modal-header-delete {
+    background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
+}
+
+/* 닫기 버튼 */
+.close-btn {
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    font-size: 28px;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+/* 모달 바디 */
+.modal-body-custom {
+    padding: 30px 25px;
+    color: #555;
+}
+
+/* 폼 스타일 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #555;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box; /* 패딩 포함 너비 계산 */
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #1cc88a; /* 포커스 시 녹색 테두리 (생성 모달 기준) */
+    box-shadow: 0 0 0 3px rgba(28, 200, 138, 0.1);
+    outline: none;
+}
+
+/* 부서 삭제 모달 내 select 포커스 색상 */
+#deptDeleteModal .form-group select:focus {
+    border-color: #e74a3b;
+    box-shadow: 0 0 0 3px rgba(231, 74, 59, 0.1);
+}
+
+
+/* 버튼 스타일 */
+.btn-manage-custom {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    margin-top: 10px;
+}
+
+.btn-manage-custom:active {
+    transform: scale(0.98);
+}
+
+/* 부서 생성 버튼 테마 (녹색) */
+.btn-create-submit {
+    background: #1cc88a;
+}
+
+.btn-create-submit:hover {
+    background: #17a673;
+}
+
+/* 부서 삭제 버튼 테마 (빨간색) */
+.btn-delete-submit {
+    background: #e74a3b;
+}
+
+.btn-delete-submit:hover {
+    background: #c0392b;
+}
+
+/* 경고 문구 스타일 */
+.warning-text {
+    color: #e74a3b;
+    font-size: 0.9rem;
+    font-weight: 600;
+    background-color: #fff5f5;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #e74a3b;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+}
+
+.warning-text i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+/* =========================================
+       6. [추가] 사원 이동/제외 버튼 스타일
+   ========================================= */
+.emp-actions {
+    margin-left: auto; /* 오른쪽 끝으로 밀기 */
+    display: flex;
+    gap: 5px;
+}
+
+.btn-xs {
+    padding: 4px 8px;
+    font-size: 11px;
+    border-radius: 4px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.btn-move { background-color: #36b9cc; } /* 청록색 */
+.btn-move:hover { background-color: #2c9faf; }
+
+.btn-exclude { background-color: #858796; } /* 회색 */
+.btn-exclude:hover { background-color: #60616f; }
+
+/* 리스트 아이템 레이아웃 수정 */
+.emp-item {
+    justify-content: space-between; /* 양쪽 정렬 */
 }
