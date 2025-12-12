@@ -35,7 +35,7 @@ public interface SalMapper {
     int insertSalaryByMonth(@Param("targetMonth") String month);
 
     // 🔹 관리자용 정렬/월필터 급여 목록
-    List<SalVO> getAdminSalList(Map<String, String> param);
+    List<SalVO> getAdminSalList(Map<String, Object> param);
 
-	
+    Map<String, Object> getAdminSalSummary(Map<String, Object> param);
 }
