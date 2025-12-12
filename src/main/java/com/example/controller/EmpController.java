@@ -4,13 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;   // retireDate 파라미터 타입에서 사용
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -47,21 +46,31 @@ public class EmpController {
     @Autowired
     private SalService salService;
 
-    // 🔹 실제 저장할 디렉터리 (classpath:/static/upload/emp → 빌드 후 target/classes 기준)
+    // ✅ 실제 저장할 디렉터리 (프로젝트 경로 기준)
     private File empUploadDir;
 
+    // (선택) 로그 확인용
+    private String empUploadPath;
+
     /* =========================================================
-       0. 업로드 디렉터리 초기화
+       0. 업로드 디렉터리 초기화 (src/main/resources/static/upload/emp)
        ========================================================= */
     @PostConstruct
-    public void initUploadDir() throws IOException {
+    public void initUploadDir() {
 
-        // classpath:/static/upload/emp/ 실제 경로 얻기
-        ClassPathResource resource = new ClassPathResource("static/upload/emp/");
-        File dir = resource.getFile();   // target/classes/static/upload/emp/
+        empUploadPath = System.getProperty("user.dir")
+                + File.separator + "src"
+                + File.separator + "main"
+                + File.separator + "resources"
+                + File.separator + "static"
+                + File.separator + "upload"
+                + File.separator + "emp";
+
+        File dir = new File(empUploadPath);
 
         if (!dir.exists()) {
-            dir.mkdirs();
+            boolean made = dir.mkdirs();
+            System.out.println("[EmpController] 업로드 폴더 생성 = " + made);
         }
 
         empUploadDir = dir;
@@ -114,7 +123,6 @@ public class EmpController {
         EmpVO emp = empService.selectEmpByEmpNo(empNo);
         boolean canModify = isAdmin(session);
 
-        // 🔹 비고 히스토리 문자열 조회
         String editNoteHistory = empService.getEditNoteHistory(empNo);
         System.out.println("📌 editNoteHistory = \n" + editNoteHistory);
 
@@ -151,7 +159,6 @@ public class EmpController {
             // 1) 사진 처리
             if (empImageFile != null && !empImageFile.isEmpty()) {
 
-                // ✅ (추가) 수정 시에도 파일 검증
                 long maxSize = 2 * 1024 * 1024;
                 if (empImageFile.getSize() > maxSize) {
                     System.out.println("❌ 파일 용량 초과");
@@ -167,26 +174,24 @@ public class EmpController {
                     return "FILE_TYPE";
                 }
 
-                String newFileName = saveEmpImage(empImageFile);  // 새 파일 저장
-                vo.setEmpImage(newFileName);                      // 새 이미지로 교체
+                String newFileName = saveEmpImage(empImageFile);
+                vo.setEmpImage(newFileName);
 
-                // 이전 파일 삭제
                 deleteEmpImage(oldEmpImage);
+
             } else {
-                // 새 파일이 없으면 기존 파일 유지
                 vo.setEmpImage(oldEmpImage);
             }
 
             // 2) EMP 테이블 기본정보 수정
             int cnt = empService.updateEmp(vo);
 
-            // 3) 비고 이력 저장 (EDIT 테이블에 INSERT)
+            // 3) 비고 이력 저장
             if (vo.getENote() != null && !vo.getENote().isBlank()) {
                 String writerName = (login != null ? login.getEmpName() : "SYSTEM");
                 empService.saveEmpEditHistory(vo.getEmpNo(), retireDate, vo.getENote(), writerName);
             }
 
-            // 4) 결과 리턴
             return (cnt > 0) ? "OK" : "FAIL";
 
         } catch (Exception e) {
@@ -210,7 +215,6 @@ public class EmpController {
             return "DENY";
         }
 
-        // 🔹 삭제 전에 사진 파일도 함께 삭제
         EmpVO emp = empService.selectEmpByEmpNo(empNo);
         if (emp != null) {
             deleteEmpImage(emp.getEmpImage());
@@ -235,15 +239,12 @@ public class EmpController {
             return "error/NoAuthPage";
         }
 
-        // 1) 부서 목록 조회 (DEPT 테이블 → DeptVO 리스트)
         List<DeptVO> deptList = deptService.getDeptList();
         System.out.println("📌 사원등록용 부서 개수 = " + (deptList == null ? 0 : deptList.size()));
 
-        // 2) 화면에서 사용할 데이터 세팅
         model.addAttribute("deptList", deptList);
         model.addAttribute("menu", "empNew");
 
-        // 3) 사원 등록 JSP로 이동
         return "emp/empNewForm";
     }
 
@@ -259,22 +260,18 @@ public class EmpController {
 
         System.out.println("📌 /emp/insert 호출, vo = " + vo);
 
-        // 0) 관리자 권한 체크
         if (!isAdmin(session)) {
             System.out.println("❌ 사원 등록 권한 없음");
             return "DENY";
         }
 
         try {
-            /* ===========================================================
-               1) 입사일 미래 날짜 금지 (String → Date 파싱)
-            =========================================================== */
+            // 1) 입사일 미래 날짜 금지
             if (vo.getEmpRegdate() != null && !vo.getEmpRegdate().isEmpty()) {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    Date regDate = sdf.parse(vo.getEmpRegdate());  // "2025-12-10"
-
-                    Date today = new Date(); // 현재 시각
+                    Date regDate = sdf.parse(vo.getEmpRegdate());
+                    Date today = new Date();
 
                     if (regDate.after(today)) {
                         System.out.println("❌ 미래 입사일 오류");
@@ -287,19 +284,15 @@ public class EmpController {
                 }
             }
 
-            /* ===========================================================
-               2) 사진 업로드 검증 (확장자 + 크기 제한)
-            =========================================================== */
+            // 2) 사진 업로드 검증 + 저장
             if (empImageFile != null && !empImageFile.isEmpty()) {
 
-                // 🔹 2MB 제한
                 long maxSize = 2 * 1024 * 1024;
                 if (empImageFile.getSize() > maxSize) {
                     System.out.println("❌ 파일 용량 초과");
                     return "FILE_SIZE";
                 }
 
-                // 🔹 확장자 검사
                 String fileName = empImageFile.getOriginalFilename();
                 String lower = (fileName == null) ? "" : fileName.toLowerCase();
 
@@ -309,36 +302,17 @@ public class EmpController {
                     return "FILE_TYPE";
                 }
 
-                // 🔹 통과 → 저장
                 String savedName = saveEmpImage(empImageFile);
                 vo.setEmpImage(savedName);
             }
 
-            /* ===========================================================
-               3) 사원 정보 DB 저장
-            =========================================================== */
+            // 3) 사원 정보 DB 저장
             int cnt = empService.insertEmp(vo);
             System.out.println("✔ 사원 등록 완료, cnt = " + cnt);
 
             if (cnt <= 0) return "FAIL";
 
-            /* ===========================================================
-               4) 활동 로그 기록 (선택 – 나중에 logService 붙이기)
-            =========================================================== */
-            try {
-                LoginVO login = (LoginVO) session.getAttribute("login");
-                System.out.println(
-                    "📘 LOG : 등록자 = " + (login != null ? login.getEmpNo() : "UNKNOWN")
-                    + ", 대상사번 = " + vo.getEmpNo()
-                );
-                // logService.logNewEmp(login.getEmpNo(), vo.getEmpNo()); // TODO: 나중에 구현
-            } catch (Exception logEx) {
-                System.out.println("⚠ 활동 로그 기록 중 오류 (치명적이지 않음): " + logEx.getMessage());
-            }
-
-            /* ===========================================================
-               5) 신규 사원 → 기본 근태/급여 생성
-            =========================================================== */
+            // 4) 신규 사원 → 기본 근태/급여 생성
             try {
                 monthAttendService.createDefaultForNewEmp(vo.getEmpNo());
                 salService.createBaseSalaryForNewEmp(vo.getEmpNo());
@@ -389,7 +363,7 @@ public class EmpController {
        9. 파일 저장/삭제 헬퍼 메서드
        ========================================================= */
 
-    /** 🔹 사진 저장 – classpath:/static/upload/emp/ 경로 사용 */
+    /** ✅ 사진 저장 – src/main/resources/static/upload/emp 에 저장 */
     private String saveEmpImage(MultipartFile file) throws IOException {
 
         if (file == null || file.isEmpty()) {
@@ -403,9 +377,9 @@ public class EmpController {
             ext = originalName.substring(dot);
         }
 
+        // ✅ UUID + 확장자 (공백/한글 문제 방지)
         String savedName = UUID.randomUUID().toString() + ext;
 
-        // ✅ 실제 저장 위치: classpath:/static/upload/emp/
         if (empUploadDir == null) {
             throw new IllegalStateException("empUploadDir 가 초기화되지 않았습니다.");
         }
@@ -413,13 +387,13 @@ public class EmpController {
         File dest = new File(empUploadDir, savedName);
         file.transferTo(dest);
 
-        return savedName;   // DB에는 파일명만 저장
+        return savedName;
     }
 
-    /** 🔹 사진 삭제 – 업로드 디렉터리에서 파일 제거 */
+    /** ✅ 사진 삭제 */
     private void deleteEmpImage(String fileName) {
         if (fileName == null || fileName.isBlank()) return;
-        if (empUploadDir == null) return;  // 방어 코드
+        if (empUploadDir == null) return;
 
         File f = new File(empUploadDir, fileName);
         if (f.exists()) {

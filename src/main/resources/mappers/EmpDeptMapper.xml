@@ -3,7 +3,7 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
-  <mapper namespace="com.example.repository.DeptMapper">
+  <mapper namespace="com.example.repository.EmpDeptMapper">
   
   <select id="getDeptList" resultType="com.example.domain.DeptVO">
     SELECT

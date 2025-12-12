@@ -187,87 +187,94 @@
                                     </form>
                                 </div>
 
-                                <!-- 사원 목록 테이블 -->
-                                <div class="emp-card">
-                                    <table id="empTable" class="emp-table">
-                                        <thead>
-                                        <tr>
-                                            <th>사원번호</th>
-                                            <th>부서명</th>
-                                            <th>직급</th>
-                                            <th>재직상태</th>
-                                            <th>이름</th>
-                                        </tr>
-                                        </thead>
+									<!-- 사원 목록 테이블 -->
+									<div class="emp-card">
+										<table id="empTable" class="emp-table" style="width: 100%;">
 
-                                        <tbody>
-                                        <c:forEach var="emp" items="${empList}">
-                                            <%-- 상태별 배지 클래스 결정 --%>
-                                            <c:set var="statusClass" value="status-etc" />
-                                            <c:choose>
-                                                <c:when test="${emp.statusNo == 1 or emp.statusNo == 7}">
-                                                    <c:set var="statusClass" value="status-active" />
-                                                </c:when>
-                                                <c:when test="${emp.statusNo == 0}">
-                                                    <c:set var="statusClass" value="status-retired" />
-                                                </c:when>
-                                                <c:when test="${emp.statusNo == 2 or emp.statusNo == 3}">
-                                                    <c:set var="statusClass" value="status-leave" />
-                                                </c:when>
-                                                <c:when test="${emp.statusNo == 6}">
-                                                    <c:set var="statusClass" value="status-intern" />
-                                                </c:when>
-                                            </c:choose>
+											<colgroup>
+												<col style="width: 15%;"><!-- 사원번호 -->
+												<col style="width: 20%;"><!-- 부서명 -->
+												<col style="width: 20%;"><!-- 직급 -->
+												<col style="width: 25%;"><!-- 재직상태 -->
+												<col style="width: 20%;"><!-- 이름 -->
+											</colgroup>
 
-                                            <tr class="emp-row" data-empno="${emp.empNo}">
-                                                <!-- 1) 사원번호 -->
-                                                <td>${emp.empNo}</td>
+											<thead>
+												<tr>
+													<th>사원번호</th>
+													<th>부서명</th>
+													<th>직급</th>
+													<th>재직상태</th>
+													<th>이름</th>
+												</tr>
+											</thead>
 
-                                                <!-- 2) 부서명 -->
-                                                <td>${emp.deptName}</td>
+											<tbody>
+												<c:forEach var="emp" items="${empList}">
+													<%-- 상태별 배지 클래스 결정 --%>
+													<c:set var="statusClass" value="status-etc" />
+													<c:choose>
+														<c:when test="${emp.statusNo == 1 or emp.statusNo == 7}">
+															<c:set var="statusClass" value="status-active" />
+														</c:when>
+														<c:when test="${emp.statusNo == 0}">
+															<c:set var="statusClass" value="status-retired" />
+														</c:when>
+														<c:when test="${emp.statusNo == 2 or emp.statusNo == 3}">
+															<c:set var="statusClass" value="status-leave" />
+														</c:when>
+														<c:when test="${emp.statusNo == 6}">
+															<c:set var="statusClass" value="status-intern" />
+														</c:when>
+													</c:choose>
 
-                                                <!-- 3) 직급 -->
-                                                <td>${emp.gradeName}</td>
+													<tr class="emp-row" data-empno="${emp.empNo}">
+														<!-- 1) 사원번호 -->
+														<td>${emp.empNo}</td>
 
-                                                <!-- 4) 재직상태 배지 -->
-                                                <td>
-                                                    <span class="status-badge ${statusClass}">
-                                                        ${emp.statusName}
-                                                    </span>
-                                                </td>
+														<!-- 2) 부서명 -->
+														<td>${emp.deptName}</td>
 
-                                                <!-- 5) 이름 + 아바타 -->
-                                                <td>
-                                                    <div class="emp-name-cell">
-                                                        <div class="emp-avatar">
-                                                            <c:choose>
-                                                                <%-- 사진이 있으면 사진 사용 --%>
-                                                                <c:when test="${not empty emp.empImage}">
-                                                                    <img src="${pageContext.request.contextPath}/upload/emp/${emp.empImage}"
-                                                                         alt="${emp.empName}">
-                                                                </c:when>
-                                                                <%-- 없으면 이름 첫 글자 --%>
-                                                                <c:otherwise>
-                                                                    <c:out value="${fn:substring(emp.empName, 0, 1)}" />
-                                                                </c:otherwise>
-                                                            </c:choose>
-                                                        </div>
-                                                        <span class="emp-name-text">${emp.empName}</span>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </c:forEach>
+														<!-- 3) 직급 -->
+														<td>${emp.gradeName}</td>
 
-                                        <c:if test="${empty empList}">
-                                            <tr class="emp-empty-row">
-                                                <td colspan="5">조회된 사원 정보가 없습니다.</td>
-                                            </tr>
-                                        </c:if>
-                                        </tbody>
-                                    </table>
-                                </div>
+														<!-- 4) 재직상태 배지 -->
+														<td><span class="status-badge ${statusClass}">
+																${emp.statusName} </span></td>
 
-                                <!-- DataTables 페이지네이션 삽입 공간 -->
+														<!-- 5) 이름 + 아바타 -->
+														<td>
+															<div class="emp-name-cell">
+																<div class="emp-avatar">
+																	<c:choose>
+																		<%-- 사진이 있으면 사진 사용 --%>
+																		<c:when test="${not empty emp.empImage}">
+																			<img
+																				src="${pageContext.request.contextPath}/upload/emp/${emp.empImage}"
+																				alt="${emp.empName}">
+																		</c:when>
+																		<%-- 없으면 이름 첫 글자 --%>
+																		<c:otherwise>
+																			<c:out value="${fn:substring(emp.empName, 0, 1)}" />
+																		</c:otherwise>
+																	</c:choose>
+																</div>
+																<span class="emp-name-text">${emp.empName}</span>
+															</div>
+														</td>
+													</tr>
+												</c:forEach>
+
+												<c:if test="${empty empList}">
+													<tr class="emp-empty-row">
+														<td colspan="5">조회된 사원 정보가 없습니다.</td>
+													</tr>
+												</c:if>
+											</tbody>
+										</table>
+									</div>
+
+									<!-- DataTables 페이지네이션 삽입 공간 -->
                                 <div class="emp-pagination-container"></div>
 
                             </div>
@@ -293,13 +300,20 @@
 
                 </div>
                 <!-- end content-wrapper -->
+             
 
             </div>
-        </main>
+				<script>
+					$(window).on('resize', function() {
+						$('#empTable').DataTable().columns.adjust();
+					});
+				</script>
+			</main>
 
         <!-- 푸터 -->
         <jsp:include page="../common/footer.jsp" />
     </div>
+
 
 </div>
 
