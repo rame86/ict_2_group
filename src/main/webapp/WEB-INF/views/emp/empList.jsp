@@ -75,28 +75,32 @@
         });
 
         /* =========================================================
-           🔹 [추가] 조직도에서 넘어왔을 때 자동 선택 로직
-           ========================================================= */
-        const urlParams = new URLSearchParams(window.location.search);
-        const autoSelectEmpNo = urlParams.get('autoSelectEmpNo');
+         URL 파라미터 처리 (사번 자동선택 OR 키워드 검색)
+        ========================================================= */
+     const urlParams = new URLSearchParams(window.location.search);
+     
+     const autoSelectEmpNo = urlParams.get('autoSelectEmpNo');
+     const keywordParam    = urlParams.get('keyword'); 
 
-        if (autoSelectEmpNo) {
-            // 1. 해당 사번으로 테이블 검색 (필터링)
-            table.search(autoSelectEmpNo).draw();
+     // 1) 키워드(부서명)가 넘어왔을 경우 -> 자동 검색
+     if (keywordParam) {
+         $('input[name="keyword"]').val(keywordParam); // 검색창에 표시
+         table.search(keywordParam).draw();           // 테이블 필터링 실행
+     }
+     
+     // 2) 사번(autoSelectEmpNo)이 넘어왔을 경우 -> 검색 후 클릭
+     else if (autoSelectEmpNo) {
+         table.search(autoSelectEmpNo).draw();
+         
+         const targetRow = $('#empTable tbody tr.emp-row').first();
+         if (targetRow.length > 0) {
+             // 필요하다면 검색창에도 값 입력
+             // $('input[name="keyword"]').val(autoSelectEmpNo); 
+             targetRow.trigger('click');
+         }
+     }
 
-            // 2. 검색 결과가 그려진 후 첫 번째 행 자동 클릭
-            // (DataTables는 draw가 동기적으로 처리되지만 DOM 반영 보장을 위해 약간의 딜레이나 콜백이 안전할 수 있음. 보통은 바로 실행됨)
-            const targetRow = $('#empTable tbody tr.emp-row').first();
-            
-            if (targetRow.length > 0) {
-                // 검색창에도 사번 표시 (선택사항)
-                $('input[name="keyword"]').val(autoSelectEmpNo);
-                
-                // 클릭 트리거
-                targetRow.trigger('click');
-            }
-        }
-    });
+ });
 </script>
 
 
