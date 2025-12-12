@@ -68,7 +68,8 @@
 
                                     <!-- 안내 문구 -->
                                     <p class="photo-help-text">
-                                        * jpg, jpeg, png, gif 파일만 업로드 가능 (최대 2MB)
+                                        * jpg, jpeg, png, gif 파일만 업로드 가능 <br>
+                                        (최대 2MB)
                                     </p>
                                 </div>
 

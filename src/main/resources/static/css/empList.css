@@ -647,9 +647,9 @@ table.dataTable thead th.sorting_desc:after {
 
 /* 화면이 커져도 너무 커 보이지 않게 브레이크 */
 .content-wrapper {
-  padding: 24px 32px;
+  padding: 0 0;
   max-width: 1440px;   /* 16:9에서 안정적 (더 넓히고 싶으면 1520~1600) */
-  margin: 0 auto;
+  margin: 0;
 }
 
 /* ✅ 좌(목록) / 우(인사카드) */
