@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.example.domain.DeptVO;
 
 @Mapper
-public interface DeptMapper{
+public interface EmpDeptMapper{
 	
 	
 	List<DeptVO> getDeptList();

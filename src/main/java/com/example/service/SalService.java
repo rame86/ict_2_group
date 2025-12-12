@@ -17,7 +17,10 @@ public interface SalService {
     int createSalaryByMonth(String month);
 
     // 관리자용 급여 목록 (월 필터 + 정렬)
-    List<SalVO> getAdminSalList(Map<String, String> param);
+    List<SalVO> getAdminSalList(Map<String, Object> param);
 
 	void createBaseSalaryForNewEmp(String empNo)throws Exception;
+	
+	Map<String, Object> getAdminSalSummary(Map<String, Object> param);
+
 }

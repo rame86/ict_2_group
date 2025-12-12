@@ -1,28 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-  
-  <mapper namespace="com.example.repository.DeptMapper">
-  
-  <select id="getDeptList" resultType="com.example.domain.DeptVO">
-    SELECT
-        DEPT_NO         AS deptNo,
-        MANAGER_EMP_NO  AS managerEmpNo,
-        DEPT_NAME       AS deptName,
-        NVL(PARENT_DEPT_NO, 0) AS myParentDeptNo,
-        DEPT_ADDR       AS deptAddr,
-        DEPT_PHONE      AS deptPhone
-    FROM DEPT
-    ORDER BY DEPT_NO
-</select>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  </mapper>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.repository.DeptDAO">
+
+    <select id="selectAllDeptList" resultType="DeptVO">
+        SELECT 
+            d.DEPT_NO, 
+            d.DEPT_NAME, 
+            d.PARENT_DEPT_NO, 
+            d.MANAGER_EMP_NO,
+            e.EMP_NAME AS managerName,
+            e.EMP_IMAGE AS managerImage,
+            e.JOB_TITLE AS managerJobTitle
+        FROM DEPT d
+        LEFT JOIN EMP e ON d.MANAGER_EMP_NO = e.EMP_NO
+        ORDER BY d.DEPT_NO ASC
+    </select>
+
+    <select id="selectEmpListByDept" parameterType="int" resultType="EmpVO">
+        SELECT 
+            EMP_NO, 
+            EMP_NAME, 
+            EMP_IMAGE, 
+            JOB_TITLE, 
+            DEPT_NO
+        FROM EMP
+        WHERE DEPT_NO = #{deptNo}
+        ORDER BY EMP_NAME ASC
+    </select>
+
+</mapper>

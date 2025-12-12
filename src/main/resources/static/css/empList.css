@@ -32,17 +32,17 @@ html, body {
 /* =========================================
    🔹 공통 레이아웃
    ========================================= */
-
+/* 
 table.emp-table thead th {
     text-align: center !important;
-}
+} */
 
 /* 페이지 전체 내부 여백 + 세로 레이아웃 */
+
 .content-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 24px;           /* 제목 ↔ 본문 간격 */
+  padding: 24px 32px;
+  max-width: 1600px;   /* ⭐ 핵심 */
+  margin: 0 auto;     /* 가운데 정렬 */
 }
 
 /* 상단 제목 영역 */
@@ -69,7 +69,7 @@ table.emp-table thead th {
     border: 1px solid #ddd;
     padding: 6px 8px;
     background-color: #fff;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 1.4;
 }
 
@@ -123,44 +123,6 @@ table.emp-table thead th {
     background: #2e59d9;
 }
 
-/* =========================================
-   🔹 사원 목록 + 인사카드 2단 레이아웃
-   ========================================= */
-
-/* 전체 2단 레이아웃 컨테이너 – 폭 고정 */
-.emp-wrapper {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
-   /*  margin-top: 15px; */
-
-    max-width: 1200px;
-    width: 100%;
-}
-
-/* 왼쪽 영역 : 제목 포함 + 아래 내용 */
-.emp-list-area {
-    flex: 0 0 60%;
-    padding-left: 150px;
-}
-
-/* 제목만 다시 왼쪽으로 당기기 */
-.emp-list-area .page-header {
-    margin-left: -150px;
-}
-
-/* 오른쪽 인사카드 영역 전체 */
-.emp-detail-area {
-    margin-top: 50px;
-    flex: 0 0 800px;
-    max-width: 800px;
-    min-width: 800px;
-    background: #ffffff;
-    border-radius: 24px;
-    padding: 24px 28px;
-    border: 1px solid #e3e6f0;
-    box-shadow: 0 0.15rem 1.75rem rgba(58,59,69,.15);
-}
 
 /* 처음 진입했을 때 안내 문구 */
 #emp-detail-placeholder {
@@ -209,7 +171,7 @@ table.emp-table thead th {
 .emp-table {
     width: 100%;
     border-collapse: separate;
-    font-size: 16px;
+    font-size: 14px;
     table-layout: fixed;
 }
 
@@ -262,7 +224,7 @@ table.emp-table thead th {
     justify-content: center;
     align-items: center;
     gap: 4px;
-    font-size: 15px;
+    font-size: 14px;
 }
 
 /* 이전/다음, 페이지 번호 공통 스타일 */
@@ -300,7 +262,7 @@ table.emp-table thead th {
    ========================================= */
 .emp-card {
     width: 100%;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 /* 상단 : 사진 + 기본정보 */
@@ -320,14 +282,14 @@ table.emp-table thead th {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 13px;
     color: #858796;
     background: #f8f9fc;
 }
 
 /* 기본정보 텍스트 */
 .emp-basic-info h3 {
-    font-size: 18px;
+    font-size: 14px;
     margin-bottom: 4px;
     color: #5a5c69;
 }
@@ -485,6 +447,7 @@ table.emp-table thead th {
     border: 1px solid #e3e6f0;
     border-radius: 18px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    max-width: 920px;
 }
 
 .emp-list-card .search-area {
@@ -513,7 +476,7 @@ table.emp-table thead th {
     min-width: 52px;
     padding: 2px 10px;
     border-radius: 999px;          /* pill 형태 */
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     text-align: center;
     letter-spacing: -0.2px;
@@ -607,7 +570,7 @@ table.emp-table thead th {
     border-radius: 999px;
     background: #f2f4ff;
     color: #4e5a7d;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .emp-summary-item strong {
@@ -670,3 +633,126 @@ table.dataTable thead th.sorting_desc:after {
     content: "▼";
     color: #4e73df;
 }
+
+.emp-layout {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;  /* ⭐ 비율 조정 */
+  gap: 20px;
+  align-items: start;
+}
+
+/* =========================================
+   ✅ empList 반응형 최종 레이아웃 (16:9 기준 “적당”)
+   ========================================= */
+
+/* 화면이 커져도 너무 커 보이지 않게 브레이크 */
+.content-wrapper {
+  padding: 24px 32px;
+  max-width: 1440px;   /* 16:9에서 안정적 (더 넓히고 싶으면 1520~1600) */
+  margin: 0 auto;
+}
+
+/* ✅ 좌(목록) / 우(인사카드) */
+.emp-wrapper {
+  display: grid;
+  grid-template-columns: minmax(520px, 1.4fr) minmax(360px, 1fr);
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+  max-width: none;      /* 기존 max-width 무력화 */
+}
+
+/* ✅ 창이 좁아지면 1열로 */
+@media (max-width: 1100px) {
+  .emp-wrapper {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 왼쪽 카드(목록) 여백 조정 */
+.emp-list-card {
+  margin-top: 36px;          /* 기존 50px → 살짝 줄여서 답답함 감소 */
+  padding: 14px 18px 16px;   /* 기존보다 살짝 슬림 */
+}
+
+/* 오른쪽 카드(상세) - 고정 800px 제거 */
+.emp-detail-area {
+  margin-top: 36px;          /* 왼쪽이랑 높이 맞추기 */
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 18px 20px;        /* 기존 24/28 → 살짝 줄여서 커 보임 완화 */
+  border: 1px solid #e3e6f0;
+  box-shadow: 0 0.15rem 1.75rem rgba(58,59,69,.15);
+}
+
+/* =========================================
+   ✅ 표가 너무 커 보이는 문제 해결 (밀도 조절)
+   ========================================= */
+
+/* 검색 input: 16:9에서 적당한 길이 */
+.search-area input[type="text"] {
+  width: clamp(260px, 34vw, 420px);
+  font-size: 13px;
+  padding: 6px 12px;
+}
+
+/* 테이블 기본 폰트/패딩 줄이기 */
+.emp-table {
+  width: 100%;
+  border-collapse: separate;
+  table-layout: fixed;
+  font-size: 14px;          /* 기존 16px → 14px */
+}
+
+.emp-table thead th {
+  padding: 10px 8px;        /* 기존 12px → 10px */
+  font-size: 13px;
+}
+
+.emp-table tbody td {
+  padding: 9px 8px;         /* 기존 12px → 9px */
+  font-size: 14px;
+}
+
+/* DataTables 사용 시 width 깨짐 방지 */
+table.dataTable { width: 100% !important; }
+
+/* 표가 넓어질 때 레이아웃 안 깨지게: 표만 스크롤 */
+.emp-list-card .emp-card {
+  overflow-x: auto;
+}
+
+/* =========================================
+   ✅ (선택) 오른쪽 카드가 너무 길게 느껴지면
+   ========================================= */
+.emp-detail-area .emp-card {
+  padding: 18px 22px 72px;  /* 기존 24/32/80 → 약간 슬림 */
+}
+
+/* ✅ DataTables가 덮어써도 헤더/바디 가운데 정렬 유지 */
+table#empTable.dataTable thead th,
+table#empTable.dataTable tbody td {
+  text-align: center !important;
+  vertical-align: middle;
+}
+
+/* 이름 셀은 구조가 flex라 중앙정렬이 따로 필요할 수 있어요 */
+table#empTable.dataTable td:last-child .emp-name-cell {
+  justify-content: center; /* 이름+아바타를 가운데로 */
+}
+
+/* ✅ 셀 padding 줄이기 */
+table#empTable.dataTable thead th {
+  padding: 8px 6px !important;
+  font-size: 13px;
+}
+
+table#empTable.dataTable tbody td {
+  padding: 8px 6px !important;
+  font-size: 14px;
+}
+
