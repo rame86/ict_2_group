@@ -4,30 +4,85 @@
 
 <mapper namespace="com.example.repository.DeptDAO">
 
-    <select id="selectAllDeptList" resultType="DeptVO">
-        SELECT 
-            d.DEPT_NO, 
-            d.DEPT_NAME, 
-            d.PARENT_DEPT_NO, 
-            d.MANAGER_EMP_NO,
-            e.EMP_NAME AS managerName,
-            e.EMP_IMAGE AS managerImage,
-            e.JOB_TITLE AS managerJobTitle
-        FROM DEPT d
-        LEFT JOIN EMP e ON d.MANAGER_EMP_NO = e.EMP_NO
-        ORDER BY d.DEPT_NO ASC
-    </select>
+	<select id="selectAllDeptList" resultType="DeptVO">
+		SELECT
+		d.DEPT_NO,
+		d.DEPT_NAME,
+		d.PARENT_DEPT_NO,
+		d.MANAGER_EMP_NO,
+		e.EMP_NAME AS
+		managerName,
+		e.EMP_IMAGE AS managerImage,
+		e.JOB_TITLE AS managerJobTitle
+		FROM DEPT d
+		LEFT JOIN EMP
+		e ON d.MANAGER_EMP_NO = e.EMP_NO
+		ORDER BY
+		d.DEPT_NO ASC
+	</select>
 
-    <select id="selectEmpListByDept" parameterType="int" resultType="EmpVO">
-        SELECT 
-            EMP_NO, 
-            EMP_NAME, 
-            EMP_IMAGE, 
-            JOB_TITLE, 
-            DEPT_NO
-        FROM EMP
-        WHERE DEPT_NO = #{deptNo}
-        ORDER BY EMP_NAME ASC
-    </select>
+	<select id="selectEmpListByDept" parameterType="int" resultType="EmpVO">
+		SELECT
+		EMP_NO,
+		EMP_NAME,
+		EMP_IMAGE,
+		JOB_TITLE,
+		DEPT_NO
+		FROM EMP
+		WHERE DEPT_NO = #{deptNo}
+		ORDER BY EMP_NAME ASC
+	</select>
+
+	<insert id="insertDept" parameterType="com.example.domain.DeptVO">
+		INSERT INTO DEPT (
+		DEPT_NO,
+		DEPT_NAME,
+		PARENT_DEPT_NO,
+		MANAGER_EMP_NO,
+		DEPT_ADDR,
+		DEPT_PHONE
+		) VALUES (
+		#{deptNo}, #{deptName}, #{parentDeptNo, jdbcType=NUMERIC},
+		#{managerEmpNo,
+		jdbcType=NUMERIC},
+		#{deptAddr, jdbcType=VARCHAR},
+		#{deptPhone, jdbcType=VARCHAR}
+		)
+	</insert>
+
+	<update id="updateEmpDeptNull" parameterType="int">
+		UPDATE EMP
+		SET
+		DEPT_NO = 0
+		WHERE DEPT_NO = #{deptNo}
+	</update>
+
+	<delete id="deleteDept" parameterType="int">
+		DELETE FROM DEPT
+		WHERE
+		DEPT_NO = #{deptNo}
+	</delete>
+
+	<update id="updateEmpDept" parameterType="map">
+		UPDATE EMP
+		SET DEPT_NO = #{deptNo}
+		WHERE EMP_NO = #{empNo}
+	</update>
+
+	<insert id="insertEditLog" parameterType="map">
+		INSERT INTO EDIT (
+		EDIT_NO,
+		EMP_NO,
+		WRITER,
+		E_NOTE,
+		UPDATE_DAY )
+		VALUES (
+		EDIT_SEQ.NEXTVAL,
+		#{empNo},
+		#{writer},
+		#{eNote},
+		SYSDATE
+		)
+	</insert>
 
 </mapper>

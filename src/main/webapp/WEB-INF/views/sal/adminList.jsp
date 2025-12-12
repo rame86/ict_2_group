@@ -1,7 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!DOCTYPE html>
 <html>
@@ -33,10 +32,14 @@
 		<div id="layoutSidenav_content">
 			<main>
 				<div class="container-fluid px-4">
+				<div class="sal-admin-page">
 
-					<h3 class="mt-4">급여 관리 관리자모드</h3>
+					<div class="page-title-wrap">
+						<h3 class="page-title">[관리자모드] 급여 관리</h3>
+					</div>
 					<br>
-					<h4>급여 명세 목록</h4>
+					<h4 class ="page-mini">급여 명세 목록</h4>
+					
 
 					<!-- ✅ 1) 상단 요약 카드 -->
 					<div class="sal-summary-row">
@@ -64,7 +67,7 @@
 						</div>
 
 						<!-- 검색 조건 사원 수 -->
-						<div class="summary-card js-summary-card" data-filter="all">
+						<div class="summary-card js-summary-card" data-filter="overtime">
 							<div class="summary-label">검색 조건에 해당하는 사원 수</div>
 							<div class="summary-value">
 								<fmt:formatNumber value="${summary.empCount}" pattern="#,##0" />
@@ -73,7 +76,8 @@
 							<div class="summary-sub">필터에 포함된 직원 인원</div>
 						</div>
 					</div>
-
+					<br>
+					
 					<!-- ✅ 2) 검색/필터 영역 (월 + 부서 + 초과근무 + 엑셀 버튼 + Search...) -->
 					<div class="sal-filter-row">
 
@@ -119,8 +123,8 @@
 							</label> --%>
 
 							<!-- 검색 버튼 -->
-							<button type="submit" class="btn btn-primary btn-sm">검색
-							</button>
+							<button type="submit" class="btn btn-search btn-sm">검색</button>
+
 						</form>
 
 						<!-- 오른쪽: 엑셀 다운로드 + DataTables 검색창 자리 -->
@@ -134,14 +138,14 @@
 								<c:param name="excludeRetired" value="${excludeRetired}" />
 							</c:url>
 
-							<button type="button" class="btn btn-outline-secondary btn-sm"
-								onclick="location.href='${exportUrl}'">엑셀 다운로드</button>
+							<button type="button" class="btn btn-excel btn-sm" 
+							onclick="location.href='${exportUrl}'">엑셀 다운로드</button>
+
 
 							<!-- DataTables 검색창이 JS에서 여기로 append 됨 -->
 							<div class="sal-top-right"></div>
 						</div>
 					</div>
-
 					<!-- =========================
                      3) 테이블 영역
                    ========================= -->
@@ -205,8 +209,10 @@
 
 			<!-- 푸터 -->
 			<jsp:include page="../common/footer.jsp" />
+			</div>
 		</div>
 	</div>
+	
 
 	<!-- DataTables JS -->
 	<script
@@ -215,79 +221,84 @@
 	<c:if test="${not empty salList}">
 		<script>
 			$(function() {
-
-				var table = $('#salTable').DataTable({
-					ordering : true,
-					order : [ [ 0, 'desc' ], [ 1, 'asc' ] ],
-					paging : true,
-					pageLength : 10,
-					lengthChange : false,
-					searching : true,
-					info : false,
-					columnDefs : [ {
-						orderable : false,
-						targets : -1
-					} ],
-					language : {
-						search : "",
-						emptyTable : "표시할 급여 데이터가 없습니다.",
-						paginate : {
-							previous : "이전",
-							next : "다음"
-						}
-					}
-				});
-
-				// 🔹 DataTables 검색창 → 오른쪽 영역으로 이동
-				var filter = $('#salTable_wrapper .dataTables_filter');
-				filter.appendTo('.sal-filter-right .sal-top-right');
-				filter.addClass('sal-search-box');
-				$('.dataTables_filter input').attr('placeholder', 'Search...');
-
-				// ✅ 요약 카드 클릭 → 필터 적용 이동
-				$('.js-summary-card')
-						.on(
-								'click',
-								function() {
-
-									const filterType = $(this).data('filter'); // all / overtime 등
-									const baseUrl = '${pageContext.request.contextPath}/sal/admin/list';
-									const params = new URLSearchParams();
-
-									// 🔹 현재 필터 값 유지
-									const month = $('input[name="month"]')
-											.val();
-									const deptNo = $('select[name="deptNo"]')
-											.val();
-									const onlyOvertime = $(
-											'input[name="onlyOvertime"]').is(
-											':checked');
-									const excludeRetired = $(
-											'input[name="excludeRetired"]').is(
-											':checked');
-
-									if (month)
-										params.append('month', month);
-									if (deptNo)
-										params.append('deptNo', deptNo);
-									if (excludeRetired)
-										params.append('excludeRetired', 'true');
-
-									// 🔹 카드 종류별 추가 필터
-									if (filterType === 'overtime') {
-										params.append('onlyOvertime', 'true');
-									} else {
-										// 기존 체크 유지
-										if (onlyOvertime)
-											params.append('onlyOvertime',
-													'true');
+				$('#salTable')
+						.DataTable(
+								{
+									ordering : true,
+									order : [ [ 0, 'desc' ], [ 1, 'asc' ] ],
+									paging : true,
+									pageLength : 10,
+									lengthChange : false,
+									searching : true,
+									info : false,
+									columnDefs : [ {
+										orderable : false,
+										targets : -1
+									} ],
+									language : {
+										search : "",
+										emptyTable : "표시할 급여 데이터가 없습니다.",
+										paginate : {
+											previous : "이전",
+											next : "다음"
+										}
+									},
+									initComplete : function() {
+										var filter = $('#salTable_wrapper .dataTables_filter');
+										filter
+												.appendTo('.sal-filter-right .sal-top-right');
+										filter.addClass('sal-search-box');
+										$('.dataTables_filter input').attr(
+												'placeholder', 'Search...');
 									}
-									// 이동
-									location.href = baseUrl + '?'
-											+ params.toString();
 								});
 			});
 		</script>
 	</c:if>
+
+	<script>
+		$(function() {
+			console.log("✅ card script loaded");
+
+			$('.js-summary-card')
+					.on(
+							'click',
+							function() {
+								console.log("✅ card clicked", $(this).data(
+										'filter'));
+
+								const filterType = $(this).data('filter');
+								const baseUrl = '${pageContext.request.contextPath}/sal/admin/list';
+								const params = new URLSearchParams();
+
+								const month = $('input[name="month"]').val();
+								const deptNo = $('select[name="deptNo"]').val();
+								const onlyOvertime = $(
+										'input[name="onlyOvertime"]').is(
+										':checked');
+								const excludeRetired = $(
+										'input[name="excludeRetired"]').is(
+										':checked');
+
+								if (month)
+									params.append('month', month);
+								if (deptNo)
+									params.append('deptNo', deptNo);
+								if (excludeRetired)
+									params.append('excludeRetired', 'true');
+
+								if (filterType === 'overtime') {
+									params.append('onlyOvertime', 'true');
+								} else {
+									if (onlyOvertime)
+										params.append('onlyOvertime', 'true');
+								}
+
+								location.href = baseUrl + '?'
+										+ params.toString();
+							});
+		});
+	</script>
+
 </body>
 </html>

@@ -12,4 +12,10 @@ public interface DeptService {
 	public List<DeptVO> getOrgChartData();
 
 	public List<EmpVO> getEmployeesByDept(int deptNo);
+
+	void createDept(DeptVO vo);
+
+	void removeDept(int deptNo);
+	
+	void changeEmpDept(int empNo, int newDeptNo, String writerEmpNo, String note);
 }
