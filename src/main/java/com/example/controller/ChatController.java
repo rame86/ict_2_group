@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import com.example.domain.AlertVO;
 import com.example.domain.LoginVO;
 import com.example.domain.MessageVO;
-import com.example.repository.AlertVO;
 import com.example.service.MessageService;
 import com.example.service.NotificationService;
 
