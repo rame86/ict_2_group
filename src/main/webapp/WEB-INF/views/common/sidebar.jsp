@@ -4,7 +4,8 @@
 
 <%
 String menu = (String) request.getAttribute("menu");
-if (menu == null) menu = "";
+if (menu == null)
+	menu = "";
 %>
 
 <!DOCTYPE html>
@@ -25,8 +26,8 @@ if (menu == null) menu = "";
 							<i class="fas fa-tachometer-alt"></i>
 						</div> 마이페이지
 					</a>
-					
-					<div class="sb-sidenav-menu-heading">게시판</div>					
+
+					<div class="sb-sidenav-menu-heading">게시판</div>
 					<a class="nav-link" href="/board/getNoticeBoardList">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-table"></i>
@@ -36,8 +37,8 @@ if (menu == null) menu = "";
 							<i class="fas fa-table"></i>
 						</div> 자유 게시판
 					</a>
-					
-					
+
+
 					<div class="sb-sidenav-menu-heading">메인 메뉴</div>
 					<%--근태 관리 --%>
 					<a class="nav-link" href="/attend/attend">
@@ -59,7 +60,7 @@ if (menu == null) menu = "";
 					</a>
 
 					<div
-						class="collapse <%= (menu.equals("emp") || menu.equals("empNew")) ? "show" : "" %>"
+						class="collapse <%=(menu.equals("emp") || menu.equals("empNew")) ? "show" : ""%>"
 						id="collapseEmp" aria-labelledby="headingOne"
 						data-bs-parent="#sidenavAccordion">
 
@@ -75,12 +76,10 @@ if (menu == null) menu = "";
 
 
 					<%--부서 관리 --%>
-					<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-						aria-expanded="false" aria-controls="collapsePages">
+					<a class="nav-link collapsed" href="/dept/dept">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-book-open"></i>
-						</div> 부서관리
-						<div class="sb-sidenav-collapse-arrow"></div>
+						</div> 부서관리						
 					</a>
 
 					<%--결재 관리 --%>
@@ -95,16 +94,22 @@ if (menu == null) menu = "";
 						</div>
 					</a>
 					<div
-						class="collapse <%=menu.equals("status") || menu.equals("receive") || menu.equals("send") || menu.equals("finish") || menu.equals("create") ? "show" : ""%>"
+						class="collapse <%=menu.equals("status") || menu.equals("receive") || menu.equals("send") || menu.equals("finish")
+		|| menu.equals("create") ? "show" : ""%>"
 						id="collapseApproval" aria-labelledby="headingOne"
 						data-bs-parent="#sidenavAccordion">
 						<nav class="sb-sidenav-menu-nested nav">
-							<a class="nav-link  <%=menu.equals("status") ? "active" : ""%>" href="/approve/statusList">결재 현황</a>
-							<a class="nav-link <%=menu.equals("receive") ? "active" : ""%>" href="/approve/receiveList">
-							결재 할 문서 <span id="badgeId" class="notification-badge" style="display : none;"></span></a>
-							<a class="nav-link <%=menu.equals("send") ? "active" : ""%>" href="/approve/sendList">결재 받을 문서</a>
-							<a class="nav-link <%=menu.equals("finish") ? "active" : ""%>" href="/approve/finishList">결재 완료 문서</a>
-							<a class="nav-link <%=menu.equals("create") ? "active" : ""%>" href="/approve/createForm">문서 작성 하기</a>
+							<a class="nav-link  <%=menu.equals("status") ? "active" : ""%>"
+								href="/approve/statusList">결재 현황</a> <a
+								class="nav-link <%=menu.equals("receive") ? "active" : ""%>"
+								href="/approve/receiveList"> 결재 할 문서 <span id="badgeId"
+								class="notification-badge" style="display: none;"></span></a> <a
+								class="nav-link <%=menu.equals("send") ? "active" : ""%>"
+								href="/approve/sendList">결재 받을 문서</a> <a
+								class="nav-link <%=menu.equals("finish") ? "active" : ""%>"
+								href="/approve/finishList">결재 완료 문서</a> <a
+								class="nav-link <%=menu.equals("create") ? "active" : ""%>"
+								href="/approve/createForm">문서 작성 하기</a>
 						</nav>
 					</div>
 
@@ -115,7 +120,7 @@ if (menu == null) menu = "";
 							<i class="fas fa-columns"></i>
 						</div> 급여관리
 					</a>
-					
+
 				</div>
 			</div>
 			<div class="sb-sidenav-footer">

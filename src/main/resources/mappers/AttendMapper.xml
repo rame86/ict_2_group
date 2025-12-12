@@ -185,10 +185,12 @@
 		SELECT
 		DAY_ATTEND_SEQ.NEXTVAL,
 		E.EMP_NO,
-		'10', NULL, NULL, NULL, SYSDATE, NULL, '결근', TRUNC(SYSDATE) FROM
+		'10', NULL, NULL,
+		NULL, SYSDATE, NULL, '결근', TRUNC(SYSDATE) FROM
 		EMP E
 		WHERE
-		E.STATUS_NO != 99
+		E.STATUS_NO !=
+		99
 		AND
 		E.EMP_NO NOT IN (
 		SELECT
@@ -217,7 +219,14 @@
 		OUT_TIME IS NULL -- 퇴근 시간이 기록되지 않은 경우
 	</update>
 
-
+	<select id="countAttendRecordByDate" parameterType="DayAttendVO"
+		resultType="int">
+		SELECT COUNT(*)
+		FROM DAY_ATTEND
+		WHERE EMP_NO = #{empNo}
+		AND
+		TO_CHAR(DATE_ATTEND, 'YYYY-MM-DD') = #{dateAttend}
+	</select>
 
 
 </mapper>

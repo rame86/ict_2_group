@@ -13,6 +13,11 @@ public class DeptVO {
 	private String deptAddr;
 	private String deptPhone;
 	
+	// 조인을 통해 가져올 부서장 정보
+    private String managerName;     // EMP_NAME
+    private String managerImage;    // EMP_IMAGE (사진 경로)
+    private String managerJobTitle; // JOB_TITLE
+	
 	// approve단계에서 사용할 상위부서번호 정보
 	private String parentDeptNo; // 상위부서의 부서번호
 	private String parentManagerEmpNo; // 상위부서의 부서장번호

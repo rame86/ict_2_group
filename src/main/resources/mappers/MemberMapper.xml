@@ -44,8 +44,7 @@
 		resultType="EmpVO">
 		SELECT *
 		FROM EMP
-		WHERE EMP_NO = #{empNo} AND EMP_NAME =
-		#{empName}
+		WHERE EMP_NO = #{empNo} AND EMP_NAME =	#{empName}
 	</select>
 
 	<select id="KakaoMemberCheck" parameterType="String"
