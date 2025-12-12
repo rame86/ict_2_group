@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.repository.AlertDAO">
+
+	<insert id="insertAlert" parameterType="AlertVO">
+	    <selectKey keyProperty="alertId" resultType="int" order="BEFORE">
+	        SELECT ALERT_SEQ.NEXTVAL FROM DUAL
+	    </selectKey>
+	    INSERT INTO ALERT (
+	        ALERT_ID,
+	        EMP_NO,
+	        LINK_TYPE,
+	        LINK_ID
+	    ) VALUES (
+	        #{alertId}, 
+	        #{empNo},
+	        #{linkType},
+	        #{linkId}
+	    )
+	</insert>
+	
+	<select id="selectLatestAlerts" parameterType="String" resultType="AlertVO">
+	    SELECT 
+	        *
+	    FROM (
+	        SELECT
+	            ALERT_ID AS alertId,
+	            EMP_NO AS empNo,
+	            LINK_TYPE AS linkType,
+	            LINK_ID AS linkId,
+	            CREATED_DATE AS createdDate,
+	            IS_READ AS isRead
+	        FROM 
+	            ALERT
+	        WHERE 
+	            EMP_NO = #{empNo}
+	        ORDER BY 
+	            CREATED_DATE DESC
+	    )
+	    WHERE ROWNUM &lt;= 10
+    </select>
+    
+    <update id="markAllAsRead" parameterType="String">
+	    UPDATE 
+	        ALERT
+	    SET 
+	        IS_READ = 'Y'
+	    WHERE 
+	        EMP_NO = #{empNo}
+	        AND IS_READ = 'N'
+	</update>
+
+	<select id="selectUnreadCount" parameterType="String" resultType="int">
+	    SELECT 
+	        COUNT(ALERT_ID)
+	    FROM 
+	        ALERT
+	    WHERE 
+	        EMP_NO = #{empNo}
+	        AND IS_READ = 'N'
+	</select>
+
+</mapper>
