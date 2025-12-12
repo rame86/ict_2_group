@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class AlertVO {
-	private String alertId;
+	private Integer alertId;
 	private String empNo;
 	private String linkType;
 	private String linkId;

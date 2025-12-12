@@ -10,7 +10,6 @@ function updateSidebarBadge() {
 			badgeElement.hide();
 			$("#approvalIcon").removeClass("icon-notify");
 		}
-		updateHeaderAlertsBadge(waitingCount);
 	});
 }
 
@@ -35,18 +34,25 @@ function getApprovalCount(successCallback) {
 	});
 }
 
-function updateHeaderAlertsBadge(pendingCount) {
-	const badgeElement = $('#alertBadge'); // 헤더 뱃지 ID
-    
-    badgeElement.text(pendingCount > 99 ? '99+' : pendingCount);
-    
-    if (pendingCount > 0) {
-        // 결재는 중요한 알림이므로, bg-warning을 유지하거나 bg-danger 등으로 변경 가능
-        badgeElement.show(); 
-    } else {
-        badgeElement.hide(); 
-    }
-    console.log("✅ 헤더 결재 알림 뱃지 업데이트 완료:", pendingCount);
+function updateHeaderAlertsBadge() {
+	$.ajax({
+		url: '/alert/unreadCount',
+		type: 'GET',
+		success: function(totalCount) { // 통합 알림 개수를 받습니다.
+			const badgeElement = $('#alertBadge'); // 헤더 뱃지 ID
+			badgeElement.text(totalCount > 99 ? '99+' : totalCount);
+			if (totalCount > 0) {
+				badgeElement.show(); 
+			} else {
+				badgeElement.hide(); 
+			}
+			console.log("✅ 헤더 통합 알림 뱃지 업데이트 완료:", totalCount);
+		},
+		error: function(xhr, status, error) {
+			console.error("❌ 헤더 통합 알림 카운트 조회 실패:", status, error);
+			$('#alertBadge').hide(); // 에러 시 숨김
+		}
+	});
 }
 
 // 알람유형에 맞는 아이콘
