@@ -11,4 +11,6 @@ public class ApproveListVO {
 	private String step1ManagerName;
     private String step2ManagerName;
     private String progressStatus;
+    private String completionType;
+    private String docType;
 }

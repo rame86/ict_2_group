@@ -39,7 +39,7 @@
 	        #{memo, jdbcType=VARCHAR},
 	        #{attStatus, jdbcType=VARCHAR}             
 	    )
-</insert>
+	</insert>
 
 	<insert id="insertApprove" parameterType="ApproveVO">
 		INSERT INTO approve(
@@ -320,6 +320,71 @@
 		WHERE A.EMP_NO = #{empNo}
 		) T
 		GROUP BY T.COMPLETION_TYPE
+	</select>
+	
+	<select id="selectWaitingApproveAlerts" resultType="ApproveListVO" parameterType="map">
+		SELECT * FROM (
+			SELECT
+				D.DOC_NO,
+				D.DOC_TITLE,
+				D.DOC_DATE,
+				D.DOC_TYPE, 
+				U.EMP_NAME AS writerName,
+	            
+	            -- 알림 유형 구분을 위해 'WAITING'이라는 고정 필드를 추가 (Java에서 AlertVO.type 결정)
+	            'WAITING' AS completionType 
+	
+			FROM APPROVE A
+			JOIN DOC D ON A.DOC_NO = D.DOC_NO
+			JOIN EMP U ON A.EMP_NO = U.EMP_NO
+			
+			WHERE
+			(
+				(A.STEP1_MANAGER_NO = #{empNo} AND A.STEP1_STATUS = 'W')
+				OR
+				(A.STEP2_MANAGER_NO = #{empNo} AND A.STEP2_STATUS = 'W' AND (A.STEP1_STATUS = 'A' OR A.STEP1_MANAGER_NO IS NULL))
+			)
+			ORDER BY D.DOC_DATE DESC
+		) R
+		<if test="limit != null">
+			WHERE ROWNUM &lt;= #{limit}
+		</if>
+	</select>
+	
+	<select id="selectSendStatusChangeAlerts" resultType="ApproveListVO" parameterType="map">
+		SELECT * FROM (
+			SELECT
+				D.DOC_NO,
+				D.DOC_TITLE,
+				D.DOC_DATE,
+				D.DOC_TYPE, 
+				U.EMP_NAME AS writerName, 
+				
+				-- 최종 상태 구분을 위한 필드 추가 (Java에서 AlertVO.type 결정)
+				CASE
+					WHEN A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R' THEN 'REJECT'
+					ELSE 'FINISH'
+				END AS completionType 
+				
+			FROM APPROVE A
+			JOIN DOC D ON A.DOC_NO = D.DOC_NO
+	        JOIN EMP U ON A.EMP_NO = U.EMP_NO
+			
+			WHERE A.EMP_NO = #{empNo}
+			AND (
+				(A.STEP1_STATUS = 'R' OR A.STEP2_STATUS = 'R') -- 반려
+				OR 
+				(
+					(A.STEP1_STATUS = 'A' AND A.STEP2_STATUS = 'A') 
+					OR 
+					(A.STEP1_MANAGER_NO IS NULL AND A.STEP2_STATUS = 'A')
+				) -- 최종 승인
+			)
+			ORDER BY D.DOC_DATE DESC
+		) RESULT_TABLE
+		<if test="limit != null">
+			WHERE ROWNUM &lt;= #{limit}
+		</if>
 	</select>
 
 </mapper>
