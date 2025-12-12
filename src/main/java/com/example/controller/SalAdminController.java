@@ -35,6 +35,8 @@ public class SalAdminController {
     @Autowired private EmpService empService;
     @Autowired private DeptService deptService;
 
+   
+    
     /** 관리자 여부 */
     private boolean isAdmin(HttpSession session) {
         LoginVO login = (LoginVO) session.getAttribute("login");
@@ -49,10 +51,14 @@ public class SalAdminController {
     public String adminSalList(@RequestParam(required = false) String month,
                                @RequestParam(required = false) String deptNo,
                                @RequestParam(required = false, defaultValue = "false") boolean onlyOvertime,
+                               @RequestParam(required = false, defaultValue = "false") boolean excludeRetired,
+                               @RequestParam(required = false, defaultValue = "false") boolean excludeDeletePlanned,
                                @RequestParam(required = false, defaultValue = "date") String sort,
                                @RequestParam(required = false, defaultValue = "desc") String dir,
                                HttpSession session,
                                Model model) {
+    	
+    	
 
         if (!isAdmin(session)) {
             return "error/NoAuthPage";
@@ -63,6 +69,9 @@ public class SalAdminController {
         param.put("month", month);                 // "2025-11"
         param.put("deptNo", deptNo);               // 부서번호
         param.put("onlyOvertime", onlyOvertime);   // 초과근무자만
+        param.put("excludeRetired", excludeRetired);
+        param.put("excludeDeletePlanned", excludeDeletePlanned);
+
         param.put("sort", sort);                   // empNo / name / dept / date
         param.put("dir", dir);                     // asc / desc
 
@@ -72,6 +81,7 @@ public class SalAdminController {
         // 요약(총/평균/인원)
         Map<String, Object> summary = salService.getAdminSalSummary(param);
         model.addAttribute("summary", summary);
+        
 
         // 부서 목록(필터용)
         List<DeptVO> deptList = deptService.getDeptList();
@@ -83,6 +93,7 @@ public class SalAdminController {
         model.addAttribute("salList", salList);
         model.addAttribute("summary", summary);
         model.addAttribute("deptList", deptList);
+        
 
         // 검색 조건 유지용
         model.addAttribute("searchMonth", month);
@@ -91,13 +102,19 @@ public class SalAdminController {
 
         model.addAttribute("searchDeptNo", deptNo);
         model.addAttribute("onlyOvertime", onlyOvertime);
+        model.addAttribute("excludeRetired", excludeRetired);
+        model.addAttribute("excludeDeletePlanned", excludeDeletePlanned);
+
         model.addAttribute("sort", sort);
         model.addAttribute("dir", dir);
 
         model.addAttribute("menu", "saladmin");
+        
+        log.info("[summary] {}", summary);
 
         // ✅ 카드 있는 JSP로 고정 (너희 프로젝트 파일명에 맞게)
         return "sal/adminList";
+        
     }
 
     /* =========================================================
@@ -131,6 +148,8 @@ public class SalAdminController {
     public void exportAdminSalary(@RequestParam(required = false) String month,
                                   @RequestParam(required = false) String deptNo,
                                   @RequestParam(required = false, defaultValue = "false") boolean onlyOvertime,
+                                  @RequestParam(required = false, defaultValue = "false") boolean excludeRetired,
+                                  @RequestParam(required = false, defaultValue = "false") boolean excludeDeletePlanned,
                                   HttpSession session,
                                   HttpServletResponse response) throws Exception {
 
@@ -143,6 +162,9 @@ public class SalAdminController {
         param.put("month", month);
         param.put("deptNo", deptNo);
         param.put("onlyOvertime", onlyOvertime);
+        param.put("excludeRetired", excludeRetired);
+        param.put("excludeDeletePlanned", excludeDeletePlanned);
+
         // export도 정렬이 필요하면 아래 2줄 추가 가능
         // param.put("sort", "date");
         // param.put("dir", "desc");

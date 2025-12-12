@@ -13,8 +13,7 @@
 		s.EMP_NO AS empNo,
 
 		-- 지급월 라벨: 2025년 11월
-		TO_CHAR(s.SAL_DATE, 'YYYY"년
-		"MM"월"') AS yearMonthLabel,
+		TO_CHAR(s.SAL_DATE, 'YYYY"년 "MM"월"') AS yearMonthLabel,
 
 		s.SAL_BASE AS salBase,
 		NVL(s.SAL_BONUS, 0)
@@ -176,7 +175,8 @@
 		SAL_SEQ.NEXTVAL,
 		T.MONTH_ATTNO,
 		T.EMP_NO,
-		TRUNC(T.MONTH_DATE_ATTEND, 'MM') + 14,  <!-- 매달 15일(=월 시작 + 14일) -->
+		TRUNC(T.MONTH_DATE_ATTEND,
+		'MM') + 14,  <!-- 매달 15일(=월 시작 + 14일) -->
 		T.SAL_BASE,
 		0,
 		0,
@@ -194,34 +194,41 @@
 		-- 초과근무 수당
 		ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5) AS OVERTIME_PAY,
 
-		-- 4대보험(예: 4.5%)
+		--
+		4대보험(예: 4.5%)
 		ROUND(
-		(E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.045
+		(E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME
+		* 1.5)) * 0.045
 		) AS INSURANCE,
 
 		-- 세금(예: 3%)
 		ROUND(
-		(E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.03
+		(E.SAL_BASE +
+		ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.03
 		) AS TAX,
 
 		-- 실지급액
 		(
 		E.SAL_BASE
 		+ ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)
-		- ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) *
+		-
+		ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) *
 		0.045)
-		- ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) *
+		- ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME *
+		1.5)) *
 		0.03)
 		) AS REALPAY
 		FROM MONTH_ATTEND M
-		JOIN EMP E ON M.EMP_NO = E.EMP_NO
+		JOIN EMP E ON M.EMP_NO =
+		E.EMP_NO
 		WHERE TO_CHAR(M.MONTH_DATE_ATTEND, 'YYYY-MM') = #{targetMonth}
 		) T
 		WHERE NOT EXISTS (
 		SELECT 1
 		FROM SAL S
 		WHERE S.EMP_NO = T.EMP_NO
-		AND TRUNC(S.SAL_DATE, 'MM') = TRUNC(T.MONTH_DATE_ATTEND, 'MM')
+		AND
+		TRUNC(S.SAL_DATE, 'MM') = TRUNC(T.MONTH_DATE_ATTEND, 'MM')
 		)
 	</insert>
 
@@ -267,6 +274,25 @@
 			<if test="onlyOvertime == true">
 				AND NVL(S.OVERTIME_PAY, 0) > 0
 			</if>
+
+			<!-- ✅ 퇴사자 제외 (퇴직=0 제외) -->
+			<if test="excludeRetired == true">
+				AND E.STATUS_NO != 0
+			</if>
+
+			<!-- ✅ 삭제예정 제외 (DB 방식에 맞게 1개만 선택해서 사용) -->
+			<!-- <if test="excludeDeletePlanned == true"> -->
+				<!-- (A) EMP에 삭제예정 플래그가 있는 경우 예: E.DEL_YN = 'Y' -->
+				<!-- AND NVL(E.DEL_YN, 'N') != 'Y' -->
+
+				<!-- (B) 삭제예정이 STATUS_NO로 표현되는 경우 예: 8 -->
+				<!-- AND E.STATUS_NO != 8 -->
+
+				<!-- (C) 삭제예정 테이블이 따로 있는 경우 -->
+				<!-- AND NOT EXISTS (SELECT 1 FROM EMP_DELETE_PLAN dp WHERE dp.EMP_NO 
+					= E.EMP_NO AND dp.PLAN_YN='Y') -->
+			<!-- </if> -->
+
 		</where>
 
 
@@ -286,31 +312,43 @@
 		</choose>
 
 	</select>
-	
+
 	<!-- 9. 관리자 상단 요약 카드용 집계 -->
-<select id="getAdminSalSummary" parameterType="map" resultType="map">
-  SELECT
-    NVL(SUM(S.REALPAY), 0) AS totalRealPay,
-    NVL(ROUND(AVG(S.REALPAY)), 0) AS avgRealPay,
-    COUNT(DISTINCT S.EMP_NO) AS empCount
-  FROM SAL S
-  JOIN EMP E ON S.EMP_NO = E.EMP_NO
-  LEFT JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
+	<select id="getAdminSalSummary" parameterType="map"
+		resultType="map">
+		SELECT
+		NVL(SUM(S.REALPAY), 0) AS "totalRealPay",
+		NVL(ROUND(AVG(S.REALPAY)), 0) AS "avgRealPay",
+		COUNT(DISTINCT S.EMP_NO)
+		AS "empCount"
+		FROM SAL S
+		JOIN EMP E ON S.EMP_NO = E.EMP_NO
+		LEFT JOIN DEPT
+		D ON E.DEPT_NO = D.DEPT_NO
 
-  <where>
-    <if test="month != null and month != ''">
-      AND TO_CHAR(S.SAL_DATE, 'YYYY-MM') = #{month}
-    </if>
+		<where>
+			<if test="month != null and month != ''">
+				AND TO_CHAR(S.SAL_DATE, 'YYYY-MM') = #{month}
+			</if>
 
-    <if test="deptNo != null and deptNo != ''">
-      AND E.DEPT_NO = #{deptNo}
-    </if>
+			<if test="deptNo != null and deptNo != ''">
+				AND E.DEPT_NO = #{deptNo}
+			</if>
 
-    <if test="onlyOvertime == true">
-      AND NVL(S.OVERTIME_PAY, 0) > 0
-    </if>
-  </where>
-</select>
-	
+			<if test="onlyOvertime == true">
+				AND NVL(S.OVERTIME_PAY, 0) > 0
+			</if>
+
+			<if test="excludeRetired == true">
+				AND E.STATUS_NO != 0
+			</if>
+
+			<!-- <if test="excludeDeletePlanned == true">
+				DB 방식에 맞는 조건 1개만 선택
+			</if> -->
+
+		</where>
+	</select>
+
 
 </mapper>

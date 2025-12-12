@@ -14,7 +14,8 @@
         DEPT_ADDR       AS deptAddr,
         DEPT_PHONE      AS deptPhone
     FROM DEPT
-    ORDER BY DEPT_NO
+    ORDER BY TO_NUMBER(DEPT_NO)
+
 </select>
   
   
