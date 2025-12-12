@@ -42,7 +42,7 @@ public class SalServiceImpl implements SalService {
     }
 
     @Override
-    public List<SalVO> getAdminSalList(Map<String, String> param) {
+    public List<SalVO> getAdminSalList(Map<String, Object> param) {
         return salMapper.getAdminSalList(param);
     }
 
@@ -50,5 +50,11 @@ public class SalServiceImpl implements SalService {
 	public void createBaseSalaryForNewEmp(String empNo) throws Exception {
 		System.out.println("📌 [Salary] 신규 사원 기본 급여 생성: empNo = " + empNo);
 		
+	}
+
+	@Override
+	public Map<String, Object> getAdminSalSummary(Map<String, Object> param) {
+		
+		return salMapper.getAdminSalSummary(param);
 	}
 }
