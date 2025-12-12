@@ -11336,21 +11336,25 @@ body {
 	font-size : 14px;
 }
 
+#latestAlertsContainer .list-group-item,
 #latestMessagesContainer .list-group-item {
     padding-top: 0.5rem !important;    /* 상단 패딩 축소 (기존 py-3 대신) */
     padding-bottom: 0.5rem !important; /* 하단 패딩 축소 (기존 py-3 대신) */
 }
 
+#latestAlertsContainer .list-group-item .me-3,
 #latestMessagesContainer .list-group-item .me-3 {
     width: 35px !important;            /* 너비 40px -> 35px */
     height: 35px !important;           /* 높이 40px -> 35px */
     flex-shrink: 0;                    /* 크기 고정 */
 }
 
+#latestAlertsContainer .list-group-item .small.text-gray-500,
 #latestMessagesContainer .list-group-item .small.text-gray-500 {
     font-size: 0.75rem; /* 기존보다 더 작게 */
 }
 
+#latestAlertsContainer .list-group-item .text-truncate,
 #latestMessagesContainer .list-group-item .text-truncate {
     font-size: 0.85rem; /* 메시지 내용 폰트 크기 지정 (약간 작게) */
     font-weight: bold !important; /* 볼드체 해제 */
