@@ -1,7 +1,8 @@
 package com.example.controller;
 
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -52,8 +53,10 @@ public class SalController {
         String empNo = login.getEmpNo();
 
         EmpVO emp = empService.getEmp(empNo);
-        List<SalVO> salList = salService.getSalList(empNo);
-
+        List<SalVO> salList = salService.getSalList(empNo);        
+        Map<String, Object> summary = salService.getEmpSalSummary(empNo);
+        
+        model.addAttribute("summary", summary);
         model.addAttribute("emp", emp);
         model.addAttribute("salList", salList);
         model.addAttribute("menu", "salemp");
@@ -102,6 +105,18 @@ public class SalController {
 
         return "redirect:/sal/admin/list?month=" + month;
     }
+
+    @GetMapping("/create")
+    public String createSalary(@RequestParam("month") String month) {
+        salService.createSalaryByMonth(month);
+        return "redirect:/sal/admin/list?month=" + month; 
+    }
+    
+    @GetMapping("/adminList")
+    public String adminListAlias(@RequestParam(required = false) String month) {
+        return "redirect:/sal/admin/list" + (month != null ? "?month=" + month : "");
+    }
+
 
    
 }

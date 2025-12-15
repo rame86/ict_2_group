@@ -22,5 +22,7 @@ public interface SalService {
 	void createBaseSalaryForNewEmp(String empNo)throws Exception;
 	
 	Map<String, Object> getAdminSalSummary(Map<String, Object> param);
+	
+	Map<String, Object> getEmpSalSummary(String empNo);
 
 }
