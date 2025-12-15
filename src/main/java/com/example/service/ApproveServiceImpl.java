@@ -27,6 +27,8 @@ public class ApproveServiceImpl implements ApproveService {
 	private ApproveDAO approveDao;
 	@Autowired
 	AlertService alertService;
+	@Autowired
+	private NotificationService notificationService;
 	
 	// 결재 신청
 	@Override
@@ -51,7 +53,13 @@ public class ApproveServiceImpl implements ApproveService {
 								? Integer.valueOf(parent.getParentManagerEmpNo()) 
 								: null;
 		
-		if(step1ManagerNo == step2ManagerNo) {
+		log.info(parent.getParentDeptNo());
+		if(parent.getParentDeptNo().equals("1001")) {
+			avo.setStep1ManagerNo(null);
+			avo.setStep1Status("X");
+			avo.setStep2ManagerNo(step1ManagerNo);
+			avo.setStep2Status("W");
+		}else if (step1ManagerNo == step2ManagerNo) {
 			avo.setStep1ManagerNo(null);
 			avo.setStep1Status("X");
 			avo.setStep2ManagerNo(step1ManagerNo);
@@ -270,6 +278,7 @@ public class ApproveServiceImpl implements ApproveService {
 		
 		if(receiveEmpNo == null || receiveEmpNo == 0) {
 			log.info("Alert: 수신자 사원 번호가 유효하지 않아 알림을 저장하지 못했습니다. docNo: {}", docNo);
+			return;
 		}
 		
 		log.info("Alert 시도: 수신자 {}, 문서 {}", receiveEmpNo, docNo);
@@ -283,6 +292,7 @@ public class ApproveServiceImpl implements ApproveService {
 		
 		try {
 	        alertService.saveNewAlert(alert);
+	        notificationService.pushNewAlert(alert);
 	    } catch (Exception e) {
 	        log.error("Alert: 알림 저장 중 오류 발생 (수신자: {}): {}", receiveEmpNo, e.getMessage());
 	    }
