@@ -188,11 +188,12 @@ public class ApproveController {
 		} else if (vo.getDocType().equals("5") && step2Status.equals("A")) {
 			attendService.commuteCorrection(vo);
 			log.info("DocType :" + vo.getDocType());
-		} else if (vo.getDocType().equals("6") && step2Status.equals("A")) {
+		} else if ((vo.getDocType().equals("6") || vo.getDocType().equals("7")) && step2Status.equals("A")) {
 			log.info("DocType :" + vo.getDocType());
 			deptService.setDeptManager(vo);
 			empService.setEmpJobTitle(vo);
 		}
+		
 
 		notificationService.sendApprovalNotification(Integer.toString(empNo), "결재가 성공적으로 완료되었습니다.");
 
