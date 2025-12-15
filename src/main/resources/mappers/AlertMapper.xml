@@ -23,23 +23,22 @@
 	
 	<select id="selectLatestAlerts" parameterType="String" resultType="AlertVO">
 	    SELECT 
-	        *
-	    FROM (
-	        SELECT
-	            ALERT_ID AS alertId,
-	            EMP_NO AS empNo,
-	            LINK_TYPE AS linkType,
-	            LINK_ID AS linkId,
-	            CREATED_DATE AS createdDate,
-	            IS_READ AS isRead
-	        FROM 
-	            ALERT
-	        WHERE 
-	            EMP_NO = #{empNo}
-	        ORDER BY 
-	            CREATED_DATE DESC
-	    )
-	    WHERE ROWNUM &lt;= 10
+		    A.ALERT_ID,
+		    A.EMP_NO,
+		    A.LINK_TYPE,
+		    A.LINK_ID,
+		    A.CREATED_DATE,
+		    A.IS_READ,
+		    D.DOC_TITLE AS title,      
+		    D.DOC_DATE AS sentTime,   
+		    E.EMP_NAME AS senderName  
+		FROM ALERT A
+		LEFT JOIN DOC D ON A.LINK_ID = D.DOC_NO AND A.LINK_TYPE = 'APPROVAL'
+		LEFT JOIN EMP E ON D.DOC_WRITER = E.EMP_NO
+		
+		WHERE A.EMP_NO = #{empNo}
+		  AND A.IS_READ = 'N' 
+		ORDER BY A.CREATED_DATE DESC
     </select>
     
     <update id="markAllAsRead" parameterType="String">

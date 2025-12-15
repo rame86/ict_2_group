@@ -10,7 +10,6 @@ function updateSidebarBadge() {
 			badgeElement.hide();
 			$("#approvalIcon").removeClass("icon-notify");
 		}
-		updateHeaderAlertsBadge(waitingCount);
 	});
 }
 
@@ -35,18 +34,25 @@ function getApprovalCount(successCallback) {
 	});
 }
 
-function updateHeaderAlertsBadge(pendingCount) {
-	const badgeElement = $('#alertBadge'); // 헤더 뱃지 ID
-    
-    badgeElement.text(pendingCount > 99 ? '99+' : pendingCount);
-    
-    if (pendingCount > 0) {
-        // 결재는 중요한 알림이므로, bg-warning을 유지하거나 bg-danger 등으로 변경 가능
-        badgeElement.show(); 
-    } else {
-        badgeElement.hide(); 
-    }
-    console.log("✅ 헤더 결재 알림 뱃지 업데이트 완료:", pendingCount);
+function updateHeaderAlertsBadge() {
+	$.ajax({
+		url: '/alert/unreadCount',
+		type: 'GET',
+		success: function(totalCount) { // 통합 알림 개수를 받습니다.
+			const badgeElement = $('#alertBadge'); // 헤더 뱃지 ID
+			badgeElement.text(totalCount > 99 ? '99+' : totalCount);
+			if (totalCount > 0) {
+				badgeElement.show(); 
+			} else {
+				badgeElement.hide(); 
+			}
+			console.log("✅ 헤더 통합 알림 뱃지 업데이트 완료:", totalCount);
+		},
+		error: function(xhr, status, error) {
+			console.error("❌ 헤더 통합 알림 카운트 조회 실패:", status, error);
+			$('#alertBadge').hide(); // 에러 시 숨김
+		}
+	});
 }
 
 // 알람유형에 맞는 아이콘
@@ -91,35 +97,62 @@ function createAlertItemHtml(alert) {
 			formattedTime = alert.sentTime;
 		}
     }
+	
+	let fullUrl = '#'; // 기본값은 #
 
-	let html = '<a class="list-group-item list-group-item-action" href="' + alert.linkId + '">';
+	// alert 객체에 linkType과 linkId가 있는지 확인합니다.
+	if (alert.linkType && alert.linkId) {
+	        
+	switch (alert.linkType) {
+		case 'APPROVAL':
+		// 결재 문서는 문서 번호를 쿼리 파라미터로 보냅니다.
+		// 예: /approve/detail?docNo=188
+		fullUrl = '/approve/detail?docNo=' + alert.linkId;
+		break;
+	                
+		case 'NOTICE':
+		// 공지사항은 문서 번호를 경로로 보냅니다.
+		// 예: /notice/view/15
+		fullUrl = '/notice/view/' + alert.linkId; 
+		break;
+	                
+		// 필요하다면 다른 linkType도 추가합니다.
+		case 'MESSAGE':
+		// 메시지 관련 링크 (예시)
+		fullUrl = '/message/view/' + alert.linkId;
+		break;
+	                
+		default:
+		// 매핑되지 않은 기타 알림은 기본 링크 사용 (details.link)
+		fullUrl = details.link || '#';
+		break;
+		}
+	} else {
+		// linkType이나 linkId가 누락된 경우
+		fullUrl = details.link || '#';
+	}
+
+	let html = '<a class="list-group-item list-group-item-action" href="' + fullUrl + '">';
 	    html += '<div class="d-flex align-items-center">'; // ⭐ py-2 클래스 유지
-
-	    // 1. 아이콘 영역 (40x40)
 	    html += '<div class="me-3" style="width: 40px; height: 40px;">'; // ⭐ width/height 스타일 유지
-	    
 	    // 아이콘 설정: icon-circle bg-light p-2 rounded-circle text-primary (text-primary 대신 details.iconClass 사용)
 	    html += '<div class="icon-circle bg-light p-2 rounded-circle ' + details.iconClass + '">';
 	    html += '<i class="' + details.icon + '"></i>'; // ⭐ 아이콘 클래스 사용
 	    html += '</div>';
-	    
 	    html += '</div>';
-	    
 	    // 2. 내용 영역
 	    html += '<div class="w-100">'; // ⭐ w-100 클래스 유지
-	    
 	    // 시간 및 발신자
 	    html += '<div class="small text-gray-500 mb-1">' + (alert.senderName || '시스템') + ' · ' + formattedTime + '</div>'; // ⭐ mb-1 클래스 유지
-	    
 	    // 제목
 	    html += '<span class="fw-bold text-truncate" style="max-width: 250px;">'; // ⭐ fw-bold 및 max-width 스타일 유지
 	    html += alert.title;
 	    html += '</span>';
-	    
 	    html += '</div>';
 	    html += '</div>';
 	    html += '</a>';
 	    
 	    return html;
+		
 }
 

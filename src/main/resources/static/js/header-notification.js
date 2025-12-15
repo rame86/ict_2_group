@@ -107,7 +107,17 @@ function connectSocket() {
         
     }, function(error) {
         console.error('STOMP: 연결 실패 또는 오류:', error);
-		setTimeout(connectSocket, 5000);
+		if (stompClient && stompClient.connected) {
+			try {
+					// 이미 끊어졌을 수 있으나, 혹시 모를 상황을 대비해 연결을 명시적으로 끊습니다.
+					stompClient.disconnect();
+				} catch (e) {
+					// disconnect 중 에러가 발생해도 무시 (이미 연결이 끊어진 경우)
+				}
+			}
+			
+			stompClient = null;
+			window.location.href = '/';
     });
 	
 }
@@ -117,9 +127,14 @@ $(document).ready(function(){
 	requestNotificationPermission();
 	
     const currentEmpNo = $('#sessionEmpNo').val();
-    if (currentEmpNo && stompClient === null) {
-        connectSocket();
-    }
+	
+	console.log("DEBUG: #sessionEmpNo의 실제 값 (로그아웃 시): [" + currentEmpNo + "]");
+	    console.log("DEBUG: 값의 길이: " + currentEmpNo.length);
+	if (currentEmpNo && currentEmpNo.length > 0 && stompClient === null) {
+	    connectSocket();
+	}
+	
+	updateHeaderAlertsBadge();
 	
 	$(document).on('shown.bs.dropdown', '#messagesDropdown', function () {
 		console.log("✅ 드롭다운 이벤트 발생! loadLatestMessages() 호출 시도.");
@@ -129,9 +144,24 @@ $(document).ready(function(){
 	$(document).on('shown.bs.dropdown', '#alertsDropdown', function () {
 		console.log("✅ 알림 드롭다운 이벤트 발생! loadLatestAlerts() 호출 시도.");
 		loadLatestAlerts();
+		markAllAlertsAsReadAPI();
 	});
 	
 });
+
+function markAllAlertsAsReadAPI() {
+    $.ajax({
+        url: '/alert/markAllAsRead', 
+        type: 'POST',
+        success: function() {
+            console.log("✅ 모든 알림 읽음 처리 완료. 뱃지 업데이트.");
+            $('#alertBadge').text('').hide(); 
+        },
+        error: function(xhr, status, error) {
+            console.error("❌ 읽음 처리 실패:", error);
+        }
+    });
+}
 
 function loadConversationList(empNo) {
 	
@@ -234,14 +264,14 @@ function loadLatestAlerts() {
 	console.log("loadLatestAlerts() 호출됨");
 
     $.ajax({
-        url: '/api/alerts/latestDocument', // 서버의 통합 알림 API 엔드포인트 가정
+        url: '/alert/latestView', // 서버의 통합 알림 API 엔드포인트 가정
         type: 'GET',
         dataType: 'json',
         success: function(alerts) {
             container.empty();
             
             if (alerts && alerts.length > 0) {
-                const limitedAlerts = alerts.slice(0, 7); 
+                const limitedAlerts = alerts.slice(0, 5); 
                 
                 limitedAlerts.forEach(alert => {
                     container.append(createAlertItemHtml(alert));

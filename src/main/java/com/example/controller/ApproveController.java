@@ -145,7 +145,8 @@ public class ApproveController {
 		log.info(dvo.toString());
 		approveService.ApprovalApplication(dvo, avo);
 		notificationService.sendApprovalNotification(Integer.toString(avo.getStep1ManagerNo()), "새로운 결재가 도착했습니다");
-		return "redirect:statusList";
+		if(dvo.getDocType().equals("4") || dvo.getDocType().equals("5") || dvo.getDocType().equals("6")) return "OK";
+		else return "redirect:statusList";
 	}
 	
 	// 문서 상세보기

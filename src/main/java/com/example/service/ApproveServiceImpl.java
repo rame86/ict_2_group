@@ -9,10 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.domain.AlertVO;
 import com.example.domain.ApproveListVO;
 import com.example.domain.ApproveVO;
 import com.example.domain.DeptVO;
 import com.example.domain.DocVO;
+import com.example.repository.AlertDAO;
 import com.example.repository.ApproveDAO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,8 @@ public class ApproveServiceImpl implements ApproveService {
 
 	@Autowired
 	private ApproveDAO approveDao;
+	@Autowired
+	AlertService alertService;
 	
 	// 결재 신청
 	@Override
@@ -60,6 +64,13 @@ public class ApproveServiceImpl implements ApproveService {
 		}
 				
 		approveDao.insertApprove(avo);
+		
+		if(avo.getStep1ManagerNo() != null && "W".equals(avo.getStep1Status())) {
+			log.info("ApproveService 시도 - 수신자 : " + avo.getStep1ManagerNo());
+			sendApprovalAlert(avo.getStep1ManagerNo(), dvo.getDocNo(), "결재 요청");
+		} else if("X".equals(avo.getStep1Status()) && avo.getStep2ManagerNo() != null && "W".equals(avo.getStep2Status())) {
+			sendApprovalAlert(avo.getStep2ManagerNo(), dvo.getDocNo(), "결재 요청");
+		}
 		
 	}
 	
@@ -206,9 +217,29 @@ public class ApproveServiceImpl implements ApproveService {
 		
 		if("A".equals(status)) {
 			approveDao.updateApproveStatus(param);
+			
+			if("STEP1".equals(step)) {
+				Integer step2ManagerNo = docVo.getStep2ManagerNo();
+				if(step2ManagerNo != null && !step2ManagerNo.equals(docVo.getStep1ManagerNo())) {
+					sendApprovalAlert(step2ManagerNo, docNo, "결재 요청");
+				}
+			}
+			
+			if("STEP2".equals(step)) {
+				String writerEmpNo = docVo.getDocWriter();
+				if(writerEmpNo != null) {
+					sendApprovalAlert(Integer.parseInt(writerEmpNo), docNo, "최종 승인");
+				}
+			}
+			
 		}else if("R".equals(status)) {
 			param.put("rejectReason", rejectReason);
 			approveDao.updateRejectStatus(param);
+			
+			String writerEmpNo = docVo.getDocWriter(); 
+		    if (writerEmpNo != null) {
+		        sendApprovalAlert(Integer.parseInt(writerEmpNo), docNo, "결재 반려");
+		    }
 		}
 		
 	}
@@ -231,6 +262,30 @@ public class ApproveServiceImpl implements ApproveService {
 		}
 		
 		return result;
+		
+	}
+	
+	// 결재건 알람에 전달
+	private void sendApprovalAlert(Integer receiveEmpNo, Integer docNo, String alertTitle) {
+		
+		if(receiveEmpNo == null || receiveEmpNo == 0) {
+			log.info("Alert: 수신자 사원 번호가 유효하지 않아 알림을 저장하지 못했습니다. docNo: {}", docNo);
+		}
+		
+		log.info("Alert 시도: 수신자 {}, 문서 {}", receiveEmpNo, docNo);
+		
+		AlertVO alert = new AlertVO();
+		
+		alert.setEmpNo(String.valueOf(receiveEmpNo));
+		alert.setLinkType("APPROVAL");
+		alert.setLinkId(docNo);
+		alert.setTitle(alertTitle);
+		
+		try {
+	        alertService.saveNewAlert(alert);
+	    } catch (Exception e) {
+	        log.error("Alert: 알림 저장 중 오류 발생 (수신자: {}): {}", receiveEmpNo, e.getMessage());
+	    }
 		
 	}
 
