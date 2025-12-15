@@ -7,16 +7,26 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.domain.EmpSearchVO;
 import com.example.domain.EmpVO;
+import com.example.domain.DocVO;
 import com.example.domain.EditVO;
 import com.example.repository.EmpMapper;
-import com.example.repository.EditMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+import com.example.repository.EditMapper;
+import com.example.repository.EmpDAO;
+
+@Slf4j
 @Service
 public class EmpServiceImpl implements EmpService {
 
+	@Autowired
+	private EmpDAO empDAO;
+	
     @Autowired
     private EmpMapper empMapper;
 
@@ -195,4 +205,19 @@ public class EmpServiceImpl implements EmpService {
     public EditVO getLastEdit(String empNo) {
         return editMapper.selectLastEditByEmpNo(empNo);
     }
+    
+ // =======================================================================================
+ 	// setDeptManager()
+ 	@Transactional
+ 	public void setEmpJobTitle(DocVO vo) {
+ 		log.info("[EmpServiceImpl - setDeptManager 요청 받음]"); 		
+ 		empDAO.setEmpJobTitle(vo);
+ 				
+ 	}	
+ 	// end of setDeptManager()	
+ 	// =======================================================================================
+ 	
+ 	//
+
+    
 }

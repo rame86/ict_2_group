@@ -29,4 +29,7 @@ public interface AttendDAO {
 	public int updateIncompleteAttendanceToAbsence();
 	
 	public int countAttendRecordByDate(DayAttendVO davo);
+	
+
+
 }

@@ -198,7 +198,7 @@ textarea {
 			method="POST" class="space-y-6">
 
 			<input type="hidden" name="DocType" id="documentTypeInput" value="5">
-			<input type="hidden" name="DocTitle" value="출퇴근 정정 신청">
+			<input type="hidden" name="DocTitle" value="[근태정정] 출퇴근 시간 정정 신청">
 			<input type="hidden" name="step1ManagerNo" value="${ sessionScope.login.managerEmpNo }">
 			<input type="hidden" name="step2ManagerNo" value="${ sessionScope.login.parentDeptNo }">
 

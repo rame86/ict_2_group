@@ -227,6 +227,8 @@
 		AND
 		TO_CHAR(DATE_ATTEND, 'YYYY-MM-DD') = #{dateAttend}
 	</select>
+	
+	
 
 
 </mapper>

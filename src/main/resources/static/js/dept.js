@@ -171,6 +171,8 @@ function openDraftModal(empNo, empInfoText) {
 	$('#draftTargetEmpNo').val(empNo);
 	// 부서 번호 세팅
 	$('#draftDeptNo').val(currentDeptId);
+	// 메모 세팅
+	$('#draftMemo').val(currentDeptName+" 부서장");
 
 	// 날짜 생성 및 세팅 (YYYY-MM-DD 형식) -> id="draftDocDate"에 값 주입
 	const now = new Date();
@@ -219,7 +221,7 @@ function submitFinalApproval() {
                 // 필요 시 페이지 새로고침
                 // location.reload();
             } else {
-                alert("상신 처리 완료 (서버 메시지 확인 필요)");
+                alert("상신 처리 완료");
                 // 성공인데 텍스트가 다른 경우도 있어 창을 닫음
                 closeDraftModal();
                 closeModal();

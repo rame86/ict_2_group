@@ -8,8 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.example.domain.DeptVO;
+import com.example.domain.DocVO;
 import com.example.domain.EmpVO;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Repository
 public class DeptDAOImpl implements DeptDAO {
 
@@ -58,4 +62,14 @@ public class DeptDAOImpl implements DeptDAO {
         // XML id="insertEditLog" 호출
         return sess.insert(NAMESPACE + ".insertEditLog", map);
     }
+    
+	// =======================================================================================
+	// setDeptManager()
+	public void setDeptManager(DocVO vo) {
+		log.info("[AttendDAO - setDeptManager 요청 받음]");
+		sess.update("com.example.repository.DayAttendDAO.setDeptManager", vo);
+	}
+	// end of setDeptManager()
+	// =======================================================================================
+    
 }
