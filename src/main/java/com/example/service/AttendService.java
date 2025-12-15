@@ -18,9 +18,11 @@ public interface AttendService {
 	public void insertVacation(DocVO vo);
 
 	public void commuteCorrection(DocVO vo);
-
+	
 	public int processDailyAbsence();
 
 	public int processIncompleteAttendance();
+	
+	
 
 }

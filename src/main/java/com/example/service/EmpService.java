@@ -3,6 +3,7 @@ package com.example.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.example.domain.DocVO;
 import com.example.domain.EditVO;
 import com.example.domain.EmpSearchVO;
 import com.example.domain.EmpVO;
@@ -46,5 +47,7 @@ public interface EmpService {
 	// 비고 히스토리(헤더까지 포함한 문자열) 조회
     String getEditNoteHistory(String empNo);
 
+	
+	public void setEmpJobTitle(DocVO vo);
 	
 }

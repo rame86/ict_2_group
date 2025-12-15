@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.example.domain.DeptVO;
+import com.example.domain.DocVO;
 import com.example.domain.EmpVO;
 
 public interface DeptDAO {
@@ -27,4 +28,7 @@ public interface DeptDAO {
 
    // 부서 변경 이력 로그 저장
     int insertEditLog(Map<String, Object> map);
+    
+    //부서장 임명
+    public void setDeptManager(DocVO vo);
 }

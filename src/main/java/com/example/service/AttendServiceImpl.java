@@ -10,6 +10,7 @@ import com.example.controller.ToDate;
 import com.example.domain.DayAttendVO;
 import com.example.domain.DocVO;
 import com.example.repository.AttendDAO;
+import com.example.repository.EmpDAO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -200,6 +201,8 @@ public class AttendServiceImpl implements AttendService {
 	// =======================================================================================
 
 	//
+	
+	
 	
 	// =======================================================================================
 	// processDailyAbsence()

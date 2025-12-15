@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.domain.DeptVO;
+import com.example.domain.DocVO;
 import com.example.domain.EmpVO;
 import com.example.repository.DeptDAO;
 import com.example.repository.EmpDeptMapper;
@@ -60,5 +61,11 @@ public class DeptServiceImpl implements DeptService {
 
 		// 3. 로그 저장
 		deptDAO.insertEditLog(map);
+	}
+	
+	@Override
+	public void setDeptManager(DocVO vo) {
+		deptDAO.setDeptManager(vo);
+		
 	}
 }

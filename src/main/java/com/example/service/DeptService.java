@@ -3,6 +3,7 @@ package com.example.service;
 import java.util.List;
 
 import com.example.domain.DeptVO;
+import com.example.domain.DocVO;
 import com.example.domain.EmpVO;
 
 public interface DeptService {
@@ -18,4 +19,7 @@ public interface DeptService {
 	void removeDept(int deptNo);
 	
 	void changeEmpDept(int empNo, int newDeptNo, String writerEmpNo, String note);
+	
+	public void setDeptManager(DocVO vo);
+	
 }
