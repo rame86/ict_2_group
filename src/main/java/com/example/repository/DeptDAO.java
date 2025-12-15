@@ -31,5 +31,5 @@ public interface DeptDAO {
     int insertEditLog(Map<String, Object> map);
     
     //부서장 임명
-    public void setDeptManager(DocVO vo, Map<String, Object> map);
+    public void setDeptManager(Map<String, Object> map);
 }

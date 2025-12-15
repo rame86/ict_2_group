@@ -218,7 +218,7 @@ function openDraftModal(empNo, empName, type) {
 
     if (type === 6) {
         // === 부서장 임명 (Type 6) ===
-        $('#draftMemo').val(currentDeptName + " 부서장 임명");
+        $('#draftMemo').val(currentDeptName);
         title = `[인사발령] ${currentDeptName} 부서장 임명 건`;
         content = `1. 귀 부서의 무궁한 발전을 기원합니다.\n`
             + `2. 아래와 같이 부서장 임명을 명하고자 하오니 재가 바랍니다.\n\n`
@@ -229,7 +229,7 @@ function openDraftModal(empNo, empName, type) {
 
     } else if (type === 7) {
         // === 부서장 해임 (Type 7) ===
-        $('#draftMemo').val(currentDeptName + " 부서장 해임");
+        $('#draftMemo').val(currentDeptName);
         title = `[인사발령] ${currentDeptName} 부서장 해임 건`;
         content = `1. 귀 부서의 무궁한 발전을 기원합니다.\n`
             + `2. 아래와 같이 부서장 해임을 명하고자 하오니 재가 바랍니다.\n\n`
