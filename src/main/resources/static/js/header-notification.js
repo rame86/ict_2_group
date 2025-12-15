@@ -121,6 +121,8 @@ $(document).ready(function(){
         connectSocket();
     }
 	
+	updateHeaderAlertsBadge();
+	
 	$(document).on('shown.bs.dropdown', '#messagesDropdown', function () {
 		console.log("✅ 드롭다운 이벤트 발생! loadLatestMessages() 호출 시도.");
 	    loadLatestMessages();
