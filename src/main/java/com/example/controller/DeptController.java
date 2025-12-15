@@ -36,7 +36,7 @@ public class DeptController {
 		if (login != null) {
 			// String으로 변환해서 비교
 			String dNo = String.valueOf(login.getDeptNo());
-			String gNo = String.valueOf(login.getGradeNo());
+			String gNo = String.valueOf(login.getGradeNo()).trim();
 
 			log.info("[DeptController] 접속자 부서: " + dNo + ", 등급: " + gNo);
 

@@ -303,16 +303,15 @@
 		</div>
 	</div>
 
-	<script>
-		// JSP(서버) 데이터 -> JS 변수 변환
-		const contextPath = '${pageContext.request.contextPath}';
-		const isAdminUser = $
-		{
-			isAdmin != null ? isAdmin : false
-		};
-	</script>
-
-	<script src="${pageContext.request.contextPath}/js/dept.js"></script>
-
+<script>
+    // JSP(서버) 데이터 -> JS 변수 변환
+    const contextPath = '${pageContext.request.contextPath}';
+    
+    /* [중요] EL 표현식은 반드시 한 줄에 공백 없이 작성해야 합니다. */
+    const isAdminUser = ${isAdmin != null ? isAdmin : false};
+    
+    console.log("현재 접속자 관리자 권한 여부:", isAdminUser); // 콘솔에서 확인 가능하도록 로그 추가
+</script>
+<script src="${pageContext.request.contextPath}/js/dept.js"></script>
 </body>
 </html>
