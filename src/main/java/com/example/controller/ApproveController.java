@@ -22,6 +22,8 @@ import com.example.domain.DocVO;
 import com.example.domain.LoginVO;
 import com.example.service.ApproveService;
 import com.example.service.AttendService;
+import com.example.service.DeptService;
+import com.example.service.EmpService;
 import com.example.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
@@ -35,6 +37,11 @@ public class ApproveController {
 	private ApproveService approveService;
 	@Autowired
 	private AttendService attendService;
+	@Autowired
+	private DeptService deptService;
+	@Autowired
+	private EmpService empService;
+	
 	private final NotificationService notificationService;
 	
 	public ApproveController(NotificationService notificationService) {
@@ -178,6 +185,9 @@ public class ApproveController {
 			attendService.insertVacation(vo);
 		}else if(vo.getDocType().equals("5") && step2Status.equals("A")) {
 			attendService.commuteCorrection(vo);
+		}else if(vo.getDocContent().equals("6") && step2Status.equals("A")) {
+			deptService.setDeptManager(vo);
+			empService.setEmpJobTitle(vo);
 		}
 		
 		notificationService.sendApprovalNotification(Integer.toString(empNo), "결재가 성공적으로 완료되었습니다.");

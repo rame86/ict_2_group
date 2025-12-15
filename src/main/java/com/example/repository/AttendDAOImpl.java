@@ -287,9 +287,9 @@ public class AttendDAOImpl implements AttendDAO {
 	// =======================================================================================
 	// insertVacation() 연차 승인후 입력 (단일 날짜 처리로 변경)
 	public void insertVacation(DayAttendVO davo) {
-	    log.info("[AttendDAO - insertVacation 요청 받음]");
-	    log.info("INSERT 시도 - dateAttend: " + davo.getDateAttend());
-	    sess.insert("com.example.repository.DayAttendDAO.insertVacation", davo);
+		log.info("[AttendDAO - insertVacation 요청 받음]");
+		log.info("INSERT 시도 - dateAttend: " + davo.getDateAttend());
+		sess.insert("com.example.repository.DayAttendDAO.insertVacation", davo);
 	}
 	// end of insertVacation()
 	// =======================================================================================
@@ -360,6 +360,8 @@ public class AttendDAOImpl implements AttendDAO {
 	}
 	// end of updateIncompleteAttendanceToAbsence()
 	// =======================================================================================
+
+	//
 	
-	
+
 }
