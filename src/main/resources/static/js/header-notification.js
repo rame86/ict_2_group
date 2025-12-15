@@ -115,9 +115,7 @@ function connectSocket() {
 					// disconnect 중 에러가 발생해도 무시 (이미 연결이 끊어진 경우)
 				}
 			}
-			
 			stompClient = null;
-			window.location.href = '/';
     });
 	
 }
