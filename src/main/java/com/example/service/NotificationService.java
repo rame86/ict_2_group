@@ -61,49 +61,17 @@ public class NotificationService {
         
     }
     
-//    public List<AlertVO> getLatestAlert(String empNo){
-//    	
-//    	Map<String, Object> param = new HashMap<>();
-//    	
-//    	param.put("empNo", empNo);
-//    	param.put("limit", 10);
-//    	
-//    	List<ApproveListVO> receiveList = approveDao.selectWaitingApproveAlerts(param);
-//    	List<ApproveListVO> sendList = approveDao.selectSendStatusChangeAlerts(param);
-//    	List<AlertVO> alertList = new ArrayList<>();
-//    	
-//    	for(ApproveListVO receive : receiveList) {
-//    		AlertVO alert = convertToAlertVO(receive, true);
-//    		alertList.add(alert);
-//    	}
-//    	
-//    	for(ApproveListVO send : sendList) {
-//    		AlertVO alert = convertToAlertVO(send, false);
-//    		alertList.add(alert);
-//    	}
-//    	
-//    	alertList.sort(Comparator.comparing(AlertVO::getSentTime, Comparator.nullsLast(Comparator.reverseOrder())));
-//    	
-//    	return alertList.stream().limit(5).collect(Collectors.toList());
-//    	
-//    }
-//    
-//    public AlertVO convertToAlertVO(ApproveListVO approve, boolean status) {
-//    	
-//    	AlertVO alert = new AlertVO();
-//    	String statusMsg = "";
-//    	
-//    	alert.setType("결재");
-//    	if(status || "WAITING".equals(approve.getCompletionType())) statusMsg = "[결재 요청]";
-//    	else if("FINISH".equals(approve.getCompletionType())) statusMsg = "[최종 승인]";
-//    	else if("REJECT".equals(approve.getCompletionType())) statusMsg = "[결재 반려]";
-//    	alert.setTitle(statusMsg + " " + approve.getDocTitle());
-//    	alert.setSenderName(approve.getWriterName());
-//    	alert.setSentTime(approve.getDocDate());
-//    	alert.setLinkId("/approve/detail?docNo=" + approve.getDocNo());
-//    	
-//    	return alert;
-//    	
-//    }
+    public void pushNewAlert(AlertVO alert) {
+    	
+    	String destination = "/topic/notifications/" + alert.getEmpNo();
+    	
+    	Map<String, Object> payload = new HashMap<>();
+    	
+    	payload.put("action", "REFRESH_HEADER_ALERTS");
+    	payload.put("content", "새로운 알람이 도착했습니다.");
+    	
+    	messagingTemplate.convertAndSend(destination, payload);
+    	
+    }
 
 }

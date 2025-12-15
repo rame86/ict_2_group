@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import org.springframework.web.servlet.ModelAndView;
-
+import com.example.domain.AlertVO;
 import com.example.domain.ApproveListVO;
 import com.example.domain.ApproveVO;
 import com.example.domain.DocVO;
@@ -153,6 +152,17 @@ public class ApproveController {
 		log.info(dvo.toString());
 		approveService.ApprovalApplication(dvo, avo);
 		notificationService.sendApprovalNotification(Integer.toString(avo.getStep1ManagerNo()), "새로운 결재가 도착했습니다");
+		
+		
+		// 헤더바 알람처리
+		AlertVO alert = new AlertVO();
+		String message = dvo.getDocTitle() + "새로운 결재 요청이 도착했습니다.";
+		
+		alert.setEmpNo(Integer.toString(avo.getStep1ManagerNo()));
+		alert.setContent(message);
+		
+		notificationService.pushNewAlert(alert);
+		
 		if (dvo.getDocType().equals("4") || dvo.getDocType().equals("5") || dvo.getDocType().equals("6"))
 			return "OK";
 		else
@@ -181,6 +191,7 @@ public class ApproveController {
 		Integer step2Manager = vo.getStep2ManagerNo(); // 2차결재자의 사번
 		String step2Status = vo.getStep2Status(); // 2차결재의 상태
 		String writeNotificationMessage;
+		AlertVO alert = null;
 
 		if (vo.getDocType().equals("4") && step2Status.equals("A")) {
 			log.info("DocType :" + vo.getDocType());			
@@ -195,9 +206,12 @@ public class ApproveController {
 		}
 
 		notificationService.sendApprovalNotification(Integer.toString(empNo), "결재가 성공적으로 완료되었습니다.");
+		
 
-		if (step2Status != null && step2Status.equals("A"))
+		if (step2Status != null && step2Status.equals("A")) {
 			writeNotificationMessage = "문서가 최종 승인 되었습니다.";
+		}
+			
 		else if (status.equals("R"))
 			writeNotificationMessage = "문서가 반려되었습니다";
 		else
