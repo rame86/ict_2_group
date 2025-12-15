@@ -278,7 +278,7 @@ public class ApproveServiceImpl implements ApproveService {
 		
 		alert.setEmpNo(String.valueOf(receiveEmpNo));
 		alert.setLinkType("APPROVAL");
-		alert.setLinkId("/approve/detail?docNo=" + docNo);
+		alert.setLinkId(docNo);
 		alert.setTitle(alertTitle);
 		
 		try {

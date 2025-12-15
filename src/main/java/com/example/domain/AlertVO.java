@@ -7,7 +7,7 @@ public class AlertVO {
 	private Integer alertId;
 	private String empNo;
 	private String linkType;
-	private String linkId;
+	private Integer linkId;
 	private String createdDate;
 	private String isRead;
 	

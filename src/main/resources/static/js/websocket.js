@@ -127,5 +127,6 @@ function createAlertItemHtml(alert) {
 	    html += '</a>';
 	    
 	    return html;
+		
 }
 

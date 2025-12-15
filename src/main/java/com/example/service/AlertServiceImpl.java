@@ -7,15 +7,12 @@ import org.springframework.stereotype.Service;
 
 import com.example.domain.AlertVO;
 import com.example.repository.AlertDAO;
-import com.example.repository.ApproveDAO;
 
 @Service
 public class AlertServiceImpl implements AlertService {
 	
 	@Autowired
 	private AlertDAO alertDao;
-	@Autowired
-	private ApproveDAO approveDao;
 
 	@Override
 	public void saveNewAlert(AlertVO vo) {
@@ -30,20 +27,7 @@ public class AlertServiceImpl implements AlertService {
 	// 최신 알람정보 10개 얻어와서 띄우기
 	@Override
 	public List<AlertVO> getUnreadAlertView(String empNo) {
-		
-		List<AlertVO> alertList = alertDao.selectLatestAlerts(empNo);
-		
-		for(AlertVO alert : alertList) {
-			
-			if("APPROVAL".equals(alert.getLinkType())) {
-				
-		
-				
-			}
-			
-		}
-		
-		return null;
+		return alertDao.selectLatestAlerts(empNo);
 	}
 
 }
