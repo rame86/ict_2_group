@@ -79,20 +79,27 @@ public class EmpController {
     }
 
     /* =========================================================
-       1. 사원 목록
+       1. 사원 목록 (✅ 관리자만 접근 가능)
        ========================================================= */
     @GetMapping("/emp/list")
     public String empList(HttpSession session, Model model) {
 
         System.out.println("📌 /emp/list 접근됨");
 
+        // ✅ 변경: 로그인 체크
         LoginVO login = (LoginVO) session.getAttribute("login");
         if (login == null) {
             System.out.println("❌ 로그인 정보 없음 → 로그인 페이지로 이동");
-            return "redirect:/login/loginForm";
+            return "redirect:/login/loginForm"; // ✅ 프로젝트에서 실제 쓰는 경로로 통일
         }
 
-        boolean canModify = isAdmin(session);
+        // ✅ 변경: 관리자(grade 1,2)만 허용
+        if (!isAdmin(session)) {
+            System.out.println("❌ 사원목록 접근 권한 없음");
+            return "error/NoAuthPage";
+        }
+
+        boolean canModify = true; // 어차피 관리자만 들어오므로 true 고정 가능
 
         List<EmpVO> list = empService.selectEmpList();
         System.out.println("📌 조회된 사원 수 = " + (list == null ? "null" : list.size()));
@@ -107,6 +114,8 @@ public class EmpController {
 
     /* =========================================================
        2. 인사카드(사원 상세)
+       - ✅ 관리자만 접근으로 유지하면: 아래처럼
+       - (만약 "본인 카드"는 허용하고 싶으면 조건 바꿔드릴게요)
        ========================================================= */
     @GetMapping("/emp/card")
     public String empCard(@RequestParam("empNo") String empNo,
@@ -115,13 +124,19 @@ public class EmpController {
 
         System.out.println("📌 /emp/card 접근됨, empNo = " + empNo);
 
+        // ✅ 변경: 로그인 체크 통일
         LoginVO login = (LoginVO) session.getAttribute("login");
         if (login == null) {
+            return "redirect:/login/loginForm";
+        }
+
+        // ✅ 변경: 관리자만 허용(원하면 "본인만 허용"으로 확장 가능)
+        if (!isAdmin(session)) {
             return "error/NoAuthPage";
         }
 
         EmpVO emp = empService.selectEmpByEmpNo(empNo);
-        boolean canModify = isAdmin(session);
+        boolean canModify = true;
 
         String editNoteHistory = empService.getEditNoteHistory(empNo);
         System.out.println("📌 editNoteHistory = \n" + editNoteHistory);
@@ -134,7 +149,7 @@ public class EmpController {
     }
 
     /* =========================================================
-       3. 사원 수정 (사진 포함)
+       3. 사원 수정 (사진 포함) - 관리자만
        ========================================================= */
     @PostMapping("/emp/update")
     @ResponseBody
@@ -201,7 +216,7 @@ public class EmpController {
     }
 
     /* =========================================================
-       4. 사원 삭제
+       4. 사원 삭제 - 관리자만
        ========================================================= */
     @PostMapping("/emp/delete")
     @ResponseBody
@@ -227,13 +242,18 @@ public class EmpController {
     }
 
     /* =========================================================
-       5. 사원 등록 폼
+       5. 사원 등록 폼 - 관리자만
        ========================================================= */
     @GetMapping("/emp/new")
     public String empNewForm(HttpSession session, Model model) {
 
         System.out.println("📌 /emp/new 접근됨");
 
+        // ✅ 변경: 로그인 체크 통일
+        LoginVO login = (LoginVO) session.getAttribute("login");
+        if (login == null) return "redirect:/login/loginForm";
+
+        // ✅ 변경: 권한 체크는 isAdmin으로 통일 (중복 제거)
         if (!isAdmin(session)) {
             System.out.println("❌ 사원 등록 권한 없음");
             return "error/NoAuthPage";
@@ -249,7 +269,7 @@ public class EmpController {
     }
 
     /* =========================================================
-       6. 사원 등록 (사진 포함)
+       6. 사원 등록 (사진 포함) - 관리자만
        ========================================================= */
     @PostMapping("/emp/insert")
     @ResponseBody
@@ -330,7 +350,7 @@ public class EmpController {
     }
 
     /* =========================================================
-       7. 관리자 여부 체크
+       7. 관리자 여부 체크 (grade 1,2)
        ========================================================= */
     private boolean isAdmin(HttpSession session) {
         LoginVO login = (LoginVO) session.getAttribute("login");
@@ -350,10 +370,14 @@ public class EmpController {
 
     /* =========================================================
        8. 사번 중복 체크 (AJAX)
+       - ✅ 관리자만 사용하게 하려면 isAdmin 체크 추가 가능
        ========================================================= */
     @GetMapping("/emp/checkEmpNo")
     @ResponseBody
-    public String checkEmpNo(@RequestParam("empNo") String empNo) {
+    public String checkEmpNo(@RequestParam("empNo") String empNo, HttpSession session) {
+
+        // (선택) 관리자만 허용하고 싶다면 ↓ 주석 해제
+        // if (!isAdmin(session)) return "DENY";
 
         boolean dup = empService.isEmpNoDuplicate(empNo);
         return dup ? "DUP" : "OK";
