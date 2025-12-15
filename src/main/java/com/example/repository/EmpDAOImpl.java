@@ -1,5 +1,7 @@
 package com.example.repository;
 
+import java.util.Map;
+
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -17,9 +19,9 @@ public class EmpDAOImpl implements EmpDAO{
 
 	 // =======================================================================================
  	// setEmpJobTitle()
- 	public void setEmpJobTitle(DocVO vo) {
+ 	public void setEmpJobTitle(Map<String,Object> map) {
  		log.info("[EmpDAO - setEmpJobTitle 요청 받음]");
- 		sess.update("com.example.repository.EmpMapper.setEmpJobTitle", vo);
+ 		sess.update("com.example.repository.EmpMapper.setEmpJobTitle", map);
  	}
  	// =======================================================================================
  	// end of setEmpJobTitle()

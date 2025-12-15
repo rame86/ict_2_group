@@ -1,7 +1,8 @@
 package com.example.repository;
 
-import com.example.domain.DocVO;
+import java.util.Map;
+
 
 public interface EmpDAO {
-	public void setEmpJobTitle(DocVO vo);
+	public void setEmpJobTitle(Map<String, Object> map);
 }

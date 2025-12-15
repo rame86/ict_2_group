@@ -25,11 +25,11 @@ public class DeptDAOImpl implements DeptDAO {
 	private static final String NAMESPACE = "com.example.repository.DeptDAO";
 
 	public List<DeptVO> selectAllDeptList() {
-		return sess.selectList(NAMESPACE+".selectAllDeptList");
+		return sess.selectList(NAMESPACE + ".selectAllDeptList");
 	}
 
 	public List<EmpVO> selectEmpListByDept(int deptNo) {
-		return sess.selectList(NAMESPACE+".selectEmpListByDept", deptNo);
+		return sess.selectList(NAMESPACE + ".selectEmpListByDept", deptNo);
 	}
 
 	// 부서서 생성
@@ -45,34 +45,34 @@ public class DeptDAOImpl implements DeptDAO {
 		return sess.update(NAMESPACE + ".updateEmpDeptNull", deptNo);
 	}
 
-	// 부서 삭제	
+	// 부서 삭제
 	public int deleteDept(int deptNo) {
 		// XML id="deleteDept" 호출
 		return sess.delete(NAMESPACE + ".deleteDept", deptNo);
 	}
-	
-	// 사원 부서 이동
-    @Override
-    public int updateEmpDept(Map<String, Object> map) {
-        // XML id="updateEmpDept" 호출
-        return sess.update(NAMESPACE + ".updateEmpDept", map);
-    }
 
-    // 변경 이력 로그 저장
-    @Override
-    public int insertEditLog(Map<String, Object> map) { 
-        return sess.insert(NAMESPACE + ".insertEditLog", map);
-    }
-    
+	// 사원 부서 이동
+	@Override
+	public int updateEmpDept(Map<String, Object> map) {
+		// XML id="updateEmpDept" 호출
+		return sess.update(NAMESPACE + ".updateEmpDept", map);
+	}
+
+	// 변경 이력 로그 저장
+	@Override
+	public int insertEditLog(Map<String, Object> map) {
+		return sess.insert(NAMESPACE + ".insertEditLog", map);
+	}
+
 	// =======================================================================================
 	// setDeptManager()
-	public void setDeptManager(DocVO vo, Map<String,Object> map) {
+	public void setDeptManager(Map<String, Object> map) {
 		log.info("[DeptDAO - setDeptManager 요청 받음]");
-		sess.update("com.example.repository.DeptDAO.setDeptManager", vo);
-				
-		sess.insert("com.example.repository.DeptDAO.insertEditLog",map);
+		sess.update("com.example.repository.DeptDAO.setDeptManager", map);
+
+		sess.insert("com.example.repository.DeptDAO.insertEditLog", map);
 	}
 	// end of setDeptManager()
 	// =======================================================================================
-    
+
 }
