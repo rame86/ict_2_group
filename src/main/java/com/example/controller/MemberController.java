@@ -38,7 +38,6 @@ public class MemberController {
 			return "/member/login";
 		}
 		return "index";
-		
 	}
  
 	@GetMapping("/member/empNoCheck")

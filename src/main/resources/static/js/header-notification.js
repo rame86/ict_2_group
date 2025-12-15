@@ -123,6 +123,7 @@ function connectSocket() {
 				}
 			}
 			stompClient = null;
+			window.location.href = '/';
     });
 	
 	}
