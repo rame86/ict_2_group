@@ -1,5 +1,6 @@
 package com.example.repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.domain.DeptVO;
 import com.example.domain.DocVO;
+import com.example.domain.EditVO;
 import com.example.domain.EmpVO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -58,16 +60,17 @@ public class DeptDAOImpl implements DeptDAO {
 
     // 변경 이력 로그 저장
     @Override
-    public int insertEditLog(Map<String, Object> map) {
-        // XML id="insertEditLog" 호출
+    public int insertEditLog(Map<String, Object> map) { 
         return sess.insert(NAMESPACE + ".insertEditLog", map);
     }
     
 	// =======================================================================================
 	// setDeptManager()
-	public void setDeptManager(DocVO vo) {
+	public void setDeptManager(DocVO vo, Map<String,Object> map) {
 		log.info("[DeptDAO - setDeptManager 요청 받음]");
 		sess.update("com.example.repository.DeptDAO.setDeptManager", vo);
+				
+		sess.insert("com.example.repository.DeptDAO.insertEditLog",map);
 	}
 	// end of setDeptManager()
 	// =======================================================================================

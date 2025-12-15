@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.domain.DeptVO;
 import com.example.domain.DocVO;
+import com.example.domain.EditVO;
 import com.example.domain.EmpVO;
 import com.example.repository.DeptDAO;
 import com.example.repository.EmpDeptMapper;
@@ -64,7 +65,12 @@ public class DeptServiceImpl implements DeptService {
 	}
 	
 	public void setDeptManager(DocVO vo) {
-		deptDAO.setDeptManager(vo);
+		Map<String, Object> map = new HashMap<>();
+		map.put("empNo", vo.getTargetEmpNo());		
+		map.put("writer", vo.getEmpNo());
+		map.put("eNote", vo.getMemo() + "임명");		
+		
+		deptDAO.setDeptManager(vo, map);
 		
 	}
 }
