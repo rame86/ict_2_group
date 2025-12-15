@@ -309,12 +309,12 @@
 	</select>
 	
 	<!-- 부서장 설정 설정 -->
-	<update id="setEmpJobTitle" parameterType="DocVO">
+	<update id="setEmpJobTitle" parameterType="map">
 		UPDATE EMP
 		SET
-		JOB_TITLE = #{memo},
-		GRADE_NO = '2'		
-		WHERE EMP_NO = #{targetEmpNo}
+		JOB_TITLE = #{jobTitle},
+		GRADE_NO = #{targetGradeNo}		
+		WHERE EMP_NO = #{empNo}
 	</update>
 
 </mapper>

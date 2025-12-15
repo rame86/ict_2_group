@@ -1,4 +1,4 @@
-/* dept.css - 최종 수정본 */
+/* dept.css - 최종 수정본 (Z-Index 수정됨) */
 
 /* =========================================
    1. 트리 구조 핵심 CSS (선 그리기)
@@ -138,18 +138,25 @@
 
 
 /* =========================================
-   [중요] 모달 스타일 통합 (오류 수정됨)
+   [중요] 모달 및 레이어 순서 (Z-Index 완벽 정리)
    ========================================= */
 
-/* 애니메이션 정의 (@ 문법 필수) */
-@keyframes slideDown {
-    from { transform: translateY(-30px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+/* 1. 가장 밑바닥: 관리자 플로팅 버튼 */
+/* 모달이 뜨면 이 버튼은 모달 배경(어두운 막) 뒤로 가야 합니다 */
+.admin-action-area {
+    position: fixed;
+    left: 280px;
+    top: 220px;
+    bottom: auto;
+    /* 모달(4000~)보다 확실히 아래에 위치 */
+    z-index: 3000 !important; 
+    display: flex;
+    gap: 10px;
 }
 
-/* 모달 배경 */
+/* 2. 모달 기본 설정 */
 .modal-custom {
-    display: none; /* 기본 숨김 */
+    display: none;
     position: fixed;
     left: 0;
     top: 0;
@@ -159,10 +166,38 @@
     backdrop-filter: blur(3px);
 }
 
-/* ★ 모달 레이어 순서 (Z-Index) 정리 ★ */
-#deptInfoModal { z-index: 9990; }      /* 부서정보 (가장 밑) */
-#deptAppointModal { z-index: 9995; }   /* 부서장 선택 (중간) */
-#approvalDraftModal { z-index: 10000; } /* 기안서 작성 (가장 위) */
+/* ★★★ 레이어 순서(Hierarchy) 정의 ★★★ */
+
+/* [Layer 1] 기본 모달 (부서 정보, 생성, 삭제) */
+/* 이들은 가장 먼저 뜨는 창입니다. 버튼(3000)보다는 위에 있습니다. */
+#deptInfoModal, 
+#deptCreateModal, 
+#deptDeleteModal { 
+    z-index: 4000; 
+}
+
+/* [Layer 2] 상세/작업 모달 (부서 정보 창에서 '이동'이나 '임명'을 눌렀을 때 뜨는 창) */
+/* Layer 1(4000)보다 무조건 위에 떠야 합니다. */
+#deptMoveModal,      /* 부서 이동 */
+#deptAppointModal,   /* 부서장 임명 */
+#employeeDetailModal /* 사원 상세(가정) */ { 
+    z-index: 5000; 
+}
+
+/* [Layer 3] 최상위 모달 (기안서 작성) */
+/* 모든 작업의 끝인 결재 기안 창은 무조건 가장 위에 떠야 합니다. */
+#approvalDraftModal { 
+    z-index: 6000; 
+}
+
+
+/* --- 아래는 기존 디자인 유지 --- */
+
+/* 애니메이션 */
+@keyframes slideDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
 
 /* 모달 내용 박스 */
 .modal-content-custom {
@@ -173,10 +208,10 @@
     max-width: 450px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
     overflow: hidden;
-    animation: slideDown 0.3s ease-out; /* 애니메이션 적용 */
+    animation: slideDown 0.3s ease-out;
 }
 
-/* 기안서 모달은 좀 더 넓게 */
+/* 기안서 모달 넓게 */
 #approvalDraftModal .modal-content-custom {
     max-width: 600px;
 }
@@ -341,14 +376,14 @@
 .org-node.my-dept .profile-pic { border-color: #FFB6C1; }
 
 /* =========================================
-   관리자용 플로팅 버튼
+   관리자용 플로팅 버튼 (Z-Index 수정됨)
    ========================================= */
 .admin-action-area {
     position: fixed;
     left: 280px;
     top: 220px;
     bottom: auto;
-    z-index: 99999 !important;
+    z-index: 3000 !important; /* 모달보다 낮게 조정 */
     display: flex;
     gap: 10px;
 }

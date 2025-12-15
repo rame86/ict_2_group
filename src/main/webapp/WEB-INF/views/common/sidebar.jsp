@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <%
 String menu = (String) request.getAttribute("menu");
@@ -47,39 +48,45 @@ if (menu == null)
 						</div> 근태관리
 					</a>
 
-					<%-- 사원 관리 --%>
-					<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-						data-bs-target="#collapseEmp" aria-expanded="false"
-						aria-controls="collapseEmp">
-						<div class="sb-nav-link-icon">
-							<i class="fas fa-book-open"></i>
-						</div> 사원관리
-						<div class="sb-sidenav-collapse-arrow">
-							<i class="fas fa-angle-down"></i>
+					<c:if
+						test="${not empty sessionScope.login 
+            and (sessionScope.login.gradeNo eq '1' or sessionScope.login.gradeNo eq '2')}">
+
+						<%-- 사원 관리 --%>
+						<a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+							data-bs-target="#collapseEmp" aria-expanded="false"
+							aria-controls="collapseEmp">
+							<div class="sb-nav-link-icon">
+								<i class="fas fa-book-open"></i>
+							</div> 사원관리
+							<div class="sb-sidenav-collapse-arrow">
+								<i class="fas fa-angle-down"></i>
+							</div>
+						</a>
+
+						<div
+							class="collapse <%=(menu.equals("emp") || menu.equals("empNew")) ? "show" : ""%>"
+							id="collapseEmp" aria-labelledby="headingOne"
+							data-bs-parent="#sidenavAccordion">
+
+							<nav class="sb-sidenav-menu-nested nav">
+								<a class="nav-link <%=menu.equals("emp") ? "active" : ""%>"
+									href="${pageContext.request.contextPath}/emp/list"> 사원 목록 </a>
+
+								<a class="nav-link <%=menu.equals("empNew") ? "active" : ""%>"
+									href="${pageContext.request.contextPath}/emp/new"> 사원 등록 </a>
+							</nav>
 						</div>
-					</a>
 
-					<div
-						class="collapse <%=(menu.equals("emp") || menu.equals("empNew")) ? "show" : ""%>"
-						id="collapseEmp" aria-labelledby="headingOne"
-						data-bs-parent="#sidenavAccordion">
+					</c:if>
 
-						<nav class="sb-sidenav-menu-nested nav">
-
-							<a class="nav-link <%=menu.equals("emp") ? "active" : ""%>"
-								href="${pageContext.request.contextPath}/emp/list"> 사원 목록 </a> <a
-								class="nav-link <%=menu.equals("empNew") ? "active" : ""%>"
-								href="${pageContext.request.contextPath}/emp/new"> 사원 등록 </a>
-
-						</nav>
-					</div>
 
 
 					<%--부서 관리 --%>
 					<a class="nav-link collapsed" href="/dept/dept">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-book-open"></i>
-						</div> 부서관리						
+						</div> 부서관리
 					</a>
 
 					<%--결재 관리 --%>

@@ -1,6 +1,4 @@
 /* ====== 전체 레이아웃 ====== */
-
-
 /* 폰트 전체 통일 (salList 페이지) */
 #layoutSidenav_content,
 #layoutSidenav_content * {
@@ -87,7 +85,6 @@ table.salary-table tbody tr:hover {
 .month-pill:active{
   transform: translateY(0);
 }
-
 
 .text-muted {
 	text-align: center;
@@ -293,7 +290,6 @@ table.salary-table tbody tr:hover{
   text-align: center;
 }
 
-
 /* ===== 정렬 화살표 위치 조정 ===== */
 
 /* 숫자 컬럼 헤더의 정렬 화살표를 더 오른쪽으로 */
@@ -333,7 +329,6 @@ table.salary-table tbody tr:hover{
   color: #C2410C;
   border: 1px solid #FED7AA;
 }
-
 
 /* ===== DataTables 페이징 가운데 정렬 ===== */
 div.dataTables_wrapper div.dataTables_paginate{
