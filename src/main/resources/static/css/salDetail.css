@@ -1,6 +1,18 @@
 /* =========================================================
    ✅ salDetail.jsp 전용 필수 스타일 (최소본)
    ========================================================= */
+ 
+ /* salDetail.jsp폰트 통일 */  
+ .mt-4,
+.sal-List-Title,
+.info-card-header,
+.salary-box,
+.btn-print,
+.btn-area,
+.summary-box {
+font-family: 'SUIT', 'Pretendard', 'Noto Sans KR', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
 
 /* 1) 공통 래퍼 */
 .content-wrapper {
@@ -406,8 +418,8 @@
   color: #333 !important;
 }
 
-/* ===== 드롭다운이 위로 뜨는 현상 완화(아래 공간 확보) ===== */
-#layoutSidenav_content main .container-fluid{
+/* ✅ adminList에서만 적용되도록 범위 제한 */
+.sal-admin-page #layoutSidenav_content main .container-fluid{
   padding-bottom: 260px;
 }
 
@@ -423,3 +435,4 @@
     justify-content: space-between;
   }
 }
+

@@ -32,10 +32,12 @@ public interface SalMapper {
     List<SalVO> selectAdminSalList(Map<String, String> param);
 
     // 🔹 MONTH_ATTEND 기준 일괄 급여 생성
-    int insertSalaryByMonth(@Param("targetMonth") String month);
+    int insertSalaryByMonth(String targetMonth);
 
     // 🔹 관리자용 정렬/월필터 급여 목록
     List<SalVO> getAdminSalList(Map<String, Object> param);
 
     Map<String, Object> getAdminSalSummary(Map<String, Object> param);
+    
+    Map<String, Object> getEmpSalSummary(String empNo);
 }

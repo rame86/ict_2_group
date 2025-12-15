@@ -17,6 +17,9 @@
 <jsp:include page="../common/header.jsp" />
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/salDetail.css">
+	
+	<!-- SUIT 폰트 로드 (없으면 폰트 적용 안됨) -->
+<link href="https://cdn.jsdelivr.net/npm/suit-font/dist/suit.min.css" rel="stylesheet">
 
 </head>
 <body>
@@ -33,7 +36,7 @@
 						<h3 class="mt-4">급여 관리</h3>
 					</div>
 					<br>
-					<h4>급여 명세서</h4>
+					<h4 class = "sal-List-Title">급여 명세서</h4>
 
 					<div class="content-wrapper">
 

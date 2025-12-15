@@ -57,4 +57,9 @@ public class SalServiceImpl implements SalService {
 		
 		return salMapper.getAdminSalSummary(param);
 	}
+
+	@Override
+	public Map<String, Object> getEmpSalSummary(String empNo) {
+				return salMapper.getEmpSalSummary(empNo);
+	}
 }
