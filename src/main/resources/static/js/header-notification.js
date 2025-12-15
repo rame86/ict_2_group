@@ -1,7 +1,3 @@
-// ==========================================
-// [수정완성본] 알림 및 소켓 연결 JS
-// ==========================================
-
 // 1. 알람 권한 요청
 function requestNotificationPermission() {
 	if (!('Notification' in window)) {
@@ -23,31 +19,22 @@ let stompClient = null;
 // 2. 소켓 연결 함수 (핵심 수정: 진입 시점 방어 로직 추가)
 function connectSocket() {
 
-    // [중요] 함수 시작하자마자 값 확인. 없으면 즉시 종료.
-    // SockJS 객체를 생성하기 전에 막아야 서버로 요청이 안 날아갑니다.
     const checkEmpNo = $('#sessionEmpNo').val();
     if (!checkEmpNo || checkEmpNo.trim() === "" || checkEmpNo === "null") {
         console.log("⛔ [connectSocket] 로그인 정보 없음. 소켓 연결을 중단합니다.");
         return; 
     }
 
-    // --- 로그인 정보가 있을 때만 아래 로직 실행 ---
-
 	const socket = new SockJS('/ws/stomp');
 	stompClient = Stomp.over(socket);
-    
-    // 디버그 로그 끄기 (선택사항: 콘솔 지저분하면 주석 해제)
-    // stompClient.debug = null; 
-
+  
 	stompClient.connect({}, function(frame) {
 
 		console.log('STOMP: 연결 성공!');
 		const myEmpNo = $('#sessionEmpNo').val();
 
-		// 1-1. 대화 목록 로드
 		loadConversationList(myEmpNo);
 
-		// 1-2. 채팅방 자동 로드 (파라미터 체크)
 		const urlParams = new URLSearchParams(window.location.search);
 		const initialEmpNo = urlParams.get('otherEmpNo');
 		const initialEmpNameParam = urlParams.get('otherEmpName');
@@ -57,14 +44,34 @@ function connectSocket() {
 			loadChatWindow(initialEmpNo, initialEmpName);
 		}
 
-		// 2-1. 개인 알림 구독
 		const personalTopic = '/topic/notifications/' + myEmpNo;
 		stompClient.subscribe(personalTopic, function(notificationOutput) {
 			console.log("STOMP: 개인 알림 도착");
-
+			
+			let notificationData = {};
+			try {
+				notificationData = JSON.parse(notificationOutput.body);
+			} catch (e) {
+				console.error("수신 데이터 파싱 오류:", e);
+				return;
+			}
+			
+			if(notificationData.action === 'REFRESH_HEADER_ALERTS') {
+				console.log("--> 헤더 알림 목록 갱신 신호 수신");
+				
+				if(typeof updateHeaderAlerts === 'function') {
+					updateHeaderAlerts();
+				} else {
+					console.warn("WARN: updateHeaderAlerts 함수가 정의되지 않았습니다.");
+				}
+				
+				return;
+			}
+			
+			
+			console.log("--> 채팅 알림 처리 시작");
 			if ('Notification' in window && Notification.permission === 'granted') {
 				try {
-					const notificationData = JSON.parse(notificationOutput.body);
 					const senderName = notificationData.senderName || '알 수 없는 발신자';
 					const messageContent = notificationData.msgContent || '메시지 내용을 확인해주세요.';
 
@@ -111,15 +118,21 @@ function connectSocket() {
 				console.error("결재 알림 오류:", e);
 			}
 		});
-
-	}, function(error) {
-		console.error('STOMP: 연결 끊김/오류:', error);
-        // [중요] 에러 발생 시 리다이렉트 금지.
-		if (stompClient) {
-			try { stompClient.disconnect(); } catch (e) {}
-		}
-		stompClient = null;
-	});
+        
+    }, function(error) {
+        console.error('STOMP: 연결 실패 또는 오류:', error);
+		if (stompClient && stompClient.connected) {
+			try {
+					// 이미 끊어졌을 수 있으나, 혹시 모를 상황을 대비해 연결을 명시적으로 끊습니다.
+					stompClient.disconnect();
+				} catch (e) {
+					// disconnect 중 에러가 발생해도 무시 (이미 연결이 끊어진 경우)
+				}
+			}
+			stompClient = null;
+			window.location.href = '/';
+    });
+	
 }
 
 // 3. 페이지 로드 시 실행

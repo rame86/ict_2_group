@@ -18,7 +18,7 @@ public class EmpDAOImpl implements EmpDAO{
 	 // =======================================================================================
  	// setEmpJobTitle()
  	public void setEmpJobTitle(DocVO vo) {
- 		log.info("[AttendDAO - setEmpJobTitle 요청 받음]");
+ 		log.info("[EmpDAO - setEmpJobTitle 요청 받음]");
  		sess.update("com.example.repository.EmpMapper.setEmpJobTitle", vo);
  	}
  	// =======================================================================================
