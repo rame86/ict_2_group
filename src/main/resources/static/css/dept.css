@@ -1,472 +1,262 @@
-/* dept.css */
+/* dept.css - 최종 수정본 */
 
 /* =========================================
-       1. 트리 구조 핵심 CSS (선 그리기)
+   1. 트리 구조 핵심 CSS (선 그리기)
    ========================================= */
-.org-tree * {
-	box-sizing: border-box;
-}
+.org-tree * { box-sizing: border-box; }
 
 .org-tree {
-	display: flex;
-	justify-content: center;
-	padding-top: 20px;
-	overflow-x: auto; /* 화면 작을 때 가로 스크롤 */
-	padding-bottom: 50px;
+    display: flex;
+    justify-content: center;
+    padding-top: 20px;
+    overflow-x: auto;
+    padding-bottom: 50px;
 }
 
 .org-tree ul {
-	padding-top: 20px;
-	position: relative;
-	display: flex;
-	justify-content: center;
+    padding-top: 20px;
+    position: relative;
+    display: flex;
+    justify-content: center;
 }
 
 .org-tree li {
-	float: left;
-	text-align: center;
-	list-style-type: none;
-	position: relative;
-	padding: 20px 10px 0 10px; /* 좌우 간격 조절 */
+    float: left;
+    text-align: center;
+    list-style-type: none;
+    position: relative;
+    padding: 20px 10px 0 10px;
 }
 
-/* 선 그리기: 수직선 및 가로선 */
+/* 선 그리기 */
 .org-tree li::before, .org-tree li::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	right: 50%;
-	border-top: 2px solid #ccc;
-	width: 50%;
-	height: 20px;
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    border-top: 2px solid #ccc;
+    width: 50%;
+    height: 20px;
 }
-
 .org-tree li::after {
-	right: auto;
-	left: 50%;
-	border-left: 2px solid #ccc;
+    right: auto;
+    left: 50%;
+    border-left: 2px solid #ccc;
 }
-
-/* 첫 번째, 마지막 자식의 선 정리 */
-.org-tree li:only-child::after, .org-tree li:only-child::before {
-	display: none;
-}
-
-.org-tree li:only-child {
-	padding-top: 0;
-}
-
-.org-tree li:first-child::before, .org-tree li:last-child::after {
-	border: 0 none;
-}
-
-/* 선 굴곡 처리 (선택사항) */
+.org-tree li:only-child::after, .org-tree li:only-child::before { display: none; }
+.org-tree li:only-child { padding-top: 0; }
+.org-tree li:first-child::before, .org-tree li:last-child::after { border: 0 none; }
 .org-tree li:last-child::before {
-	border-right: 2px solid #ccc;
-	border-radius: 0 5px 0 0;
+    border-right: 2px solid #ccc;
+    border-radius: 0 5px 0 0;
 }
-
-.org-tree li:first-child::after {
-	border-radius: 5px 0 0 0;
-}
-
-/* 자식 노드로 내려가는 수직선 */
+.org-tree li:first-child::after { border-radius: 5px 0 0 0; }
 .org-tree ul ul::before {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 50%;
-	border-left: 2px solid #ccc;
-	width: 0;
-	height: 20px;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 2px solid #ccc;
+    width: 0;
+    height: 20px;
 }
 
 /* =========================================
-       2. 카드(Node) 디자인
+   2. 카드(Node) 디자인
    ========================================= */
 .org-node {
-	display: inline-block;
-	background-color: #fff;
-	border: 1px solid #e3e6f0;
-	border-radius: 12px;
-	padding: 15px;
-	min-width: 140px; /* 최소 너비 */
-	text-align: center;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-	position: relative;
-	z-index: 2; /* 선 위에 오도록 */
+    display: inline-block;
+    background-color: #fff;
+    border: 1px solid #e3e6f0;
+    border-radius: 12px;
+    padding: 15px;
+    min-width: 140px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 2;
 }
 
 .org-node:hover {
-	transform: translateY(-5px);
-	box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* CEO 스타일 */
 .org-node.ceo {
-	border: 2px solid #f6c23e; /* 노란색 */
-	background-color: #fffdf5;
-	min-width: 180px;
+    border: 2px solid #f6c23e;
+    background-color: #fffdf5;
+    min-width: 180px;
 }
-
-/* 부서장 스타일 */
-.org-node.head {
-	border-top: 4px solid #4e73df; /* 파란색 */
-}
-
-/* 팀 스타일 */
-.org-node.team {
-	min-width: 120px;
-}
+.org-node.head { border-top: 4px solid #4e73df; }
+.org-node.team { min-width: 120px; }
 
 /* 프로필 이미지 */
 .profile-pic {
-	width: 60px;
-	height: 60px;
-	border-radius: 50%;
-	overflow: hidden;
-	margin: 0 auto 10px;
-	border: 2px solid #eaecf4;
-	background-color: #fff;
-	display: block;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 10px;
+    border: 2px solid #eaecf4;
+    background-color: #fff;
+    display: block;
 }
-
 .profile-pic img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
-
 .ceo .profile-pic {
-	width: 80px;
-	height: 80px;
-	border-color: #f6c23e;
+    width: 80px;
+    height: 80px;
+    border-color: #f6c23e;
 }
 
 /* 텍스트 스타일 */
 .dept-name {
-	font-weight: 800;
-	color: #333;
-	margin-bottom: 4px;
-	font-size: 15px;
-	display: block;
+    font-weight: 800;
+    color: #333;
+    margin-bottom: 4px;
+    font-size: 15px;
+    display: block;
 }
-
 .position {
-	font-size: 12px;
-	color: #888;
-	margin-bottom: 2px;
-	display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 2px;
+    display: block;
 }
-
 .manager-name {
-	font-size: 14px;
-	font-weight: bold;
-	color: #4e73df;
-	display: block;
-}
-
-.ceo .manager-name {
-	color: #d4a017;
-}
-
-/* =========================================
-       모달 스타일 (기존 유지)
-   ========================================= */
-#deptInfoModal {
-	display: none;
-	position: fixed;
-	z-index: 9999;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	overflow: auto;
-	background-color: rgba(0, 0, 0, 0.6);
-	backdrop-filter: blur(2px);
-}
-
-.modal-content-custom {
-	background-color: #fff;
-	margin: 5% auto;
-	border-radius: 10px;
-	width: 90%;
-	max-width: 500px;
-	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-	animation: slideDown 0.3s;
-}
-
-keyframes slideDown {
-	from {transform: translateY(-50px);
-	opacity: 0;
-}
-
-to {
-	transform: translateY(0);
-	opacity: 1;
-}
-
-}
-.modal-header-custom {
-	padding: 15px 20px;
-	background-color: #4e73df;
-	color: white;
-	border-top-left-radius: 10px;
-	border-top-right-radius: 10px;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-}
-
-.close-btn {
-	cursor: pointer;
-	font-size: 24px;
-}
-
-.modal-body-custom {
-	padding: 20px;
-	min-height: 150px;
-}
-
-/* 리스트 스타일 */
-#employeeList {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-}
-
-.emp-item {
-	display: flex;
-	align-items: center;
-	padding: 10px;
-	border-bottom: 1px solid #eee;
-	cursor: pointer;
-}
-
-.emp-item:hover {
-	background-color: #f8f9fc;
-}
-
-.emp-thumb {
-	width: 45px;
-	height: 45px;
-	border-radius: 50%;
-	margin-right: 15px;
-	border: 1px solid #ddd;
-	object-fit: cover;
-}
-
-.btn-manage-custom {
-	width: 100%;
-	padding: 12px;
-	background: #4e73df;
-	color: white;
-	border: none;
-	border-bottom-left-radius: 10px;
-	border-bottom-right-radius: 10px;
-	cursor: pointer;
-	font-size: 16px;
-}
-
-.btn-manage-custom:hover {
-	background: #2e59d9;
-}
-
-/* =========================================
-       [추가] 하위 부서 2열 배치용 스타일
-   ========================================= */
-
-/* Level 3를 감싸는 UL: 가로 일직선 대신 격자(Grid) 모양으로 변경 */
-.org-tree ul.team-grid {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr); /* 한 줄에 2개씩 배치 */
-	gap: 15px; /* 카드 사이 간격 */
-	width: 300px; /* 전체 박스 너비 고정 (적절히 조절 가능) */
-	padding-top: 20px;
-	margin: 0 auto; /* 가운데 정렬 */
-	justify-items: center; /* 그리드 아이템 가운데 정렬 */
-}
-
-/* Grid 내부의 LI: 기존 트리 선 제거 (박스형 배치를 위해) */
-.org-tree ul.team-grid li {
-	float: none;
-	padding: 0;
-	width: 100%; /* 셀 꽉 채우기 */
-	display: flex;
-	justify-content: center;
-}
-
-/* Grid 내부의 연결선 제거 (깔끔하게 카드만 보이도록) */
-.org-tree ul.team-grid li::before, .org-tree ul.team-grid li::after {
-	display: none;
-}
-
-/* 부서장(Level 2)과 팀(Level 3) 박스를 잇는 중앙 수직선 */
-.org-tree ul.team-grid::before {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 50%;
-	border-left: 2px solid #ccc;
-	width: 0;
-	height: 20px;
-	transform: translateX(-50%); /* 정확한 중앙 정렬 */
-}
-
-/* =========================================
-       3. [추가] 내 부서 강조 스타일 (분홍색)
-   ========================================= */
-
-/* 로그인한 유저의 부서 (클래스명: my-dept) */
-.org-node.my-dept {
-	border-color: #FF8FA3 !important; /* 테두리: 연한 핫핑크 */
-	background-color: #FFF0F5; /* 배경: 아주 연한 핑크 (LavenderBlush) */
-	box-shadow: 0 0 15px rgba(255, 105, 180, 0.5); /* 분홍색 은은한 발광 효과 */
-	transform: translateY(-3px); /* 살짝 떠있는 느낌 */
-}
-
-/* 내 부서의 부서장 이름 색상 변경 */
-.org-node.my-dept .manager-name {
-	color: #D63384 !important; /* 글자: 진한 핑크 */
-}
-
-/* 부서장급(head)일 때 상단 굵은 선 색상 변경 */
-.org-node.head.my-dept {
-	border-top-color: #FF8FA3 !important;
-}
-
-/* CEO가 내 부서일 경우 (혹시 모를 상황 대비) */
-.org-node.ceo.my-dept {
-	border-color: #FF8FA3 !important;
-}
-
-/* 프로필 사진 테두리도 핑크로 변경 */
-.org-node.my-dept .profile-pic {
-	border-color: #FFB6C1;
-}
-
-/* =========================================
-       4. [수정] 관리자용 플로팅 버튼 (좌측 상단으로 이동)
-   ========================================= */
-.admin-action-area {
-    position: fixed;
-    /* 사이드바 너비(약 225~250px) + 여백 */
-    left: 280px; 
-    
-    /* 헤더 높이 + 여백 (화면 상단에서 얼마나 띄울지) */
-    top: 220px;   
-    
-    /* 기존 bottom 속성은 제거하거나 auto로 초기화 */
-    bottom: auto; 
-    
-    z-index: 99999 !important; /* ⭐️ 가장 앞으로 강제 호출 */
-    display: flex;
-    gap: 10px;
-}
-
-/* 버튼 스타일은 기존 유지 */
-.btn-float {
-    padding: 10px 16px; /* 크기 약간 조절 (선택사항) */
-    border-radius: 30px;
-    border: none;
-    font-weight: bold;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-    transition: transform 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
     font-size: 14px;
+    font-weight: bold;
+    color: #4e73df;
+    display: block;
 }
+.ceo .manager-name { color: #d4a017; }
 
-.btn-float:hover {
-    transform: translateY(-2px);
-}
-
-.btn-create { background-color: #09C9DE; } /* 초록색 */
-.btn-delete { background-color: #E55D3D; } /* 빨간색 */
 
 /* =========================================
-       5. [수정] 모달 및 폼 스타일 개선
+   [중요] 모달 스타일 통합 (오류 수정됨)
    ========================================= */
 
-/* 모달 배경 오버레이 */
-.modal-custom {
-    display: none;
-    position: fixed;
-    z-index: 9999;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* 반투명 검은색 배경 */
-    backdrop-filter: blur(3px); /* 배경 블러 효과 추가 */
-}
-
-/* 모달 컨텐츠 박스 */
-.modal-content-custom {
-    background-color: #fff;
-    margin: 5% auto; /* 상단 여백 조정 */
-    border-radius: 15px; /* 더 둥근 모서리 */
-    width: 90%;
-    max-width: 450px; /* 최대 너비 약간 넓힘 */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* 부드럽고 깊은 그림자 */
-    overflow: hidden; /* 자식 요소의 border-radius 넘침 방지 */
-    animation: slideDown 0.3s ease-out; /* 부드러운 등장 애니메이션 */
-}
-
+/* 애니메이션 정의 (@ 문법 필수) */
 @keyframes slideDown {
     from { transform: translateY(-30px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
 
+/* 모달 배경 */
+.modal-custom {
+    display: none; /* 기본 숨김 */
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+}
+
+/* ★ 모달 레이어 순서 (Z-Index) 정리 ★ */
+#deptInfoModal { z-index: 9990; }      /* 부서정보 (가장 밑) */
+#deptAppointModal { z-index: 9995; }   /* 부서장 선택 (중간) */
+#approvalDraftModal { z-index: 10000; } /* 기안서 작성 (가장 위) */
+
+/* 모달 내용 박스 */
+.modal-content-custom {
+    background-color: #fff;
+    margin: 5% auto;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    animation: slideDown 0.3s ease-out; /* 애니메이션 적용 */
+}
+
+/* 기안서 모달은 좀 더 넓게 */
+#approvalDraftModal .modal-content-custom {
+    max-width: 600px;
+}
+
 /* 모달 헤더 */
 .modal-header-custom {
-    padding: 20px 25px;
+    padding: 15px 20px;
+    background-color: #4e73df;
     color: white;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 1.2rem;
     font-weight: 600;
 }
+.modal-header-create { background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%); }
+.modal-header-delete { background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%); }
 
-/* 부서 생성 모달 헤더 테마 (녹색) */
-.modal-header-create {
-    background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
-}
-
-/* 부서 삭제 모달 헤더 테마 (빨간색) */
-.modal-header-delete {
-    background: linear-gradient(135deg, #e74a3b 0%, #c0392b 100%);
-}
-
-/* 닫기 버튼 */
 .close-btn {
-    color: rgba(255, 255, 255, 0.8);
     cursor: pointer;
-    font-size: 28px;
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.8);
     transition: color 0.2s;
 }
+.close-btn:hover { color: #fff; }
 
-.close-btn:hover {
-    color: #fff;
-}
-
-/* 모달 바디 */
 .modal-body-custom {
-    padding: 30px 25px;
+    padding: 20px;
+    min-height: 150px;
     color: #555;
 }
 
-/* 폼 스타일 */
-.form-group {
-    margin-bottom: 20px;
+/* =========================================
+   리스트 및 폼 스타일
+   ========================================= */
+#employeeList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.emp-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+.emp-item:hover { background-color: #f8f9fc; }
+.emp-thumb {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    margin-right: 15px;
+    border: 1px solid #ddd;
+    object-fit: cover;
 }
 
+/* 버튼 스타일 */
+.btn-manage-custom {
+    width: 100%;
+    padding: 12px;
+    background: #4e73df;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: background 0.2s, transform 0.1s;
+}
+.btn-manage-custom:hover { background: #2e59d9; }
+.btn-manage-custom:active { transform: scale(0.98); }
+
+.btn-create-submit { background: #1cc88a; }
+.btn-delete-submit { background: #e74a3b; }
+
+.form-group { margin-bottom: 20px; }
 .form-group label {
     display: block;
     margin-bottom: 8px;
@@ -474,9 +264,7 @@ to {
     color: #333;
     font-size: 0.95rem;
 }
-
-.form-group input,
-.form-group select {
+.form-group input, .form-group select, .form-group textarea {
     width: 100%;
     padding: 12px 15px;
     border: 1px solid #ddd;
@@ -484,60 +272,15 @@ to {
     font-size: 1rem;
     color: #555;
     transition: border-color 0.2s, box-shadow 0.2s;
-    box-sizing: border-box; /* 패딩 포함 너비 계산 */
+    box-sizing: border-box;
 }
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #1cc88a; /* 포커스 시 녹색 테두리 (생성 모달 기준) */
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: #1cc88a;
     box-shadow: 0 0 0 3px rgba(28, 200, 138, 0.1);
     outline: none;
 }
 
-/* 부서 삭제 모달 내 select 포커스 색상 */
-#deptDeleteModal .form-group select:focus {
-    border-color: #e74a3b;
-    box-shadow: 0 0 0 3px rgba(231, 74, 59, 0.1);
-}
-
-
-/* 버튼 스타일 */
-.btn-manage-custom {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: white;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-    margin-top: 10px;
-}
-
-.btn-manage-custom:active {
-    transform: scale(0.98);
-}
-
-/* 부서 생성 버튼 테마 (녹색) */
-.btn-create-submit {
-    background: #1cc88a;
-}
-
-.btn-create-submit:hover {
-    background: #17a673;
-}
-
-/* 부서 삭제 버튼 테마 (빨간색) */
-.btn-delete-submit {
-    background: #e74a3b;
-}
-
-.btn-delete-submit:hover {
-    background: #c0392b;
-}
-
-/* 경고 문구 스타일 */
+/* 경고 문구 */
 .warning-text {
     color: #e74a3b;
     font-size: 0.9rem;
@@ -550,21 +293,91 @@ to {
     display: flex;
     align-items: center;
 }
+.warning-text i { margin-right: 10px; font-size: 1.2rem; }
 
-.warning-text i {
-    margin-right: 10px;
-    font-size: 1.2rem;
+/* =========================================
+   하위 부서 2열 배치 (Grid)
+   ========================================= */
+.org-tree ul.team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    width: 300px;
+    padding-top: 20px;
+    margin: 0 auto;
+    justify-items: center;
+}
+.org-tree ul.team-grid li {
+    float: none;
+    padding: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.org-tree ul.team-grid li::before, .org-tree ul.team-grid li::after { display: none; }
+.org-tree ul.team-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    border-left: 2px solid #ccc;
+    width: 0;
+    height: 20px;
+    transform: translateX(-50%);
 }
 
 /* =========================================
-       6. [추가] 사원 이동/제외 버튼 스타일
+   내 부서 강조 (분홍색)
+   ========================================= */
+.org-node.my-dept {
+    border-color: #FF8FA3 !important;
+    background-color: #FFF0F5;
+    box-shadow: 0 0 15px rgba(255, 105, 180, 0.5);
+    transform: translateY(-3px);
+}
+.org-node.my-dept .manager-name { color: #D63384 !important; }
+.org-node.head.my-dept { border-top-color: #FF8FA3 !important; }
+.org-node.ceo.my-dept { border-color: #FF8FA3 !important; }
+.org-node.my-dept .profile-pic { border-color: #FFB6C1; }
+
+/* =========================================
+   관리자용 플로팅 버튼
+   ========================================= */
+.admin-action-area {
+    position: fixed;
+    left: 280px;
+    top: 220px;
+    bottom: auto;
+    z-index: 99999 !important;
+    display: flex;
+    gap: 10px;
+}
+.btn-float {
+    padding: 10px 16px;
+    border-radius: 30px;
+    border: none;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+}
+.btn-float:hover { transform: translateY(-2px); }
+.btn-create { background-color: #09C9DE; }
+.btn-delete { background-color: #E55D3D; }
+
+/* =========================================
+   사원 이동/제외 버튼
    ========================================= */
 .emp-actions {
-    margin-left: auto; /* 오른쪽 끝으로 밀기 */
+    margin-left: auto;
     display: flex;
     gap: 5px;
 }
-
 .btn-xs {
     padding: 4px 8px;
     font-size: 11px;
@@ -575,14 +388,7 @@ to {
     font-weight: bold;
     transition: background 0.2s;
 }
-
-.btn-move { background-color: #36b9cc; } /* 청록색 */
+.btn-move { background-color: #36b9cc; }
 .btn-move:hover { background-color: #2c9faf; }
-
-.btn-exclude { background-color: #858796; } /* 회색 */
+.btn-exclude { background-color: #858796; }
 .btn-exclude:hover { background-color: #60616f; }
-
-/* 리스트 아이템 레이아웃 수정 */
-.emp-item {
-    justify-content: space-between; /* 양쪽 정렬 */
-}

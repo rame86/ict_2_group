@@ -56,8 +56,7 @@
 		$(document).ready(function() {
 			updateSidebarBadge();
 			// 전자결재 사이드바 알람
-			$("#collapseApproval").on('show.bs.collapse', function() {
-			});
+			$("#collapseApproval").on('show.bs.collapse', function() {});
 		});
 	</script>
 	<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">

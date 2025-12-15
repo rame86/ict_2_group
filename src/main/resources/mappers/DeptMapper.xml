@@ -85,4 +85,14 @@
 		)
 	</insert>
 
+	<update id="setDeptManager" parameterType="DocVO">
+		UPDATE DEPT
+		SET MANAGER_EMP_NO = #{targetEmpNo}
+		WHERE DEPT_NO = #{targetDeptNo}
+
+	</update>
+
+
+
+
 </mapper>

@@ -10,6 +10,8 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/dept.css">
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body class="sb-nav-fixed">
@@ -228,6 +230,7 @@
 			</div>
 		</div>
 	</div>
+
 	<div id="deptAppointModal" class="modal-custom">
 		<div class="modal-content-custom" style="max-width: 350px;">
 			<div class="modal-header-custom" style="background: #4e73df;">
@@ -252,15 +255,56 @@
 		</div>
 	</div>
 
-	<form id="approveRequestForm" action="../approve/approve-form"
-		method="POST" style="display: none;">
-		<input type="hidden" name="empNo" id="apprEmpNo"> <input
-			type="hidden" name="deptNo" id="apprDeptNo"> <input
-			type="hidden" name="type" value="APPOINTMENT">
-	</form>
-	
+	<div id="approvalDraftModal" class="modal-custom">
+		<div class="modal-content-custom" style="max-width: 600px;">
+			<div class="modal-header-custom" style="background: #4e73df;">
+				<h5 style="margin: 0;">
+					<i class="fas fa-file-alt"></i> 기안서 작성
+				</h5>
+				<span onclick="closeDraftModal()" class="close-btn">&times;</span>
+			</div>
+			<div class="modal-body-custom">
+				<form id="finalApprovalForm">
+					<input type="hidden" name="empNo"
+						value="${sessionScope.login.empNo}"> <input type="hidden"
+						name="deptNo" id="draftDeptNo"> <input type="hidden"
+						name="DocType" value="6"> <input type="hidden"
+						name="step1ManagerNo" value="${sessionScope.login.managerEmpNo}">
+					<input type="hidden" name="step2ManagerNo"
+						value="${sessionScope.login.parentDeptNo}"> <input
+						type="hidden" name="targetEmpNo" id="draftTargetEmpNo"> <input
+						type="hidden" name="targetDeptNo" id="draftTargetDeptNo"> <input
+						type="hidden" name="memo" id="draftMemo"> <input
+						type="hidden" name="docDate" id="draftDocDate">
+
+					<div class="form-group">
+						<label>제목</label> <input type="text" id="draftTitle"
+							name="DocTitle" class="form-control"
+							style="width: 100%; padding: 8px; margin-bottom: 10px;" readonly>
+					</div>
+
+					<div class="form-group">
+						<label>내용</label>
+						<textarea id="draftContent" name="docContent" rows="10"
+							style="width: 100%; padding: 8px; resize: none;"></textarea>
+					</div>
+
+					<div style="text-align: right; margin-top: 15px;">
+						<button type="button" class="btn-manage-custom"
+							style="background: #6c757d; border: none;"
+							onclick="closeDraftModal()">취소</button>
+						<button type="button" class="btn-manage-custom"
+							style="background: #4e73df;" onclick="submitFinalApproval()">
+							<i class="fas fa-paper-plane"></i> 기안 상신
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
 	<script>
-		// JSP(서버)에서만 알 수 있는 값을 전역 변수로 설정하여 dept.js에서 사용할 수 있게 함
+		// JSP(서버) 데이터 -> JS 변수 변환
 		const contextPath = '${pageContext.request.contextPath}';
 		const isAdminUser = $
 		{

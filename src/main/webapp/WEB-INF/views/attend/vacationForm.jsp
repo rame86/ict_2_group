@@ -164,6 +164,20 @@
 
             function handleVacationTypeChange() {
                 const selectedType = $('#vacationType').val();
+             // --- 제목 자동 변경 로직 ---
+                const $docTitle = $('#docTitle'); // id로 hidden input 선택
+                const selectedText = $('#vacationType option:selected').text(); // 선택된 옵션의 텍스트 가져오기
+
+                // 값이 선택되어 있다면 "[휴가신청] 휴가종류" 형식으로 변경
+                if (selectedType) {
+                    $docTitle.val(`[휴가신청] ${selectedText} 신청`);
+
+                } else {
+                    // 선택 안됨 경우 기본값 유지
+                    $docTitle.val('[휴가신청]');
+                }
+                console.log("현재 문서 제목:", $docTitle.val()); // 확인용 로그
+            
                 const $endDateGroup = $('#endDateGroup');
                 const $totalDaysGroup = $('#totalDaysGroup');
                 const $startDateLabel = $('#startDateLabel');
@@ -343,10 +357,11 @@ textarea {
 			class="space-y-6" enctype="multipart/form-data">
 
 			<input type="hidden" name="DocType" id="documentTypeInput" value="4">
-			<input type="hidden" name="DocTitle" value="휴가 신청"> <input
-				type="hidden" name="step1ManagerNo"
-				value="${ loginVO.managerEmpNo }"> <input type="hidden"
-				name="step2ManagerNo" value="${ loginVO.parentDeptNo }">
+			<input type="hidden" name="DocTitle" id="docTitle" value="[휴가신청]">
+			<input type="hidden" name="step1ManagerNo"
+				value="${sessionScope.login.managerEmpNo }"> <input
+				type="hidden" name="step2ManagerNo"
+				value="${sessionScope.login.parentDeptNo }">
 
 			<fieldset class="p-4 border border-gray-200 rounded-lg">
 				<legend class="text-sm font-bold text-blue-600 px-2">신청자 정보
@@ -397,7 +412,7 @@ textarea {
 						<option value="half_am">반차 (오전)</option>
 						<option value="half_pm">반차 (오후)</option>
 						<option value="sick">병가</option>
-						<option value="compensatory">보상 휴가</option>						
+						<option value="compensatory">보상 휴가</option>
 					</select>
 				</div>
 
@@ -463,8 +478,7 @@ textarea {
 					class="text-gray-500 hover:text-gray-800 text-3xl leading-none">&times;</button>
 			</div>
 
-			<div id="vacationInfoDisplay" class="space-y-4 text-base">
-				</div>
+			<div id="vacationInfoDisplay" class="space-y-4 text-base"></div>
 
 			<div class="mt-8 flex justify-center">
 				<button type="button" id="okModalBtn"
