@@ -41,9 +41,14 @@
 	src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script src="/js/header-notification.js"></script>
 </head>
-<c:if test="${not empty sessionScope.login}">
-	<input type="hidden" id="sessionEmp" value="${sessionScope.login}">
-</c:if>
+<c:choose>
+    <c:when test="${not empty sessionScope.login}">
+        <input type="hidden" id="sessionEmpNo" value="${sessionScope.login.empNo}">
+    </c:when>
+    <c:otherwise>
+        <input type="hidden" id="sessionEmpNo" value="">
+    </c:otherwise>
+</c:choose>
 <body class="sb-nav-fixed">
 	<script src="/js/websocket.js"></script>
 	<script>
@@ -55,7 +60,6 @@
 			});
 		});
 	</script>
-	<input type="hidden" id="sessionEmpNo" value="${login.empNo}">
 	<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
 		<!-- Navbar Brand-->
 		<a class="navbar-brand ps-3" href="/index.html">PEOPLE CYNC</a>

@@ -10,6 +10,7 @@ public class DocVO {
 	private String docTitle;
 	private String docContent;
 	private String docDate;
+	private String targetEmpNo;
 	
 	// 추가로 사용할 필드
 	private String writerName;

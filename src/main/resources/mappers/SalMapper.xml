@@ -16,8 +16,7 @@
 		TO_CHAR(s.SAL_DATE, 'YYYY"년 "MM"월"') AS yearMonthLabel,
 
 		s.SAL_BASE AS salBase,
-		NVL(s.SAL_BONUS, 0)
-		AS salBonus,
+		NVL(s.SAL_BONUS, 0) AS salBonus,
 
 		-- 기타 수당
 		NVL(s.SAL_PLUS, 0) AS salPlus,
@@ -25,26 +24,26 @@
 		NVL(s.OVERTIME_PAY, 0) AS overtimePay,
 
 		s.INSURANCE AS insurance,
-		s.TAX
-		AS tax,
+		s.TAX AS tax,
+
+		-- ✅ 지급일(지급완료/예정 판단용)
+		TO_CHAR(s.SAL_DATE, 'YYYY-MM-DD') AS salDate,
 
 		-- 총 지급액 / 공제 총액 / 실지급액
 		(
 		s.SAL_BASE
 		+ NVL(s.SAL_BONUS, 0)
-		+
-		NVL(s.SAL_PLUS, 0)
+		+ NVL(s.SAL_PLUS, 0)
 		+ NVL(s.OVERTIME_PAY, 0)
 		) AS payTotal,
 
-		(s.INSURANCE +
-		s.TAX) AS deductTotal,
+		(s.INSURANCE + s.TAX) AS deductTotal,
 		s.REALPAY AS realPay
 		FROM SAL s
-		WHERE s.EMP_NO =
-		#{empNo}
+		WHERE s.EMP_NO = #{empNo}
 		ORDER BY s.MONTH_ATTNO ASC
 	</select>
+
 
 	<!-- 2. 급여 상세 -->
 	<select id="selectSalDetail" parameterType="map"
@@ -158,6 +157,9 @@
 
 	<!-- 7. MONTH_ATTEND 기준 급여 일괄 생성 (월 기준 중복 방지 최종본) -->
 	<insert id="insertSalaryByMonth" parameterType="string">
+
+		<bind name="startDate" value="_parameter + '-01'" />
+
 		INSERT INTO SAL (
 		SAL_NUM,
 		MONTH_ATTNO,
@@ -176,7 +178,7 @@
 		T.MONTH_ATTNO,
 		T.EMP_NO,
 		TRUNC(T.MONTH_DATE_ATTEND,
-		'MM') + 14,  <!-- 매달 15일(=월 시작 + 14일) -->
+		'MM') + 14,
 		T.SAL_BASE,
 		0,
 		0,
@@ -191,46 +193,49 @@
 		M.MONTH_DATE_ATTEND,
 		E.SAL_BASE,
 
-		-- 초과근무 수당
 		ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5) AS OVERTIME_PAY,
 
-		--
-		4대보험(예: 4.5%)
+		ROUND(
+		(E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.045
+		)
+		AS INSURANCE,
+
 		ROUND(
 		(E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME
-		* 1.5)) * 0.045
-		) AS INSURANCE,
-
-		-- 세금(예: 3%)
-		ROUND(
-		(E.SAL_BASE +
-		ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.03
+		* 1.5)) * 0.03
 		) AS TAX,
 
-		-- 실지급액
 		(
 		E.SAL_BASE
-		+ ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)
-		-
-		ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) *
+		+ ROUND((E.SAL_BASE / 160) *
+		M.OVERTIME * 1.5)
+		- ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) *
+		M.OVERTIME * 1.5)) *
 		0.045)
-		- ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME *
-		1.5)) *
+		- ROUND((E.SAL_BASE + ROUND((E.SAL_BASE /
+		160) * M.OVERTIME * 1.5)) *
 		0.03)
 		) AS REALPAY
+
 		FROM MONTH_ATTEND M
-		JOIN EMP E ON M.EMP_NO =
-		E.EMP_NO
-		WHERE TO_CHAR(M.MONTH_DATE_ATTEND, 'YYYY-MM') = #{targetMonth}
+		JOIN
+		EMP E ON M.EMP_NO = E.EMP_NO
+		WHERE M.MONTH_DATE_ATTEND >=
+		TO_DATE(#{startDate}, 'YYYY-MM-DD')
+		AND M.MONTH_DATE_ATTEND &lt;
+		ADD_MONTHS(TO_DATE(#{startDate},
+		'YYYY-MM-DD'), 1)
 		) T
 		WHERE NOT EXISTS (
 		SELECT 1
 		FROM SAL S
 		WHERE S.EMP_NO = T.EMP_NO
-		AND
-		TRUNC(S.SAL_DATE, 'MM') = TRUNC(T.MONTH_DATE_ATTEND, 'MM')
+		AND TRUNC(S.SAL_DATE, 'MM')
+		= TRUNC(T.MONTH_DATE_ATTEND, 'MM')
 		)
+
 	</insert>
+
 
 
 	<!-- 8. 관리자 화면용 (월 필터 + 정렬) -->
@@ -282,15 +287,15 @@
 
 			<!-- ✅ 삭제예정 제외 (DB 방식에 맞게 1개만 선택해서 사용) -->
 			<!-- <if test="excludeDeletePlanned == true"> -->
-				<!-- (A) EMP에 삭제예정 플래그가 있는 경우 예: E.DEL_YN = 'Y' -->
-				<!-- AND NVL(E.DEL_YN, 'N') != 'Y' -->
+			<!-- (A) EMP에 삭제예정 플래그가 있는 경우 예: E.DEL_YN = 'Y' -->
+			<!-- AND NVL(E.DEL_YN, 'N') != 'Y' -->
 
-				<!-- (B) 삭제예정이 STATUS_NO로 표현되는 경우 예: 8 -->
-				<!-- AND E.STATUS_NO != 8 -->
+			<!-- (B) 삭제예정이 STATUS_NO로 표현되는 경우 예: 8 -->
+			<!-- AND E.STATUS_NO != 8 -->
 
-				<!-- (C) 삭제예정 테이블이 따로 있는 경우 -->
-				<!-- AND NOT EXISTS (SELECT 1 FROM EMP_DELETE_PLAN dp WHERE dp.EMP_NO 
-					= E.EMP_NO AND dp.PLAN_YN='Y') -->
+			<!-- (C) 삭제예정 테이블이 따로 있는 경우 -->
+			<!-- AND NOT EXISTS (SELECT 1 FROM EMP_DELETE_PLAN dp WHERE dp.EMP_NO 
+				= E.EMP_NO AND dp.PLAN_YN='Y') -->
 			<!-- </if> -->
 
 		</where>
@@ -343,11 +348,49 @@
 				AND E.STATUS_NO != 0
 			</if>
 
-			<!-- <if test="excludeDeletePlanned == true">
-				DB 방식에 맞는 조건 1개만 선택
-			</if> -->
+			<!-- <if test="excludeDeletePlanned == true"> DB 방식에 맞는 조건 1개만 선택 </if> -->
 
 		</where>
+	</select>
+
+	<!-- (사원용) 급여 요약 카드 -->
+	<select id="getEmpSalSummary" parameterType="string"
+		resultType="map">
+		SELECT
+		/* 1) 최근 지급월 실지급액 */
+		NVL((
+		SELECT s.REALPAY
+		FROM SAL s
+		WHERE s.EMP_NO = #{_parameter}
+		ORDER BY s.SAL_DATE DESC
+		FETCH FIRST 1
+		ROWS ONLY
+		), 0) AS "latestRealPay",
+
+		/* 2) 최근 3개월 평균 실지급액 */
+		NVL(ROUND((
+		SELECT AVG(s.REALPAY)
+		FROM (
+		SELECT s.REALPAY
+		FROM SAL s
+		WHERE s.EMP_NO =
+		#{_parameter}
+		ORDER BY s.SAL_DATE DESC
+		FETCH FIRST 3 ROWS ONLY
+		) s
+		)), 0)
+		AS "avg3mRealPay",
+
+		/* 3) 올해 누적(YTD) 실지급액 */
+		NVL((
+		SELECT SUM(s.REALPAY)
+		FROM SAL s
+		WHERE s.EMP_NO = #{_parameter}
+		AND TO_CHAR(s.SAL_DATE,
+		'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
+		), 0) AS "ytdRealPay"
+
+		FROM DUAL
 	</select>
 
 

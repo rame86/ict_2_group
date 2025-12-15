@@ -27,8 +27,6 @@ public class ChatController {
 	
 	private final SimpMessagingTemplate messagingTemplate;
     private final MessageService messageService;
-    @Autowired
-    private NotificationService notificationService;
     
     public ChatController(SimpMessagingTemplate messagingTemplate, MessageService messageService) {
         this.messagingTemplate = messagingTemplate;
@@ -118,10 +116,10 @@ public class ChatController {
     	return list;
     }
     
-    @GetMapping("/api/alerts/latestDocument")
-    @ResponseBody
-    public List<AlertVO> getLatestDocument(@SessionAttribute("login") LoginVO login) {
-    	return notificationService.getLatestAlert(login.getEmpNo());
-    }
+//    @GetMapping("/api/alerts/latestDocument")
+//    @ResponseBody
+//    public List<AlertVO> getLatestDocument(@SessionAttribute("login") LoginVO login) {
+//    	return notificationService.getLatestAlert(login.getEmpNo());
+//    }
     
 }
