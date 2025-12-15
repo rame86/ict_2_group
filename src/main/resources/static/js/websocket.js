@@ -156,3 +156,56 @@ function createAlertItemHtml(alert) {
 		
 }
 
+function updateHeaderAlerts() {
+    
+	console.log("ALERT: updateHeaderAlerts 함수 실행 시작!");
+    // 1. 읽지 않은 알림 개수(뱃지 숫자) 갱신
+    $.ajax({
+        // 서버의 알림 개수 조회 API 엔드포인트 (AlertController에 정의되어 있음)
+        url: '/alert/unreadCount', 
+        type: 'GET',
+        success: function(count) {
+            // ★★★ HTML의 알림 숫자 뱃지를 감싸는 엘리먼트의 ID로 변경해야 합니다. ★★★
+            const $badge = $('#alertBadge'); 
+            
+            // 텍스트 업데이트
+            $badge.text(count);
+            
+            // 0개 이상일 때만 표시
+            if (count > 0) {
+                $badge.show();
+            } else {
+                $badge.hide();
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("Unread Alert Count 조회 실패:", error);
+        }
+    });
+
+    // 2. 알림 드롭다운 목록 갱신
+    $.ajax({
+        // 서버의 알림 목록 조회 API 엔드포인트 (AlertController에 정의되어 있음)
+        url: '/alert/latestView', 
+        type: 'GET',
+        success: function(alerts) {
+            const $dropdownList = $('#headerAlertDropdownList');
+            $dropdownList.empty();
+            
+            if (alerts.length === 0) {
+                 $dropdownList.append('<a href="#" class="list-group-item list-group-item-action">새 알림이 없습니다.</a>');
+                 return;
+            }
+            
+            // 알림 목록을 순회하며 HTML을 동적으로 생성하여 추가
+			alerts.forEach(function(alert) {
+				const alertHtml = createAlertItemHtml(alert);
+				$dropdownList.append(alertHtml);
+			});
+        },
+        error: function(xhr, status, error) {
+             console.error("Latest Alert View 조회 실패:", error);
+        }
+    });
+}
+
