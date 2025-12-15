@@ -153,7 +153,6 @@ public class ApproveController {
 		approveService.ApprovalApplication(dvo, avo);
 		notificationService.sendApprovalNotification(Integer.toString(avo.getStep1ManagerNo()), "새로운 결재가 도착했습니다");
 		
-		
 		// 헤더바 알람처리
 		AlertVO alert = new AlertVO();
 		String message = dvo.getDocTitle() + "새로운 결재 요청이 도착했습니다.";
@@ -191,7 +190,6 @@ public class ApproveController {
 		Integer step2Manager = vo.getStep2ManagerNo(); // 2차결재자의 사번
 		String step2Status = vo.getStep2Status(); // 2차결재의 상태
 		String writeNotificationMessage;
-		AlertVO alert = null;
 
 		if (vo.getDocType().equals("4") && step2Status.equals("A")) {
 			log.info("DocType :" + vo.getDocType());			
@@ -202,17 +200,16 @@ public class ApproveController {
 		} else if ((vo.getDocType().equals("6") || vo.getDocType().equals("7")) && step2Status.equals("A")) {
 			log.info("DocType :" + vo.getDocType());
 			deptService.setDeptManager(vo);
-			empService.setEmpJobTitle(vo);
 		}
 		
-
 		notificationService.sendApprovalNotification(Integer.toString(empNo), "결재가 성공적으로 완료되었습니다.");
 		
-
-		if (step2Status != null && step2Status.equals("A")) {
-			writeNotificationMessage = "문서가 최종 승인 되었습니다.";
-		}
+		if(status.equals("R")) {
 			
+		}
+		
+		if (step2Status != null && step2Status.equals("A"))
+			writeNotificationMessage = "문서가 최종 승인 되었습니다.";			
 		else if (status.equals("R"))
 			writeNotificationMessage = "문서가 반려되었습니다";
 		else

@@ -1,438 +1,321 @@
 /* =========================================================
-   ✅ salDetail.jsp 전용 필수 스타일 (최소본)
+   ✅ salDetail.css (salDetail.jsp 전용)
+   - adminList 관련(.sal-admin-page …) 전부 넣지 마세요!
    ========================================================= */
- 
- /* salDetail.jsp폰트 통일 */  
- .mt-4,
+
+/* ---- 폰트 통일 ---- */
+.mt-4,
 .sal-List-Title,
-.info-card-header,
-.salary-box,
+.info-card,
+.info-card * ,
+.salary-wrapper,
+.salary-wrapper * ,
+.net-salary-box,
+.net-salary-box * ,
 .btn-print,
-.btn-area,
-.summary-box {
-font-family: 'SUIT', 'Pretendard', 'Noto Sans KR', -apple-system,
-    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+.btn-area{
+  font-family: 'SUIT','Pretendard','Noto Sans KR',-apple-system,
+    BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
 }
 
-/* 1) 공통 래퍼 */
-.content-wrapper {
-  padding: 20px 30px;
-}
+/* ---- 공통 래퍼 ---- */
+.content-wrapper{ padding:20px 30px; }
 
-/* 2) 페이지 타이틀 */
-.page-title {
-  font-size: 30px;
-  font-weight: 600;
-  margin-bottom: 15px;
-}
-
-/* 3) 상단 사원/지급 정보 카드 */
-.info-card {
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  background-color: #f8f9fa;
-  font-size: 14px;
-}
-
-.info-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.info-row {
-  display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 4px;
-}
-
-.info-row span {
-  margin-right: 18px;
-}
-
-.info-label {
-  font-weight: 600;
-}
-
-/* 4) 인쇄 버튼 */
-.btn-print {
-  padding: 5px 10px;
-  border-radius: 4px;
-  border: 1px solid #6c757d;
-  background-color: #6c757d;
-  color: #fff;
-  font-size: 12px;
-  cursor: pointer;
-}
-.btn-print:hover {
-  background-color: #5c636a;
-}
-
-/* 5) 지급/공제 박스 레이아웃 */
-.salary-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.salary-box {
-  flex: 1 1 260px;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 12px 16px;
-  background-color: #ffffff;
-  min-width: 260px;
-}
-
-.salary-box h5 {
-  margin: 0 0 10px 0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-/* 6) 지급/공제 테이블 */
-.salary-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 5px;
-  font-size: 14px;
-}
-
-.salary-table th,
-.salary-table td {
-  border: 1px solid #dee2e6;
-  padding: 6px 8px;
-}
-
-.salary-table th {
-  background-color: #f1f1f1;
-  text-align: left;
-  width: 50%;
-}
-
-.salary-table td {
-  text-align: right;
-  width: 50%;
-}
-
-/* 7) 하단 요약(총/공제/실지급) */
-.summary-box {
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  padding: 12px 16px;
-  max-width: 600px;
-  background-color: #ffffff;
-  margin: 0 0 15px auto;
-}
-
-.summary-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 6px;
-  font-size: 14px;
-}
-
-.summary-label {
-  font-weight: 600;
-}
-
-.summary-row.real-pay-row {
-  margin-top: 10px;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.summary-row.real-pay-row .amount {
-  color: #0d6efd;
-}
-
-/* 8) 하단 버튼 영역 */
-.btn-area {
-  text-align: right;
-  margin-top: 10px;
-}
-
-.btn-area button {
-  padding: 6px 12px;
-  border-radius: 4px;
-  border: 1px solid #6c757d;
-  background-color: #6c757d;
-  color: white;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.btn-area button:hover {
-  background-color: #5c636a;
-}
-
+/* ---- 타이틀 밑줄 ---- */
 .page-title-wrap{
-	border-bottom: 4px double #869ABF;
-	
-	}
-
-
-/* =========================================================
-   ✅ [adminList.jsp 전용] Scoped Styles
-   - adminList.jsp 최상단을 <div class="sal-admin-page">로 감싼 상태 기준
-   - 상세(salDetail) 화면에는 절대 영향 없음
-   ========================================================= */
-
-.sal-admin-page,
-.sal-admin-page button,
-.sal-admin-page input,
-.sal-admin-page select,
-.sal-admin-page table,
-.sal-admin-page th,
-.sal-admin-page td {
-  font-family: 'SUIT', 'Pretendard', 'Noto Sans KR', -apple-system,
-    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  width:100%;
+  border-bottom:4px double #869ABF;
+  margin-top:18px;
+  margin-bottom:14px;
+  padding-bottom:12px;
 }
 
-/* ===== 타이틀(밑줄: 페이지 끝까지 쭉) ===== */
-.sal-admin-page .page-title-wrap{
-  width: 100%;
-  border-bottom: 4px double #869ABF;
-  margin-top: 18px;
-  margin-bottom: 14px;
-  padding-bottom: 12px;
+/* ---- 상단 정보 카드 ---- */
+.info-card{
+  border:1px solid #dee2e6;
+  border-radius:8px;
+  padding:12px 16px;
+  margin-bottom:20px;
+  background:#f8f9fa;
+  font-size:14px;
 }
 
-.sal-admin-page .page-title{
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.3px;
-  margin: 0;
-}
-
-.sal-admin-page .page-mini{
-  font-weight: 700;
-  color: #374151;
-  margin: 0;
-  padding-bottom: 10px;
-}
-
-/* ===== 요약 카드 ===== */
-.sal-admin-page .sal-summary-row{
-  display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr;
-  gap: 16px;
-  margin: 14px 0 16px;
-}
-
-.sal-admin-page .summary-card{
-  background: #fff;
-  border: 1px solid #E5E7EB;
-  border-radius: 16px;
-  padding: 16px 18px;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
-  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-  cursor: pointer;
-}
-
-.sal-admin-page .summary-card:hover{
-  transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
-  border-color: #D1D5DB;
-}
-
-.sal-admin-page .summary-card.summary-main{
-  border-color: #C7D2FE;
-  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFF 100%);
-}
-
-.sal-admin-page .summary-label{
-  font-size: 13px;
-  color: #6B7280;
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-
-.sal-admin-page .summary-value{
-  font-size: 22px;
-  font-weight: 800;
-  color: #111827;
-  letter-spacing: -0.2px;
-}
-
-.sal-admin-page .summary-sub{
-  margin-top: 6px;
-  font-size: 12px;
-  color: #9CA3AF;
-}
-
-/* ===== 필터 바(월/부서/체크/검색/엑셀/서치) ===== */
-.sal-admin-page .sal-filter-row{
+.info-card-header{
   display:flex;
-  justify-content: space-between;
+  justify-content:space-between;
   align-items:center;
-  gap:14px;
-  margin-bottom:12px;
-  padding:10px 12px;
-  border-radius:14px;
-  background:#fff;
-  border:1px solid #E5E7EB;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+  margin-bottom:8px;
 }
 
-.sal-admin-page .sal-filter-left{
+.info-row{
   display:flex;
-  align-items:center;
-  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:4px;
 }
 
-.sal-admin-page .sal-filter-right{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
+.info-row span{ margin-right:18px; }
+.info-label{ font-weight:700; }
 
-.sal-admin-page .sal-overtime-check{
-  font-size: 13px;
-  color: #374151;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* ===== 검색 버튼(핑크) ===== */
-.sal-admin-page .btn-search{
-  background-color:#ffbdbd;
-  border:1px solid #ff8080;
+/* ---- 출력 버튼 ---- */
+.btn-print{
+  padding:8px 14px;
+  border-radius:8px;
+  background:#8cb1d2;
+  border:1px solid #63a7cf;
   color:#fff;
-  font-weight:700;
-  border-radius:12px;
-  padding:7px 12px;
-}
-.sal-admin-page .btn-search:hover{
-  background-color:#F8AFAF;
-}
-
-/* ===== 엑셀 버튼(파스텔 초록) ===== */
-.sal-admin-page .btn-excel{
-  background:#80c6ab;
-  border:1px solid #01beb5;
-  color:#fff;
-  font-weight:800;
-  border-radius:12px;
-  padding:7px 12px;
-  transition: transform .12s ease, filter .12s ease;
-}
-.sal-admin-page .btn-excel:hover{
-  background:#009d9d;
-  color:#fff;
-  transform: translateY(-1px);
-}
-.sal-admin-page .btn-excel:active{
-  transform: translateY(0);
-}
-
-/* ===== DataTables 검색창(오른쪽 Search...) ===== */
-.sal-admin-page .sal-top-right{ min-width: 170px; }
-
-.sal-admin-page .sal-filter-right .dataTables_filter{ margin:0; }
-.sal-admin-page .sal-filter-right .dataTables_filter label{ font-size:0; }
-
-.sal-admin-page .sal-filter-right .dataTables_filter input{
   font-size:13px;
-  height:32px;
+  cursor:pointer;
+}
+.btn-print:hover{
+  background:#009d9d;
+}
+
+/* ---- 요약 칩(B안) ---- */
+.summary-chips{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
   padding:6px 10px;
-  border-radius:12px;
-  border:1px solid #E5E7EB !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-.sal-admin-page .sal-filter-right .dataTables_filter input:focus{
-  border-color:#C7D2FE !important;
-}
-
-/* ===== 테이블(카드형 컨테이너) ===== */
-.sal-admin-page #salTable{
-  background: #fff;
-  border: 1px solid #E5E7EB;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
-}
-
-.sal-admin-page #salTable thead th{
-  background: #F8FAFC;
-  color: #374151;
-  font-weight: 800;
-  font-size: 13px;
-  border-bottom: 1px solid #E5E7EB !important;
-  text-align:center;
-  vertical-align:middle;
-}
-
-.sal-admin-page #salTable tbody td{
-  font-size: 13px;
-  color: #111827;
-  border-bottom: 1px solid #F1F5F9;
-  text-align:center;
-  vertical-align:middle;
-}
-
-.sal-admin-page #salTable tbody tr:hover{
-  background:#F8FAFF;
-}
-
-/* 초과근무 강조 */
-.sal-admin-page tr.has-overtime{ background-color:#fff7ed; }
-.sal-admin-page .badge-overtime{
-  display:inline-block;
-  padding:2px 8px;
   border-radius:999px;
-  background-color:#fee2e2;
-  color:#b91c1c;
-  font-size:11px;
-  margin-left:4px;
+  font-size:13px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  font-weight:700;
+}
+.chip-pay{ border-color:#45b66c; background:#d8eed0; color:#065f46; }
+.chip-deduct{ border-color:#fbbbd0; background:#fde6f0; color:#991b1b; }
+.chip-net{ border-color:#80a9f4; background:#eff6ff; color:#1d4ed8; }
+
+/* ---- 가운데 3박스(지급/공제/차트) ---- */
+.salary-wrapper{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap:18px;
+  align-items:stretch;
 }
 
-/* ===== 페이징 중앙 정렬 ===== */
-.sal-admin-page div.dataTables_wrapper div.dataTables_paginate{
-  float: none !important;
-  text-align: center;
-  margin-top: 10px;
+.salary-wrapper > .detail-card{
+  display: flex;          /* 이미 있으면 OK */
 }
 
-.sal-admin-page .dataTables_paginate .paginate_button{
-  border: 1px solid #ccc !important;
-  border-radius: 10px !important;
-  padding: 4px 10px !important;
-  margin: 0 3px !important;
-  background: #fff !important;
-  color: #333 !important;
-}
-.sal-admin-page .dataTables_paginate .paginate_button:hover{
-  background: #f0f0f0 !important;
-  border-color: #888 !important;
-}
-.sal-admin-page .dataTables_paginate .paginate_button.current{
-  border: 1px solid #C7D2FE !important;
-  background: #EEF2FF !important;
-  color: #333 !important;
+.salary-wrapper > .detail-card > .salary-box{
+  width: 100%;
+  height: 100%;           /* ✅ 핵심: 박스 높이를 칸 높이에 맞춤 */
 }
 
-/* ✅ adminList에서만 적용되도록 범위 제한 */
-.sal-admin-page #layoutSidenav_content main .container-fluid{
-  padding-bottom: 260px;
+.detail-card{ display:flex; }             /* ✅ 높이 맞춤 핵심 */
+.salary-box{
+  width:100%;
+  border:1px solid #dee2e6;
+  border-radius:8px;
+  padding:16px;
+  background:#fff;
+  min-width:260px;
 }
 
-/* ===== 반응형 ===== */
-@media (max-width: 1200px){
-  .sal-admin-page .sal-summary-row{ grid-template-columns: 1fr; }
-  .sal-admin-page .sal-filter-row{
-    flex-direction: column;
-    align-items: stretch;
+/* 상단 색 띠 */
+.pay-card{ border-top:4px solid #c8e963; }
+.deduct-card{ border-top:4px solid #fddfdf; }
+.chart-card{ border-top:4px solid #6cc0ee; }
+
+.salary-box h5{
+  margin:0 0 10px 0;
+  font-size:16px;
+  font-weight:800;
+  color:#111827;
+}
+
+/* ---- 테이블 ---- */
+.salary-table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:6px;
+  font-size:14px;
+}
+.salary-table th,
+.salary-table td{
+  border:1px solid #dee2e6;
+  padding:6px 8px;
+}
+.salary-table th{
+  background:#f1f1f1;
+  text-align:left;
+  width:50%;
+}
+.salary-table td{
+  text-align:right;
+  width:50%;
+}
+
+/* 0원 회색 */
+.amount-zero{ color:#9ca3af; }
+
+/* ---- 차트 캔버스(도넛) ---- */
+.chart-card canvas{
+  display:block;
+  margin:0 auto;
+}
+
+/* 차트 영역 고정(무한스크롤 방지) */
+.chart-card .salary-box{
+  min-height:260px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+#payDonutChart{
+  width:200px !important;
+  height:200px !important;
+  max-width:220px;
+  max-height:220px;
+  margin:0 auto;
+}
+
+/* (선택) 범례 */
+.chart-legend{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  margin-top:10px;
+  font-size:13px;
+  font-weight:800;
+}
+.chart-legend .pay{ color:#10b981; }
+.chart-legend .deduct{ color:#ef4444; }
+
+/* ---- 하단 실지급 요약 ---- */
+.net-salary-box{
+  background:#ffffff;
+  margin-top:20px;
+  padding:16px 20px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+}
+.summary-box{
+  max-width:600px;
+  margin:0 0 0 auto;
+}
+.summary-row{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:6px;
+  font-size:14px;
+}
+.summary-row.real-pay-row{
+  margin-top:10px;
+  font-size:18px;
+  font-weight:900;
+}
+.net-salary{
+  font-size:22px;
+  font-weight:900;
+  color:#2563eb;
+}
+
+/* ---- 하단 버튼 ---- */
+.btn-area{
+  text-align:right;
+  margin-top:10px;
+}
+.btn-area button{
+  padding:6px 12px;
+  border-radius:8px;
+  border:1px solid #6395c2;
+  background:#8cb1d2;
+  color:#fff;
+  font-size:13px;
+  cursor:pointer;
+}
+.btn-area button:hover{ background:#424e84; }
+
+/* ---- 인쇄 ---- */
+@media print {
+
+  /* 버튼 같은 UI 숨김 */
+  .no-print { 
+    display: none !important; 
   }
-  .sal-admin-page .sal-filter-left,
-  .sal-admin-page .sal-filter-right{
-    justify-content: space-between;
+
+  /* 레이아웃 튀어나옴 방지 */
+  .content-wrapper { 
+    padding: 0 !important; 
+  }
+
+  .salary-wrapper {
+    gap: 10px !important;                 /* 인쇄에서 간격 줄이기 */
+    grid-template-columns: 1fr 1fr !important; /* 차트 숨기면 2칸으로 */
+  }
+
+  .salary-box {
+    min-width: 0 !important;              /* min-width 때문에 튀는 것 방지 */
+  }
+
+  /* ✅ 인쇄 시 네비/사이드바/푸터/차트 숨김 */
+  #layoutSidenav_nav,
+  .sb-sidenav,
+  .navbar,
+  footer,
+  .footer,
+  #footer,
+  .sb-sidenav-footer,
+  #layoutSidenav_content footer,
+  .chart-card {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
   }
 }
 
+
+/* =========================
+   ✅ PRINT FIX (A4에서 3칸 튀어나옴 방지)
+   ========================= */
+@media print {
+
+  /* 페이지 여백/스케일 안정화 */
+  @page { size: A4; margin: 12mm; }
+
+  /* 부트스트랩 px-4 때문에 폭이 밀리는 경우가 많아서 인쇄 때는 제거 */
+  #layoutSidenav_content main .container-fluid.px-4{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* ✅ 핵심: min-width 때문에 3칸이 못 줄어들어서 overflow 발생 */
+  .salary-box{
+    min-width: 0 !important;           /* ★ 이게 제일 중요 */
+    box-sizing: border-box !important;
+  }
+
+  /* 인쇄 폭에 맞게 3칸을 동일 비율로 */
+  .salary-wrapper{
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  /* 인쇄에서는 카드 내부 여백을 조금만 줄여서 폭/높이 여유 확보 */
+  .salary-box{
+    padding: 12px 12px !important;
+  }
+
+  /* 도넛 차트가 있으면 캔버스가 박스를 밀지 않도록 */
+  #payDonutChart{
+    max-width: 160px !important;
+    max-height: 160px !important;
+    width: 160px !important;
+    height: 160px !important;
+    display: block !important;
+    margin: 0 auto !important;
+  }
+}
