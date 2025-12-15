@@ -40,5 +40,4 @@ public class MemberServiceImpl implements MemberService {
         return memberDao.kakaoLoginInfo(kakaId);
     }
 
-
 }

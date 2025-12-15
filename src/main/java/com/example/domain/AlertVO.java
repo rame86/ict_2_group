@@ -15,4 +15,5 @@ public class AlertVO {
 	private String title;
     private String senderName;
     private String sentTime;
+    private String content;
 }
