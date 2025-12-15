@@ -101,9 +101,13 @@ public class DeptController {
 
 		LoginVO login = (LoginVO) session.getAttribute("login");
 
+		String dNo = String.valueOf(login.getDeptNo());
+		String gNo = String.valueOf(login.getGradeNo());
 		// 권한 체크 (2000, 2010 부서의 관리자만 가능)
-		boolean isAuth = (login.getDeptNo().equals("2000") || login.getDeptNo().equals("2010"))
-				&& (login.getGradeNo().equals("1") || login.getGradeNo().equals("2"));
+		boolean isAuth = false;
+		if((dNo.equals("2000") || dNo.equals("2010")) && (gNo.equals("1") || gNo.equals("2"))) {
+			isAuth = true;
+		}
 
 		if (!isAuth)
 			return "NO_AUTH";
