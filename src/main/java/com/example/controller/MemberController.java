@@ -40,7 +40,7 @@ public class MemberController {
 		}
 		return "index";
 	}
-
+ 
 	@GetMapping("/member/empNoCheck")
 	@ResponseBody
 	public String empNoCheck(String empNo, String empName, EmpVO vo, HttpSession session) {

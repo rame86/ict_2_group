@@ -24,10 +24,15 @@ public class AlertServiceImpl implements AlertService {
 		return alertDao.selectUnreadCount(empNo);
 	}
 
-	// 최신 알람정보 10개 얻어와서 띄우기
+	// 최신 알람정보 띄우기
 	@Override
 	public List<AlertVO> getUnreadAlertView(String empNo) {
 		return alertDao.selectLatestAlerts(empNo);
+	}
+
+	@Override
+	public void markUpdateAsRead(String empNo) {
+		alertDao.markAllAsRead(empNo);
 	}
 
 }
