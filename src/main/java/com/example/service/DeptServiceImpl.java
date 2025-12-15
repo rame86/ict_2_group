@@ -63,7 +63,6 @@ public class DeptServiceImpl implements DeptService {
 		deptDAO.insertEditLog(map);
 	}
 	
-	@Override
 	public void setDeptManager(DocVO vo) {
 		deptDAO.setDeptManager(vo);
 		

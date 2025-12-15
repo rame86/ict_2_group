@@ -66,8 +66,8 @@ public class DeptDAOImpl implements DeptDAO {
 	// =======================================================================================
 	// setDeptManager()
 	public void setDeptManager(DocVO vo) {
-		log.info("[AttendDAO - setDeptManager 요청 받음]");
-		sess.update("com.example.repository.DayAttendDAO.setDeptManager", vo);
+		log.info("[DeptDAO - setDeptManager 요청 받음]");
+		sess.update("com.example.repository.DeptDAO.setDeptManager", vo);
 	}
 	// end of setDeptManager()
 	// =======================================================================================

@@ -169,7 +169,9 @@ function submitAppointManager() {
 function openDraftModal(empNo, empInfoText) {
 	// 대상자(임명될 사람)
 	$('#draftTargetEmpNo').val(empNo);
-	// 부서 번호 세팅
+	// 대상 부서 세팅
+	$('#draftTargetDeptNo').val(currentDeptId);	
+	// 부서 번호 세팅	
 	$('#draftDeptNo').val(currentDeptId);
 	// 메모 세팅
 	$('#draftMemo').val(currentDeptName+" 부서장");
@@ -207,13 +209,11 @@ function submitFinalApproval() {
     const formData = $('#finalApprovalForm').serialize();
 
     $.ajax({
-        url: contextPath + '/approve/approve-form', 
+        url: contextPath + '/approve/approve-ajax', 
         type: 'POST',
         data: formData,
         success: function(res) {
-            // 서버 응답 처리는 기존 로직 유지 (성공 시 모달 닫기)
-            // 만약 서버가 페이지를 리턴한다면 location.href 등을 써야 할 수도 있습니다.
-            // 일단 AJAX 성공 응답(OK 등)을 가정합니다.
+
             if(res === "OK" || res.result === "success") { 
                 alert("결재가 성공적으로 상신되었습니다.");
                 closeDraftModal();
@@ -280,6 +280,8 @@ function submitExcludeEmp(e, empNo, empName) {
 	if (!confirm(`[${empName}] 제외하시겠습니까?`)) return;
 	ajaxChangeDept(empNo, 0);
 }
+
+
 function openMoveModal(e, empNo, empName) {
 	e.stopPropagation();
 	$('#moveTargetName').text(`대상자: ${empName}`);

@@ -268,11 +268,12 @@
 					<input type="hidden" name="empNo"
 						value="${sessionScope.login.empNo}"> <input type="hidden"
 						name="deptNo" id="draftDeptNo"> <input type="hidden"
-						name="DocType" value="APPOINTMENT"> <input type="hidden"
+						name="DocType" value="6"> <input type="hidden"
 						name="step1ManagerNo" value="${sessionScope.login.managerEmpNo}">
 					<input type="hidden" name="step2ManagerNo"
 						value="${sessionScope.login.parentDeptNo}"> <input
 						type="hidden" name="targetEmpNo" id="draftTargetEmpNo"> <input
+						type="hidden" name="targetDeptNo" id="draftTargetDeptNo"> <input
 						type="hidden" name="memo" id="draftMemo"> <input
 						type="hidden" name="docDate" id="draftDocDate">
 

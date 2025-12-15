@@ -313,7 +313,7 @@
 		UPDATE EMP
 		SET
 		JOB_TITLE = #{memo},
-		GRADE_NO = "2"		
+		GRADE_NO = '2'		
 		WHERE EMP_NO = #{targetEmpNo}
 	</update>
 
