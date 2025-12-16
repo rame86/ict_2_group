@@ -105,6 +105,17 @@ if (request.getAttribute("menu") == null) {
 
 						</div>
 
+						<!-- 🔹 관리자 전용: 급여 정정 버튼 -->
+						<c:if test="${isAdmin}">
+							<div class="no-print"
+								style="text-align: right; margin: 8px 0 16px;">
+								<a class="btn btn-primary"
+									href="${pageContext.request.contextPath}/sal/admin/edit?salNum=${sal.salNum}">
+									✏️ 급여 정정 </a>
+							</div>
+						</c:if>
+
+
 
 						<!-- ================= 지급 / 공제 / 비율 ================= -->
 						<div class="salary-wrapper">
@@ -205,6 +216,37 @@ if (request.getAttribute("menu") == null) {
 								</div>
 							</div>
 						</div>
+
+						<!-- 🔹 관리자 전용: 급여 정정 이력 -->
+						<c:if test="${isAdmin && not empty edits}">
+							<div class="detail-card" style="margin-top: 24px;">
+								<h5 style="margin-bottom: 12px;">급여 정정 이력</h5>
+
+								<table class="salary-table">
+									<thead>
+										<tr>
+											<th>정정일시</th>
+											<th>수정자</th>
+											<th>정정 사유</th>
+											<th>실지급액 (전 → 후)</th>
+										</tr>
+									</thead>
+									<tbody>
+										<c:forEach var="e" items="${edits}">
+											<tr>
+												<td>${e.editDate}</td>
+												<td>${e.editBy}</td>
+												<td style="text-align: left;">${e.editReason}</td>
+												<td><fmt:formatNumber value="${e.beforeRealPay}"
+														pattern="#,##0" />원 → <fmt:formatNumber
+														value="${e.afterRealPay}" pattern="#,##0" />원</td>
+											</tr>
+										</c:forEach>
+									</tbody>
+								</table>
+							</div>
+						</c:if>
+
 
 						<!-- 버튼 -->
 						<div class="btn-area no-print">

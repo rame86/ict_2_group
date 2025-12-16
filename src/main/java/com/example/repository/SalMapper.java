@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.example.domain.SalEditVO;
 import com.example.domain.SalVO;
 
 @Mapper
@@ -40,4 +41,19 @@ public interface SalMapper {
     Map<String, Object> getAdminSalSummary(Map<String, Object> param);
     
     Map<String, Object> getEmpSalSummary(String empNo);
+
+	int updateSalaryByAdmin(SalVO sal);
+
+
+    // ===== 🔹 여기부터 새로 추가 =====
+
+    /** SAL_NUM 기준 급여 1건 조회 (정정용 before 값) */
+    SalVO selectSalBySalNum(int salNum);
+
+    /** 급여 정정 이력 저장 */
+    int insertSalEdit(SalEditVO edit);
+
+    /** 급여 정정 이력 조회 (상세 하단 표시용) */
+    List<SalEditVO> selectSalEditsBySalNum(int salNum);
+
 }
