@@ -236,7 +236,6 @@ $(document).ready(function() {
                 <input type="hidden" name="DocType" value="4"> 
                 <input type="hidden" name="DocTitle" value="[휴가신청]"> 
                 <input type="hidden" name="step1ManagerNo" value="${sessionScope.login.managerEmpNo}"> 
-                <input type="hidden" name="step2ManagerNo" value="${sessionScope.login.parentDeptNo}">
                 
                 <div class="bg-gray-50 p-3 rounded text-sm grid grid-cols-3 gap-2 border">
                     <div>이름: ${sessionScope.login.empName}</div>
