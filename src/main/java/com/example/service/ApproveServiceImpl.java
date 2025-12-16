@@ -53,7 +53,6 @@ public class ApproveServiceImpl implements ApproveService {
 								? Integer.valueOf(parent.getParentManagerEmpNo()) 
 								: null;
 		
-		log.info(parent.getParentDeptNo());
 		if(parent.getParentDeptNo().equals("1001")) {
 			avo.setStep1ManagerNo(null);
 			avo.setStep1Status("X");

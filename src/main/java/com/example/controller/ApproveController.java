@@ -37,8 +37,6 @@ public class ApproveController {
 	private AttendService attendService;
 	@Autowired
 	private DeptService deptService;
-	@Autowired
-	private EmpService empService;
 
 	private final NotificationService notificationService;
 
