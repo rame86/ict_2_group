@@ -6,34 +6,24 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>getFreeBoardList.jsp - 자유 게시판 목록</title>
+<title>getFreeBoardList.jsp - 자유 게시판</title>
 <style>
-/* -------------------- [공통 모달: 상세 보기(boardModal)] -------------------- */
-#boardModal .modal-header {
-	background-color: #92a8d1;
+#boardModal .modal-header, #writeModal .modal-header, #modifyModal .modal-header {
+	background-color: #F7CAC9; /* 기존에 통일되어 있던 색상 */
 	color: white;
 	border-bottom: 1px solid #A8C7F7;
 	font-weight: bold;
 }
-/* ... (나머지 boardModal 스타일 생략) ... */
-
-/* -------------------- [글쓰기/수정 모달 공통 스타일] -------------------- */
-#writeModal .modal-header, #modifyModal .modal-header {
-	background-color: #92a8d1;
-	color: white;
-	border-bottom: 1px solid #46b8da;
-	font-weight: bold;
-}
-
-#writeModal .modal-body label, #modifyModal .modal-body label {
-	font-weight: bold;
-	margin-bottom: 5px;
-}
-
-/* 🚨 수정됨: 게시글 내용 모달의 텍스트 왼쪽 정렬 (가운데 정렬 문제 해결) */
 #boardModal .modal-body {
 	white-space: pre-wrap;
 	text-align: left;
+}
+/* 자유게시판 맞춤 모달 헤더 스타일 */
+#boardModal.global-free .modal-header { /* 전체 게시판 (bg-success) */
+	background-color: #F7CAC9; /* Success color */
+}
+#boardModal.dept-free .modal-header { /* 부서 게시판 (bg-secondary) */
+	background-color: #6C757D; /* Secondary color (회색) */
 }
 </style>
 </head>
@@ -43,101 +33,136 @@
 	<jsp:include page="../common/header.jsp" flush="true" />
 
 	<div id="layoutSidenav">
-
 		<jsp:include page="../common/sidebar.jsp" flush="true" />
 
 		<div id="layoutSidenav_content">
 			<main>
 				<div class="container-fluid px-4">
 
-					<h3 class="mt-4">자유 게시판</h3>
-					<br>
+					<h1 class="mt-4">자유 게시판</h1>
+					
+					<div class="d-flex justify-content-end mb-3">
+						<button type="button" class="btn btn-primary" data-bs-toggle="modal"
+							data-bs-target="#writeModal">
+							<i class="fas fa-pencil-alt me-1"></i> 새 글 쓰기
+						</button>
+					</div>
 
 					<div class="card mb-4">
-						<div class="card-header table-Header">
-							<i class="fas fa-table me-1"></i> 전체 자유 게시판
+						<div class="card-header bg-success text-white">
+							<i class="fas fa-users me-1"></i> <strong>전체 자유게시판</strong>
 						</div>
-
 						<div class="card-body">
-							<table id="datatablesSimple" class="display">
+							<table id="datatablesGlobal" class="table table-striped table-hover">
 								<thead>
 									<tr>
-										<th>글번호</th>
-										<th>글제목</th>
+										<th>No</th>
+										<th style="width: 50%;">제목</th>
 										<th>작성자</th>
-										<th>작성시간</th>
+										<th>작성일</th>
 										<th>조회수</th>
 									</tr>
 								</thead>
-								<tfoot>
-									<tr>
-										<th>글번호</th>
-										<th>글제목</th>
-										<th>작성자</th>
-										<th>작성시간</th>
-										<th>조회수</th>
-									</tr>
-								</tfoot>
 								<tbody>
 									<c:forEach var="vo" items="${ freeBoardList }">
-										<tr>
-											<td>${ vo.boardNo }</td>
-											<td><a href="#" data-bs-toggle="modal"
-												data-bs-target="#boardModal" data-no="${ vo.boardNo }"
-												data-title="<c:out value='${vo.boardTitle}'/>"
-												data-content="<c:out value='${vo.boardContent}'/>"> ${ vo.boardTitle }
-											</a></td>
-											<td><a href="#">${ vo.boardWriter }</a></td>
-											<td>${ vo.boardDate }</td>
-											<td>${ vo.boardCnt }</td>
-										</tr>
+										<c:if test="${vo.deptNo == 0}">
+										    <tr>
+										        <td>${ vo.boardNo }</td>
+										        <td>
+										            <span class="badge bg-success me-2">전체</span>
+										            <a href="#" class="text-decoration-none text-dark"
+										                data-bs-toggle="modal" data-bs-target="#boardModal"
+										                data-no="${ vo.boardNo }"
+										                data-title="<c:out value='${vo.boardTitle}'/>"
+										                data-type="global-free"> ${ vo.boardTitle }
+										            </a>
+										        </td>
+										        <td>${ vo.boardWriter }</td>
+										        <td>${ vo.boardDate }</td>
+										        <td>${ vo.boardCnt }</td>
+										    </tr>
+										</c:if>
 									</c:forEach>
 								</tbody>
 							</table>
-							<c:if
-								test="${not empty sessionScope.login && sessionScope.login.gradeNo <= 4}">
-								<div style="text-align: left; margin-top: 10px;">
-									<a href="#" class="btn btn-primary" data-bs-toggle="modal"
-										data-bs-target="#writeModal">글쓰기</a>
-								</div>
-							</c:if>
+						</div>
+					</div>
+
+					<div class="card mb-4">
+						<div class="card-header bg-secondary text-white">
+							<i class="fas fa-house-user me-1"></i> <strong>${sessionScope.login.deptName} 자유게시판</strong>
+						</div>
+						<div class="card-body">
+							<table id="datatablesDept" class="table table-hover">
+								<thead>
+									<tr>
+										<th>No</th>
+										<th style="width: 50%;">제목</th>
+										<th>작성자</th>
+										<th>작성일</th>
+										<th>조회수</th>
+									</tr>
+								</thead>
+								<tbody>
+									<c:forEach var="vo" items="${ freeBoardList }">
+										<c:if test="${vo.deptNo != 0}">
+										    <tr>
+										        <td>${ vo.boardNo }</td>
+										        <td>
+										            <span class="badge bg-secondary text-white me-2">부서</span>
+										            <a href="#" class="text-decoration-none text-dark"
+										                data-bs-toggle="modal" data-bs-target="#boardModal"
+										                data-no="${ vo.boardNo }"
+										                data-title="<c:out value='${vo.boardTitle}'/>"
+										                data-type="dept-free"> ${ vo.boardTitle }
+										            </a>
+										        </td>
+										        <td>${ vo.boardWriter }</td>
+										        <td>${ vo.boardDate }</td>
+										        <td>${ vo.boardCnt }</td>
+										    </tr>
+										</c:if>
+									</c:forEach>
+								</tbody>
+							</table>
 						</div>
 					</div>
 				</div>
 
-				<div class="modal fade" id="writeModal" tabindex="-1"
-					aria-labelledby="writeModalLabel" aria-hidden="true">
+				<div class="modal fade" id="writeModal" tabindex="-1" aria-hidden="true">
 					<div class="modal-dialog modal-lg">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="writeModalLabel">새 글 작성</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal"
-									aria-label="Close"></button>
+								<h5 class="modal-title">새 글 작성</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
-
 							<form action="/board/insertFreeBoard" method="post">
 								<div class="modal-body">
 									<div class="mb-3">
-										<label for="writer" class="form-label">작성자</label> <input
-											type="text" class="form-control" id="writer"
-											name="boardWriter" value="${ sessionScope.login.empName }">
-										<input type="hidden" name="empNo"
-											value="${ sessionScope.login.empNo }">
+										<label class="form-label">작성자</label> 
+										<input type="text" class="form-control" name="boardWriter" value="${ sessionScope.login.empName }" readonly>
+										<input type="hidden" name="empNo" value="${ sessionScope.login.empNo }">
 									</div>
 									<div class="mb-3">
-										<label for="title" class="form-label">글 제목</label> <input
-											type="text" class="form-control" id="title"
-											name="boardTitle" required>
+										<label class="form-label">게시 대상</label>
+										<select class="form-select" name="deptNo">
+											<c:if test="${sessionScope.login.gradeNo <= 3}">
+												<option value="0">🌏 전체 자유게시판</option>
+											</c:if>
+											<option value="${sessionScope.login.deptNo}" selected>🏠 내 부서만 (${sessionScope.login.deptName})</option>
+										</select>
 									</div>
 									<div class="mb-3">
-										<label for="content" class="form-label">글 내용</label>
-										<textarea class="form-control" id="content"
-											name="boardContent" rows="10" required></textarea>
+										<label class="form-label">제목</label> 
+										<input type="text" class="form-control" name="boardTitle" required>
+									</div>
+									<div class="mb-3">
+										<label class="form-label">내용</label>
+										<textarea class="form-control" name="boardContent" rows="10" required></textarea>
 									</div>
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary"
-										data-bs-dismiss="modal">취소</button>
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
 									<button type="submit" class="btn btn-primary">작성</button>
 								</div>
 							</form>
@@ -145,45 +170,32 @@
 					</div>
 				</div>
 
-				<div class="modal fade" id="modifyModal" tabindex="-1"
-					aria-labelledby="modifyModalLabel" aria-hidden="true">
+				<div class="modal fade" id="modifyModal" tabindex="-1" aria-hidden="true">
 					<div class="modal-dialog modal-lg">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="modifyModalLabel">게시글 수정</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal"
-									aria-label="Close"></button>
+								<h5 class="modal-title">게시글 수정</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
-
-							<form action="/board/insertFreeBoard" method="post"
-								id="modifyForm">
+							<form action="/board/insertFreeBoard" method="post" id="modifyForm">
 								<div class="modal-body">
 									<input type="hidden" name="boardNo" id="modifyBoardNo">
-
 									<div class="mb-3">
-										<label for="modifyWriter" class="form-label">작성자</label> <input
-											type="text" class="form-control" id="modifyWriter"
-											name="boardWriter" value="${ sessionScope.login.empName }">
-										<input type="hidden" name="empNo"
-											value="${ sessionScope.login.empNo }">
+										<label class="form-label">작성자</label> 
+										<input type="text" class="form-control" name="boardWriter" value="${ sessionScope.login.empName }" readonly>
+										<input type="hidden" name="empNo" value="${ sessionScope.login.empNo }">
 									</div>
-
 									<div class="mb-3">
-										<label for="modifyTitle" class="form-label">글 제목</label> <input
-											type="text" class="form-control" id="modifyTitle"
-											name="boardTitle" required>
+										<label class="form-label">제목</label> 
+										<input type="text" class="form-control" id="modifyTitle" name="boardTitle" required>
 									</div>
-
 									<div class="mb-3">
-										<label for="modifyContent" class="form-label">글 내용</label>
-										<textarea class="form-control" id="modifyContent"
-											name="boardContent" rows="10" required></textarea>
+										<label class="form-label">내용</label>
+										<textarea class="form-control" id="modifyContent" name="boardContent" rows="10" required></textarea>
 									</div>
-
 								</div>
 								<div class="modal-footer">
-									<button type="button" class="btn btn-secondary"
-										data-bs-dismiss="modal">취소</button>
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
 									<button type="submit" class="btn btn-primary">수정 완료</button>
 								</div>
 							</form>
@@ -191,169 +203,100 @@
 					</div>
 				</div>
 
-				<div class="modal fade" id="boardModal" tabindex="-1"
-					aria-labelledby="boardModalLabel" aria-hidden="true">
+				<div class="modal fade" id="boardModal" tabindex="-1" aria-hidden="true">
 					<div class="modal-dialog modal-lg">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title" id="boardModalLabel">글 제목</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal"
-									aria-label="Close"></button>
+								<h5 class="modal-title">글 상세</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
 							<div class="modal-body">
 								<span id="modalContentText" style="display: block;"></span>
 							</div>
 							<div class="modal-footer">
-                                <input type="hidden" id="currentBoardNo">
-								<button type="button" class="btn btn-primary me-2"
-									id="btnModify" style="display:none;">수정</button> 
-									
-								<button type="button" class="btn btn-secondary"
-									data-bs-dismiss="modal">닫기</button>
+								<input type="hidden" id="currentBoardNo">
+								<button type="button" class="btn btn-primary me-2" id="btnModify" style="display:none;">수정</button>
+								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
 							</div>
 						</div>
 					</div>
 				</div>
-			</main>
 
+			</main>
 			<jsp:include page="../common/footer.jsp" flush="true" />
 		</div>
 	</div>
 
 	<script>
-		$(document).ready(
-				function() {
+		// DataTables 초기화 (각각 다른 ID 사용)
+		window.addEventListener('DOMContentLoaded', event => {
+			const datatablesGlobal = document.getElementById('datatablesGlobal');
+			if (datatablesGlobal) new simpleDatatables.DataTable(datatablesGlobal);
+			
+			const datatablesDept = document.getElementById('datatablesDept');
+			if (datatablesDept) new simpleDatatables.DataTable(datatablesDept);
+		});
 
-					var $boardModal = $('#boardModal');
-					var $btnModify = $('#btnModify');
-					var $writeForm = $('#writeModal form');
-					var $modifyForm = $('#modifyForm');
-                    
-                    // 로그인된 사용자의 empNo를 EL로 가져와 JS 변수에 저장
-                    // (주의: 로그인되어 있지 않으면 빈 문자열이 될 수 있음)
-                    var LOGIN_EMP_NO = '${ sessionScope.login.empNo }';
+		$(document).ready(function() {
+			var $boardModal = $('#boardModal');
+			var $btnModify = $('#btnModify');
+			var LOGIN_EMP_NO = '${ sessionScope.login.empNo }';
 
+			// 상세 모달 OPEN
+			$boardModal.on('show.bs.modal', function(event) {
+				var button = $(event.relatedTarget);
+				$btnModify.hide(); // 일단 숨김
 
-					// -------------------------------------------------------------
-					// 등록 폼 제출 시 확인창 띄우기 (jQuery Submit Event)
-					// -------------------------------------------------------------
-					$writeForm.on('submit', function(event) {
-						event.preventDefault(); // 폼의 기본 제출 동작을 막음
+				var boardNo = button.data('no');
+				var title = button.data('title');
+				var type = button.data('type');
 
-						if (confirm('새 글을 작성하시겠습니까?')) {
-							// '확인'을 눌렀을 경우, 폼을 실제로 제출
-							this.submit();
-						}
-					});
+			
+				$boardModal.removeClass('global-free dept-free').addClass(type);
+				$boardModal.find('.modal-title').text(title);
+				$boardModal.find('#modalContentText').text('로딩중...');
 
-					// -------------------------------------------------------------
-					// 수정 폼 제출 시 확인창 띄우기 (jQuery Submit Event)
-					// -------------------------------------------------------------
-					$modifyForm.on('submit', function(event) {
-						event.preventDefault(); // 폼의 기본 제출 동작을 막음
+				$.ajax({
+					url : '/board/getContentFreeBoard',
+					type : 'POST',
+					data : { boardNo : boardNo },
+					dataType : 'json',
+					success : function(response) {
+						if (response && response.boardContent) {
+							var content = response.boardContent;
+							var writerEmpNo = response.empNo;
 
-						if (confirm('게시글 내용을 수정하시겠습니까?')) {
-							// '확인'을 눌렀을 경우, 폼을 실제로 제출
-							this.submit();
-						}
-					});
+							$boardModal.find('#modalContentText').text(content);
+							$('#currentBoardNo').val(boardNo);
+							$btnModify.data('title', title);
+							$btnModify.data('content', content);
 
-					// -------------------------------------------------------------
-					// 글 상세 보기 모달이 열릴 때 데이터 설정
-					// -------------------------------------------------------------
-					$boardModal.on('show.bs.modal', function(event) {
-						var button = $(event.relatedTarget);
-                        
-                        // 모달이 열릴 때마다 수정 버튼 숨김 처리부터 시작
-                        $btnModify.hide(); 
-
-						// 글 목록에서 전달된 데이터 가져오기
-						var boardNo = button.data('no');
-						var title = button.data('title');
-
-						// 상세 모달에 제목 표시
-						$boardModal.find('.modal-title').text(title);
-						$boardModal.find('#modalContentText').text(
-								'내용을 불러오는 중...'); // 로딩 메시지
-
-						// Controller로 AJAX 요청 (boardNo를 이용해 내용 조회)
-						$.ajax({
-							url : '/board/getContentFreeBoard', // AJAX URL 변경
-							type : 'POST',
-							data : {
-								boardNo : boardNo // 파라미터 이름 변경
-							},
-							dataType : 'json', // Controller가 JSON을 반환한다고 가정
-							success : function(response) {
-								// Controller에서 받은 데이터 (response) 처리
-								if (response && response.boardContent) { 
-									var content = response.boardContent;
-                                    var writerEmpNo = response.empNo; // 🚨 게시글 작성자의 empNo
-                                    
-									// 모달 내용 업데이트
-									$boardModal.find('#modalContentText').text(
-											content);
-
-									// 수정 버튼을 위해 글 번호와 내용들을 저장
-									$('#currentBoardNo').val(boardNo); // 글 번호 저장
-									$btnModify.data('title', title);
-									$btnModify.data('content', content); // AJAX로 가져온 내용 저장
-
-                                    // -------------------------------------------------------------
-                                    // 작성자 일치 여부 확인 후 수정 버튼 노출 
-                                    // -------------------------------------------------------------
-                                    
-                                    // 1. 로그인되어 있어야 하고
-                                    // 2. 로그인된 사용자의 empNo와 게시글 작성자의 empNo가 같으면 버튼 노출
-                                    if (LOGIN_EMP_NO && LOGIN_EMP_NO === writerEmpNo) {
-                                        $btnModify.show(); // 수정 버튼 노출
-                                    } else {
-                                        // 같지 않다면 다시 숨김 처리
-                                        $btnModify.hide(); 
-                                    }
-                                    // -------------------------------------------------------------
-                                    
-								} else {
-									$boardModal.find('#modalContentText').text(
-											'내용을 가져오지 못했습니다.');
-								}
-							},
-							error : function(xhr, status, error) {
-								console.error("AJAX Error:", status, error);
-								$boardModal.find('#modalContentText').text(
-										'데이터 로드 중 오류가 발생했습니다.');
+							// 작성자 본인 확인
+							if (LOGIN_EMP_NO && LOGIN_EMP_NO == writerEmpNo) {
+								$btnModify.show();
 							}
-						});
-
-					});
-
-					// -------------------------------------------------------------
-					// 수정 버튼을 클릭했을 때 수정 모달 띄우기 (jQuery Click Event)
-					// -------------------------------------------------------------
-					$btnModify.on('click', function() {
-						var $this = $(this);
-
-						// 1) 상세 모달 닫기
-						var boardModalInstance = bootstrap.Modal
-								.getInstance($boardModal[0]);
-						boardModalInstance.hide();
-
-						// 2) 수정 모달에 데이터 채우기
-						var boardNo = $('#currentBoardNo').val();
-						var title = $this.data('title');
-						var content = $this.data('content');
-
-						$('#modifyBoardNo').val(boardNo);
-						$('#modifyTitle').val(title);
-						$('#modifyContent').val(content);
-
-						// 3) 수정 모달 띄우기
-						var modifyModal = new bootstrap.Modal(
-								$('#modifyModal')[0]);
-						modifyModal.show();
-					});
+						}
+					},
+					error : function() {
+						$boardModal.find('#modalContentText').text('오류 발생');
+					}
 				});
+			});
+
+			// 수정 버튼 클릭 -> 수정 모달 OPEN
+			$btnModify.on('click', function() {
+				bootstrap.Modal.getInstance($boardModal[0]).hide();
+				var boardNo = $('#currentBoardNo').val();
+				var title = $(this).data('title');
+				var content = $(this).data('content');
+
+				$('#modifyBoardNo').val(boardNo);
+				$('#modifyTitle').val(title);
+				$('#modifyContent').val(content);
+
+				new bootstrap.Modal($('#modifyModal')[0]).show();
+			});
+		});
 	</script>
 </body>
-
 </html>

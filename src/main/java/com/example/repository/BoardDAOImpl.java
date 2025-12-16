@@ -1,27 +1,23 @@
 package com.example.repository;
 
 import java.util.List;
-
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import com.example.domain.FreeBoardVO;
 import com.example.domain.NoticeBoardVO;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Repository
 public class BoardDAOImpl implements BoardDAO {
 	@Autowired
-	private SqlSessionTemplate sess; // 커넥션
+	private SqlSessionTemplate sess; 
 
-	// 공지~
-	public List<NoticeBoardVO> getNoticeBoardList() {
-		log.info("[BoardDAOImpl - getNoticeBoardList()] 요청받음");
-		List<NoticeBoardVO> result = sess.selectList("com.example.repository.BoardDAO.getNoticeBoardList");
-
+	// 공지 목록 조회 (부서번호 추가)
+	public List<NoticeBoardVO> getNoticeBoardList(Integer deptNo) {
+		log.info("[BoardDAOImpl - getNoticeBoardList()] 요청받음 - deptNo: " + deptNo);
+		List<NoticeBoardVO> result = sess.selectList("com.example.repository.BoardDAO.getNoticeBoardList", deptNo);
 		return result;
 	}
 
@@ -33,23 +29,18 @@ public class BoardDAOImpl implements BoardDAO {
 			log.info("공지 " + result + "개 입력 완료");
 			resultString = String.valueOf(result);
 		}
-
 		return resultString;
-
 	};
 
 	public String updateNoticeBoard(NoticeBoardVO vo) {
 		log.info("[BoardDAOImpl - updateNoticeBoard()] 요청받음");
 		String resultString = "";
-		// ⚠️ sess.insert() -> sess.update()로 변경 (updateBoard의 경우)
 		Integer result = sess.update("com.example.repository.BoardDAO.updateNoticeBoard", vo);
 		if (result != null) {
 			log.info("공지 " + result + "개 수정 완료");
 			resultString = String.valueOf(result);
 		}
-
 		return resultString;
-
 	};
 
 	public NoticeBoardVO getContentNoticeBoard(String noticeNo) {
@@ -65,11 +56,10 @@ public class BoardDAOImpl implements BoardDAO {
 
 	// =============================================================
 
-	// 자게~
-
-	public List<FreeBoardVO> getFreeBoardList() {
-		log.info("[BoardDAOImpl - getFreeBoardList()] 요청받음");
-		List<FreeBoardVO> result = sess.selectList("com.example.repository.BoardDAO.getFreeBoardList");
+	// 자게 목록 조회 (부서번호 추가)
+	public List<FreeBoardVO> getFreeBoardList(Integer deptNo) {
+		log.info("[BoardDAOImpl - getFreeBoardList()] 요청받음 - deptNo: " + deptNo);
+		List<FreeBoardVO> result = sess.selectList("com.example.repository.BoardDAO.getFreeBoardList", deptNo);
 		return result;
 	}
 
@@ -104,7 +94,5 @@ public class BoardDAOImpl implements BoardDAO {
 	public void updateFreeBoardCnt(String boardNo) {
 		log.info("[BoardDAOImpl - updateFreeBoardCnt()] 요청받음");
 		sess.update("com.example.repository.BoardDAO.updateFreeBoardCnt", boardNo);
-
 	}
-
 }

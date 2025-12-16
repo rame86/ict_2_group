@@ -8,7 +8,7 @@ import com.example.domain.NoticeBoardVO;
 public interface BoardDAO {
 
 	// 공지
-	public List<NoticeBoardVO> getNoticeBoardList();
+	public List<NoticeBoardVO> getNoticeBoardList(Integer deptNo);
 
 	public String insertNoticeBoard(NoticeBoardVO vo);
 
@@ -19,7 +19,7 @@ public interface BoardDAO {
 	public void updateNoticeCnt(String noticeNo);
 
 	// 자게
-	public List<FreeBoardVO> getFreeBoardList();
+	public List<FreeBoardVO> getFreeBoardList(Integer deptNo);
 
 	public String insertFreeBoard(FreeBoardVO vo);
 

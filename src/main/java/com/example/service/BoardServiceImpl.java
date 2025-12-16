@@ -20,8 +20,8 @@ public class BoardServiceImpl implements BoardService {
 
 	// 공지영역~
 
-	public List<NoticeBoardVO> getNoticeBoardList() {
-		return boardDAO.getNoticeBoardList();
+	public List<NoticeBoardVO> getNoticeBoardList(Integer deptNo) {
+		return boardDAO.getNoticeBoardList(deptNo);
 	}
 
 	public String insertNoticeBoard(NoticeBoardVO vo) {
@@ -41,8 +41,8 @@ public class BoardServiceImpl implements BoardService {
 	//=======================
 	// 자게영역~
 
-	public List<FreeBoardVO> getFreeBoardList() {
-		return boardDAO.getFreeBoardList();
+	public List<FreeBoardVO> getFreeBoardList(Integer deptNo) {
+		return boardDAO.getFreeBoardList(deptNo);
 
 	}
 
