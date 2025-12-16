@@ -51,8 +51,29 @@ small {
 					<h3 class="mt-4">쪽지함</h3><br>
 					
 					<div class="row">
+						<div class="col-xl-3 col-lg-4"> 
+					        <div class="card shadow mb-4" style="height: 700px;">
+					            <div class="card-header py-3">
+					                <h6 class="m-0 font-weight-bold text-danger">
+					                    <i class="fas fa-bell me-1"></i> 주요 알림
+					                </h6>
+					            </div>
+					            
+					            <div class="card-body p-0" style="max-height: 650px; overflow-y: auto;">
+					                <div id="notificationListContainer" class="list-group list-group-flush">
+					                    <div class="p-3 text-center text-muted">알림을 불러오는 중...</div>
+					                </div>
+					            </div>
+					            
+					             <div class="card-footer text-center py-2">
+					                <a href="javascript:void(0);" class="small text-danger fw-bold" onclick="markAllNotificationsAsRead()">
+					                    전체 알림 읽음 처리
+					                </a>
+					            </div>
+					        </div>
+					    </div>
     
-				        <div class="col-xl-4 col-lg-5">
+				        <div class="col-xl-3 col-lg-4">
 						    <div class="card shadow mb-4" style="height: 700px;">
 						        <div class="card-header py-3 d-flex justify-content-between align-items-center">
 						            
@@ -71,7 +92,7 @@ small {
 						    </div>
 						</div>
 
-				        <div class="col-xl-8 col-lg-7">
+				        <div class="col-xl-6 col-lg-4">
 				            <div class="card shadow mb-4" style="height: 700px;">
 				                <div class="card-header py-3">
 				                    <h6 class="m-0 font-weight-bold text-primary" id="chatWindowHeader">김철수 사원과의 대화</h6>
