@@ -154,13 +154,14 @@ table.dataTable thead .sorting_asc,
 table.dataTable thead .sorting_desc {
     background-image: none;
     position: relative;
+    font-size: 15px;
 }
 
 table.dataTable thead .sorting:after,
 table.dataTable thead .sorting_asc:after,
 table.dataTable thead .sorting_desc:after {
     content: "▲▼";
-    font-size: 10px;
+    font-size: 15px;
     color: #999;
     position: absolute;
     right: 6px;
@@ -337,3 +338,35 @@ div.dataTables_wrapper div.dataTables_paginate{
   margin-top: 12px;
 }
 
+/* 실지급액: 주인공 */
+td.real-pay {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* 총지급/공제: 조연 */
+td.pay-total,
+td.deduct-total {
+  font-weight: 600;
+  font-size: 14px;
+  color: #374151;
+}
+
+/* 지급 요약: 설명 텍스트 */
+.allowance-cell { min-width: 180px; }
+.allowance-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 15px;
+   font-weight: 400;
+  line-height: 1.35;
+  color: #6b7280;
+}
+.allowance-label { white-space: nowrap; }
+.allowance-val { font-variant-numeric: tabular-nums; }
+
+
+#salTable thead th.realpay-th {
+  text-align: right !important;
+}

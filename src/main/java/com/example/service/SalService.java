@@ -3,6 +3,7 @@ package com.example.service;
 import java.util.List;
 import java.util.Map;
 
+import com.example.domain.SalEditVO;
 import com.example.domain.SalVO;
 
 public interface SalService {
@@ -24,5 +25,14 @@ public interface SalService {
 	Map<String, Object> getAdminSalSummary(Map<String, Object> param);
 	
 	Map<String, Object> getEmpSalSummary(String empNo);
+
+	SalVO getSalDetailBySalNum(int salNum);
+
+	void editSalaryWithHistory(int salNum,
+	                           int salBase, int salBonus, int salPlus, int overtimePay,
+	                           int insurance, int tax,
+	                           String reason, String editorEmpNo);
+
+	List<SalEditVO> getEditsBySalNum(int salNum); // (선택)
 
 }
