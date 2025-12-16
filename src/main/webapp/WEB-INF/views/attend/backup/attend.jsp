@@ -1,262 +1,315 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>attend.jsp</title>
+<title>근태 현황</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel='stylesheet'
-	href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' />
-<link rel="stylesheet" href="/css/attend.css">
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css' />
+<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script
-	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-<script
-	src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales-all.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/locales-all.min.js'></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script src="/js/attend.js"></script>
 
-<script type="text/javascript">
-// =============================================================
-//                       전역 데이터 정의
-// =============================================================
+<script>
+    // Tailwind 설정
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: { primary: '#f69022', 'blue-primary': '#1d4ed8' }
+            }
+        }
+    }
+</script>
 
-var calendar; // FullCalendar 인스턴스 저장용 변수.
+<style>
+    /* 모달 스타일 */
+    .modal {
+        display: none; position: fixed; z-index: 9999;
+        left: 0; top: 0; width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.5); overflow: auto;
+    }
+    .modal.show { display: block; }
+    .modal-content {
+        background-color: #fff; margin: 5% auto; padding: 25px;
+        border: 1px solid #888; width: 90%; max-width: 600px;
+        border-radius: 12px; position: relative;
+    }
+    .close {
+        position: absolute; right: 20px; top: 15px; font-size: 28px; cursor: pointer; color: #aaa;
+    }
+    .close:hover { color: #000; }
+    
+    /* 버튼 스타일 */
+    .custom-btn {
+        padding: 10px 20px; border-radius: 9999px; font-weight: bold;
+        transition: transform 0.2s; border: none;
+    }
+    .custom-btn:hover { transform: translateY(-2px); }
+</style>
 
-// 1. 이벤트 색상 정의: 근태 상태별 캘린더 색상 지정.
+<script>
+// [2] 전역 데이터 초기화
 const colorMap = {
-    '출근': '#4CAF50', '연차': '#2196F3', '반차': '#00BCD4', 
-    '휴가': '#2196F3', '결근': '#FF9800', '지각': '#FFC107', 
-    '조퇴': '#FFC107', '출장': '#9E9E9E', '외근': '#9E9E9E' 
+    '출근': '#4CAF50', '연차': '#2196F3', '반차': '#00BCD4', '휴가': '#2196F3',
+    '결근': '#FF9800', '지각': '#FFC107', '조퇴': '#FFC107', '외근': '#9E9E9E'
 };
 
-// 2. 서버 데이터를 JavaScript 배열로 생성: DB에서 가져온 근태 기록을 캘린더 이벤트 형식으로 변환.
-// appendEvents 변수는 FullCalendar 초기화 및 차트 업데이트에 사용됨.
+// 서버 데이터를 JS 배열로 변환
 let appendEvents = [       
- <c:forEach var="dayAttend" items="${result}" varStatus="status">
- <c:if test="${not empty dayAttend.dateAttend}">
- { 
-     title: "${dayAttend.attStatus}",     // 근태 상태(출근, 휴가 등)
-     date: "${dayAttend.dateAttend.substring(0, 10)}", // 날짜 YYYY-MM-DD
-     allDay: true,
-     color: colorMap["${dayAttend.attStatus}"],
-     attStatus: "${dayAttend.attStatus}",
-     
-     // inTime: 휴가/결근 시 시간 제외 처리. HH:MM:SS 포맷.
-     inTime: "<c:choose><c:when test="${empty dayAttend.inTime or dayAttend.attStatus eq '휴가' or dayAttend.attStatus eq '결근'}"></c:when><c:otherwise>${dayAttend.inTime.substring(11, 19)}</c:otherwise></c:choose>",
-     // outTime: 휴가/결근 시 시간 제외 처리. HH:MM:SS 포맷.
-     outTime: "<c:choose><c:when test="${empty dayAttend.outTime or dayAttend.attStatus eq '휴가' or dayAttend.attStatus eq '결근'}"></c:when><c:otherwise>${dayAttend.outTime.substring(11, 19)}</c:otherwise></c:choose>",
-     
-     breakTime: "01:00:00", // 기본 휴게시간
-     dayFulltime: "${dayAttend.dayFulltime}", // 일일 총 근무 시간. 예: "0 8:0:0.0"
-     memo: "${dayAttend.memo}" // 특이사항 메모
-  }<c:if test="${!status.last && not empty result[status.index + 1].dateAttend}">,</c:if>
- </c:if>
- </c:forEach>
+    <c:forEach var="dayAttend" items="${result}" varStatus="status">
+    <c:if test="${not empty dayAttend.dateAttend}">
+    { 
+        title: "${dayAttend.attStatus}",
+        date: "${dayAttend.dateAttend.substring(0, 10)}",
+        allDay: true,
+        color: colorMap["${dayAttend.attStatus}"] || '#999',
+        attStatus: "${dayAttend.attStatus}",
+        inTime: "${dayAttend.inTime != null ? dayAttend.inTime.substring(11, 19) : ''}",
+        outTime: "${dayAttend.outTime != null ? dayAttend.outTime.substring(11, 19) : ''}",
+        memo: "${dayAttend.memo}",
+        dayFulltime: "${dayAttend.dayFulltime}"
+    }<c:if test="${!status.last}">,</c:if>
+    </c:if>
+    </c:forEach>
 ];
 
-// =============================================================
-//                       FullCalendar 초기화
-// =============================================================
 document.addEventListener('DOMContentLoaded', function(){
-    
+    // 캘린더 렌더링
     var calendarEl = document.getElementById('calendar'); 
-
-    // 캘린더 요소 없으면 에러 로그 찍고 종료.
-    if (!calendarEl) {
-        console.error("#calendar 요소를 찾을 수 없음.");
-        return;
-    }
-    
-    calendar = new FullCalendar.Calendar(calendarEl, {
+    var calendar = new FullCalendar.Calendar(calendarEl, {
         initialDate: new Date(),
         initialView: 'dayGridMonth',
-        headerToolbar: {
-             left: 'prev,next', // 이전/다음 달 이동 버튼.
-             center: 'title', // 현재 월 표시.
-             right: 'today' // 오늘 날짜로 이동.
-        },
-        locale: 'ko', // 한국어 설정.
-        events: appendEvents, // 초기 로딩된 근태 이벤트 목록 사용.
-        fixedWeekCount: false, // 해당 월의 주차 수만큼만 표시
-        // 캘린더 날짜 클릭 시 이벤트 핸들러.
+        headerToolbar: { left: 'prev,next', center: 'title', right: 'today' },
+        locale: 'ko',
+        events: appendEvents,
+        height: 'auto',
         dateClick: function(info) {
-             const clickedDate = info.dateStr; 
-             // 클릭한 날짜의 근태 기록 찾기.
-             const workEvent = appendEvents.find(event => event.date === clickedDate);
-
-             // 시간 표시 영역 초기화.
-             $('#inTimeDisplay').text("출근시간: -");
-             $('#outTimeDisplay').text("퇴근시간: -"); 
-             $('#fieldworkDisplay').text(""); // 특이사항 영역 초기화.
-             
-             if (workEvent) {
-                 // 출근 시간 표시.
-                 if (workEvent.inTime && workEvent.inTime.trim() !== '') {                 
-                     $('#inTimeDisplay').text("출근시간: " + workEvent.inTime); 
-                 } else {
-                     $('#inTimeDisplay').text("출근시간: 기록 없음");
-                 }
-                 
-                 // 퇴근 시간 표시.
-                 if (workEvent.outTime && workEvent.outTime.trim() !== '') {
-                     $('#outTimeDisplay').text("퇴근시간: " + workEvent.outTime); 
-                 } else {
-                     $('#outTimeDisplay').text("퇴근시간: 기록 없음");
-                 }
-                 
-                 // 메모(특이사항) 표시. null 또는 공백이 아닐 때만 출력함.
-                 if (workEvent.memo && workEvent.memo.trim() !== '' && workEvent.memo.trim() !== 'null') {
-                	 $('#fieldworkDisplay').text("특이사항: " + workEvent.memo);
-                 } else {                
-                	 $('#fieldworkDisplay').text(""); // 메모 없으면 비워둠.
-                 }
-                 
-             } else {  
-                 // 해당 날짜에 근태 기록이 없으면 모두 '기록 없음'으로 표시.
-                 $('#inTimeDisplay').text("출근시간: 기록 없음");
-                 $('#outTimeDisplay').text("퇴근시간: 기록 없음");
-             }
-            
-             // 도넛 차트 업데이트 함수 호출 (attend.js에 정의됨).
-             updateDonutChart(appendEvents, clickedDate);
+             const event = appendEvents.find(e => e.date === info.dateStr);
+             $('#inTimeDisplay').text(event && event.inTime ? "출근: " + event.inTime : "출근: -");
+             $('#outTimeDisplay').text(event && event.outTime ? "퇴근: " + event.outTime : "퇴근: -");
+             if(typeof updateDonutChart === 'function') updateDonutChart(appendEvents, info.dateStr);
         }
     });    
+    calendar.render();
     
-    calendar.render(); // 캘린더 렌더링.
- 	
-    const initialDate = calendar.getDate().toISOString().substring(0, 10);
-    
-    // 차트 생성 시점에 맞춰 초기 데이터로 차트 업데이트.
-    setTimeout(() => {
-        updateDonutChart(appendEvents, initialDate); 
-    }, 100);
+    // 차트 초기화
+    setTimeout(() => { if(typeof updateDonutChart === 'function') updateDonutChart(appendEvents, new Date().toISOString().slice(0,10)); }, 100);
 });
 
-//=============================================================
-//							모달 제어 함수
-//=============================================================
-
 $(document).ready(function() {
- 
- // 모달 변수 설정
- const vacationModal = $('#vacationModal');
- const correctionModal = $('#commuteCorrectionModal');
- 
- // 모달 닫기 버튼 (X 버튼) 이벤트 설정
- $('.modal .close').on('click', function() {
-     $(this).closest('.modal').css('display', 'none');
- });
- 
- // 1. 휴가 신청 버튼 클릭 시
- $('#btnVacation').on('click', function() {
-     vacationModal.css('display', 'block');
- });
- 
- // 2. 출/퇴근 정정 신청 버튼 클릭 시 (여기서 모달이 열림)
- $('#btnCommuteCorrection').on('click', function() {
-     correctionModal.css('display', 'block');
-     // 모달 열 때 폼 초기화
-     $('#correctionForm')[0].reset();
-     $('#existingTime').val('');
- });
- 
- // 모달 외부 클릭 시 닫기
- $(window).on('click', function(event) {
-     if ($(event.target).is(vacationModal)) {
-         vacationModal.css('display', 'none');
-     }
-     if ($(event.target).is(correctionModal)) {
-         correctionModal.css('display', 'none');
-     }
- });
+    // 모달 제어
+    const $vacationModal = $('#vacationModal');
+    const $correctionModal = $('#commuteCorrectionModal');
 
- // 전역 함수로 closeModal 정의: commuteCorrectionForm.jsp에서 호출됨
- window.closeModal = function() {
-	      correctionModal.css('display', 'none');
-	  }
- 
- $(document).on('click', '#cancelBtn', function(event) {
-     event.preventDefault(); // 기본 폼 동작 방지
-     
-     // 취소 버튼이 속한 모달을 찾아서 닫음 (correctionModal 변수와 동일한 기능)
-     $(this).closest('.modal').css('display', 'none');
-     
-     // 선택 사항: 폼 초기화를 위해 correctionForm을 찾아서 reset
-     $('#correctionForm')[0].reset(); 
- });
- 
+    $('#btnVacation').click(() => $vacationModal.addClass('show'));
+    $('#btnCommuteCorrection').click(() => {
+        $('#correctionForm')[0].reset();
+        $('#existingTime').val('');
+        $correctionModal.addClass('show');
+    });
+    $('.close, .btn-close-modal').click(function() { $(this).closest('.modal').removeClass('show'); });
+    $(window).click((e) => {
+        if($(e.target).is($vacationModal)) $vacationModal.removeClass('show');
+        if($(e.target).is($correctionModal)) $correctionModal.removeClass('show');
+    });
+
+    // 출퇴근 정정: 기존 시간 자동 조회
+    $('#correctionDate, #correctionType').change(function() {
+        const date = $('#correctionDate').val();
+        const type = $('#correctionType').val();
+        const record = appendEvents.find(r => r.date === date);
+        let time = '';
+        if(record) {
+            if(type === 'inTime' && record.inTime) time = record.inTime.substring(0, 5);
+            else if(type === 'outTime' && record.outTime) time = record.outTime.substring(0, 5);
+        }
+        $('#existingTime').val(time);
+    });
+
+    // 휴가 신청: 반차 로직
+    $('#vacationType').change(function() {
+        if($(this).val().includes('half')) {
+            $('#endDateGroup').hide(); $('#totalDays').val('0.5 일');
+        } else {
+            $('#endDateGroup').show(); calculateDays();
+        }
+    });
+    $('#startDate, #endDate').change(calculateDays);
+    function calculateDays() {
+        if($('#vacationType').val().includes('half')) return;
+        const s = new Date($('#startDate').val()), e = new Date($('#endDate').val());
+        if(s && e && s <= e) $('#totalDays').val((Math.round((e-s)/86400000)+1) + ' 일');
+        else $('#totalDays').val('0 일');
+    }
+
+    // AJAX 전송 (공통)
+    $('form.ajax-form').on('submit', function(e) {
+        e.preventDefault();
+        const $form = $(this);
+        const $modal = $form.closest('.modal');
+        
+        // 반차 날짜 보정
+        if($form.attr('id') === 'vacationForm' && $('#vacationType').val().includes('half')) {
+            $('#endDate').prop('disabled', false).val($('#startDate').val());
+        }
+
+        const formData = new FormData(this);
+        if(formData.has('totalDays')) formData.set('totalDays', formData.get('totalDays').replace(' 일', ''));
+
+        $.ajax({
+            url: $form.attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false, contentType: false,
+            dataType: 'json',
+            success: function(res) {
+                if(res.success) {
+                    alert('✅ 완료되었습니다.');
+                    $modal.removeClass('show');
+                } else {
+                    alert('❌ 실패: ' + res.message);
+                }
+            },
+            error: function(xhr) {
+                console.error(xhr);
+                alert('❌ 오류 발생 (로그인 확인 필요)\n' + xhr.responseText.substring(0, 100) + "...");
+            }
+        });
+    });
+    
+    // 출퇴근 버튼
+    $('#checkIn').click(() => confirm('출근하시겠습니까?') && $.get('/attend/checkIn', (res)=> { alert(res); $('#inTimeDisplay').text("출근: "+res); }));
+    $('#checkOut').click(() => confirm('퇴근하시겠습니까?') && $.get('/attend/checkOut', (res)=> { alert(res); $('#outTimeDisplay').text("퇴근: "+res); }));
 });
 </script>
 </head>
 
-<body class="sb-nav-fixed">
+<body class="sb-nav-fixed bg-gray-100">
+    <jsp:include page="../common/header.jsp" flush="true" />
+    <div id="layoutSidenav">
+        <jsp:include page="../common/sidebar.jsp" flush="true" />
+        <div id="layoutSidenav_content">
+            <main class="px-4 py-6">
+                <h3 class="font-bold text-2xl text-gray-800 mb-4">근태 현황</h3>
+                
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <div class="w-full lg:w-1/3 bg-white p-4 rounded-xl shadow border">
+                        <jsp:include page="../attend/donutChart.jsp" flush="true" />
+                    </div>
+                    
+                    <div class="w-full lg:w-2/3 bg-white p-6 rounded-xl shadow border">
+                        <div class="flex justify-between mb-4">
+                            <div class="space-x-2">
+                                <button id="checkIn" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 font-bold">출근</button>
+                                <button id="checkOut" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 font-bold">퇴근</button>
+                            </div>
+                            <div class="text-sm font-medium pt-1">
+                                <span id="inTimeDisplay" class="mr-3 text-green-700">출근: -</span>
+                                <span id="outTimeDisplay" class="text-blue-700">퇴근: -</span>
+                            </div>
+                        </div>
+                        
+                        <div id="calendar"></div>
 
-	<jsp:include page="../common/header.jsp" flush="true" />
+                        <div class="flex justify-end gap-3 mt-4 border-t pt-4">
+                            <button id="btnVacation" class="custom-btn bg-primary text-white hover:bg-orange-600 shadow-md">휴가 신청</button>
+                            <button id="btnCommuteCorrection" class="custom-btn bg-blue-primary text-white hover:bg-blue-800 shadow-md">출/퇴근 정정</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+            <jsp:include page="../common/footer.jsp" flush="true" />
+        </div>
+    </div>
 
-	<div id="layoutSidenav">
-		<jsp:include page="../common/sidebar.jsp" flush="true" />
+    <div id="vacationModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-2xl font-bold text-center mb-6">휴가 신청</h2>
+            <form id="vacationForm" action="${pageContext.request.contextPath}/approve/approve-ajax" method="POST" class="ajax-form space-y-4">
+                <input type="hidden" name="DocType" value="4"> 
+                <input type="hidden" name="DocTitle" value="[휴가신청]"> 
+                <input type="hidden" name="step1ManagerNo" value="${sessionScope.login.managerEmpNo}"> 
+                <input type="hidden" name="step2ManagerNo" value="${sessionScope.login.parentDeptNo}">
+                
+                <div class="bg-gray-50 p-3 rounded text-sm grid grid-cols-3 gap-2 border">
+                    <div>이름: ${sessionScope.login.empName}</div>
+                    <div>사번: ${sessionScope.login.empNo}</div>
+                    <div>부서: ${sessionScope.login.deptName}</div>
+                </div>
 
-		<div id="layoutSidenav_content">
-			<main id="content-area">
-				<div class="main-layout-container">
+                <div class="space-y-3">
+                    <div class="flex items-center"><label class="w-20 font-bold">종류</label>
+                        <select id="vacationType" name="attStatus" class="flex-1 p-2 border rounded" required>
+                            <option value="" disabled selected>선택</option>
+                            <option value="annual">연차</option>
+                            <option value="half_am">오전반차</option>
+                            <option value="half_pm">오후반차</option>
+                            <option value="sick">병가</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center"><label class="w-20 font-bold">시작일</label>
+                        <input type="date" id="startDate" name="startDate" class="flex-1 p-2 border rounded" required>
+                    </div>
+                    <div class="flex items-center" id="endDateGroup"><label class="w-20 font-bold">종료일</label>
+                        <input type="date" id="endDate" name="endDate" class="flex-1 p-2 border rounded" required>
+                    </div>
+                    <div class="flex items-center"><label class="w-20 font-bold">일수</label>
+                        <input type="text" id="totalDays" name="totalDays" readonly class="flex-1 p-2 bg-gray-100 border rounded">
+                    </div>
+                    <div><textarea name="docContent" rows="3" class="w-full p-2 border rounded" placeholder="사유 입력" required></textarea></div>
+                </div>
+                
+                <div class="flex justify-center gap-2 pt-4">
+                    <button type="submit" class="custom-btn bg-primary text-white">신청</button>
+                    <button type="button" class="btn-close-modal custom-btn bg-gray-200">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-					<div class="report-section">
-						<jsp:include page="../attend/donutChart.jsp" flush="true" />
-					</div>
+    <div id="commuteCorrectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="text-2xl font-bold text-center mb-6">출/퇴근 정정</h2>
+            <form id="correctionForm" action="${pageContext.request.contextPath}/approve/approve-ajax" method="POST" class="ajax-form space-y-4">
+                <input type="hidden" name="DocType" value="5">
+                <input type="hidden" name="DocTitle" value="[근태정정]">
+                <input type="hidden" name="step1ManagerNo" value="${sessionScope.login.managerEmpNo}">
+                <input type="hidden" name="step2ManagerNo" value="${sessionScope.login.parentDeptNo}">
+                
+                <div class="space-y-3">
+                    <div class="flex items-center"><label class="w-20 font-bold">정정일</label>
+                        <input type="date" id="correctionDate" name="startDate" class="flex-1 p-2 border rounded" required>
+                    </div>
+                    <div class="flex items-center"><label class="w-20 font-bold">구분</label>
+                        <select id="correctionType" name="memo" class="flex-1 p-2 border rounded" required>
+                            <option value="" disabled selected>선택</option>
+                            <option value="inTime">출근시간</option>
+                            <option value="outTime">퇴근시간</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center"><label class="w-20 font-bold">기존</label>
+                        <input type="time" id="existingTime" readonly class="flex-1 p-2 bg-gray-100 border rounded">
+                    </div>
+                    <div class="flex items-center"><label class="w-20 font-bold">정정</label>
+                        <input type="time" name="newmodifyTime" class="flex-1 p-2 border rounded border-blue-500" required>
+                    </div>
+                    <div><textarea name="docContent" rows="3" class="w-full p-2 border rounded" placeholder="사유 입력" required></textarea></div>
+                </div>
 
-					<div class="calendar-section">
-						<div class="top-calendar-group">
-							<div class="controls">
-								<button class="btn-checkin" id="checkIn">출 근</button>
-								<button class="btn-checkout" id="checkOut">퇴 근</button>
-								<div class="time-display">
-									<p id="inTimeDisplay">출근시간: -</p>
-									<p id="outTimeDisplay">퇴근시간: -</p>
-									<p id="fieldworkDisplay"></p>
-								</div>
-								<button class="btn-fieldwork" id="fieldwork">외 근</button>
-							<!-- 임시 월근무 계산기 버튼 -->
-								<button class="btn-fieldwork" id="monthAttend">임시 월근무 계산기</button>
-							<!-- /임시 월근무 계산기 버튼 -->	
-							</div>
-							<div class="calendar">
-								<div id="calendar"></div>
-							</div>
-						</div>
-
-						<div class="actions">
-							<button id="btnVacation">휴가 신청</button>
-							<button id="btnCommuteCorrection">출/퇴근 정정 신청</button>
-						</div>
-					</div>
-				</div>
-			</main>
-			<jsp:include page="../common/footer.jsp" flush="true" />
-		</div>
-	</div>
-
-	<div id="vacationModal" class="modal">
-		<div class="modal-content">
-			<span class="close">&times;</span>
-			<div id="vacationFormContent">
-				<jsp:include page="vacationForm.jsp" flush="true" />
-			</div>
-		</div>
-	</div>
-
-	<div id="commuteCorrectionModal" class="modal">
-		<div class="modal-content">
-			<span class="close">&times;</span>
-			<div id="commuteCorrectionFormContent">
-				<jsp:include page="commuteCorrectionForm.jsp" flush="true" />
-			</div>
-		</div>
-	</div>
-
+                <div class="flex justify-center gap-2 pt-4">
+                    <button type="submit" class="custom-btn bg-primary text-white">신청</button>
+                    <button type="button" class="btn-close-modal custom-btn bg-gray-200">취소</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
