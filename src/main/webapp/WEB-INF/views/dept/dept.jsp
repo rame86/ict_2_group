@@ -31,6 +31,7 @@
 
 					<div class="card mb-4">
 						<div class="card-body">
+							
 							<div class="org-tree">
 								<ul>
 									<c:forEach var="ceo" items="${deptList}">
@@ -91,8 +92,37 @@
 									</c:forEach>
 								</ul>
 							</div>
-
-						</div>
+							<div class="mt-5 pt-4 border-top">
+								<h5 class="text-secondary font-weight-bold mb-3">
+									<i class="fas fa-user-clock"></i> 대기 / 무소속
+								</h5>
+								
+								<div class="org-tree" style="justify-content: flex-start; min-height: auto;">
+									<ul>
+										<c:forEach var="etc" items="${deptList}">
+											<%-- DEPT_NO가 0인 '무소속'만 찾아서 출력 --%>
+											<c:if test="${etc.deptNo == 0}">
+												<li>
+													<div class="org-node team ${sessionScope.login.deptNo == etc.deptNo ? 'my-dept' : ''}"
+														 style="background-color: #f8f9fa; border: 2px dashed #b7b9cc;"
+														 onclick="showDeptModal('${etc.deptNo}', '${etc.deptName}', '${etc.managerName}')">
+														
+														<div class="profile-pic" style="background: #b7b9cc; display: flex; align-items: center; justify-content: center;">
+															<i class="fas fa-users-slash" style="color: white; font-size: 20px;"></i>
+														</div>
+														
+														<span class="dept-name" style="color: #5a5c69;">${etc.deptName}</span>
+														<span class="manager-name" style="color: #858796;">
+															${empty etc.managerName ? '(관리자 없음)' : etc.managerName}
+														</span>
+													</div>
+												</li>
+											</c:if>
+										</c:forEach>
+									</ul>
+								</div>
+							</div>
+							</div>
 					</div>
 				</div>
 			</main>
@@ -307,10 +337,10 @@
     // JSP(서버) 데이터 -> JS 변수 변환
     const contextPath = '${pageContext.request.contextPath}';
     
-    /* [중요] EL 표현식은 반드시 한 줄에 공백 없이 작성해야 합니다. */
+     /* EL 표현식은 반드시 한 줄에 공백 없이 작성해야 합니다. */   
     const isAdminUser = ${isAdmin != null ? isAdmin : false};
-    
-    console.log("현재 접속자 관리자 권한 여부:", isAdminUser); // 콘솔에서 확인 가능하도록 로그 추가
+       
+    console.log("현재 접속자 관리자 권한 여부:", isAdminUser); 
 </script>
 <script src="${pageContext.request.contextPath}/js/dept.js"></script>
 </body>
