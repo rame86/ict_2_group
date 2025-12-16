@@ -18,9 +18,11 @@ if (request.getAttribute("menu") == null) {
 
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/css/salDetail.css">
-
 <link href="https://cdn.jsdelivr.net/npm/suit-font/dist/suit.min.css"
 	rel="stylesheet">
+
+<!-- ✅ Chart.js는 차트 생성 전에 1번만 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -44,66 +46,78 @@ if (request.getAttribute("menu") == null) {
 						<div class="info-card">
 
 							<div class="info-card-header">
-								<div>
-									<span class="info-label"> 지급월 : <c:choose>
-											<c:when test="${not empty sal.yearMonthLabel}">
-                                            ${sal.yearMonthLabel}
-                                        </c:when>
-											<c:when test="${not empty sal.yearMonth}">
-                                            ${sal.yearMonth}
-                                        </c:when>
-											<c:otherwise>
-                                            ${sal.monthAttno}
-                                        </c:otherwise>
-										</c:choose>
+								<div class="info-row info-row--single">
+									<span class="info-item"> <span class="info-label">지급월
+											:</span> <span class="info-value"> <c:choose>
+												<c:when test="${not empty sal.yearMonthLabel}">${sal.yearMonthLabel}</c:when>
+												<c:when test="${not empty sal.yearMonth}">${sal.yearMonth}</c:when>
+												<c:otherwise>${sal.monthAttno}</c:otherwise>
+											</c:choose>
+									</span>
 									</span>
 								</div>
+
 								<button type="button" class="btn-print no-print"
 									onclick="window.print();">🖨 명세서 출력</button>
 							</div>
 
-							<div class="info-row">
-								<span class="info-label"> 지급일 : <c:choose>
-										<c:when test="${not empty sal.salDate}">
-                                        ${sal.salDate}
-                                    </c:when>
-										<c:when test="${not empty sal.yearMonthLabel}">
-                                        ${sal.yearMonthLabel} 15일
-                                    </c:when>
-										<c:otherwise>15일</c:otherwise>
-									</c:choose>
-								</span>
-							</div>
-<br>
-							<div class="info-row">
-								<span class="info-label">사번 : ${emp.empNo}</span> <span
-									class="info-label">이름 : ${emp.empName}</span> <span
-									class="info-label">부서 : ${emp.deptName}</span> <span
-									class="info-label">재직상태 : ${emp.statusName}</span>
+							<!-- ✅ 본문(지급일 + 사원정보) -->
+							<div class="info-body">
+								<div class="info-row info-row--single">
+									<span class="info-item"> <span class="info-label">지급일
+											:</span> <span class="info-value"> <c:choose>
+												<c:when test="${not empty sal.salDate}">${sal.salDate}</c:when>
+												<c:when test="${not empty sal.yearMonthLabel}">${sal.yearMonthLabel} 15일</c:when>
+												<c:otherwise>15일</c:otherwise>
+											</c:choose>
+									</span>
+									</span>
+								</div>
+
+								<div class="info-grid">
+									<div class="info-pair">
+										<span class="k">사번</span><span class="v">${emp.empNo}</span>
+									</div>
+									<div class="info-pair">
+										<span class="k">이름</span><span class="v">${emp.empName}</span>
+									</div>
+									<div class="info-pair">
+										<span class="k">부서</span><span class="v">${emp.deptName}</span>
+									</div>
+									<div class="info-pair">
+										<span class="k">재직상태</span><span class="v">${emp.statusName}</span>
+									</div>
+								</div>
 							</div>
 
-							<div class="summary-chips">
-								<span class="chip chip-pay"> 총 지급 <b><fmt:formatNumber
-											value="${sal.payTotal}" pattern="#,###" /></b>원
-								</span> <span class="chip chip-deduct"> 공제 <b><fmt:formatNumber
-											value="${sal.deductTotal}" pattern="#,###" /></b>원
-								</span> <span class="chip chip-net"> 실지급 <b><fmt:formatNumber
-											value="${sal.realPay}" pattern="#,###" /></b>원
-								</span>
+							<!-- ✅ 칩 영역을 카드 하단 “한 덩어리”로 -->
+							<div class="info-chips">
+								<div class="summary-chips">
+									<span class="chip chip-pay">총 지급 <b><fmt:formatNumber
+												value="${sal.payTotal}" pattern="#,###" /></b>원
+									</span> <span class="chip chip-deduct">공제 <b><fmt:formatNumber
+												value="${sal.deductTotal}" pattern="#,###" /></b>원
+									</span> <span class="chip chip-net">실지급 <b><fmt:formatNumber
+												value="${sal.realPay}" pattern="#,###" /></b>원
+									</span>
+								</div>
 							</div>
+
 						</div>
+
 
 						<!-- ================= 지급 / 공제 / 비율 ================= -->
 						<div class="salary-wrapper">
 
-							<!-- ✅ 지급 / 공제 원형 그래프 -->
+							<!-- ✅ 지급/공제 도넛 차트 -->
 							<div class="detail-card mini-card chart-card">
 								<div class="salary-box">
 									<h5>지급 / 공제 비율</h5>
 
+									<!-- ✅ 데이터는 dataset으로 안전하게 전달 -->
 									<canvas id="payDonutChart" data-pay="${sal.payTotal}"
-										data-deduct="${sal.deductTotal}">
-									</canvas>
+										data-deduct="${sal.deductTotal}" data-realpay="${sal.realPay}">
+                                </canvas>
 
 									<div class="chart-legend">
 										<span class="legend pay">● 지급</span> <span
@@ -168,6 +182,13 @@ if (request.getAttribute("menu") == null) {
 
 						<!-- ================= 하단 요약 ================= -->
 						<div class="net-salary-box">
+
+							<!-- ✅ 문구: 실지급액 왼쪽 영역 -->
+							<div class="net-left">
+								<div class="pay-note">* 결재 승인은 월말 당일 중에 완료 될 수 있도록 협력
+									부탁드립니다. *</div>
+							</div>
+
 							<div class="summary-box">
 								<div class="summary-row">
 									<span class="summary-label">총 지급액</span> <span><fmt:formatNumber
@@ -179,9 +200,8 @@ if (request.getAttribute("menu") == null) {
 								</div>
 								<div class="summary-row real-pay-row">
 									<span class="summary-label">실지급액</span> <span
-										class="net-salary"> <fmt:formatNumber
-											value="${sal.realPay}" pattern="#,##0" />원
-									</span>
+										class="net-salary"><fmt:formatNumber
+											value="${sal.realPay}" pattern="#,##0" />원</span>
 								</div>
 							</div>
 						</div>
@@ -193,113 +213,91 @@ if (request.getAttribute("menu") == null) {
 						</div>
 
 					</div>
+					<!-- content-wrapper -->
 				</div>
+				<!-- container -->
 			</main>
 
 			<jsp:include page="../common/footer.jsp" />
-
-			<script>
-				const pay = $
-				{
-					sal.payTotal
-				};
-				const deduct = $
-				{
-					sal.deductTotal
-				};
-
-				const ctx = document.getElementById('payDonutChart');
-
-				new Chart(
-						ctx,
-						{
-							type : 'doughnut',
-							data : {
-								labels : [ '지급', '공제' ],
-								datasets : [ {
-									data : [ pay, deduct ],
-									backgroundColor : [ '#3b82f6', '#fb923c' ],
-									borderColor: '#000000',   
-									borderWidth : 0
-								} ]
-							},
-							options : {
-								responsive : true,
-								cutout : '65%',
-								plugins : {
-									legend : {
-										display : false
-									},
-									tooltip : {
-										callbacks : {
-											label : function(context) {
-												return context.label
-														+ ': '
-														+ context.parsed
-																.toLocaleString()
-														+ '원';
-											}
-										}
-									}
-								}
-							}
-						});
-			</script>
-
 		</div>
+		<!-- layoutSidenav_content -->
 	</div>
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<!-- layoutSidenav -->
 
-	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+	<!-- ===================== 차트 스크립트 (1번만) ===================== -->
 	<script>
-		document
-				.addEventListener(
-						'DOMContentLoaded',
-						function() {
-							const canvas = document
-									.getElementById('payDonutChart');
-							if (!canvas)
-								return;
+  // ✅ 도넛 중앙 텍스트 플러그인
+  const donutCenterText = {
+    id: 'donutCenterText',
+    afterDraw(chart, args, pluginOptions) {
+      const { ctx, chartArea } = chart;
+      if (!chartArea) return;
 
-							// Chart.js 로드 체크
-							if (typeof Chart === 'undefined') {
-								console
-										.error('Chart.js가 로드되지 않았어요. <script src="...chart.js"> 위치를 확인해주세요.');
-								return;
-							}
+      const text1 = pluginOptions.text1 || '';
+      const text2 = pluginOptions.text2 || '';
 
-							const pay = Number(canvas.dataset.pay || 0);
-							const deduct = Number(canvas.dataset.deduct || 0);
+      const centerX = (chartArea.left + chartArea.right) / 2;
+      const centerY = (chartArea.top + chartArea.bottom) / 2;
 
-							// 값이 둘 다 0이면 임시로 1 넣어서 도넛이 안 보이는 문제 방지(선택)
-							const dataPay = pay > 0 ? pay : 0;
-							const dataDed = deduct > 0 ? deduct : 0;
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
 
-							new Chart(canvas, {
-								type : 'doughnut',
-								data : {
-									labels : [ '지급', '공제' ],
-									datasets : [ {
-										data : [ dataPay, dataDed ],
-										backgroundColor : [ '#2563eb', '#ef4444' ],
-										borderColor: '#000000',
-										borderWidth : 0,
-									} ]
-								},
-								options : {
-									responsive : true,
-									maintainAspectRatio : false,
-									cutout : '65%',
-									plugins : {
-										legend : {
-											display : false
-										}
-									}
-								}
-							});
-						});
-	</script>
+      ctx.font = '700 12px SUIT, Pretendard, sans-serif';
+      ctx.fillStyle = '#6B7280';
+      ctx.fillText(text1, centerX, centerY - 10);
+
+      ctx.font = '800 16px SUIT, Pretendard, sans-serif';
+      ctx.fillStyle = '#111827';
+      ctx.fillText(text2, centerX, centerY + 12);
+
+      ctx.restore();
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const canvas = document.getElementById('payDonutChart');
+    if (!canvas) return;
+
+    const pay = Number(canvas.dataset.pay || 0);
+    const deduct = Number(canvas.dataset.deduct || 0);
+    const realPay = Number(canvas.dataset.realpay || (pay - deduct));
+
+    new Chart(canvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['지급', '공제'],
+        datasets: [{
+          data: [pay, deduct],
+          backgroundColor: ['#7783BD', '#BA5A6D'], // ✅ 원하시면 여기 색 바꾸면 돼요
+          borderWidth: 0,
+          hoverOffset: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return context.label + ': ' + Number(context.parsed || 0).toLocaleString() + '원';
+              }
+            }
+          },
+          donutCenterText: {
+            text1: '실지급액',
+            text2: realPay.toLocaleString() + '원'
+          }
+        }
+      },
+      plugins: [donutCenterText]
+    });
+  });
+</script>
 
 </body>
 </html>
