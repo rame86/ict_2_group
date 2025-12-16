@@ -227,7 +227,7 @@ function renderConversationList(list) {
          'onclick="loadChatWindow(\'' + conv.otherUserId + '\', \'' + conv.otherUserName + '\')">' + 
              
              '<div class="d-flex align-items-center">' +
-                 '<img src="/img/profile_placeholder.png" class="rounded-circle profile-img-small" alt="프로필">' +
+                 '<img src="${pageContext.request.contextPath}/upload/emp/${login.empImage}" class="rounded-circle profile-img-small" alt="프로필">' +
                  
                  '<div class="w-100">' +
                      
