@@ -243,7 +243,7 @@ public class ApproveController {
 
 	// 다른 폼에서 오는 ajax 결제관리
 	@PostMapping("approve/approve-ajax")
-	@ResponseBody // 이건 새로 만드는 거니까 붙여도 되죠?
+	@ResponseBody 
 	public String approveFormAjax(DocVO dvo, ApproveVO avo) {
 		log.info("approve/approve-ajax 요청받음");
 		log.info(dvo.toString());
