@@ -51,14 +51,16 @@ small {
 					<h3 class="mt-4">쪽지함</h3><br>
 					
 					<div class="row">
-						<div class="col-xl-3 col-lg-4"> 
+						<div class="col-xl-3 col-lg-4">
+						 
 					        <div class="card shadow-sm mb-3 mx-2 border-left-danger" data-noti-id="1">
-    
-							    <div class="card-header py-2 bg-primary d-flex justify-content-between align-items-center">
-							        <h6 class="m-0 small fw-bold text-white">
-							            <i class="fas fa-exclamation-triangle me-1 text-white"></i> 미확인 알림
-							        </h6>
-							        <small class="m-0 text-white">방금 전</small>
+    							<div id="notificationListContainer">
+								    <div class="card-header py-2 bg-primary d-flex justify-content-between align-items-center">
+								        <h6 class="m-0 small fw-bold text-white">
+								            <i class="fas fa-exclamation-triangle me-1 text-white"></i> 미확인 알림
+								        </h6>
+								        <small class="m-0 text-white">방금 전</small>
+								    </div>
 							    </div>
 							    
 							    <a href="#" class="card-body p-3 text-decoration-none" onclick="markOneNotificationAsRead(this, event)">
@@ -83,6 +85,7 @@ small {
 							</div>
 							
 							<div class="p-3 text-center text-muted">더 이상 새로운 알림이 없습니다.</div>
+							
 					    </div>
     
 				        <div class="col-xl-3 col-lg-4">
@@ -627,6 +630,14 @@ $(document).ready(function() {
         }
     });
     
+    // 알람창!
+    if (typeof loadNotificationList === 'function') {
+        console.log("🚀 [READY] 페이지 로드 완료. 알림 목록 로드 시작.");
+        loadNotificationList();
+    } else {
+        console.error("❌ [ERROR] loadNotificationList 함수가 정의되지 않았습니다.");
+    }
+    
 });
 
 // 알람창
@@ -681,6 +692,101 @@ function renderNotifications(notifications) {
             '</div>';
             
         container.append(itemHtml);
+    });
+}
+
+// 알림창 시간 포맷팅 함수 (예: '방금 전', '1일 전')
+function formatTime(sendDate) {
+    if (!sendDate) return '';
+    
+    try {
+        const now = new Date();
+        const sent = new Date(sendDate);
+        const diffInSeconds = Math.floor((now - sent) / 1000);
+
+        if (diffInSeconds < 60) {
+            return '방금 전';
+        } else if (diffInSeconds < 3600) { // 1시간 미만
+            return Math.floor(diffInSeconds / 60) + '분 전';
+        } else if (diffInSeconds < 86400) { // 24시간 미만
+            return Math.floor(diffInSeconds / 3600) + '시간 전';
+        } else if (diffInSeconds < 604800) { // 7일 미만
+             return Math.floor(diffInSeconds / 86400) + '일 전';
+        } else {
+            // 7일 이상은 날짜 표시
+            return sent.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\./g, '.');
+        }
+    } catch (e) {
+        return sendDate;
+    }
+}
+
+//알림 상세 페이지 이동 시 읽음 처리하는 함수
+function markOneNotificationAsRead(element, event) {
+    // <a> 태그의 부모인 .card 엘리먼트에서 data-noti-id를 가져옵니다.
+    const $card = $(element).closest('.card');
+    const notiId = $card.data('noti-id');
+    
+    // 1. 알림 ID가 유효한 경우에만 읽음 처리 요청
+    if (notiId) {
+        // 비동기 요청 (AJAX)으로 읽음 상태 업데이트
+        $.ajax({
+            url: '/notification/markAsRead', // 서버 알림 읽음 처리 API
+            type: 'POST',
+            data: { notificationId: notiId }, // 서버에 알림 ID 전송
+            success: function(response) {
+                console.log("✅ 알림 ID " + notiId + " 읽음 처리 완료.");
+                
+                // UI 갱신: card 스타일 변경 (읽음 상태로 변경)
+                $card.removeClass('border-left-danger');
+                $card.find('.card-header').removeClass('bg-primary').addClass('bg-light');
+                $card.find('.card-header h6').removeClass('text-white').addClass('text-muted');
+                $card.find('.card-header i').removeClass('text-white').addClass('text-dark');
+                $card.find('.card-header small').removeClass('text-white').addClass('text-muted');
+                $card.find('.card-body p').removeClass('text-dark').addClass('text-muted');
+                $card.find('.card-header h6').html('<i class="fas fa-info-circle me-1 text-dark"></i> 확인됨');
+                
+                // 헤더 뱃지 갱신이 필요한 경우 호출
+                if (typeof updateHeaderAlertsBadge === 'function') {
+                    updateHeaderAlertsBadge(); 
+                }
+                
+            },
+            error: function(xhr, status, error) {
+                console.error("❌ 알림 ID " + notiId + " 읽음 처리 실패:", error);
+            }
+        });
+    }
+}
+
+//알림 탭 (쪽지함 왼쪽)의 알림 목록을 로드하는 함수
+function loadNotificationList() {
+    
+    // [중요] JSP 코드의 알림 탭 영역에 id="notificationListContainer"가 있다고 가정합니다.
+    const $listContainer = $('#notificationListContainer'); 
+    
+    // 로딩 상태 표시
+    $listContainer.html('<div class="p-3 text-center text-primary">알림 목록을 불러오는 중...</div>');
+
+    $.ajax({
+        url: '/alert/latestView', // ⭐ 기존 AlertController의 엔드포인트 사용
+        type: 'GET',
+        dataType: 'json',
+        success: function(notifications) {
+            console.log("✅ 알림 목록 로드 성공:", notifications);
+            
+            // 기존에 정의된 renderNotifications 함수를 호출하여 목록 렌더링
+            if (typeof renderNotifications === 'function') {
+                renderNotifications(notifications);
+            } else {
+                 console.error("renderNotifications 함수가 정의되지 않았습니다.");
+                 $listContainer.html('<div class="p-3 text-center text-danger">렌더링 오류 발생</div>');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("❌ 알림 목록 로드 실패:", status, error);
+            $listContainer.html('<div class="p-3 text-center text-danger">알림 목록 로드 실패: 서버 연결 확인 필요</div>');
+        }
     });
 }
 
