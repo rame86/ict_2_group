@@ -25,12 +25,17 @@ public class AlertController {
 	
 	@GetMapping("/alert/latestView")
 	public List<AlertVO> alertLatestView(@SessionAttribute("login") LoginVO login) {
-		return  alertService.getUnreadAlertView(login.getEmpNo());
+		return alertService.getUnreadAlertView(login.getEmpNo());
 	}
 	
 	@PostMapping("/alert/markAllAsRead")
 	public void markUpdateAsRead(@SessionAttribute("login") LoginVO login) {
 		alertService.markUpdateAsRead(login.getEmpNo());
+	}
+	
+	@GetMapping("/alert/allLatestView")
+	public List<AlertVO> allLatestView(@SessionAttribute("login") LoginVO login) {
+		return alertService.getAllAlertView(login.getEmpNo());
 	}
 
 }

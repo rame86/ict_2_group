@@ -34,4 +34,9 @@ public class AlertDAOImpl implements AlertDAO{
 		return sess.selectOne("com.example.repository.AlertDAO.selectUnreadCount", empNo);
 	}
 
+	@Override
+	public List<AlertVO> selectAllLatestAlerts(String empNo) {
+		return sess.selectList("com.example.repository.AlertDAO.selectAllLatestAlerts", empNo);
+	}
+
 }

@@ -65,6 +65,11 @@ function connectSocket() {
 					console.warn("WARN: updateHeaderAlerts 함수가 정의되지 않았습니다.");
 				}
 				
+				if(window.location.pathname.includes('/message/messageList') && typeof loadNotificationList === 'function') {
+					console.log("--> 알림 페이지에서 목록 실시간 갱신 요청.");
+					loadNotificationList();
+				}
+				
 				return;
 			}
 			
