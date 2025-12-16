@@ -95,21 +95,28 @@ function initializeCorrectionForm() {
 			contentType: false,
 
 			success: function(response) {
-				console.log('AJAX 성공 응답:', response);
+			    console.log('AJAX 성공 응답:', response);
 
-				if (response && response.success) {
-					alert('✅ 출퇴근 정정 신청이 성공적으로 접수되었어.');
-					$form[0].reset();
-					// 성공 시 모달 닫기
-					window.closeModal(); // 전역 함수 호출
-				} else if (response && response.message) {
-					alert('❌ 출퇴근 정정 신청 실패: ' + response.message);
-				} else {
-					alert('✅ 출퇴근 정정 신청이 성공적으로 접수되었어. (응답 메시지 없음)');
-					$form[0].reset();
-					// 성공 시 모달 닫기
-					window.closeModal(); // 전역 함수 호출
-				}
+			    if (response && response.success) {
+			        alert('✅ 출퇴근 정정 신청이 성공적으로 접수되었어.');
+			        
+			        // 폼 초기화
+			        $form[0].reset();
+			        $('#existingTime').val(''); // 기존 시간 필드도 명시적 초기화
+
+			        // [중요] attend.jsp에 정의한 함수 호출하여 모달 닫기
+			        if (typeof window.closeModal === 'function') {
+			            window.closeModal(); 
+			        } else {
+			            // 만약 함수가 없으면 강제로 닫기 (비상용)
+			            $('#commuteCorrectionModal', parent.document).hide();
+			            // 또는
+			            $('.modal').hide();
+			        }
+			    } else {
+			        // 실패 메시지 처리 등...
+			        alert('❌ 신청 실패: ' + (response.message || '알 수 없는 오류'));
+			    }
 			},
 			error: function(xhr, status, error) {
 				console.error('AJAX 오류 발생:', status, error, xhr.responseText);

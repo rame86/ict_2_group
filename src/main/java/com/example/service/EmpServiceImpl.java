@@ -211,9 +211,7 @@ public class EmpServiceImpl implements EmpService {
  	@Transactional
  	public void setEmpJobTitle(DocVO vo) {
  		log.info("[EmpServiceImpl - setDeptManager 요청 받음] - dept에서 한번에 처리"); 		
- 		
- 
- 				
+ 		 				
  	}	
  	// end of setDeptManager()	
  	// =======================================================================================
