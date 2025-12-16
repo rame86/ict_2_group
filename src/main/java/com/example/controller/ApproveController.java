@@ -241,16 +241,50 @@ public class ApproveController {
 
 	// 다른 폼에서 오는 ajax 결제관리
 	@PostMapping("approve/approve-ajax")
-	@ResponseBody // 이건 새로 만드는 거니까 붙여도 되죠?
-	public String approveFormAjax(DocVO dvo, ApproveVO avo) {
-		log.info("approve/approve-ajax 요청받음");
-		log.info(dvo.toString());
-		// 서비스 로직은 똑같이 호출
-		approveService.ApprovalApplication(dvo, avo);
-		notificationService.sendApprovalNotification(Integer.toString(avo.getStep1ManagerNo()), "새로운 결재가 도착했습니다");
+    @ResponseBody 
+    public Map<String, Object> approveFormAjax(DocVO dvo, ApproveVO avo, @ModelAttribute("login") LoginVO login) {
+        log.info("[ApproveController] approve-ajax 요청받음");
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        try {
+            // [핵심 수정] 로그인한 사용자의 정보를 VO에 강제 주입 (NPE 방지 및 보안 강화)
+            int empNo = Integer.parseInt(login.getEmpNo());
+            avo.setEmpNo(empNo);          // 결재선 기안자 세팅
+            dvo.setDocWriter(login.getEmpNo()); // 문서 작성자 세팅
 
-		// 무조건 텍스트 리턴
-		return "OK";
-	}
+            // 1. 서비스 로직 수행
+            approveService.ApprovalApplication(dvo, avo);
+            
+            // 2. 알림 발송 로직 (Null 체크 포함)
+            Integer managerNo = avo.getStep1ManagerNo();
+            if(managerNo != null) {
+                try {
+                    // 알림 서비스 호출
+                    notificationService.sendApprovalNotification(String.valueOf(managerNo), "새로운 결재가 도착했습니다");
+                    
+                    AlertVO alert = new AlertVO();
+                    alert.setEmpNo(String.valueOf(managerNo));
+                    alert.setContent(dvo.getDocTitle() + " 새로운 결재 요청이 도착했습니다.");
+                    notificationService.pushNewAlert(alert);
+                } catch (Exception e) {
+                    log.error("알림 발송 중 경미한 오류 (무시 가능): " + e.getMessage());
+                }
+            }
+
+            // 성공 응답 생성
+            result.put("success", true);
+            result.put("message", "신청이 완료되었습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace(); // 서버 콘솔에 자세한 에러 로그 출력
+            log.error("[결재 신청 실패] " + e.getMessage());
+            
+            result.put("success", false);
+            result.put("message", "서버 에러 발생: " + e.getMessage()); 
+        }
+
+        return result;
+    }
 
 }

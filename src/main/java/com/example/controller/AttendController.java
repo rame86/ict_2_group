@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.example.domain.LoginVO;
 import com.example.domain.DayAttendVO;
 import com.example.domain.DocVO;
+import com.example.domain.LoginVO;
 import com.example.service.ApproveService;
 import com.example.service.AttendService;
 
@@ -95,7 +95,7 @@ public class AttendController {
 		} else {
 			davo.setAttStatus("2");
 		}
-		log.info(davo.toString());
+		log.info("[AttendController - checkIn - davo : " + davo.toString() + "]");
 
 		String result = attendService.checkIn(davo);
 
@@ -130,7 +130,7 @@ public class AttendController {
 		} else {
 			davo.setAttStatus("null");
 		}
-		log.info(davo.toString());
+		log.info("[AttendController - checkOut - davo : " + davo.toString() + "]");
 
 		String result = attendService.checkOut(davo);
 
@@ -155,13 +155,13 @@ public class AttendController {
 		String nowDateTime = toDate.getCurrentDateTime();
 		davo.setOutTime(nowDateTime);
 
-		log.info(davo.toString());
+		log.info("[AttendController - fieldwork - davo : " + davo.toString() + "]");
 
 		String result = attendService.fieldwork(davo);
 
 		return result;
 	}
-	// end of checkOut()
+	// end of fieldwork()
 	// =======================================================================================
 
 	//
@@ -176,11 +176,11 @@ public class AttendController {
 		String empNo = login.getEmpNo();
 		log.info("toDay : " + toDay);
 		log.info("empNo : " + empNo);
-		// vo.empNo에 유효한 값이 설정되었으므로 DB 쿼리 실행
+
 		List<DayAttendVO> result = attendService.selectDayAttend(empNo, toDay);
 
 		for (DayAttendVO day : result) {
-			log.info("데이터: {}", day.toString()); // VO 객체의 toString() 호출
+			log.info("데이터: {}", day.toString());
 		}
 
 		return result;
@@ -189,23 +189,29 @@ public class AttendController {
 	// =======================================================================================
 
 	//
-	
+
 	// =======================================================================================
-	// vacation() 외근
+	// vacation() 휴가 승인 후 처리
 	@GetMapping("/attend/vacation")
 	public String vacation(@ModelAttribute("login") Model m) {
 		log.info("[AttendController - vacation 요청 받음]");
 
 		// Model에서 "docNo" 키로 데이터 꺼내기
 		Integer docNo = (Integer) m.getAttribute("docNo");
-		;
+		
+		log.info("[AttendController - vacation - docNo : " + docNo + "]");
+
 		// 문서번호로 내용 가져오기
 		DocVO docInfo = aproveService.selectDocNo(docNo);
 		log.info("[AttendController - vacation - docInfo 데이터 : " + docInfo.toString() + "]");
+		
+		// 3번 제안 적용: 여기서 Service의 insertVacation 호출
+		attendService.insertVacation(docInfo);
+		log.info("[AttendController - vacation - Service 호출 완료]");
 
 		return "redirect:/approve/receiveList";
 	}
-	// end of checkOut()
+	// end of vacation()
 	// =======================================================================================
 
 	//
@@ -215,12 +221,15 @@ public class AttendController {
 	@GetMapping("/attend/processAbsence")
 	@ResponseBody
 	public ResponseEntity<String> processAbsence() {
+		log.info("[AttendController - processAbsence 요청 받음]");
 		try {
 			int count = attendService.processDailyAbsence();
 			String message = "결근 처리 완료. 총 " + count + "명의 사원에 대해 처리되었습니다.";
+			log.info("[AttendController - processAbsence 결과 : " + message + "]");
 			return ResponseEntity.ok(message);
 		} catch (Exception e) {
 			e.printStackTrace();
+			log.error("[AttendController - processAbsence 오류 : " + e.getMessage() + "]");
 			return ResponseEntity.internalServerError().body("결근 처리 중 오류 발생: " + e.getMessage());
 		}
 	}
@@ -230,21 +239,24 @@ public class AttendController {
 	//
 
 	// =======================================================================================
-	// processIncompleteAttendance()
+	// processIncompleteAttendance() 미퇴근 처리
 	@GetMapping("/attend/processIncomplete")
 	@ResponseBody
 	public ResponseEntity<String> processIncompleteAttendance() {
+		log.info("[AttendController - processIncompleteAttendance 요청 받음]");
 		try {
 			int updatedCount = attendService.processIncompleteAttendance();
 
 			if (updatedCount > 0) {
 				String message = String.format("미퇴근 처리 완료. 총 %d건의 출근/지각 기록이 결근 처리되었습니다.", updatedCount);
+				log.info("[AttendController - processIncompleteAttendance 결과 : " + message + "]");
 				return ResponseEntity.ok(message);
 			} else {
+				log.info("[AttendController - processIncompleteAttendance - 처리 대상 없음]");
 				return ResponseEntity.ok("미퇴근 처리할 대상이 없습니다.");
 			}
 		} catch (Exception e) {
-			// 실제 운영 환경에서는 e.getMessage() 대신 상세 로그를 찍어야 합니다.
+			log.error("[AttendController - processIncompleteAttendance 오류 : " + e.getMessage() + "]");
 			return ResponseEntity.status(500).body("미퇴근 결근 처리 중 서버 오류가 발생했습니다: " + e.getMessage());
 		}
 	}

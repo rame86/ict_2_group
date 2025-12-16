@@ -113,7 +113,7 @@
 					</div>
 
 					<li><hr class="dropdown-divider my-0" /></li>
-					<li><a class="dropdown-item text-center small text-gray-500 py-2" href="/notification/allList"> 모든 알림 보기 </a></li>
+					<li><a class="dropdown-item text-center small text-gray-500 py-2" href="/message/messageList"> 모든 알림 보기 </a></li>
 				</ul>
 			</li>
 

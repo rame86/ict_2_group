@@ -52,25 +52,37 @@ small {
 					
 					<div class="row">
 						<div class="col-xl-3 col-lg-4"> 
-					        <div class="card shadow mb-4" style="height: 700px;">
-					            <div class="card-header py-3">
-					                <h6 class="m-0 font-weight-bold text-danger">
-					                    <i class="fas fa-bell me-1"></i> 주요 알림
-					                </h6>
-					            </div>
-					            
-					            <div class="card-body p-0" style="max-height: 650px; overflow-y: auto;">
-					                <div id="notificationListContainer" class="list-group list-group-flush">
-					                    <div class="p-3 text-center text-muted">알림을 불러오는 중...</div>
-					                </div>
-					            </div>
-					            
-					             <div class="card-footer text-center py-2">
-					                <a href="javascript:void(0);" class="small text-danger fw-bold" onclick="markAllNotificationsAsRead()">
-					                    전체 알림 읽음 처리
-					                </a>
-					            </div>
-					        </div>
+					        <div class="card shadow-sm mb-3 mx-2 border-left-danger" data-noti-id="1">
+    
+							    <div class="card-header py-2 bg-primary d-flex justify-content-between align-items-center">
+							        <h6 class="m-0 small fw-bold text-white">
+							            <i class="fas fa-exclamation-triangle me-1 text-white"></i> 미확인 알림
+							        </h6>
+							        <small class="m-0 text-white">방금 전</small>
+							    </div>
+							    
+							    <a href="#" class="card-body p-3 text-decoration-none" onclick="markOneNotificationAsRead(this, event)">
+							        <p class="mb-0 small text-dark">홍길동 사원의 휴가 신청 결재 요청이 도착했습니다. 확인 부탁드립니다.</p>
+							    </a>
+							    
+							</div>
+							
+							<div class="card shadow-sm mb-3 mx-2" data-noti-id="2">
+							    
+							    <div class="card-header py-2 bg-light d-flex justify-content-between align-items-center">
+							        <h6 class="m-0 small fw-bold text-muted">
+							            <i class="fas fa-info-circle me-1 text-dark"></i> 확인됨
+							        </h6>
+							        <small class="m-0 text-muted">1일 전</small>
+							    </div>
+							    
+							    <a href="#" class="card-body p-3 text-decoration-none" onclick="markOneNotificationAsRead(this, event)">
+							        <p class="mb-0 small text-muted">2026년 인사고과 지침이 등록되었습니다. 상세 내용을 확인하세요.</p>
+							    </a>
+							    
+							</div>
+							
+							<div class="p-3 text-center text-muted">더 이상 새로운 알림이 없습니다.</div>
 					    </div>
     
 				        <div class="col-xl-3 col-lg-4">
@@ -616,6 +628,61 @@ $(document).ready(function() {
     });
     
 });
+
+// 알람창
+function renderNotifications(notifications) {
+    const container = $('#notificationListContainer');
+    container.empty();
+    
+    if (!notifications || notifications.length === 0) {
+        container.html('<div class="p-3 text-center text-muted">새로운 알림이 없습니다.</div>');
+        return;
+    }
+
+    notifications.forEach(noti => {
+        const isRead = noti.isRead === 'Y';
+        
+        // 카드 제목 및 본문 색상 설정
+        const headerBgClass = isRead ? 'bg-light' : 'bg-primary'; // 읽지 않은 알림은 파란색 제목으로 강조
+        const headerTextColor = isRead ? 'text-muted' : 'text-white';
+        const bodyTextColor = isRead ? 'text-muted' : 'text-dark';
+
+        // 아이콘 설정
+        const iconColor = noti.type === 'APPROVAL' ? 'text-danger' : 
+                          noti.type === 'HR' ? 'text-info' : 
+                          'text-success';
+        const iconClass = noti.type === 'APPROVAL' ? 'fas fa-exclamation-triangle' : 
+                          noti.type === 'HR' ? 'fas fa-user-tie' : 
+                          'fas fa-info-circle';
+        
+        
+        // 알림 항목 HTML 생성 (표준 카드 형태)
+        const itemHtml = 
+            // 알림 카드 전체 (mb-3로 간격 설정)
+            '<div class="card shadow-sm mb-3 mx-2 ' + (isRead ? '' : 'border-left-danger') + '" ' + // 읽지 않은 알림에만 border-left 강조
+            'data-noti-id="' + noti.id + '">' +
+                
+                // 카드 헤더 (제목 영역)
+                '<div class="card-header py-2 ' + headerBgClass + ' d-flex justify-content-between align-items-center">' +
+                    '<h6 class="m-0 small fw-bold ' + headerTextColor + '">' +
+                        '<i class="' + iconClass + ' me-1 ' + (isRead ? 'text-dark' : 'text-white') + '"></i>' + // 헤더 아이콘 색상 설정
+                        (isRead ? '확인됨' : '미확인 알림') +
+                    '</h6>' +
+                    '<small class="m-0 ' + headerTextColor + '">' + formatTime(noti.sendDate) + '</small>' +
+                '</div>' +
+                
+                // 카드 본문 (내용 영역)
+                '<a href="' + (noti.linkUrl || 'javascript:void(0);') + '" ' + 
+                'class="card-body p-3 text-decoration-none" ' + 
+                'onclick="markOneNotificationAsRead(this, event)">' +
+                    '<p class="mb-0 small ' + bodyTextColor + '">' + noti.content + '</p>' +
+                '</a>' +
+                
+            '</div>';
+            
+        container.append(itemHtml);
+    });
+}
 
 </script>
 </html>
