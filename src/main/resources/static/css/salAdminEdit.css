@@ -3,7 +3,7 @@
 /* salAdminEdit.css */
 :root{
   --navy:#05244d;
-  --bg:#F6F8FC;
+  --bg:#ffffff;
   --card:#FFFFFF;
   --line:#E5EAF2;
   --text:#111827;
@@ -30,6 +30,30 @@
   font-family: var(--sal-font);
 }
 
+/* edit-header가 가로로 늘어나게 */
+.edit-header{
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 0;   /* ⛔ 아래 여백 제거 */
+  margin-bottom: 18px;
+}
+
+/* 제목 블록이 헤더에서 남는 폭을 전부 차지하게 */
+.edit-header > div:first-child{
+  flex: 1;
+}
+/* ✅ 페이지 전체 폭 이중선 */
+.edit-header::after{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:18px;        /* ⭐ 버튼 위로 올리는 핵심 */
+  border-bottom: 4px double #869ABF;
+}
+
 #layoutSidenav_content main{
   background: var(--bg);
   min-height: 100vh;
@@ -43,7 +67,7 @@
 }
 
 .edit-title{
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 800;
   color: var(--text);
   margin: 0;
@@ -55,17 +79,31 @@
 }
 
 .btn-line{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding: 10px 14px;
+  padding: 5px 15px;
   border:1px solid var(--line);
-  background:#fff;
-  color: var(--text);
-  border-radius: 12px;
-  text-decoration:none;
+  border-radius:12px;
+  font-weight: 600;
+  background:#f0f7fd;
+ border-color:#8080c0; 
+  color : #000080;
 }
-.btn-line:hover{ border-color:#C9D4E6; }
+.btn-line:hover{ 
+	border-color:#C9D4E6; 
+	background : #424e84;
+	color : #ffffff;
+	}
+	
+	/* 목록으로 버튼 밑줄 완전 제거 */
+.btn-line,
+.btn-line:hover,
+.btn-line:focus {
+  text-decoration: none !important;
+}
+
+.edit-header-actions{
+  transform: translateY(-30px);
+}
+
 
 .edit-top-card{
   background: var(--card);
@@ -229,7 +267,7 @@
   border:none;
   border-radius: 12px;
   padding: 10px 16px;
-  font-weight: 800;
+  font-weight: 600;
   text-decoration:none;
   display:inline-flex;
   align-items:center;
@@ -238,16 +276,22 @@
 }
 
 .btn-gray{
-  background:#6B7280;
+  background:#e8acca;
   color:#fff;
 }
-.btn-gray:hover{ filter: brightness(.95); }
+.btn-gray:hover{ 
+	background:#e298bd;
+	color:#fff;
+	}
 
 .btn-primary{
-  background: var(--primary);
+  background: #a8c4f0;
   color:#fff;
 }
-.btn-primary:hover{ background: var(--primary2); }
+.btn-primary:hover{ 
+	background: #74a2e7;
+	color:#fff;
+}
 
 /* =========================
    정정 미리보기 카드
@@ -286,6 +330,7 @@
 .preview-item .val.strong{
   font-size: 18px;
 }
+
 
 .preview-item .sub{
   margin-top: 6px;
@@ -327,4 +372,37 @@
   font-size: 12px;
   font-weight: 900;
 }
+
+/* =========================
+   정정 미리보기(차액) 강조
+   ========================= */
+.preview-item .val.up {
+  color: #2563eb;
+  animation: pop 220ms ease-out;
+}
+.preview-item .val.down {
+  color: #dc2626;
+  animation: pop 220ms ease-out;
+}
+.preview-item .val.same {
+  color: #6b7280;
+}
+
+@keyframes pop {
+  0%   { transform: scale(0.98); opacity: 0.7; }
+  100% { transform: scale(1);    opacity: 1; }
+}
+
+/* =========================
+   정정 사유 글자수 카운터
+   ========================= */
+.text-counter{
+  margin-top: 8px;
+  text-align: right;
+  font-size: 12px;
+  color: #6b7280;
+}
+.text-counter .slash{ margin: 0 2px; }
+.text-counter.is-max{ color: #dc2626; font-weight: 700; }
+
 
