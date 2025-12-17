@@ -37,7 +37,7 @@ if (request.getAttribute("menu") == null) {
 					<div class="page-title-wrap">
 						<h3 class="mt-4">급여 관리</h3>
 					</div>
-					<br>
+				
 					<h4 class="sal-List-Title">급여 명세서</h4>
 
 					<div class="content-wrapper">
@@ -105,15 +105,7 @@ if (request.getAttribute("menu") == null) {
 
 						</div>
 
-						<!-- 🔹 관리자 전용: 급여 정정 버튼 -->
-						<c:if test="${isAdmin}">
-							<div class="no-print"
-								style="text-align: right; margin: 8px 0 16px;">
-								<a class="btn btn-primary"
-									href="${pageContext.request.contextPath}/sal/admin/edit?salNum=${sal.salNum}">
-									✏️ 급여 정정 </a>
-							</div>
-						</c:if>
+
 
 
 
@@ -219,10 +211,17 @@ if (request.getAttribute("menu") == null) {
 
 						<!-- 🔹 관리자 전용: 급여 정정 이력 -->
 						<c:if test="${isAdmin && not empty edits}">
-							<div class="detail-card" style="margin-top: 24px;">
-								<h5 style="margin-bottom: 12px;">급여 정정 이력</h5>
+							<div class="detail-card edit-history">
+								<h5 class="m-title">급여 정정 이력</h5>
 
 								<table class="salary-table">
+									<colgroup>
+										<col style="width: 22%;">
+										<col style="width: 14%;">
+										<col style="width: 34%;">
+										<col style="width: 30%;">
+										<!-- ✅ 실지급액(전→후) 더 넓게 -->
+									</colgroup>
 									<thead>
 										<tr>
 											<th>정정일시</th>
@@ -236,7 +235,7 @@ if (request.getAttribute("menu") == null) {
 											<tr>
 												<td>${e.editDate}</td>
 												<td>${e.editBy}</td>
-												<td style="text-align: left;">${e.editReason}</td>
+												<td class="edit-reason">${e.editReason}</td>
 												<td><fmt:formatNumber value="${e.beforeRealPay}"
 														pattern="#,##0" />원 → <fmt:formatNumber
 														value="${e.afterRealPay}" pattern="#,##0" />원</td>
@@ -319,7 +318,8 @@ if (request.getAttribute("menu") == null) {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
+        aspectRatio: 1,
         cutout: '68%',
         plugins: {
           legend: { display: false },

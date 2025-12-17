@@ -1,33 +1,30 @@
 /* =============================
-   사원 등록 페이지 - 최종본
-   (사진 왼쪽 고정 + 오른쪽 입력 유지)
+   공통 기본
    ============================= */
-
 html, body {
   height: 100%;
   margin: 0;
-  background-color: #fcfcfc;
-  font-family: "SUIT", sans-serif;
+  background: #fcfcfc;
+
 }
 
-/* 카드(폼) 전체 */
 .emp-new-wrapper {
   width: 100%;
   max-width: 1200px;
-  margin: 20px auto 56px auto;
+  margin: 20px auto 56px;
 }
 
 #empNewForm {
   width: 100%;
   padding: 22px 24px;
-  background: #ffffff;
+  background: #fff;
   border: 1px solid #e5edff;
   border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(15, 76, 129, 0.08);
+  box-shadow: 0 10px 25px rgba(15,76,129,0.08);
   font-size: 14px;
 }
 
-/* 상단 제목 */
+/* 제목 영역 */
 .page-header {
   margin-bottom: 20px;
   padding-bottom: 8px;
@@ -43,45 +40,134 @@ html, body {
 }
 
 /* =============================
-   ✅ 상단 영역: PHOTO + 오른쪽 입력 (항상 가로 2열)
+   상단 레이아웃: 사진 + 입력
    ============================= */
 .form-top {
   display: flex;
-  flex-direction: row;
   align-items: flex-start;
   gap: 24px;
-  flex-wrap: nowrap;              /* ✅ 줄바꿈 금지 */
-}
-
-/* 사진 영역(왼쪽) */
-.photo-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;            /* 사진/버튼/문구는 가운데 */
-  flex: 0 0 260px;                /* ✅ 왼쪽 고정 폭 */
-  max-width: 260px;
-}
-
-/* 오른쪽 영역 */
-.form-top-right {
-  flex: 1 1 auto;
-  min-width: 0;                   /* ✅ flex overflow 방지 */
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  margin-bottom: 10px;
 }
 
 /* =============================
-   🔵 사진(아바타 프레임)
+   사진 카드
    ============================= */
+.photo-wrapper {
+  flex: 0 0 300px;
+  width: 300px;
+  border: 1px solid #E5E7EB;
+  border-radius: 18px;
+  background: #F9FAFF;
+  padding: 18px 16px;
+  box-shadow: 0 6px 18px rgba(17,24,39,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.photo-section-title {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #e7eeff;
+  border-radius: 14px;
+  background: #fff;
+  color: #324a7a;
+  font-weight: 800;
+  margin-bottom: 18px;
+}
+
+.photo-section-title .sub {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: #8a97b2;
+}
+
+.badge-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #7aa2ff;
+  box-shadow: 0 0 0 4px rgba(122,162,255,0.18);
+}
+
+/* 진행률 */
+.photo-progress {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.photo-progress .step {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e5e9ff;
+  color: #7a8ccf;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-progress .step.active {
+  background: linear-gradient(135deg,#7aa2ff,#4f7cff);
+  color: #fff;
+}
+
+.photo-progress .line {
+  flex: 1;
+  height: 2px;
+  background: #e5e9ff;
+}
+
+.photo-progress .label {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: #8a94c6;
+}
+
+/* 설정 완료 배지 */
+.photo-complete-badge {
+  margin: 10px 0 15px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #e9f7ef;
+  color: #2e7d32;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.photo-complete-badge .check {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2ecc71;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+/* 사진 프레임 */
 .photo-box {
   width: 190px;
   height: 190px;
   border-radius: 50%;
   padding: 14px;
   background: #f4f6ff;
-  box-shadow: 0 14px 35px rgba(84, 112, 171, 0.28);
-
+  box-shadow: 0 14px 35px rgba(84,112,171,0.28);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,15 +175,15 @@ html, body {
   cursor: pointer;
   color: #7a8ba3;
   font-size: 14px;
+  margin: 6px 0 12px;
+  transition: all .18s ease-out;
 }
 
 .photo-box:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 40px rgba(84, 112, 171, 0.35);
-  transition: all 0.18s ease-out;
+  box-shadow: 0 18px 40px rgba(84,112,171,0.35);
 }
 
-/* ✅ HTML id에 맞춘 미리보기/텍스트 */
 #empPhotoPreview {
   width: 160px;
   height: 160px;
@@ -113,142 +199,222 @@ html, body {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border: 1px dashed rgba(154, 165, 196, 0.6);
+  border: 1px dashed rgba(154,165,196,0.6);
   font-size: 14px;
   color: #9aa5c4;
 }
 
-#btnPhotoRemove {
-  margin-top: 25px;
+/* 기본사진 (남/여) */
+.default-photo-row {
+  width: 100%;
+  margin-top: 14px;
+}
+
+.default-photo-row .form-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #6B7280;
+  margin-bottom: 6px;
+}
+
+.gender-btns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+}
+
+.gender-btn {
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid #cfd8ff;
+  background: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.gender-btn:hover { background: #f5f7ff; }
+
+.gender-btn.active {
+  background: #e9efff;
+  border-color: #7aa2ff;
 }
 
 .photo-help-text {
-  margin-top: 30px;
+  margin-top: 12px;
   font-size: 12px;
-  color: #888;
+  color: #6B7280;
   text-align: center;
+  line-height: 1.4;
+}
+
+/* =============================
+   오른쪽 입력 영역
+   ============================= */
+.form-top-right {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 필수 안내 배너 */
+.hint-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid #e7eeff;
+  background: linear-gradient(90deg,#f6f9ff,#ffffff);
+  color: #51648c;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.hint-ico {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e9efff;
+  border: 1px solid #cfd8ff;
+  font-weight: 900;
+  color: #5a78ff;
 }
 
 /* =============================
    입력 공통
    ============================= */
-.form-group { margin-bottom: 16px; }
+.form-group {
+  margin-bottom: 16px;
+}
 
-.form-label {
+.form-label,
+.form-label1,
+.form-label2 {
   font-weight: 600;
   margin-bottom: 6px;
   color: #344767;
+  display: block;
 }
 
 .form-control,
-.form-select {
+.form-select,
+.form-select1,
+.form-select2 {
   height: 38px;
   font-size: 13px;
   border-radius: 10px;
   padding: 0 10px;
   border: 1px solid #d7e3ff;
   box-shadow: none;
-}
-
-input::placeholder { color: #e0e0e0 !important; opacity: 1 !important; }
-input:focus::placeholder { color: transparent !important; }
-
-/* =============================
-   ✅ 상단 입력 줄: grid로 안정화
-   1줄(사번/부서번호/부서명)=3열
-   2줄(이름/주민)=2열
-   3줄(권한/재직)=2열
-   ============================= */
-.emp-new-wrapper .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 12px 14px;
-  margin-bottom: 18px;
-}
-
-/* 2열로 바꿔야 하는 줄들(HTML 구조상 form-row 순서 기준) */
-.emp-new-wrapper .form-top-right .form-row:nth-of-type(2),
-.emp-new-wrapper .form-top-right .form-row:nth-of-type(3) {
-  grid-template-columns: 1fr 1fr;
-}
-
-/* 하단(입사일/연락처) 줄 */
-#empNewForm > .form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px 14px;
-  margin-bottom: 18px;
-}
-
-/* =============================
-   주소 (입사일 칸과 동일 폭으로)
-   ============================= */
-
-/* full-width(주소 블록)를 2열로: 왼쪽=입사일 폭, 오른쪽=연락처 폭 */
-.full-width{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 14px;
-}
-
-/* "주소" 라벨은 2칸 전체 */
-.full-width > .form-label{
-  grid-column: 1 / -1;
-}
-
-/* 공통: 주소 영역 안 input은 꽉 채우기 */
-.full-width .form-control{
   width: 100%;
+  max-width: 260px;
 }
 
-/* 1) 우편번호 + 주소검색 버튼 줄: 왼쪽(입사일 폭)에서만 */
-.full-width .addr-row:first-of-type{
-  grid-column: 1 / 2;
-  display: grid;
-  grid-template-columns: 160px 120px 1fr; /* 우편번호 / 버튼 / (여유) */
-  gap: 10px;
-  align-items: center;
+.form-control:focus,
+.form-select:focus,
+.form-select1:focus,
+.form-select2:focus {
+  border-color: #7aa2ff;
+  box-shadow: 0 0 0 4px rgba(122,162,255,0.18);
 }
 
-/* 2) 도로명 / 상세주소 줄: 왼쪽(입사일 폭)에서만, 한 줄 100% */
-.full-width .addr-row:nth-of-type(2),
-.full-width .addr-row:nth-of-type(3){
-  grid-column: 1 / 2;
-  display: block;
+input::placeholder {
+  color: #e0e0e0 !important;
+  opacity: 1 !important;
 }
-
-/* 버튼 */
-.btn-addr{
-  height: 38px;
-  padding: 0 14px;
-  border-radius: 10px;
-  border: 1px solid #cbd5ff;
-  background: #f1f4ff;
-  font-size: 13px;
-  color: #4e5ba6;
-  cursor: pointer;
+input:focus::placeholder {
+  color: transparent !important;
 }
-.btn-addr:hover{ background: #e0e7ff; }
 
 /* =============================
-   버튼 영역
+   상단 form-row 레이아웃
    ============================= */
-#empNewForm .button-area {
-  text-align: center;
-  margin-top: 30px;
+
+/* 공통: 2칸 */
+.form-top-right .form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 260px));
+  gap: 12px 22px;
+  align-items: flex-start;
+  margin-bottom: 18px;
 }
 
-#empNewForm .btn {
-  min-width: 96px;
-  height: 38px;
-  border-radius: 16px;
-  font-size: 13px;
+/* 1줄: 사번 / 부서번호 / 부서명 → 3칸(여기만 예외) */
+.form-top-right .form-row.form-row-3 {
+  grid-template-columns: repeat(3, minmax(0, 260px));
 }
 
-#empNewForm .btn-primary { margin-right: 14px; }
+/* 사번 아이콘 있는 input */
+.input-with-status {
+  position: relative;
+}
+
+.input-with-status .form-control {
+  padding-right: 40px;
+  max-width: none;  /* 3칸 폭 따라가게 */
+}
 
 /* =============================
-   유효성
+   권한등급 안내 2줄 고정
+   ============================= */
+.grade-hint {
+  display: block;
+  margin-top: 6px;
+  line-height: 1.35;
+  color: #6B7280;
+  font-size: 12px;
+}
+
+.grade-hint > span {
+  display: block;  /* span 2개 → 정확히 2줄 */
+}
+
+/* =============================
+   사번 상태 아이콘
+   ============================= */
+.status-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.status-icon.ok {
+  display: inline-flex;
+  color: #28a745;
+  background: rgba(40,167,69,0.10);
+  border: 1px solid rgba(40,167,69,0.25);
+}
+
+.status-icon.error {
+  display: inline-flex;
+  color: #dc3545;
+  background: rgba(220,53,69,0.10);
+  border: 1px solid rgba(220,53,69,0.25);
+}
+
+/* 부트스트랩 기본 invalid 아이콘 제거 */
+input[name="empNo"].is-invalid,
+input[name="empNo"].is-valid {
+  background-image: none !important;
+  background-size: 0 !important;
+  padding-right: 32px !important;
+}
+
+/* =============================
+   유효성 스타일
    ============================= */
 .error-text {
   margin-top: 4px;
@@ -258,31 +424,141 @@ input:focus::placeholder { color: transparent !important; }
 
 .is-valid {
   border-color: #2ecc71 !important;
-  background-color: #f6fffb;
+  background: #f6fffb;
 }
 
 .is-invalid {
   border-color: #e74a3b !important;
-  background-color: #fff6f6;
+  background: #fff6f6;
 }
-
-/* 사번 상태 아이콘 */
-.input-with-status { position: relative; }
-.input-with-status .form-control { padding-right: 32px; }
-
-.status-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  display: none;
-}
-.status-icon.ok { display: inline-block; color: #28a745; }
-.status-icon.error { display: inline-block; color: #dc3545; }
 
 /* =============================
-   토스트
+   재직상태 아래: 주소 / 연락처+입사일
+   ============================= */
+.under-status-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 520px) minmax(260px, 1fr); /* 주소 넓게, 오른쪽 좁게 */
+  gap: 18px 26px;
+  margin-top: 14px;
+  align-items: flex-start;
+}
+
+/* 주소 블록 */
+.addr-block .form-control {
+  max-width: none;  /* 주소 안에서는 폭 제한 없이 */
+}
+
+/* 1줄: 우편번호 + 버튼 */
+.addr-block .addr-row:first-of-type {
+  display: grid;
+  grid-template-columns: 160px 120px;
+  gap: 10px;
+  align-items: center;
+}
+
+.addr-block .addr-row:first-of-type .addr-postcode {
+  width: 100%;
+}
+
+/* 2·3줄: 도로명, 상세주소 → 주소컬럼 가로 전체 */
+.addr-block .addr-row:nth-of-type(2) .form-control,
+.addr-block .addr-row:nth-of-type(3) .form-control {
+  width: 100%;
+}
+
+/* 도로명 주소 텍스트가 길어도 자연스럽게 한 줄로 표시 */
+#empAddrRoad {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 연락처+입사일 블록 */
+.contact-date-block .form-group {
+  margin-bottom: 14px;
+}
+
+/* 입사일 공통 스타일 + flatpickr */
+.emp-date {
+  background: #fff;
+  border-radius: 10px;
+  text-align: left;
+}
+
+.emp-date.flatpickr-input {
+  border-radius: 10px;
+  border: 1px solid #d7e3ff;
+  box-shadow: none;
+}
+
+.emp-date.flatpickr-input:focus {
+  border-color: #7aa2ff;
+  outline: none;
+}
+
+/* =============================
+   버튼 영역
+   ============================= */
+#empNewForm .button-area {
+  text-align: center;
+  margin-top: 28px;
+}
+
+#empNewForm .btn {
+  min-width: 96px;
+  height: 38px;
+  border-radius: 16px;
+  font-size: 13px;
+}
+
+/* 저장 */
+#empNewForm .btn-primary {
+  border: 1px solid #004080;
+  color : #000;
+  background: #fff;
+  box-shadow: 0 5px 5px rgba(153, 198, 242, 1.0);
+  margin-right: 14px;
+   font-weight: 600;
+}
+
+#empNewForm .btn-primary:hover {
+  transform: translateY(-1px);
+  background: #a7c2dc;
+  box-shadow: 0 10px 20px rgba(153, 198, 242, 1.0);
+  transition: all .18s ease;
+  font-weight: 700;
+}
+
+/* 목록으로 – 글자 보이게 */
+#empNewForm .btn-secondary {
+  border: 1px solid #d7e3ff;
+  background: #fff;
+  color: #111827 !important;
+  font-weight: 600;
+}
+
+#empNewForm .btn-secondary:hover {
+  background: #f6f9ff;
+}
+
+/* 주소 검색 버튼 */
+.btn-addr {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #cbd5ff;
+  background: #f1f4ff;
+  font-size: 13px;
+  color: #4e5ba6;
+  cursor: pointer;
+}
+
+.btn-addr:hover {
+  background: #e0e7ff;
+}
+
+/* =============================
+   토스트 메시지
    ============================= */
 .toast {
   position: fixed;
@@ -293,92 +569,78 @@ input:focus::placeholder { color: transparent !important; }
   max-width: 360px;
   padding: 12px 18px;
   border-radius: 999px;
-  background: rgba(146, 168, 209, 1);
+  background: rgba(146,168,209,1);
   color: #fff;
   font-size: 14px;
   text-align: center;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.18);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+  transition: opacity .25s ease-out, transform .25s ease-out;
   z-index: 9999;
 }
+
 .toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(-4px);
 }
 
 /* =============================
-   flatpickr (필요한 것만 유지)
+   반응형 (1100px 이하)
    ============================= */
-.emp-date {
-  background-color: #fff;
-  border-radius: 999px;
-  text-align: center;
+@media (max-width: 1100px) {
+
+  .form-top {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .photo-wrapper {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+
+  }
+
+  .form-top-right {
+    width: 100%;
+  }
+
+  /* 사번/부서번호/부서명 → 2칸 + 한 줄 */
+  .form-top-right .form-row.form-row-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .form-top-right .form-row.form-row-3 .form-group:nth-child(3) {
+    grid-column: 1 / -1; /* 부서명 한 줄 꽉 */
+  }
+
+  /* 나머지 줄들은 1열 */
+  .form-top-right .form-row:not(.form-row-3) {
+    grid-template-columns: 1fr;
+  }
+
+  .under-status-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* =============================
+   연락처/입사일 세로 위치 미세 조정
+   - 넓은 화면에서만 적용 (모바일 깨짐 방지)
+   ============================= */
+@media (min-width: 1101px){
+  /* 입사일이 있는 두 번째 줄만 살짝 아래로 내려주기 */
+  .contact-date-block .form-group:last-child {
+    margin-top: 28px;  /* 필요하면 16~24 사이에서 조금씩 조절해도 돼요 */
+  }
+}
+/* 사원 등록 카드 안 폰트 완전 통일용 */
+.emp-new-wrapper,
+.emp-new-wrapper * {
+  font-family: "SUIT", sans-serif !important;
 }
 
-.flatpickr-calendar {
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(15, 76, 129, 0.15);
-  border: 1px solid #e5edff;
-  font-family: "SUIT", sans-serif;
-}
-
-.flatpickr-months .flatpickr-month {
-  padding-top: 8px;
-  color: #4e5ba6;
-  font-weight: 600;
-}
-
-.flatpickr-weekdays {
-  background: #f8faff;
-  border-bottom: 1px solid #e5edff;
-}
-
-span.flatpickr-weekday {
-  color: #9aa4c6;
-  font-weight: 500;
-}
-
-.flatpickr-day.today { border-color: #ffb3c7; }
-
-.flatpickr-day.selected,
-.flatpickr-day.startRange,
-.flatpickr-day.endRange,
-.flatpickr-day.selected.inRange,
-.flatpickr-day.startRange.inRange,
-.flatpickr-day.endRange.inRange {
-  background: #ff9fb8;
-  border-color: #ff9fb8;
-  color: #fff;
-}
-
-.flatpickr-day:hover { background: #ffe7f0; }
-
-.emp-date.flatpickr-input {
-  border-radius: 999px;
-  border: 1px solid #d7e3ff;
-  box-shadow: none;
-}
-.emp-date.flatpickr-input:focus {
-  border-color: #ff9fb8;
-  outline: none;
-}
-
-.flatpickr-current-month {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 0 24px;
-  box-sizing: border-box;
-  text-align: center;
-}
-
-.flatpickr-current-month .numInput.cur-year { width: 60px; }
-.flatpickr-current-month .cur-month { margin-right: 2px; }
-
-/* footer 밀기 제거 */
-footer.py-4.bg-light.mt-auto {
-  margin: 20px 0 0 220px !important;
+/* footer는 아래에 고정 (줄어들지 않게) */
+#layoutSidenav_content footer {
+    flex-shrink: 0;
 }
