@@ -30,75 +30,85 @@
 						
 						<div class="row">
 						
-							<div class="col-xl-2 col-md-4">
-                                <div class="card bg-primary text-white mb-4">
-                                	<div class="card-header">
-                                        <a class="small text-white  d-flex align-items-center justify-content-between" href="finishList">
-                                        결재 받은 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
-                                    </div>
-                                    
-                                    <div class="card-body">승인 완료</div>
-                                    <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 받은 문서', 'finishList', '결재 완료된 문서');"><h3>${ sendFinishCount }건</h3></div><br>
-                                </div>
-                            </div>
-                            
-                            <div class="col-xl-2 col-md-4">
-                                <div class="card bg-warning text-white mb-4">
-                                	<div class="card-header d-flex align-items-center justify-content-between">
-                                        <a class="small text-white d-flex align-items-center justify-content-between w-100" href="sendList">
-                                        결재 받을 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
-                                    </div>
-                                    
-                                    <div class="card-body">결재 진행중</div>
-                                    <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 받을 문서', 'waitList', '결재 진행중인 문서');"><h3>${ sendWaitCount }건</h3></div><br>
-                                </div>
-                            </div>
-                            
-                            <div class="col-xl-2 col-md-4">
-                                <div class="card bg-danger text-white mb-4">
-                                	<div class="card-header d-flex align-items-center justify-content-between">
-                                        <a class="small text-white d-flex align-items-center justify-content-between w-100" href="finishList">
-                                        결재 받은 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
-                                    </div>
-                                    <div class="card-body">결재 반려</div>
-                                    <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 받은 문서', 'rejectList', '결재 반려된 문서');"><h3>${ sendrejectCount }건</h3></div><br>
-                                </div>
-                            </div>
-                            
-                            <div class="col-xl-2 col-md-4">
-                                <div class="card bg-primary text-white mb-4">
-                                	<div class="card-header d-flex align-items-center justify-content-between">
-                                        <a class="small text-white d-flex align-items-center justify-content-between w-100" href="finishList">
-                                        결재 완료 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
-                                    </div>
-                                    <div class="card-body">결재 완료</div>
-                                    <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 한 문서', 'receiveFinish', '결재 승인한 문서');"><h3>${ receiveFinishCount }건</h3></div><br>
-                                </div>
-                            </div>
-                            
-                            <div class="col-xl-2 col-md-4">
-                                <div class="card bg-warning text-white mb-4">
-                                	<div class="card-header d-flex align-items-center justify-content-between">
-                                        <a class="small text-white d-flex align-items-center justify-content-between w-100" href="receiveList">
-                                        결재 할 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
-                                        
-                                    </div>
-                                    <div class="card-body">결재 대기</div>
-                                    <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 할 문서', 'receiveWait', '결재 대기중인 문서');"><h3>${ receiveWaitCount }건</h3></div><br>
-                                </div>
-                            </div>
-                            
-                            <div class="col-xl-2 col-md-4">
-                                <div class="card bg-success text-white mb-4">
-                                	<div class="card-header d-flex align-items-center justify-content-between">
-                                        <div class="small text-white">모든 결재 문서</div>
-                                        <div class="small text-white"></div>
-                                    </div>
-                                    <div class="card-body">전체 합계</div>
-                                    <div class="card-body"><h3>${ totalCount }건</h3></div><br>
-                                </div>
-                            </div>
-                        </div>
+						    <div class="col-xl-2 col-md-4">
+						        <div class="card bg-primary text-white mb-4">
+						            <div class="card-header">
+						                <a class="small text-white d-flex align-items-center justify-content-between" href="finishList">
+						                결재 받은 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
+						            </div>
+						            <div class="card-body">승인 완료</div>
+						            <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 받은 문서', 'finishList', '결재 완료된 문서');"><h3>${ sendFinishCount }건</h3></div><br>
+						            
+						            <i class="fas fa-check-circle dashboard-card-icon"></i>
+						        </div>
+						    </div>
+						    
+						    <div class="col-xl-2 col-md-4">
+						        <div class="card bg-warning text-white mb-4">
+						            <div class="card-header d-flex align-items-center justify-content-between">
+						                <a class="small text-white d-flex align-items-center justify-content-between w-100" href="sendList">
+						                결재 받을 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
+						            </div>
+						            <div class="card-body">결재 진행중</div>
+						            <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 받을 문서', 'waitList', '결재 진행중인 문서');"><h3>${ sendWaitCount }건</h3></div><br>
+						            
+						            <i class="fas fa-paper-plane dashboard-card-icon"></i>
+						        </div>
+						    </div>
+						    
+						    <div class="col-xl-2 col-md-4">
+						        <div class="card bg-danger text-white mb-4">
+						            <div class="card-header d-flex align-items-center justify-content-between">
+						                <a class="small text-white d-flex align-items-center justify-content-between w-100" href="finishList">
+						                결재 받은 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
+						            </div>
+						            <div class="card-body">결재 반려</div>
+						            <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 받은 문서', 'rejectList', '결재 반려된 문서');"><h3>${ sendrejectCount }건</h3></div><br>
+						            
+						            <i class="fas fa-exclamation-circle dashboard-card-icon"></i>
+						        </div>
+						    </div>
+						    
+						    <div class="col-xl-2 col-md-4">
+						        <div class="card bg-primary text-white mb-4">
+						            <div class="card-header d-flex align-items-center justify-content-between">
+						                <a class="small text-white d-flex align-items-center justify-content-between w-100" href="finishList">
+						                결재 완료 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
+						            </div>
+						            <div class="card-body">결재 완료</div>
+						            <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 한 문서', 'receiveFinish', '결재 승인한 문서');"><h3>${ receiveFinishCount }건</h3></div><br>
+						            
+						            <i class="fas fa-stamp dashboard-card-icon"></i>
+						        </div>
+						    </div>
+						    
+						    <div class="col-xl-2 col-md-4">
+						        <div class="card bg-warning text-white mb-4">
+						            <div class="card-header d-flex align-items-center justify-content-between">
+						                <a class="small text-white d-flex align-items-center justify-content-between w-100" href="receiveList">
+						                결재 할 문서<div class="small text-white"><i class="fas fa-angle-right"></i></div></a>
+						            </div>
+						            <div class="card-body">결재 대기</div>
+						            <div class="card-body clickable" onclick="openDocumentListModal(event, '결재 할 문서', 'receiveWait', '결재 대기중인 문서');"><h3>${ receiveWaitCount }건</h3></div><br>
+						            
+						            <i class="fas fa-file-signature dashboard-card-icon"></i>
+						        </div>
+						    </div>
+						    
+						    <div class="col-xl-2 col-md-4">
+						        <div class="card bg-success text-white mb-4">
+						            <div class="card-header d-flex align-items-center justify-content-between">
+						                <div class="small text-white">모든 결재 문서</div>
+						                <div class="small text-white"></div>
+						            </div>
+						            <div class="card-body">전체 합계</div>
+						            <div class="card-body"><h3>${ totalCount }건</h3></div><br>
+						            
+						            <i class="fas fa-chart-pie dashboard-card-icon"></i>
+						        </div>
+						    </div>
+						
+						</div>
                         
                         <br>
                         

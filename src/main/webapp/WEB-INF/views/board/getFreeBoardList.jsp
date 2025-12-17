@@ -32,6 +32,12 @@
 	background-color: #6C757D; /* Secondary color (회색) */
 	border-bottom: 1px solid #6C757D;
 }
+
+.card-header.bg-pink {
+    background-color: #F7CAC9 !important;
+    border-bottom: 1px solid #F7CAC9 !important;
+    color: white !important; /* 글자색 하얗게 */
+}
 </style>
 </head>
 
@@ -57,7 +63,7 @@
 					</div>
 
 					<div class="card mb-4">
-						<div class="card-header bg-dark text-white">
+						<div class="card-header bg-pink text-white">
 							<i class="fas fa-globe me-1"></i> <strong>전체 자유 게시판</strong>
 						</div>
 						<div class="card-body">

@@ -41,6 +41,7 @@
     .fc-day-sat .fc-daygrid-day-number, .fc-day-sun .fc-daygrid-day-number { color: #F44336; }
     .fc-daygrid-day-frame, .fc-event { cursor: pointer; }
     .sb-sidenav-menu-nested.nav a { visibility: visible !important; }
+  
 </style>
 
 <script>
@@ -466,8 +467,8 @@
                         </div>
                         <div id="calendar"></div>
                         <div class="flex justify-end gap-3 mt-4 border-t pt-4">
-                            <button id="btnVacation" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl"><i class="fas fa-plane-departure text-warning"></i>휴가 신청</button>
-                            <button id="btnCommuteCorrection" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl">출/퇴근 정정</button>
+                            <button id="btnVacation" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl"><i class="fas fa-plane-departure text-gray-200"></i> 휴가 신청</button>
+                            <button id="btnCommuteCorrection" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl"><i class="fas fa-wrench text-gray-200"></i> 출/퇴근 정정</button>
                         </div>
                     </div>
                 </div>
