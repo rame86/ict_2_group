@@ -37,6 +37,12 @@ public class AlertController {
 	public List<AlertVO> allLatestView(@SessionAttribute("login") LoginVO login) {
 		return alertService.getAllAlertView(login.getEmpNo());
 	}
+	
+	@PostMapping("/alert/delete")
+	public String deleteAlert(@SessionAttribute("login") LoginVO login, Integer alertId) {
+		alertService.deleteAlert(alertId, login.getEmpNo());
+		return "success";
+	}
 
 }
 

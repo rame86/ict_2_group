@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,11 @@ public class AlertDAOImpl implements AlertDAO{
 	@Override
 	public List<AlertVO> selectAllLatestAlerts(String empNo) {
 		return sess.selectList("com.example.repository.AlertDAO.selectAllLatestAlerts", empNo);
+	}
+
+	@Override
+	public void deleteAlert(Map<String, String> param) {
+		sess.delete("com.example.repository.AlertDAO.deleteAlert", param);
 	}
 
 }

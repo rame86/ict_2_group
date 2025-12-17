@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import java.util.ArrayList; // 리스트 합치기 위해 추가
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,41 +29,47 @@ public class BoardController {
 	// ************* 공지사항 영역 *************
 
 	@GetMapping("/board/getNoticeBoardList")
-	public String getNoticeBoardList(Model m, HttpSession session) {
-		log.info("[BoardController - getNoticeBoardList()] 요청받음");
+    public String getNoticeBoardList(Model m, HttpSession session) {
+        Object login = session.getAttribute("login");
+        if (login == null) return "redirect:/";
 
-		// 🚨 수정: EmpVO -> LoginVO 로 변경
-		Object login = session.getAttribute("login");
+        LoginVO loginUser = (LoginVO) login;
+        Integer userDeptNo = Integer.parseInt(loginUser.getDeptNo());
 
-		if (login == null) {
-			return "redirect:/";
-		}
+        // 1. 전사 공지 가져오기
+        List<NoticeBoardVO> globalNotices = boardService.getGlobalNoticeList();
+        
+        // 2. 부서 공지 (하위 부서 포함 계층형) 가져오기
+        List<NoticeBoardVO> deptNotices = boardService.getDeptNoticeList(userDeptNo);
 
-		// 세션에 저장된 객체가 LoginVO이므로 LoginVO로 캐스팅해야 합니다.
-		LoginVO loginUser = (LoginVO) login; 
+        // 3. [중요] JSP 로직에 맞춰 두 리스트를 하나로 합침
+        List<NoticeBoardVO> combinedList = new ArrayList<>();
+        if (globalNotices != null) combinedList.addAll(globalNotices);
+        if (deptNotices != null) combinedList.addAll(deptNotices);
 
-		// LoginVO에 deptNo 필드와 getter가 있어야 합니다. (아래 2번 항목 확인)
-		Integer userDeptNo = Integer.parseInt(loginUser.getDeptNo()); 
-		
-		log.info("로그인 사용자: {}, 부서번호: {}", loginUser.getEmpName(), userDeptNo);
+        // 4. JSP 변수명인 'noticeBoardList'로 전달
+        m.addAttribute("noticeBoardList", combinedList);
 
-		// 부서번호 전달
-		List<NoticeBoardVO> result = boardService.getNoticeBoardList(userDeptNo);
-
-		m.addAttribute("noticeBoardList", result);
-		return "/board/getNoticeBoardList";
-	}
+        return "/board/getNoticeBoardList";
+    }
 
 	@PostMapping("/board/insertNoticeBoard")
-	public String insertNoticeBoard(NoticeBoardVO vo) {
-		log.info("[BoardController - insertNoticeBoard()] 요청받음");
-		log.info("입력된 게시판 정보: Title={}, DeptNo={}", vo.getNoticeTitle(), vo.getDeptNo());
+	public String insertNoticeBoard(NoticeBoardVO vo, HttpSession session) {
+		LoginVO login = (LoginVO) session.getAttribute("login");
+		if(login != null) {
+			vo.setEmpNo(login.getEmpNo());
+			vo.setNoticeWriter(login.getEmpName());
+		}
+		
+		// JSP <select>에서 넘어온 deptNo (0 또는 부서번호) 사용
+		// 만약 값이 없으면 기본값(내 부서) 설정
+		if (vo.getDeptNo() == null) {
+			vo.setDeptNo(Integer.parseInt(login.getDeptNo()));
+		}
 
 		if (vo.getNoticeNo() == null || vo.getNoticeNo().isEmpty()) {
-			log.info("새 공지 작성");
 			boardService.insertNoticeBoard(vo);
 		} else {
-			log.info("기존 공지 수정");
 			boardService.updateNoticeBoard(vo);
 		}
 		return "redirect:/board/getNoticeBoardList";
@@ -75,45 +82,50 @@ public class BoardController {
 	}
 
 
-	// ************* 자유게시판 영역 *************
+	// ************* 자유게시판 영역 (기존 유지) *************
 
 	@GetMapping("/board/getFreeBoardList")
-	public String getFreeBoardList(Model m, HttpSession session) {
-		log.info("[BoardController - getFreeBoardList()] 요청받음");
+    public String getFreeBoardList(Model m, HttpSession session) {
+        Object login = session.getAttribute("login");
+        if (login == null) return "redirect:/";
 
-		// 🚨 수정: EmpVO -> LoginVO 로 변경
-		Object login = session.getAttribute("login");
+        LoginVO loginUser = (LoginVO) login;
+        Integer userDeptNo = Integer.parseInt(loginUser.getDeptNo());
 
-		if (login == null) {
-			return "redirect:/";
-		}
+        // 1. [전체 자유게시판] 가져오기
+        List<FreeBoardVO> globalFreeBoards = boardService.getGlobalFreeBoardList();
+        
+        // 2. [부서 자유게시판] (내 부서 + 하위 부서) 가져오기
+        List<FreeBoardVO> deptFreeBoards = boardService.getDeptFreeBoardList(userDeptNo);
+        
+        // 3. JSP 변수명인 'freeBoardList'로 전달하기 위해 두 리스트를 하나로 합침
+        List<FreeBoardVO> combinedList = new ArrayList<>();
+        if (globalFreeBoards != null) combinedList.addAll(globalFreeBoards);
+        if (deptFreeBoards != null) combinedList.addAll(deptFreeBoards);
 
-		LoginVO loginUser = (LoginVO) login;
-		Integer userDeptNo = Integer.parseInt(loginUser.getDeptNo());
-		
-		log.info("로그인 사용자: {}, 부서번호: {}", loginUser.getEmpName(), userDeptNo);
-
-		List<FreeBoardVO> result = boardService.getFreeBoardList(userDeptNo);
-
-		m.addAttribute("freeBoardList", result);
-		return "/board/getFreeBoardList";
-	}
+        m.addAttribute("freeBoardList", combinedList);
+        return "/board/getFreeBoardList";
+    }
 
 	@PostMapping("/board/insertFreeBoard")
-	public String insertFreeBoard(FreeBoardVO vo) {
-		log.info("[BoardController - insertFreeBoard()] 요청받음");
-		log.info("입력된 게시판 정보: Title={}, DeptNo={}", vo.getBoardTitle(), vo.getDeptNo());
+    public String insertFreeBoard(FreeBoardVO vo, HttpSession session) {
+        LoginVO login = (LoginVO) session.getAttribute("login");
+        if(login != null) {
+            vo.setEmpNo(login.getEmpNo());
+            vo.setBoardWriter(login.getEmpName());
+            if(vo.getDeptNo() == null) {
+                vo.setDeptNo(Integer.parseInt(login.getDeptNo()));
+            }
+        }
 
-		if (vo.getBoardNo() == null || vo.getBoardNo().isEmpty()) {
-			log.info("새 자유 게시글 작성");
-			boardService.insertFreeBoard(vo);
-		} else {
-			log.info("기존 자유 게시글 수정");
-			boardService.updateFreeBoard(vo);
-		}
-		return "redirect:/board/getFreeBoardList";
-	}
-
+        if (vo.getBoardNo() == null || vo.getBoardNo().isEmpty()) {
+            boardService.insertFreeBoard(vo);
+        } else {
+            boardService.updateFreeBoard(vo);
+        }
+        return "redirect:/board/getFreeBoardList";
+    }
+	
 	@PostMapping("/board/getContentFreeBoard")
 	@ResponseBody
 	public FreeBoardVO getContentFreeBoard(@RequestParam("boardNo") String boardNo) {
