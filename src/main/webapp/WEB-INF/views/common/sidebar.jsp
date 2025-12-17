@@ -122,7 +122,7 @@ if (menu == null)
 
 					<%--급여 관리 --%>
 					<a class="nav-link <%=menu.equals("salemp") ? "active" : ""%>"
-						href="${pageContext.request.contextPath}/sal/list">
+						href="${pageContext.request.contextPath}/sal">
 						<div class="sb-nav-link-icon">
 							<i class="fas fa-columns"></i>
 						</div> 급여관리

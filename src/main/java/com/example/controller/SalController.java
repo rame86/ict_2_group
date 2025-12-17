@@ -30,33 +30,40 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/sal")
 public class SalController {
 
-    @Autowired
-    private EmpService empService;
+    @Autowired private EmpService empService;
+    @Autowired private SalService salService;
 
-    @Autowired
-    private SalService salService;
+    // ✅ 관리자 급여관리 허용 여부(대표이사/운영총괄/재무회계 팀장)
+    private boolean isSalaryAdmin(LoginVO login) {
+        if (login == null) return false;
 
+        String gradeNo = login.getGradeNo() == null ? "" : login.getGradeNo().trim();
+        String deptNo  = login.getDeptNo()  == null ? "" : login.getDeptNo().trim();
+
+        boolean gradeOk = "1".equals(gradeNo) || "2".equals(gradeNo);
+        boolean deptOk  = "1001".equals(deptNo) || "2000".equals(deptNo) || "2020".equals(deptNo);
+
+        return gradeOk && deptOk;
+    }
 
     /** 🔹 사원용: 본인 월별 급여 목록 */
     @GetMapping("/list")
     public String salList(HttpSession session, Model model) {
 
         LoginVO login = (LoginVO) session.getAttribute("login");
-        if (login == null) {
-            return "redirect:/member/login";
-        }
+        if (login == null) return "redirect:/member/login";
 
-        // 관리자는 관리자 목록으로 리다이렉트
-        if ("1".equals(login.getGradeNo())) {
+        // ✅ 여기 수정: gradeNo=1만 보지 말고 관리자 조건 통일
+        if (isSalaryAdmin(login)) {
             return "redirect:/sal/admin/list";
         }
 
         String empNo = login.getEmpNo();
 
         EmpVO emp = empService.getEmp(empNo);
-        List<SalVO> salList = salService.getSalList(empNo);        
+        List<SalVO> salList = salService.getSalList(empNo);
         Map<String, Object> summary = salService.getEmpSalSummary(empNo);
-        
+
         model.addAttribute("summary", summary);
         model.addAttribute("emp", emp);
         model.addAttribute("salList", salList);
@@ -75,32 +82,24 @@ public class SalController {
         log.info("[SalController-salDetail] empNo = {}, monthAttno = {}", empNo, monthAttno);
 
         LoginVO login = (LoginVO) session.getAttribute("login");
-        if (login == null) {
-            return "redirect:/member/login";
-        }
+        if (login == null) return "redirect:/member/login";
 
-        boolean isAdmin = "1".equals(login.getGradeNo());
+        // ✅ 여기 수정: 관리자 판별도 통일
+        boolean isAdmin = isSalaryAdmin(login);
         model.addAttribute("isAdmin", isAdmin);
-        boolean isMine  = login.getEmpNo().equals(empNo);
 
-        if (!isAdmin && !isMine) {
-            return "error/NoAuthPage";
-        }
+        boolean isMine = login.getEmpNo().equals(empNo);
+        if (!isAdmin && !isMine) return "error/NoAuthPage";
 
-        // ✅ 1) 상세 급여 조회 (empNo + monthAttno 기준)
         SalVO sal = salService.getSalaryDetail(empNo, monthAttno);
-
-        // 혹시 데이터 없을 때 방어
         if (sal == null) {
             model.addAttribute("msg", "해당 월의 급여 정보가 없습니다.");
-            return "error/NoDataPage"; // 너희 프로젝트 에러 페이지에 맞춰 변경
+            return "error/NoDataPage";
         }
 
-        // ✅ 2) 정정 이력 조회는 salNum으로
-        Integer salNum = sal.getSalNum();   // ⭐ 핵심
+        Integer salNum = sal.getSalNum();
         List<SalEditVO> edits = salService.getEditsBySalNum(salNum);
 
-        // ✅ 3) 사원 정보
         EmpVO emp = empService.getEmp(empNo);
 
         model.addAttribute("sal", sal);
@@ -111,27 +110,27 @@ public class SalController {
         return "sal/salDetail";
     }
 
-
-    /** 🔹 급여 생성 테스트용: /sal/salMake?month=2025-11 */
+    /** 🔹 급여 생성 테스트용 */
     @GetMapping("/salMake")
     public String makeSalary(@RequestParam("month") String month) {
-
-        log.info("[SalController-makeSalary] month = {}", month);
-
         salService.createSalaryByMonth(month);
-
         return "redirect:/sal/admin/list?month=" + month;
     }
 
     @GetMapping("/create")
     public String createSalary(@RequestParam("month") String month) {
         salService.createSalaryByMonth(month);
-        return "redirect:/sal/admin/list?month=" + month; 
+        return "redirect:/sal/admin/list?month=" + month;
     }
- 
 
+    /** ✅ 공용 진입 URL: /sal */
+    @GetMapping({"", "/"})
+    public String salaryEntry(HttpSession session) {
 
+        LoginVO login = (LoginVO) session.getAttribute("login");
+        if (login == null) return "redirect:/member/login";
 
-
-   
+        if (isSalaryAdmin(login)) return "redirect:/sal/admin/list";
+        return "redirect:/sal/list";
+    }
 }

@@ -29,7 +29,9 @@
 						<!-- 헤더 -->
 						<div class="edit-header">
 							<div>
+							<div class="page-title-wrap">
 								<h3 class="edit-title">급여 정정</h3>
+								</div>
 								<p class="edit-sub">수정 내역은 이력으로 저장되며, 정정 사유는 필수입니다.</p>
 							</div>
 							<div class="edit-header-actions">
@@ -93,8 +95,8 @@
 										<div class="input-wrap">
 											<input type="number" name="overtimePay"
 												value="${sal.overtimePay == null ? 0 : sal.overtimePay}"
- 												class="input" required min="0"
-												step="1"> <span class="unit">원</span>
+												class="input" required min="0" step="1"> <span
+												class="unit">원</span>
 										</div>
 									</div>
 								</section>
@@ -140,14 +142,19 @@
 									</h5>
 								</div>
 								<textarea name="editReason" class="textarea" rows="4" required
-									placeholder="예) 초과근무 수당 누락 / 성과금 반영 / 공제 재산정"></textarea>
+									maxlength="500" placeholder="예) 초과근무 수당 누락 / 성과금 반영 / 공제 재산정"></textarea>
+
+								<div class="text-counter">
+									<span id="reasonCount">0</span><span class="slash">/</span>500
+								</div>
+
 							</section>
 
 							<!-- 버튼 -->
 							<div class="edit-actions">
 								<a class="btn-gray"
 									href="${pageContext.request.contextPath}/sal/admin/list">취소</a>
-								<button type="submit" class="btn-primary">정정 저장</button>
+								<button type="submit" class="btn-primary"> 저장</button>
 							</div>
 
 							<!-- ✅ 변경 전/후 미리보기 -->
@@ -212,25 +219,25 @@
   }
 
   function calc() {
-    const base = num(qs("input[name='salBase']")?.value);
+    const base  = num(qs("input[name='salBase']")?.value);
     const bonus = num(qs("input[name='salBonus']")?.value);
-    const plus = num(qs("input[name='salPlus']")?.value);
-    const ot = num(qs("input[name='overtimePay']")?.value);
+    const plus  = num(qs("input[name='salPlus']")?.value);
+    const ot    = num(qs("input[name='overtimePay']")?.value);
 
     const ins = num(qs("input[name='insurance']")?.value);
     const tax = num(qs("input[name='tax']")?.value);
 
-    const afterPay = base + bonus + plus + ot;
+    const afterPay    = base + bonus + plus + ot;
     const afterDeduct = ins + tax;
-    const afterReal = afterPay - afterDeduct;
+    const afterReal   = afterPay - afterDeduct;
 
     const card = qs(".preview-card");
     const beforeReal = num(card?.dataset.beforeReal);
 
-    qs("#beforeRealText").textContent = won(beforeReal);
-    qs("#afterPayText").textContent = won(afterPay);
+    qs("#beforeRealText").textContent  = won(beforeReal);
+    qs("#afterPayText").textContent    = won(afterPay);
     qs("#afterDeductText").textContent = won(afterDeduct);
-    qs("#afterRealText").textContent = won(afterReal);
+    qs("#afterRealText").textContent   = won(afterReal);
 
     const diff = afterReal - beforeReal;
     const diffEl = qs("#diffText");
@@ -253,20 +260,43 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", function(){
-    // ✅ form 전체에서 input/change를 받음 (DOM 구조 바뀌어도 안정)
-    const form = qs("form.edit-form") || qs("form");
-    if (form) {
-      form.addEventListener("input", calc);
-      form.addEventListener("change", calc);
-    }
+  function updateReasonCount() {
+    const ta = qs("textarea[name='editReason']");
+    const out = qs("#reasonCount");
+    const wrap = qs(".text-counter");
+    if (!ta || !out || !wrap) return;
 
-    // ✅ 최초 1회
+    const max = Number(ta.getAttribute("maxlength") || 500);
+    const len = (ta.value || "").length;
+
+    out.textContent = len;
+    wrap.classList.toggle("is-max", len >= max);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = qs("form.edit-form") || qs("form");
+    if (!form) return;
+
+    // 입력/변경 시 미리보기 계산
+    form.addEventListener("input", function (e) {
+      calc();
+      if (e.target && e.target.name === "editReason") updateReasonCount();
+    });
+    form.addEventListener("change", calc);
+
+    // 저장 전 확인
+    form.addEventListener("submit", function (e) {
+      const ok = confirm("급여 정정을 저장하시겠습니까?\n저장 시 정정 이력이 남습니다.");
+      if (!ok) e.preventDefault();
+    });
+
+    // 최초 1회 렌더
     calc();
+    updateReasonCount();
   });
 })();
 </script>
-
+	
 
 
 </body>

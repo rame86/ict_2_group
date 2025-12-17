@@ -36,10 +36,22 @@ public class SalAdminController {
     @Autowired private EmpService empService;
     @Autowired private DeptService deptService;
 
-    /** 관리자 여부 */
-    private boolean isAdmin(HttpSession session) {
+    /* =========================================================
+       ✅ 급여관리 관리자 접근 권한
+       - gradeNo: 1(대표이사), 2(팀장급)
+       - deptNo : 1001(대표이사), 2000(운영총괄), 2020(재무회계)
+       ========================================================= */
+    private boolean isSalaryAdmin(HttpSession session) {
         LoginVO login = (LoginVO) session.getAttribute("login");
-        return (login != null && "1".equals(login.getGradeNo()));
+        if (login == null) return false;
+
+        String gradeNo = login.getGradeNo() == null ? "" : login.getGradeNo().trim();
+        String deptNo  = login.getDeptNo()  == null ? "" : login.getDeptNo().trim();
+
+        boolean gradeOk = "1".equals(gradeNo) || "2".equals(gradeNo);
+        boolean deptOk  = "1001".equals(deptNo) || "2000".equals(deptNo) || "2020".equals(deptNo);
+
+        return gradeOk && deptOk;
     }
 
     /* =========================================================
@@ -56,9 +68,7 @@ public class SalAdminController {
                                HttpSession session,
                                Model model) {
 
-        if (!isAdmin(session)) {
-            return "error/NoAuthPage";
-        }
+        if (!isSalaryAdmin(session)) return "error/NoAuthPage";
 
         Map<String, Object> param = new HashMap<>();
         param.put("month", month);
@@ -77,22 +87,22 @@ public class SalAdminController {
         model.addAttribute("summary", summary);
         model.addAttribute("deptList", deptList);
 
+        // 검색 조건 유지
         model.addAttribute("searchMonth", month);
-        String periodLabel = (month == null || month.isBlank()) ? "전체 기간 기준" : month + " 기준";
-        model.addAttribute("periodLabel", periodLabel);
-
         model.addAttribute("searchDeptNo", deptNo);
         model.addAttribute("onlyOvertime", onlyOvertime);
         model.addAttribute("excludeRetired", excludeRetired);
         model.addAttribute("excludeDeletePlanned", excludeDeletePlanned);
-
         model.addAttribute("sort", sort);
         model.addAttribute("dir", dir);
+
+        String periodLabel = (month == null || month.isBlank()) ? "전체 기간 기준" : month + " 기준";
+        model.addAttribute("periodLabel", periodLabel);
+
         model.addAttribute("menu", "saladmin");
 
         log.info("[adminSalList] month={}, deptNo={}, onlyOvertime={}, sort={}, dir={}, size={}",
                 month, deptNo, onlyOvertime, sort, dir, (salList != null ? salList.size() : 0));
-        log.info("[summary] {}", summary);
 
         return "sal/adminList";
     }
@@ -106,9 +116,7 @@ public class SalAdminController {
                                  HttpSession session,
                                  Model model) {
 
-        if (!isAdmin(session)) {
-            return "error/NoAuthPage";
-        }
+        if (!isSalaryAdmin(session)) return "error/NoAuthPage";
 
         SalVO sal = salService.getSalaryDetail(empNo, monthAttno);
         EmpVO emp = empService.getEmp(empNo);
@@ -121,7 +129,7 @@ public class SalAdminController {
     }
 
     /* =========================================================
-       🔹 관리자용 급여 목록 엑셀(CSV) 다운로드 (/sal/admin/export)
+       🔹 관리자용 급여 목록 CSV 다운로드 (/sal/admin/export)
        ========================================================= */
     @GetMapping("/export")
     public void exportAdminSalary(@RequestParam(required = false) String month,
@@ -132,7 +140,7 @@ public class SalAdminController {
                                   HttpSession session,
                                   HttpServletResponse response) throws Exception {
 
-        if (!isAdmin(session)) {
+        if (!isSalaryAdmin(session)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
@@ -153,7 +161,7 @@ public class SalAdminController {
         response.setHeader("Content-Disposition", "attachment; filename=\"" + encoded + "\"");
 
         try (PrintWriter writer = response.getWriter()) {
-            writer.write('\uFEFF'); // BOM
+            writer.write('\uFEFF'); // ✅ BOM (엑셀 한글 깨짐 방지)
             writer.println("지급월,사번,이름,부서,기본급,초과근무수당,성과급,기타수당,공제합계,실지급액");
 
             for (SalVO s : salList) {
@@ -178,20 +186,17 @@ public class SalAdminController {
     }
 
     /* =========================================================
-       ✅ 관리자 급여 정정 (마감용 최종)
+       ✅ 관리자 급여 정정
        GET  /sal/admin/edit?salNum=...
        POST /sal/admin/edit
        저장 후 /sal/admin/list 로 복귀
        ========================================================= */
-
     @GetMapping("/edit")
     public String editForm(@RequestParam int salNum,
                            HttpSession session,
                            Model model) {
 
-        if (!isAdmin(session)) {
-            return "error/NoAuthPage";
-        }
+        if (!isSalaryAdmin(session)) return "error/NoAuthPage";
 
         SalVO sal = salService.getSalDetailBySalNum(salNum);
         if (sal == null) {
@@ -215,9 +220,7 @@ public class SalAdminController {
                              @RequestParam String editReason,
                              HttpSession session) {
 
-        if (!isAdmin(session)) {
-            return "error/NoAuthPage";
-        }
+        if (!isSalaryAdmin(session)) return "error/NoAuthPage";
 
         LoginVO login = (LoginVO) session.getAttribute("login");
         String editorEmpNo = login.getEmpNo();
