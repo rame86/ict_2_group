@@ -459,8 +459,8 @@
                             </div>
                            <div class="p-3 bg-gray-100 rounded-lg"> 
 							    <div class="text-sm font-medium pt-1">
-							        <span id="inTimeDisplay" class="mr-3 text-green-700">출근: -</span>
-							        <span id="outTimeDisplay" class="text-blue-700">퇴근: -</span>
+							        <span class="mr-6 text-green-700"><i class="fas fa-sign-in-alt me-1"></i><span id="inTimeDisplay"> 출근: - </span></span>
+							        <span class="text-blue-700"><i class="fas fa-sign-out-alt me-1"></i><span id="outTimeDisplay"> 퇴근: - </span></span>
 							    </div>
 							</div>
                         </div>

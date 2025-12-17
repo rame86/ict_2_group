@@ -130,92 +130,196 @@
                         </div>
 
                         <div class="col-xl-3 col-md-6 mb-4">
-						    <c:choose>
-						        <c:when test="${myStatus eq '근무중' || myStatus eq '출근'}">
-						            <div class="card bg-success text-white h-100 shadow-sm">
-						        </c:when>
-						        <c:when test="${myStatus eq '퇴근' || myStatus eq '퇴근완료'}">
-						            <div class="card bg-secondary text-white h-100 shadow-sm">
-						        </c:when>
-						        <c:otherwise>
-						            <div class="card bg-danger text-white h-100 shadow-sm">
-						        </c:otherwise>
-						    </c:choose>
-						    
-						        <div class="card-body">
-						            <div class="d-flex justify-content-between align-items-center">
-						                <div>
-						                    <div class="text-white-50 small">오늘의 근태</div>
-						                    <div class="fs-2 fw-bold">${myStatus}</div>
-						                    
-						                    <div class="mt-2 small">
-						                        <i class="fas fa-clock me-1"></i> IN : ${myInTime} <br>
-						                        <i class="fas fa-sign-out-alt me-1"></i> OUT : ${myOutTime}
-						                    </div>
-						                </div>
-						                <i class="fas fa-user-clock dashboard-card-icon"></i>
-						            </div>
-						        </div>
-						        <div class="card-footer d-flex align-items-center justify-content-between">
-						            <a class="small text-white stretched-link" href="/attend/attend">근태 현황 보기</a>
-						            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-						        </div>
-						    </div>
-						</div>
+                            <c:choose>
+                                <c:when test="${myStatus eq '근무중' || myStatus eq '출근'}">
+                                    <div class="card bg-success text-white h-100 shadow-sm">
+                                </c:when>
+                                <c:when test="${myStatus eq '퇴근' || myStatus eq '퇴근완료'}">
+                                    <div class="card bg-secondary text-white h-100 shadow-sm">
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="card bg-danger text-white h-100 shadow-sm">
+                                </c:otherwise>
+                            </c:choose>
+                            
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="text-white-50 small">오늘의 근태</div>
+                                            <div class="fs-2 fw-bold">${myStatus}</div>
+                                            <div class="mt-2 small">
+                                                <i class="fas fa-clock me-1"></i> IN : ${myInTime} <br>
+                                                <i class="fas fa-sign-out-alt me-1"></i> OUT : ${myOutTime}
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-user-clock dashboard-card-icon"></i>
+                                    </div>
+                                </div>
+                                <div class="card-footer d-flex align-items-center justify-content-between">
+                                    <a class="small text-white stretched-link" href="/attend/attend">근태 현황 보기</a>
+                                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="row">
                         
                         <div class="col-xl-8">
-                            <div class="card mb-4 shadow-sm">
+                            <div class="card mb-4 shadow-sm" style="min-height: 380px;">
                                 <div class="card-header bg-white">
-                                    <i class="fas fa-bullhorn me-1 text-primary"></i>
-                                    <span class="fw-bold">최신 공지사항</span>
-                                    <a href="/board/noticeList" class="float-end small text-decoration-none">더보기 +</a>
+                                    <ul class="nav nav-tabs card-header-tabs" id="boardTabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active fw-bold" id="global-notice-tab" data-bs-toggle="tab" data-bs-target="#global-notice" type="button" role="tab" aria-selected="true">
+                                                <i class="fas fa-bullhorn text-danger me-1"></i> 전체 공지
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link fw-bold" id="dept-notice-tab" data-bs-toggle="tab" data-bs-target="#dept-notice" type="button" role="tab" aria-selected="false">
+                                                <i class="fas fa-building text-primary me-1"></i> 부서 공지
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link fw-bold" id="dept-free-tab" data-bs-toggle="tab" data-bs-target="#dept-free" type="button" role="tab" aria-selected="false">
+                                                <i class="fas fa-comments text-success me-1"></i> 부서 게시판
+                                            </button>
+                                        </li>
+                                    </ul>
                                 </div>
+                                
                                 <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-hover table-bordered mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th style="width: 60%;">제목</th>
-                                                    <th style="width: 20%;">작성자</th>
-                                                    <th style="width: 20%;">작성일</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <c:choose>
-                                                    <c:when test="${not empty noticeList}">
-                                                        <c:forEach var="notice" items="${noticeList}" begin="0" end="4">
-                                                            <tr>
-                                                                <td>
-                                                                    <a href="/board/detail?no=${notice.boardNo}" class="text-dark text-decoration-none">
-                                                                        <c:if test="${notice.important == 'Y'}">
-                                                                            <span class="badge bg-danger me-1">필독</span>
-                                                                        </c:if>
-                                                                        ${notice.title}
-                                                                    </a>
-                                                                </td>
-                                                                <td>${notice.writerName}</td>
-                                                                <td>${notice.regDate}</td>
-                                                            </tr>
-                                                        </c:forEach>
-                                                    </c:when>
-                                                    <c:otherwise>
+                                    <div class="tab-content" id="boardTabsContent">
+                                        
+                                        <div class="tab-pane fade show active" id="global-notice" role="tabpanel" aria-labelledby="global-notice-tab">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="small text-muted">전사 중요 공지사항입니다.</span>
+                                                <a href="/board/getNoticeBoardList" class="small text-decoration-none">더보기 +</a>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover table-bordered mb-0 table-sm" style="font-size: 0.95rem;">
+                                                    <thead class="table-light">
                                                         <tr>
-                                                            <td colspan="3" class="text-center py-3 text-muted">등록된 공지사항이 없습니다.</td>
+                                                            <th style="width: 60%;">제목</th>
+                                                            <th style="width: 20%;">작성자</th>
+                                                            <th style="width: 20%;">작성일</th>
                                                         </tr>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                                                    </thead>
+                                                    <tbody>
+                                                        <c:choose>
+                                                            <c:when test="${not empty noticeList}">
+                                                                <c:forEach var="notice" items="${noticeList}">
+                                                                    <tr>
+                                                                        <td>
+                                                                            <a href="/board/getNoticeBoardList" class="text-dark text-decoration-none">
+                                                                                <c:if test="${notice.noticeTitle.contains('[필독]')}">
+                                                                                    <span class="badge bg-danger me-1">필독</span>
+                                                                                </c:if>
+                                                                                ${notice.noticeTitle}
+                                                                            </a>
+                                                                        </td>
+                                                                        <td>${notice.noticeWriter}</td>
+                                                                        <td>${notice.noticeDate}</td>
+                                                                    </tr>
+                                                                </c:forEach>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <tr>
+                                                                    <td colspan="3" class="text-center py-4 text-muted">등록된 전체 공지가 없습니다.</td>
+                                                                </tr>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="dept-notice" role="tabpanel" aria-labelledby="dept-notice-tab">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="small text-muted"><strong>${sessionScope.login.deptName}</strong> 부서 공지사항입니다.</span>
+                                                <a href="/board/getNoticeBoardList" class="small text-decoration-none">더보기 +</a>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover table-bordered mb-0 table-sm" style="font-size: 0.95rem;">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 60%;">제목</th>
+                                                            <th style="width: 20%;">작성자</th>
+                                                            <th style="width: 20%;">작성일</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <c:choose>
+                                                            <c:when test="${not empty deptNoticeList}">
+                                                                <c:forEach var="dNotice" items="${deptNoticeList}">
+                                                                    <tr>
+                                                                        <td>
+                                                                            <a href="/board/getNoticeBoardList" class="text-dark text-decoration-none">
+                                                                                <span class="badge bg-secondary me-1">부서</span>
+                                                                                ${dNotice.noticeTitle}
+                                                                            </a>
+                                                                        </td>
+                                                                        <td>${dNotice.noticeWriter}</td>
+                                                                        <td>${dNotice.noticeDate}</td>
+                                                                    </tr>
+                                                                </c:forEach>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <tr>
+                                                                    <td colspan="3" class="text-center py-4 text-muted">등록된 부서 공지가 없습니다.</td>
+                                                                </tr>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="tab-pane fade" id="dept-free" role="tabpanel" aria-labelledby="dept-free-tab">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="small text-muted"><strong>${sessionScope.login.deptName}</strong> 자유게시판입니다.</span>
+                                                <a href="/board/getFreeBoardList" class="small text-decoration-none">더보기 +</a>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover table-bordered mb-0 table-sm" style="font-size: 0.95rem;">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 60%;">제목</th>
+                                                            <th style="width: 20%;">작성자</th>
+                                                            <th style="width: 20%;">작성일</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <c:choose>
+                                                            <c:when test="${not empty deptFreeList}">
+                                                                <c:forEach var="free" items="${deptFreeList}">
+                                                                    <tr>
+                                                                        <td>
+                                                                            <a href="/board/getFreeBoardList" class="text-dark text-decoration-none">
+                                                                                ${free.boardTitle}
+                                                                            </a>
+                                                                        </td>
+                                                                        <td>${free.boardWriter}</td>
+                                                                        <td>${free.boardDate}</td>
+                                                                    </tr>
+                                                                </c:forEach>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <tr>
+                                                                    <td colspan="3" class="text-center py-4 text-muted">등록된 게시글이 없습니다.</td>
+                                                                </tr>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                    </div> </div>
                             </div>
                         </div>
 
                         <div class="col-xl-4">
-                            <div class="card mb-4 shadow-sm">
+                            <div class="card mb-4 shadow-sm" style="min-height: 380px;">
                                 <div class="card-header bg-white">
                                     <i class="fas fa-rocket me-1 text-success"></i>
                                     <span class="fw-bold">빠른 실행</span>
@@ -223,17 +327,17 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-6">
-                                            <a href="/approve/write" class="quick-menu-item">
+                                            <a href="/approve/createForm" class="quick-menu-item">
                                                 <i class="fas fa-pen-nib text-primary"></i>
                                                 <span class="fw-bold small">기안문 작성</span>
                                             </a>
-                                        </div>                                     
-										<div class="col-6">
-										    <a href="/attend/attend" class="quick-menu-item">
-										        <i class="fas fa-plane-departure text-warning"></i>
-										        <span class="fw-bold small">휴가 신청</span>
-										    </a>
-										</div>
+                                        </div>
+                                        <div class="col-6">
+                                            <a href="/attend/attend" class="quick-menu-item">
+                                                <i class="fas fa-plane-departure text-warning"></i>
+                                                <span class="fw-bold small">휴가 신청</span>
+                                            </a>
+                                        </div>
                                         <div class="col-6">
                                             <a href="/salary/myList" class="quick-menu-item">
                                                 <i class="fas fa-money-check-alt text-success"></i>
@@ -241,26 +345,22 @@
                                             </a>
                                         </div>
                                         <div class="col-6">
-                                            <a href="/address/list" class="quick-menu-item">
+                                            <a href="/member/list" class="quick-menu-item">
                                                 <i class="fas fa-address-book text-info"></i>
                                                 <span class="fw-bold small">주소록</span>
                                             </a>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <div class="card shadow-sm border-0 bg-dark text-white">
-                                <div class="card-body d-flex align-items-center justify-content-between">
-                                    <div>
-                                        <h6 class="mb-1">Project PeopleSync</h6>
-                                        <small class="text-white-50">Developers Info</small>
+                                    
+                                    <div class="d-grid mt-3">
+                                        <button class="btn btn-dark btn-sm" data-bs-toggle="modal" data-bs-target="#developerInfoModal">
+                                            <i class="fas fa-code me-1"></i> Developers Info
+                                        </button>
                                     </div>
-                                    <button class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#developerInfoModal">정보 보기</button>
                                 </div>
                             </div>
-                            
                         </div>
+
                     </div> </div>
             </main>
             
