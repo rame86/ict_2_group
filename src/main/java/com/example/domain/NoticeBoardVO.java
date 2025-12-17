@@ -12,4 +12,5 @@ public class NoticeBoardVO {
 	private String noticeTitle;
 	private Integer noticeCnt;
 	private Integer deptNo;
+	private String deptName;
 }
