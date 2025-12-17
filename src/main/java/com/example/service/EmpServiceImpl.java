@@ -215,8 +215,17 @@ public class EmpServiceImpl implements EmpService {
  	}	
  	// end of setDeptManager()	
  	// =======================================================================================
- 	
- 	//
 
-    
+ 	
+ 	// 알람용
+	@Override
+	public List<String> getEmpNoListByDept(String deptNo) {
+		return empMapper.selectEmpNoListByDept(deptNo);
+	}
+
+	@Override
+	public List<String> getAllEmpNoList() {
+		return empMapper.selectAllEmpNoList();
+	}
+ 	
 }

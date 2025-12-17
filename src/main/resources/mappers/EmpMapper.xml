@@ -316,5 +316,20 @@
 		GRADE_NO = #{targetGradeNo}		
 		WHERE EMP_NO = #{empNo}
 	</update>
+	
+	<select id="selectEmpNoListByDept" parameterType="String" resultType="string">
+	    SELECT 
+	        EMP_NO
+	    FROM EMP
+	    WHERE DEPT_NO = #{deptNo}
+	      AND STATUS_NO != 0
+	</select>
+	
+	<select id="selectAllEmpNoList" resultType="string">
+	    SELECT 
+	        EMP_NO
+	    FROM EMP
+	    WHERE STATUS_NO != 0
+	</select>
 
 </mapper>

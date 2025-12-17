@@ -1,18 +1,13 @@
 package com.example.service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.domain.AlertVO;
-import com.example.domain.ApproveListVO;
 
 import com.example.repository.ApproveDAO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,6 +57,7 @@ public class NotificationService {
     }
     
     public void pushNewAlert(AlertVO alert) {
+    	System.out.println("들어왔나" + alert.toString());
     	
     	String destination = "/topic/notifications/" + alert.getEmpNo();
     	
