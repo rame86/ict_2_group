@@ -1,15 +1,22 @@
 package com.example.repository;
 
 import java.util.List;
-
 import com.example.domain.FreeBoardVO;
 import com.example.domain.NoticeBoardVO;
 
 public interface BoardDAO {
 
-	// 공지
-	public List<NoticeBoardVO> getNoticeBoardList(Integer deptNo);
+	// 전체 조회
+	public List<NoticeBoardVO> getGlobalNoticeList();
 
+	public List<FreeBoardVO> getGlobalFreeBoardList();
+
+	// 부서별 조회
+	public List<NoticeBoardVO> getDeptNoticeList(Integer deptNo);
+
+	public List<FreeBoardVO> getDeptFreeBoardList(Integer deptNo);
+
+	// CRUD 
 	public String insertNoticeBoard(NoticeBoardVO vo);
 
 	public String updateNoticeBoard(NoticeBoardVO vo);
@@ -17,9 +24,6 @@ public interface BoardDAO {
 	public NoticeBoardVO getContentNoticeBoard(String noticeNo);
 
 	public void updateNoticeCnt(String noticeNo);
-
-	// 자게
-	public List<FreeBoardVO> getFreeBoardList(Integer deptNo);
 
 	public String insertFreeBoard(FreeBoardVO vo);
 

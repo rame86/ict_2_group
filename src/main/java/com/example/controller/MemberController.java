@@ -31,14 +31,6 @@ public class MemberController {
 		log.info("요청받은 step : " + step);
 	}
 
-//	@GetMapping("/")
-//	public String index(HttpSession session) {
-//		Object login = session.getAttribute("login");
-//		if (login == null) {
-//			return "/member/login";
-//		}
-//		return "index";
-//	}
  
 	@GetMapping("/member/empNoCheck")
 	@ResponseBody
@@ -63,7 +55,7 @@ public class MemberController {
 
 	}
 
-	@PostMapping("loginCheck")
+	@PostMapping("/member/loginCheck")
     public String loginCheck(MemberVO vo, HttpSession session) {
 
         log.info("[MemberController - loginCheck] 요청받음 :" + vo.toString());

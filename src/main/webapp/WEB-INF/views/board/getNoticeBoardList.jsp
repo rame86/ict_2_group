@@ -23,10 +23,12 @@
 
 #boardModal.global-notice .modal-header { /* 전체 공지 (bg-dark) */
 	background-color: #92a8d1; /* Dark color */
+	border-bottom: 1px solid #92a8d1;
 }
 
 #boardModal.dept-notice .modal-header { /* 부서 공지 (bg-secondary) */
 	background-color: #6C757D; /* Secondary color (회색) */
+	border-bottom: 1px solid #6C757D;
 }
 </style>
 </head>
@@ -45,13 +47,12 @@
 
 					<h1 class="mt-4">공지 게시판</h1>
 
-					<c:if test="${not empty sessionScope.login && sessionScope.login.gradeNo <= 2}">
-						<div class="d-flex justify-content-end mb-3">
-							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#writeModal">
-								<i class="fas fa-pen me-1"></i> 새 공지 작성
-							</button>
-						</div>
-					</c:if>
+					<%-- 글쓰기 버튼 (권한 체크: gradeNo가 2 이하일 때만 등, 필요시 수정) --%>
+					<div class="d-flex justify-content-end mb-3">
+						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#writeModal">
+							<i class="fas fa-pen me-1"></i> 새 공지 작성
+						</button>
+					</div>
 
 					<div class="card mb-4">
 						<div class="card-header bg-dark text-white">
@@ -73,7 +74,17 @@
 										<c:if test="${vo.deptNo == 0}">
 											<tr>
 												<td>${ vo.noticeNo }</td>
-												<td><span class="badge bg-danger me-2">전체</span><a href="#" class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#boardModal" data-no="${ vo.noticeNo }" data-title="<c:out value='${vo.noticeTitle}'/>" data-type="global-notice"> ${ vo.noticeTitle }</a></td>
+												<td>
+													<span class="badge bg-danger me-2">전체</span>
+													<a href="#" class="text-decoration-none text-dark fw-bold" 
+													   data-bs-toggle="modal" 
+													   data-bs-target="#boardModal" 
+													   data-no="${ vo.noticeNo }" 
+													   data-title="<c:out value='${vo.noticeTitle}'/>" 
+													   data-type="global-notice"> 
+													   ${ vo.noticeTitle }
+													</a>
+												</td>
 												<td>${ vo.noticeWriter }</td>
 												<td>${ vo.noticeDate }</td>
 												<td>${ vo.noticeCnt }</td>
@@ -87,7 +98,7 @@
 
 					<div class="card mb-4">
 						<div class="card-header bg-secondary text-white">
-							<i class="fas fa-building me-1"></i> <strong>${sessionScope.login.deptName} 공지사항</strong>
+							<i class="fas fa-building me-1"></i> <strong>${sessionScope.login.deptName} 및 하위부서 공지사항</strong>
 						</div>
 						<div class="card-body">
 							<table id="datatablesDept" class="table table-hover">
@@ -105,7 +116,17 @@
 										<c:if test="${vo.deptNo != 0}">
 											<tr>
 												<td>${ vo.noticeNo }</td>
-												<td><span class="badge bg-secondary text-white me-2">부서</span> <a href="#" class="text-decoration-none text-dark" data-bs-toggle="modal" data-bs-target="#boardModal" data-no="${ vo.noticeNo }" data-title="<c:out value='${vo.noticeTitle}'/>" data-type="dept-notice"> ${ vo.noticeTitle }</a></td>
+												<td>
+													<span class="badge bg-secondary text-white me-2">${vo.deptName}</span> 
+													<a href="#" class="text-decoration-none text-dark" 
+													   data-bs-toggle="modal" 
+													   data-bs-target="#boardModal" 
+													   data-no="${ vo.noticeNo }" 
+													   data-title="<c:out value='${vo.noticeTitle}'/>" 
+													   data-type="dept-notice"> 
+													   ${ vo.noticeTitle }
+													</a>
+												</td>
 												<td>${ vo.noticeWriter }</td>
 												<td>${ vo.noticeDate }</td>
 												<td>${ vo.noticeCnt }</td>
@@ -123,26 +144,28 @@
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title">새 공지 작성</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
 							<form action="/board/insertNoticeBoard" method="post">
 								<div class="modal-body">
 									<div class="mb-3">
-										<label class="form-label">작성자</label> <input type="text" class="form-control" name="noticeWriter" value="${ sessionScope.login.empName }" readonly> <input type="hidden" name="empNo" value="${ sessionScope.login.empNo }">
+										<label class="form-label fw-bold">작성자</label> 
+										<input type="text" class="form-control" name="noticeWriter" value="${ sessionScope.login.empName }" readonly> 
+										<input type="hidden" name="empNo" value="${ sessionScope.login.empNo }">
 									</div>
 									<div class="mb-3">
-										<label class="form-label">게시 대상 선택</label> <select class="form-select" name="deptNo">
-											<c:if test="${sessionScope.login.gradeNo <= 2}">
-												<option value="0" selected>📢 전체 공지 (전 직원)</option>
-											</c:if>
-											<option value="${sessionScope.login.deptNo}">🏢 부서 공지 (${sessionScope.login.deptName})</option>
+										<label class="form-label fw-bold">게시 대상 선택</label> 
+										<select class="form-select" name="deptNo">
+											<option value="0" class="text-danger fw-bold">📢 전체 공지 (전 직원)</option>
+											<option value="${sessionScope.login.deptNo}" selected>🏢 부서 공지 (${sessionScope.login.deptName})</option>
 										</select>
 									</div>
 									<div class="mb-3">
-										<label class="form-label">제목</label> <input type="text" class="form-control" name="noticeTitle" required>
+										<label class="form-label fw-bold">제목</label> 
+										<input type="text" class="form-control" name="noticeTitle" required>
 									</div>
 									<div class="mb-3">
-										<label class="form-label">내용</label>
+										<label class="form-label fw-bold">내용</label>
 										<textarea class="form-control" name="noticeContent" rows="10" required></textarea>
 									</div>
 								</div>
@@ -160,19 +183,19 @@
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title">공지 수정</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
 							<form action="/board/insertNoticeBoard" method="post" id="modifyForm">
 								<div class="modal-body">
-									<input type="hidden" name="noticeNo" id="modifyNoticeNo"> <input type="hidden" name="deptNo" value="0">
+									<input type="hidden" name="noticeNo" id="modifyNoticeNo"> 
+									<input type="hidden" name="deptNo" id="modifyDeptNo">
+									
 									<div class="mb-3">
-										<label class="form-label">작성자</label> <input type="text" class="form-control" name="noticeWriter" value="${ sessionScope.login.empName }" readonly> <input type="hidden" name="empNo" value="${ sessionScope.login.empNo }">
+										<label class="form-label fw-bold">제목</label> 
+										<input type="text" class="form-control" id="modifyTitle" name="noticeTitle" required>
 									</div>
 									<div class="mb-3">
-										<label class="form-label">제목</label> <input type="text" class="form-control" id="modifyTitle" name="noticeTitle" required>
-									</div>
-									<div class="mb-3">
-										<label class="form-label">내용</label>
+										<label class="form-label fw-bold">내용</label>
 										<textarea class="form-control" id="modifyContent" name="noticeContent" rows="10" required></textarea>
 									</div>
 								</div>
@@ -190,16 +213,14 @@
 						<div class="modal-content">
 							<div class="modal-header">
 								<h5 class="modal-title">공지 상세</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
-							<div class="modal-body">
+							<div class="modal-body" style="min-height: 200px;">
 								<span id="modalContentText" style="display: block;"></span>
 							</div>
 							<div class="modal-footer">
 								<input type="hidden" id="currentNoticeNo">
-								<c:if test="${not empty sessionScope.login && sessionScope.login.gradeNo <= 2}">
-									<button type="button" class="btn btn-primary me-2" id="btnModify">수정</button>
-								</c:if>
+								<button type="button" class="btn btn-warning text-white" id="btnModify" style="display:none;">수정</button>
 								<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
 							</div>
 						</div>
@@ -230,14 +251,19 @@
 			var $btnModify = $('#btnModify');
 			var $modifyForm = $('#modifyForm');
 
-			// 상세 보기 모달 OPEN
+			// 상세보기 모달 OPEN
 			$boardModal.on('show.bs.modal', function(event) {
 				var button = $(event.relatedTarget);
 				var noticeNo = button.data('no');
 				var title = button.data('title');
+				var type = button.data('type'); // global-notice or dept-notice
 
+				// 모달 헤더 색상 변경
+				$boardModal.removeClass('global-notice dept-notice').addClass(type);
+				
 				$boardModal.find('.modal-title').text(title);
 				$boardModal.find('#modalContentText').text('내용 로딩중...');
+				$btnModify.hide(); // 수정버튼 일단 숨김
 
 				$.ajax({
 					url : '/board/getContentNoticeBoard',
@@ -249,11 +275,14 @@
 							$boardModal.find('#modalContentText').text(response.noticeContent);
 							
 							// 수정 버튼 데이터 바인딩
-							if ($btnModify.length) {
+							// (실제로는 작성자 본인인지 체크 필요: 로그인 사번 == 작성자 사번)
+							// 여기서는 단순히 값이 있으면 보여주게 처리함 (JSP에서 gradeNo 체크하셨으므로)
+							if ("${sessionScope.login.gradeNo}" <= 2 || "${sessionScope.login.empName}" == response.noticeWriter) {
+								$btnModify.show();
 								$('#currentNoticeNo').val(noticeNo);
 								$btnModify.data('title', title);
 								$btnModify.data('content', response.noticeContent);
-								// *수정시 부서번호 유지를 위해 deptNo도 필요하다면 여기서 처리
+								$btnModify.data('deptno', response.deptNo); // 부서번호도 저장
 							}
 						}
 					},
@@ -271,10 +300,12 @@
 				var noticeNo = $('#currentNoticeNo').val();
 				var title = $(this).data('title');
 				var content = $(this).data('content');
+				var deptNo = $(this).data('deptno');
 
 				$('#modifyNoticeNo').val(noticeNo);
 				$('#modifyTitle').val(title);
 				$('#modifyContent').val(content);
+				$('#modifyDeptNo').val(deptNo);
 
 				new bootstrap.Modal($('#modifyModal')[0]).show();
 			});

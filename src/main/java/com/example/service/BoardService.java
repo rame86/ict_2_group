@@ -1,24 +1,26 @@
 package com.example.service;
 
 import java.util.List;
-
 import com.example.domain.FreeBoardVO;
 import com.example.domain.NoticeBoardVO;
 
 public interface BoardService {
-	// 공지영역
+	// 전체 조회
+	public List<NoticeBoardVO> getGlobalNoticeList();
 
-	public List<NoticeBoardVO> getNoticeBoardList(Integer deptNo);
+	public List<FreeBoardVO> getGlobalFreeBoardList();
 
+	// 부서별 조회
+	public List<NoticeBoardVO> getDeptNoticeList(Integer deptNo);
+
+	public List<FreeBoardVO> getDeptFreeBoardList(Integer deptNo);
+
+	// CRUD
 	public String insertNoticeBoard(NoticeBoardVO vo);
 
 	public String updateNoticeBoard(NoticeBoardVO vo);
 
 	public NoticeBoardVO getContentNoticeBoard(String noticeNo);
-
-	// 자게 영역
-
-	public List<FreeBoardVO> getFreeBoardList(Integer deptNo);
 
 	public String insertFreeBoard(FreeBoardVO vo);
 
