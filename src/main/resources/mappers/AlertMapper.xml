@@ -71,18 +71,33 @@
 	        A.EMP_NO,
 	        A.LINK_TYPE,
 	        A.LINK_ID,
-	        A.CREATED_DATE,
+	        A.CREATED_DATE, -- 알림 자체가 생성된 시간을 기본으로 사용
 	        A.IS_READ,
-	        D.DOC_TITLE AS title, 
-	        D.DOC_DATE AS sentTime, 
-	        E.EMP_NAME AS senderName, 
-	        A.CONTENT AS content,  A.ALERT_STATUS 
-		FROM ALERT A
-	    LEFT JOIN DOC D ON A.LINK_ID = D.DOC_NO AND A.LINK_TYPE = 'APPROVAL' 
-	    LEFT JOIN EMP E ON D.DOC_WRITER = E.EMP_NO    
+	        A.CONTENT AS content,  
+	        A.ALERT_STATUS,
+	        
+	        -- ⭐ 1. 작성자 이름 결정 (결재면 문서 작성자, 공지면 공지 작성자)
+	        CASE 
+	            WHEN A.LINK_TYPE = 'APPROVAL' THEN E_APP.EMP_NAME
+	            WHEN A.LINK_TYPE = 'BOARD' THEN E_BRD.EMP_NAME
+	            ELSE '시스템'
+	        END AS senderName,
+	
+	        -- ⭐ 2. 시간 결정 (알림 테이블의 생성 시간을 최우선으로 사용)
+	        A.CREATED_DATE AS sentTime
+	
+	    FROM ALERT A
+	    -- 결재 관련 조인
+	    LEFT JOIN DOC D ON A.LINK_ID = D.DOC_NO AND A.LINK_TYPE = 'APPROVAL'
+	    LEFT JOIN EMP E_APP ON D.DOC_WRITER = E_APP.EMP_NO
+	    
+	    -- 게시판 관련 조인 (추가)
+	    LEFT JOIN NOTICE_BOARD N ON A.LINK_ID = N.NOTICE_NO AND A.LINK_TYPE = 'BOARD'
+	    LEFT JOIN EMP E_BRD ON N.EMP_NO = E_BRD.EMP_NO
+	    
 	    WHERE A.EMP_NO = #{empNo} 
 	    ORDER BY A.CREATED_DATE DESC 
-	    FETCH FIRST 50 ROWS ONLY 
+	    FETCH FIRST 50 ROWS ONLY
     </select>
     
     <delete id="deleteAlert" parameterType="map">
