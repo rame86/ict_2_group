@@ -31,14 +31,14 @@ public class MemberController {
 		log.info("요청받은 step : " + step);
 	}
 
-	@GetMapping("/")
-	public String index(HttpSession session) {
-		Object login = session.getAttribute("login");
-		if (login == null) {
-			return "/member/login";
-		}
-		return "index";
-	}
+//	@GetMapping("/")
+//	public String index(HttpSession session) {
+//		Object login = session.getAttribute("login");
+//		if (login == null) {
+//			return "/member/login";
+//		}
+//		return "index";
+//	}
  
 	@GetMapping("/member/empNoCheck")
 	@ResponseBody
@@ -83,7 +83,7 @@ public class MemberController {
 
 	@GetMapping("/login")
 	public String loginPage() {
-		return "redirect:/member/login";
+		return "member/login";
 	}
 
 	@GetMapping("/member/register")

@@ -454,18 +454,20 @@
                     <div class="w-full lg:w-2/3 bg-white p-6 rounded-xl shadow border">
                         <div class="flex justify-between mb-4">
                             <div class="space-x-2">
-                                <button id="checkIn" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 font-bold">출근</button>
-                                <button id="checkOut" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 font-bold">퇴근</button>
+                                <button id="checkIn" class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 font-bold shadow-xl">출근</button>
+                                <button id="checkOut" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 font-bold shadow-xl">퇴근</button>
                             </div>
-                            <div class="text-sm font-medium pt-1">
-                                <span id="inTimeDisplay" class="mr-3 text-green-700">출근: -</span>
-                                <span id="outTimeDisplay" class="text-blue-700">퇴근: -</span>
-                            </div>
+                           <div class="p-3 bg-gray-100 rounded-lg"> 
+							    <div class="text-sm font-medium pt-1">
+							        <span id="inTimeDisplay" class="mr-3 text-green-700">출근: -</span>
+							        <span id="outTimeDisplay" class="text-blue-700">퇴근: -</span>
+							    </div>
+							</div>
                         </div>
                         <div id="calendar"></div>
                         <div class="flex justify-end gap-3 mt-4 border-t pt-4">
-                            <button id="btnVacation" class="custom-btn bg-primary text-white hover:bg-orange-600 shadow-md">휴가 신청</button>
-                            <button id="btnCommuteCorrection" class="custom-btn bg-blue-primary text-white hover:bg-blue-800 shadow-md">출/퇴근 정정</button>
+                            <button id="btnVacation" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl"><i class="fas fa-plane-departure text-warning"></i>휴가 신청</button>
+                            <button id="btnCommuteCorrection" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl">출/퇴근 정정</button>
                         </div>
                     </div>
                 </div>
@@ -477,7 +479,7 @@
     <div id="vacationModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2 class="text-2xl font-bold text-center mb-6">휴가 신청</h2>
+            <h2 class="text-2xl font-bold text-center mb-6"><i class="fas fa-plane-departure text-warning"></i> 휴가 신청</h2>
             <form id="vacationForm" action="${pageContext.request.contextPath}/approve/approve-ajax" method="POST" class="ajax-form space-y-4">
                 <input type="hidden" name="DocType" value="4"> 
                 <input type="hidden" name="DocTitle" value="[휴가신청]"> 
