@@ -10,4 +10,5 @@ public interface AlertService {
 	List<AlertVO> getUnreadAlertView(String empNo);
 	void markUpdateAsRead(String empNo); 
 	List<AlertVO> getAllAlertView(String empNo);
+	void deleteAlert(Integer alertId, String empNo);
 }
