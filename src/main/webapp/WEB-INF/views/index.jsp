@@ -274,7 +274,7 @@
                                                         <c:when test="${not empty noticeList}">
                                                             <c:forEach var="notice" items="${noticeList}">
                                                                 <tr>
-                                                                    <td><a href="/board/getNoticeBoardList" class="text-dark text-decoration-none"><span class="badge bg-danger me-1">전체</span>${notice.noticeTitle}</a></td>
+                                                                    <td><a href="/board/detail?no=${notice.noticeNo}" class="text-dark text-decoration-none"><span class="badge bg-danger me-1">전체</span>${notice.noticeTitle}</a></td>
                                                                     <td>${notice.noticeWriter}</td>
                                                                     <td>${notice.noticeDate}</td>
                                                                 </tr>
@@ -285,11 +285,61 @@
                                                 </tbody>
                                             </table>
                                         </div>
+                                        
                                         <div class="tab-pane fade" id="dept-notice">
-                                             <div class="text-center py-4">부서 공지 탭 내용</div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="small text-muted">우리 부서 중요 공지입니다.</span>
+                                                <a href="/board/getDeptNoticeList" class="small text-decoration-none">더보기 +</a>
+                                            </div>
+                                            <table class="table table-hover table-bordered mb-0 table-sm" style="font-size: 0.95rem;">
+                                                <thead class="table-light"><tr><th style="width: 60%;">제목</th><th style="width: 20%;">작성자</th><th style="width: 20%;">작성일</th></tr></thead>
+                                                <tbody>
+                                                    <c:choose>
+                                                        <c:when test="${not empty deptNoticeList}">
+                                                            <c:forEach var="dNotice" items="${deptNoticeList}">
+                                                                <tr>
+                                                                    <td>
+                                                                        <a href="/board/detail?no=${dNotice.noticeNo}" class="text-dark text-decoration-none">
+                                                                            <span class="badge bg-primary me-1">부서</span>${dNotice.noticeTitle}
+                                                                        </a>
+                                                                    </td>
+                                                                    <td>${dNotice.noticeWriter}</td>
+                                                                    <td>${dNotice.noticeDate}</td>
+                                                                </tr>
+                                                            </c:forEach>
+                                                        </c:when>
+                                                        <c:otherwise><tr><td colspan="3" class="text-center py-4 text-muted">등록된 부서 공지가 없습니다.</td></tr></c:otherwise>
+                                                    </c:choose>
+                                                </tbody>
+                                            </table>
                                         </div>
+
                                         <div class="tab-pane fade" id="dept-free">
-                                             <div class="text-center py-4">부서 게시판 탭 내용</div>
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span class="small text-muted">자유롭게 소통하는 공간입니다.</span>
+                                                <a href="/board/getDeptFreeList" class="small text-decoration-none">더보기 +</a>
+                                            </div>
+                                            <table class="table table-hover table-bordered mb-0 table-sm" style="font-size: 0.95rem;">
+                                                <thead class="table-light"><tr><th style="width: 60%;">제목</th><th style="width: 20%;">작성자</th><th style="width: 20%;">작성일</th></tr></thead>
+                                                <tbody>
+                                                    <c:choose>
+                                                        <c:when test="${not empty deptFreeList}">
+                                                            <c:forEach var="free" items="${deptFreeList}">
+                                                                <tr>
+                                                                    <td>
+                                                                        <a href="/board/detail?no=${free.boardNo}" class="text-dark text-decoration-none">
+                                                                            <span class="badge bg-success me-1">자유</span>${free.boardTitle}
+                                                                        </a>
+                                                                    </td>
+                                                                    <td>${free.boardWriter}</td>
+                                                                    <td>${free.boardDate}</td>
+                                                                </tr>
+                                                            </c:forEach>
+                                                        </c:when>
+                                                        <c:otherwise><tr><td colspan="3" class="text-center py-4 text-muted">등록된 게시글이 없습니다.</td></tr></c:otherwise>
+                                                    </c:choose>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div> 
                                 </div>
@@ -331,7 +381,7 @@
                             <div class="profile-card mb-4">
                                 <div class="profile-img-container">
                                     <img id="dashboardProfileImg" 
-                                         src="${pageContext.request.contextPath}/images/default_profile.png" 
+                                        src="${pageContext.request.contextPath}/images/default_profile.png" 
                                          class="profile-img" alt="프로필 사진">
                                 </div>
                                 
@@ -409,7 +459,6 @@
             </div>
 
             <div class="modal-body p-4">
-                
                 <div class="input-group mb-3">
                     <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
                     <input type="text" id="deptSearchInput" class="form-control border-start-0" placeholder="부서명 또는 번호를 검색하세요...">
@@ -435,14 +484,12 @@
                                                     Code: ${dept.deptNo}
                                                 </span>
                                             </td>
-                                            
                                             <td>
                                                 <div class="text-secondary small">
                                                     <i class="fas fa-map-marker-alt me-1 text-danger opacity-50"></i>
                                                     ${empty dept.deptAddr ? '<span class="text-muted">-</span>' : dept.deptAddr}
                                                 </div>
                                             </td>
-                                            
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div class="icon-circle bg-success bg-opacity-10 text-success me-2" 
@@ -490,7 +537,6 @@
         const dateElement = document.getElementById('currentDate');
         const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
         dateElement.innerText = new Date().toLocaleDateString('ko-KR', options);
-
         $(document).ready(function() {
             /* 프로필 사진 로드 (기존 로직 유지) */
             var myEmpNo = '${sessionScope.login.empNo}';
@@ -508,8 +554,7 @@
                 });
             }
         });
-        
-     // 모달 내부 검색 필터링 기능
+        // 모달 내부 검색 필터링 기능
         document.getElementById('deptSearchInput').addEventListener('keyup', function() {
             var value = this.value.toLowerCase();
             var rows = document.querySelectorAll('#deptAddressTable tbody tr');
