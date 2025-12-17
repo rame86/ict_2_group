@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.example.domain.ApproveListVO;
 import com.example.domain.DayAttendVO;
+import com.example.domain.EmpVO;
 import com.example.domain.FreeBoardVO;
 import com.example.domain.LoginVO;
 import com.example.domain.NoticeBoardVO;
 import com.example.service.ApproveService;
 import com.example.service.AttendService;
 import com.example.service.BoardService;
+import com.example.service.EmpService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -36,9 +38,13 @@ public class MainController {
     @Autowired
     private BoardService boardService;
     
+    @Autowired
+    private EmpService empService;
+    
     // 로그인 세션 편의 메소드
     @ModelAttribute("login")
     public LoginVO getLogin(HttpSession session) {
+    	
         return (LoginVO) session.getAttribute("login");
     }
 
@@ -143,4 +149,22 @@ public class MainController {
 
         return "index";
     }
+    @GetMapping("/emp/myInfo")
+    public String empMyInfo(@ModelAttribute("login") LoginVO login, Model model) {
+    	// 2. 내 정보 조회 (로그인 세션의 empNo 사용)
+        EmpVO emp = empService.selectEmpByEmpNo(login.getEmpNo());
+        
+        // 3. 비고 이력 조회
+        String editNoteHistory = empService.getEditNoteHistory(login.getEmpNo());
+
+        // 4. 모델 담기
+        model.addAttribute("emp", emp);
+        model.addAttribute("editNoteHistory", editNoteHistory);
+        
+        // 중요: 대시보드에서는 수정/삭제 버튼을 숨기기 위해 false 설정
+        model.addAttribute("canModify", false); 
+
+        return "emp/empCard"; // empCard.jsp 조각 반환
+    }
+    
 }
