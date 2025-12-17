@@ -31,14 +31,14 @@ public class MemberController {
 		log.info("요청받은 step : " + step);
 	}
 
-	@GetMapping("/")
-	public String index(HttpSession session) {
-		Object login = session.getAttribute("login");
-		if (login == null) {
-			return "/member/login";
-		}
-		return "index";
-	}
+//	@GetMapping("/")
+//	public String index(HttpSession session) {
+//		Object login = session.getAttribute("login");
+//		if (login == null) {
+//			return "/member/login";
+//		}
+//		return "index";
+//	}
  
 	@GetMapping("/member/empNoCheck")
 	@ResponseBody
@@ -64,26 +64,33 @@ public class MemberController {
 	}
 
 	@PostMapping("loginCheck")
-	public String loginCheck(MemberVO vo, HttpSession session) {
+    public String loginCheck(MemberVO vo, HttpSession session) {
 
-		log.info("[MemberController - member/loginCheck] 요청받음 :" + vo.toString());
+        log.info("[MemberController - loginCheck] 요청받음 :" + vo.toString());
 
-		LoginVO check = memberService.loginCheck(vo);
+        LoginVO check = memberService.loginCheck(vo);
 
-		if (check != null) {
-			session.setAttribute("login", check);
-			log.info("로그인 성공" + check.toString());
-			log.info("로그인 등급 gradeNo = " + check.getGradeNo());
-			return "index";
-		} else {
-			log.info("로그인 실패");
-			return "/member/login";
-		}
-	}
-
+        if (check != null) {           
+            session.setAttribute("login", check);
+            
+            log.info("로그인 성공: " + check.getEmpName());
+                       
+            return "redirect:/"; 
+            
+        } else {
+            log.info("로그인 실패");
+            return "member/login"; // 실패 시 다시 로그인 페이지
+        }
+    }
+	// 로그인 페이지 이동
+    @GetMapping("/member/login")
+    public String memberLoginPage() {
+        return "member/login";
+    }
+    
 	@GetMapping("/login")
 	public String loginPage() {
-		return "redirect:/member/login";
+		return "member/login";
 	}
 
 	@GetMapping("/member/register")

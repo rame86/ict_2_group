@@ -18,6 +18,7 @@ public class MessageVO {
     // 편의사항
     private String senderName; // 보낸 사람 이름
     private String receiverName; // 받은 사람 이름
+    private String senderImage;
     
     // 대화목록 조회 시 사용할 필드
     private String otherUserId; // 상대방 사번
@@ -26,4 +27,5 @@ public class MessageVO {
     private String latestMessageContent; // 최근 메시지 내용 (MSG_CONTENT와 중복될 수 있음)
     private Date latestMessageTime; // 최근 메시지 시간 (SEND_DATE와 중복될 수 있음)
     private int unreadCount; // 미확인 메시지 개수
+    private String otherUserImage; // 보낸사람 이미지
 }

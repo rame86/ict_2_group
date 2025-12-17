@@ -257,7 +257,7 @@
 .emp-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;    
     padding: 10px;
     border-bottom: 1px solid #eee;
     cursor: pointer;
