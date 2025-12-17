@@ -50,4 +50,8 @@ public interface EmpService {
 	
 	public void setEmpJobTitle(DocVO vo);
 	
+	// 알람용
+	List<String> getEmpNoListByDept(String deptNo);
+	List<String> getAllEmpNoList();
+	
 }

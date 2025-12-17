@@ -24,8 +24,10 @@ public class ApproveServiceImpl implements ApproveService {
 
     @Autowired
     private ApproveDAO approveDao;
+    
     @Autowired
     AlertService alertService;
+    
     @Autowired
     private NotificationService notificationService;
     
@@ -124,12 +126,12 @@ public class ApproveServiceImpl implements ApproveService {
         }
     }
     
-    // ... 나머지 메서드는 그대로 유지 ...
     @Override
     public Map<String, List<ApproveListVO>> selectReceiveApproveList(String empNo) {
-        // 기존 코드 그대로...
+
         Map<String, Object> param = new HashMap<>();
         param.put("empNo", empNo);
+        
         List<ApproveListVO> list = approveDao.selectReceiveApproveList(param);
         List<ApproveListVO> waitingList = new ArrayList<>();
         List<ApproveListVO> finishList = new ArrayList<>();

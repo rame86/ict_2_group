@@ -34,4 +34,9 @@ public interface EmpMapper {
 
     // 사번 중복 카운트
     int isEmpNoDuplicate(String empNo);
+    
+    // 알람용
+    List<String> selectEmpNoListByDept(String deptNo);
+    List<String> selectAllEmpNoList();
+    
 }

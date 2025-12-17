@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.example.domain.AlertVO;
 import com.example.domain.FreeBoardVO;
-import com.example.domain.NoticeBoardVO;
 import com.example.domain.LoginVO;
+import com.example.domain.NoticeBoardVO;
+import com.example.service.AlertService;
 import com.example.service.BoardService;
+import com.example.service.EmpService;
+import com.example.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +29,15 @@ public class BoardController {
 
 	@Autowired
 	private BoardService boardService;
+	
+	@Autowired
+	private EmpService empService;
+	
+	@Autowired
+	private NotificationService notificationService;
+	
+	@Autowired
+	private AlertService alertService;
 
 	// ************* 공지사항 영역 *************
 
@@ -69,6 +82,7 @@ public class BoardController {
 
 		if (vo.getNoticeNo() == null || vo.getNoticeNo().isEmpty()) {
 			boardService.insertNoticeBoard(vo);
+			sendNoticeAlert(vo);
 		} else {
 			boardService.updateNoticeBoard(vo);
 		}
@@ -131,4 +145,34 @@ public class BoardController {
 	public FreeBoardVO getContentFreeBoard(@RequestParam("boardNo") String boardNo) {
 		return boardService.getContentFreeBoard(boardNo);
 	}
+	
+	private void sendNoticeAlert(NoticeBoardVO vo) {
+        List<String> targetEmpList;
+
+        if (vo.getDeptNo() == 0) {
+            // 전사 공지: 모든 사원 리스트 조회
+            targetEmpList = empService.getAllEmpNoList();
+        } else {
+            // 부서 공지: 해당 부서 사원 리스트 조회
+            targetEmpList = empService.getEmpNoListByDept(Integer.toString(vo.getDeptNo()));
+        }
+
+        for (String targetEmpNo : targetEmpList) {
+            // 작성자 본인은 제외 (선택 사항)
+            if (targetEmpNo.equals(vo.getEmpNo())) continue;
+
+            AlertVO alert = new AlertVO();
+            alert.setEmpNo(targetEmpNo);
+            alert.setLinkType("BOARD");
+            alert.setLinkId(Integer.parseInt(vo.getNoticeNo()));
+            alert.setAlertStatus("NOTICE");
+            
+            String deptPrefix = (vo.getDeptNo() == 0) ? "[전체공지] " : "[부서공지] ";
+            alert.setContent(deptPrefix + " " + vo.getNoticeTitle() + " 공지가 등록되었습니다.");
+
+            // DB 저장 및 실시간 알림 전송 
+            alertService.saveNewAlert(alert);
+            notificationService.pushNewAlert(alert); 
+        }
+    }
 }

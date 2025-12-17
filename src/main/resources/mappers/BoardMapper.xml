@@ -81,25 +81,27 @@
 	</select>
 
 	<insert id="insertNoticeBoard" parameterType="NoticeBoardVO">
+		<selectKey keyProperty="noticeNo" resultType="string" order="BEFORE">
+	        SELECT NOTICE_NO_SEQ.NEXTVAL FROM DUAL
+	    </selectKey>
 		INSERT INTO NOTICE_BOARD (
-		NOTICE_NO, 
-		EMP_NO, 
-		NOTICE_CONTENT, 
-		NOTICE_DATE,
-		NOTICE_TITLE, 
-		NOTICE_CNT, 
-		NOTICE_WRITER, 
-		DEPT_NO
-		) VALUES (
-		NOTICE_NO_SEQ.NEXTVAL, 
-		#{empNo}, 
-		#{noticeContent}, 
-		SYSDATE,
-		#{noticeTitle}, 
-		0, 
-		#{noticeWriter}, 
-		#{deptNo}
-		)
+	        NOTICE_NO, 
+	        EMP_NO, 
+	        NOTICE_CONTENT, 
+	        NOTICE_DATE,
+	        NOTICE_TITLE, 
+	        NOTICE_CNT, 
+	        NOTICE_WRITER, 
+	        DEPT_NO
+	    ) VALUES (
+	        #{noticeNo}, #{empNo}, 
+	        #{noticeContent}, 
+	        SYSDATE,
+	        #{noticeTitle}, 
+	        0, 
+	        #{noticeWriter}, 
+	        #{deptNo}
+	    )
 	</insert>
 
 	<update id="updateNoticeBoard" parameterType="NoticeBoardVO">
