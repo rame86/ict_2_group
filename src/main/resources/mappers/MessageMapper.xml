@@ -45,6 +45,7 @@
 		NVL(E.EMP_NAME, '알 수 없음') AS otherUserName,
 		-- 💡 NUMBER인 DEPT_NO를 VARCHAR2로 변환 후 출력
 		NVL(TO_CHAR(D.DEPT_NAME), '미정') AS otherUserPosition,
+		E.EMP_IMAGE AS otherUserImage,
 		T1.MSG_CONTENT AS latestMessageContent,
 		T1.SEND_DATE AS latestMessageTime,
 		NVL(U.UNREAD_COUNT, 0) AS unreadCount
@@ -105,7 +106,8 @@
 	            T1.MSG_CONTENT AS msgContent,
 	            T1.SENDER_EMP_NO AS senderEmpNo,
 	            T1.SEND_DATE AS sendDate,
-	            T2.EMP_NAME AS senderName
+	            T2.EMP_NAME AS senderName, 
+	            T2.EMP_IMAGE AS senderImage
 	        FROM
 	            MESSAGE T1  JOIN
 	            EMP T2 ON T1.SENDER_EMP_NO = T2.EMP_NO
@@ -124,6 +126,7 @@
 		    E.EMP_NAME, 
 		    E.GRADE_NO,
 		    E.EMP_EMAIL, 
+		    E.EMP_IMAGE, 
 		    D.DEPT_NAME AS deptName
 		FROM
 		    EMP E

@@ -53,6 +53,7 @@
 	<script src="/js/websocket.js"></script>
 	<script>
 		const currentEmpNoFromJSP = '${ sessionScope.login.empNo }';
+		const CONTEXT_PATH = "${pageContext.request.contextPath}";
 		$(document).ready(function() {
 			updateSidebarBadge();
 			// 전자결재 사이드바 알람

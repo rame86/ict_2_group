@@ -221,10 +221,13 @@ function createMessageItemHtml(msg) {
 		} catch (e) {}
 	}
 
+	console.log(msg);
+	
+	
 	return `<a class="list-group-item list-group-item-action d-flex align-items-start py-3" 
             href="/message/messageList?otherEmpNo=${msg.senderEmpNo}&otherEmpName=${encodeURIComponent(msg.senderName)}">
             <div class="me-3" style="width: 40px; height: 40px;">
-                <img class="rounded-circle w-100 h-100" src="/img/profile_placeholder.png" alt="프로필">
+                <img class="rounded-circle w-100 h-100" src="${CONTEXT_PATH}/upload/emp/${msg.senderImage}" alt="프로필">
             </div>
             <div class="w-100">
                 <div class="small text-gray-500 mb-1">${msg.senderName || '알 수 없음'} · ${formattedTime}</div>
