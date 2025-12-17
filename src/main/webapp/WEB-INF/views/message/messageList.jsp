@@ -110,7 +110,7 @@ small {
 				                    <div class="d-flex justify-content-end mb-3">
 				                        <div class="p-2 rounded bg-primary text-white" style="max-width: 60%;">
 				                            네, 지금 바로 확인하겠습니다.
-				                            <div class="text-left small mt-1" style="color: rgba(255, 255, 255, 0.7);">오전 10:01</div>
+				                            <div class="text-left small mt-1">오전 10:01</div>
 				                        </div>
 				                    </div>
 				
@@ -166,6 +166,21 @@ small {
 let currentSubscription = null; // 현재 구독 중인 채널을 관리하기 위한 변수
 let currentReceiverEmpNo = null; // 현재 대화 상대 ID
 
+function createDateSeparatorHtml(dateString) {
+    const date = new Date(dateString);
+    // 한국어 형식으로 날짜 포맷 (예: 2025년 12월 16일 화요일)
+    const dateText = date.toLocaleDateString('ko-KR', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric', 
+        weekday: 'short' 
+    });
+    
+    console.log(dateText);
+    // 날짜 구분선 스타일
+    return '<div class="text-center my-3 small text-muted">--- ' + dateText + ' ---</div>';
+}
+
 //------------------------------------
 //💡 유틸리티 및 채팅방 로직 (유지)
 //------------------------------------
@@ -216,7 +231,7 @@ function renderConversationList(list) {
      const positionText = conv.otherUserPosition || ''; 
      // 직책을 이름과 분리하여 작게 표시하기 위해 괄호를 제거합니다.
      const positionHtml = positionText ? '<span class="text-muted fw-normal ms-1 conversation-position">' + positionText + '</span>' : '';
-
+     const otherUserImagePath = CONTEXT_PATH + '/upload/emp/' + (conv.otherUserImage || 'profile_placeholder.png');
 
      // 4. HTML 항목 생성 (가독성 개선)
      const itemHtml = 
@@ -227,7 +242,7 @@ function renderConversationList(list) {
          'onclick="loadChatWindow(\'' + conv.otherUserId + '\', \'' + conv.otherUserName + '\')">' + 
              
              '<div class="d-flex align-items-center">' +
-                 '<img src="${pageContext.request.contextPath}/upload/emp/${login.empImage}" class="rounded-circle profile-img-small" alt="프로필">' +
+                 '<img src="'+ otherUserImagePath +'" class="rounded-circle profile-img-small" alt="프로필">' +
                  
                  '<div class="w-100">' +
                      
@@ -350,52 +365,90 @@ function loadChatWindow(otherUserId, otherUserName) {
 
 //대화 내용 렌더링 (유지)
 function renderChatMessages(messages, currentOtherUserId) {
- // ... (기존 renderChatMessages 로직 유지) ...
- // 이 함수는 header-notifications.js로 옮길 필요 없습니다.
  
 	const chatContainer = $('#messageArea');
- chatContainer.empty(); 
+	chatContainer.empty(); 
  
- const myUserId = '${login.empNo}';
-
- if (!messages || messages.length === 0) {
-     chatContainer.html('<div class="p-5 text-center text-muted">아직 대화가 없습니다. 새로운 메시지를 보내보세요!</div>');
-     return;
- }
+	const myUserId = '${login.empNo}';
+	
+	if (!messages || messages.length === 0) {
+		chatContainer.html('<div class="p-5 text-center text-muted">아직 대화가 없습니다. 새로운 메시지를 보내보세요!</div>');
+		return;
+	}
+	
+	const defaultImageSrc = CONTEXT_PATH + '/img/profile_placeholder.png';
+	
+	const $otherUserListItem = $(".list-group-item[data-other-id='" + currentOtherUserId + "']");
+	const otherUserImageFile = $otherUserListItem.find('img').attr('src');
+	
+	let otherUserImageSrc;
+	
+	if (otherUserImageFile) {
+		otherUserImageSrc = otherUserImageFile;
+		console.log(otherUserImageSrc);
+    } else {
+        otherUserImageSrc = defaultImageSrc;
+        console.warn("WARN: 상대방 이미지 경로를 찾을 수 없어 기본 이미지를 사용합니다.", currentOtherUserId);
+    }
+	
+	let lastDate = null;
+	let lastSenderId = null;
  
- messages.forEach(message => {
+	messages.forEach(message => {
  	
- 	console.log("처리 중인 메시지 내용:", message.msgContent);
- 	
+		const currentDateString = new Date(message.sendDate).toDateString();
+		
+		if (currentDateString !== lastDate) {
+            chatContainer.append(createDateSeparatorHtml(message.sendDate));
+            lastSenderId = null;
+        }
+		
+		lastDate = currentDateString;
+		
 		// 메시지 발신자가 '나'인지 '상대방'인지 판단
-     const isMyMessage = (message.senderEmpNo === myUserId);
+		const isMyMessage = (message.senderEmpNo === myUserId);
+		const showImage = !isMyMessage && (message.senderEmpNo !== lastSenderId);
+		
+		if (showImage) {
+			console.log('=== 이미지 렌더링 시점 데이터 확인 ===');
+			console.log('1. 메시지 내용:', message.msgContent);
+			console.log('2. 넣으려는 이미지 경로(otherUserImageSrc):', otherUserImageSrc);
+			// 여기서 otherUserImageSrc가 비어있다면, 위에서 변수 할당이 잘못된 것입니다.
+		}
      
-     // CSS 클래스 설정
-     const alignmentClass = isMyMessage ? 'justify-content-end' : 'justify-content-start';
-     const bubbleClass = isMyMessage ? 'bg-primary text-white' : 'bg-light';
+		// CSS 클래스 설정
+		const alignmentClass = isMyMessage ? 'justify-content-end' : 'justify-content-start';
+		const bubbleClass = isMyMessage ? 'bg-primary text-white' : 'bg-light';
+		const timeAlignmentClass = isMyMessage ? 'text-end' : 'text-start';
      
-     // 시간 형식 변환
-     let timeString = '';
-     if (message.sendDate) {
-         const date = new Date(message.sendDate);
-         if (!isNaN(date.getTime())) {
-             timeString = date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-         }
-     }
+		// 시간 형식 변환
+		let timeString = '';
+		if (message.sendDate) {
+			const date = new Date(message.sendDate);
+			if (!isNaN(date.getTime())) {
+				timeString = date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+			}
+		}
+		
+		const profileImageHtml = showImage 
+        ? '<img src="' + otherUserImageSrc + '" class="rounded-circle" style="width: 35px; height: 35px; margin-right: 8px;" alt="' + currentOtherUserId + ' 프로필">'
+        : '<div style="width: 35px; height: 35px; margin-right: 8px;"></div>';
      
-  	// 메시지 HTML 생성
-     const messageHtml =
-     	'<div class="d-flex ' + alignmentClass + ' mb-3">' +
-	            '<div class="message-bubble-container" style="display: inline-block; max-width: 70%;">' + 
-	                '<div class="message-bubble p-2 rounded ' + bubbleClass + '">' +
-	                    message.msgContent + 
+		// 메시지 HTML 생성
+		const messageHtml =
+			'<div class="d-flex ' + alignmentClass + ' mb-3">' +
+			(!isMyMessage ? profileImageHtml : '') +
+				'<div class="message-bubble-container" style="display: inline-block; max-width: 70%;">' + 
+					'<div class="message-bubble p-2 rounded ' + bubbleClass + '">' +
+						message.msgContent + 
 	                '</div>' +
-	                '<div class="text-end text-muted small mt-1">' + timeString +
+					'<div class="' + timeAlignmentClass + ' text-muted small mt-1">' + timeString +
 	                '</div>' +
 	            '</div>' +
-	        '</div>';
+			'</div>';
 			
 		chatContainer.append(messageHtml);
+		lastSenderId = message.senderEmpNo;
  });
  
 }
@@ -438,59 +491,103 @@ function sendMessage(){
 
 }
 
-//새 메시지 추가 및 실시간 읽음 처리 (유지)
+//새 메시지 추가 및 실시간 읽음 처리 (그룹화 로직 적용됨)
 function appendNewMessageToChat(messageVO, myEmpNo) {
- const chatContainer = $('#messageArea');
+	
+	const chatContainer = $('#messageArea');
  
- // ... (기존 HTML 생성 로직 유지) ...
+	const isMyMessage = messageVO.senderEmpNo === myEmpNo;
+ 	const alignmentClass = isMyMessage ? 'justify-content-end' : 'justify-content-start';
+ 	const bubbleClass = isMyMessage ? 'bg-primary text-white' : 'bg-light';
+ 	const timeAlignmentClass = isMyMessage ? 'text-end' : 'text-start';
  
- const isMyMessage = messageVO.senderEmpNo === myEmpNo;
- 
- const alignmentClass = isMyMessage ? 'justify-content-end' : 'justify-content-start';
- const bubbleClass = isMyMessage ? 'bg-primary text-white' : 'bg-light';
- 
- let timeString = '';
- if (messageVO.sendDate) { 
-     try {
-         const date = new Date(messageVO.sendDate);
-         if (!isNaN(date.getTime())) {
-             timeString = date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-         }
-     } catch (e) {
-         timeString = '시간 오류';
-     }
- }
- 
- const messageHtml =
-     '<div class="d-flex ' + alignmentClass + ' mb-3">' +
+ 	// 1. 시간 포맷팅
+ 	let timeString = '';
+ 	let dateObj;
+    if (messageVO.sendDate instanceof Date) {
+        dateObj = messageVO.sendDate;
+    } else {
+        dateObj = new Date(messageVO.sendDate);
+    }
+ 	
+    if (!isNaN(dateObj.getTime())) {
+    	timeString = dateObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    } else {
+    	if(isMyMessage){
+    		timeString = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    	} else {
+    		timeString = '시간 정보 없음';
+    	}
+    }
+    
+    // 💡 [그룹화 핵심 로직] ---------------------------------------------------
+    // 화면에 있는 '가장 마지막 메시지'를 가져옵니다.
+    const $lastMessage = chatContainer.children('.d-flex').last();
+    
+    // 마지막 메시지가 '상대방(justify-content-start)'이 보낸 것인지 확인합니다.
+    const isLastMessageFromOther = $lastMessage.length > 0 && $lastMessage.hasClass('justify-content-start');
+    
+    // 이미지를 보여줄지 결정합니다.
+    // 1. 내 메시지면 안 보여줌
+    // 2. 상대방 메시지인데, 바로 위 메시지도 상대방 거면(연속) 안 보여줌 (Spacer 사용)
+    const showImage = !isMyMessage && !isLastMessageFromOther;
+    // ----------------------------------------------------------------------
+    
+	// 2. 이미지 경로 가져오기
+    const currentOtherUserId = currentReceiverEmpNo;
+	const defaultImageSrc = CONTEXT_PATH + '/img/profile_placeholder.png';
+	
+    // (기존 방식 유지) 리스트에서 이미지 경로 추출
+	const $otherUserListItem = $(".list-group-item[data-other-id='" + currentOtherUserId + "']");
+	const otherUserImageFile = $otherUserListItem.find('img').attr('src');
+	let otherUserImageSrc = otherUserImageFile ? otherUserImageFile : defaultImageSrc;
+	
+    // 3. 프로필 이미지 HTML 생성 (showImage 변수에 따라 결정)
+    let profileImageHtml = '';
+    
+    if (!isMyMessage) {
+        if (showImage) {
+            // 새 그룹의 시작: 이미지 표시
+             profileImageHtml = '<img src="' + otherUserImageSrc + '" class="rounded-circle" style="width: 35px; height: 35px; margin-right: 8px;" alt="' + currentOtherUserId + ' 프로필">';
+        } else {
+            // 연속된 메시지: 빈 공간(Spacer) 표시
+             profileImageHtml = '<div style="width: 35px; height: 35px; margin-right: 8px;"></div>';
+        }
+    }
+    // 내 메시지일 경우 profileImageHtml은 빈 문자열('')
+ 	 
+    // 4. 전체 HTML 조립
+ 	const messageHtml =
+		'<div class="d-flex ' + alignmentClass + ' mb-3">' +
+		(!isMyMessage ? profileImageHtml : '') + // 여기에 이미지 혹은 빈 공간이 들어갑니다.
          '<div class="message-bubble-container" style="display: inline-block; max-width: 70%;">' + 
              '<div class="message-bubble p-2 rounded ' + bubbleClass + '">' + 
                  messageVO.msgContent + 
              '</div>' +
-             '<div class="text-end text-muted small mt-1">' + timeString +
+             '<div class="' + timeAlignmentClass + ' text-muted small mt-1">' + timeString +
              '</div>' +
          '</div>' +
      '</div>';
      
- chatContainer.append(messageHtml);
- chatContainer.scrollTop(chatContainer[0].scrollHeight);
+    chatContainer.append(messageHtml);
+    chatContainer.scrollTop(chatContainer[0].scrollHeight);
  
- if (!isMyMessage) {
-     if (currentReceiverEmpNo) {
-         $.ajax({
-             url: '/chat/markAsRead',
-             type: 'POST',
-             data: { otherUserId: currentReceiverEmpNo },
-             success: function(response) {
-                 if (response === "success") {
-                     console.log("✅ 채팅 중 실시간 읽음 처리 성공.");
-                     // 💡 loadConversationList 호출 (헤더 파일의 전역 함수 사용)
-                     loadConversationList(myEmpNo); 
-                 }
-             }
-         });
-     }
- }
+    // 5. 읽음 처리
+    if (!isMyMessage) {
+        if (currentReceiverEmpNo) {
+            $.ajax({
+                url: '/chat/markAsRead',
+                type: 'POST',
+                data: { otherUserId: currentReceiverEmpNo },
+                success: function(response) {
+                    if (response === "success") {
+                        console.log("✅ 채팅 중 실시간 읽음 처리 성공.");
+                        loadConversationList(myEmpNo); 
+                    }
+                }
+            });
+        }
+    }
  
 }
 
@@ -530,11 +627,15 @@ function renderSearchResults(employees, container) {
     // 현재 로그인 사용자 ID (본인 제외를 위해 사용)
     const myEmpNo = $('#sessionEmpNo').val();
     
+    const defaultImagePath = CONTEXT_PATH + '/img/profile_placeholder.png';
+    
     employees.forEach(emp => {
     	console.log(emp);
         const empNo = emp.empNo;
         const empName = emp.name;
-        const positionDept = (emp.position || '') + (emp.dept ? ' (' + emp.dept + ')' : '');
+        const profileImagePath = (emp.empImage && emp.empImage !== 'null')
+	        ? CONTEXT_PATH + '/upload/emp/' + emp.empImage
+	        : defaultImagePath;
 
         // 🚨 검색 결과에서 자기 자신 제외 (선택 사항)
         if (empNo === myEmpNo) {
@@ -549,7 +650,7 @@ function renderSearchResults(employees, container) {
             
                 '<div class="d-flex align-items-center justify-content-between">' + 
                     '<div class="d-flex align-items-center me-2" style="width: 50%; min-width: 50%; flex-shrink: 0;">' + 
-                        '<img src="/images/sorry.gif" class="rounded-circle" style="width: 35px; height: 35px; margin-right: 10px;" alt="프로필">' +
+                        '<img src="' + profileImagePath + '" class="rounded-circle" style="width: 35px; height: 35px; margin-right: 10px;" alt="프로필">' +
                         
                         '<div class="d-flex flex-column gap-2">' + 
                             '<h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.95rem; line-height: 1.2;">' + emp.empName  + ' ( ' + emp.empNo + ' ) ' + '</h6>' +
