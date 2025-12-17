@@ -575,7 +575,7 @@ function renderNotifications(notifications) {
                 }
             } else if (noti.linkType === 'BOARD') {
                 // 게시판은 일반 이동
-                targetLink = context + '/board/detail?boardNo=' + noti.linkId;
+            	targetLink = context + '/board/getNoticeBoardList?noticeNo=' + noti.linkId;
             }
         }
         

@@ -42,29 +42,31 @@ public class BoardController {
 	// ************* 공지사항 영역 *************
 
 	@GetMapping("/board/getNoticeBoardList")
-    public String getNoticeBoardList(Model m, HttpSession session) {
-        Object login = session.getAttribute("login");
-        if (login == null) return "redirect:/";
+	public String getNoticeBoardList(Model m, HttpSession session, 
+	                                 @RequestParam(value = "noticeNo", required = false) String noticeNo) { // 👈 파라미터 추가
+	    Object login = session.getAttribute("login");
+	    if (login == null) return "redirect:/";
 
-        LoginVO loginUser = (LoginVO) login;
-        Integer userDeptNo = Integer.parseInt(loginUser.getDeptNo());
+	    LoginVO loginUser = (LoginVO) login;
+	    Integer userDeptNo = Integer.parseInt(loginUser.getDeptNo());
 
-        // 1. 전사 공지 가져오기
-        List<NoticeBoardVO> globalNotices = boardService.getGlobalNoticeList();
-        
-        // 2. 부서 공지 (하위 부서 포함 계층형) 가져오기
-        List<NoticeBoardVO> deptNotices = boardService.getDeptNoticeList(userDeptNo);
+	    // 1. 공지 목록 가져오기 (기존 로직 유지)
+	    List<NoticeBoardVO> globalNotices = boardService.getGlobalNoticeList();
+	    List<NoticeBoardVO> deptNotices = boardService.getDeptNoticeList(userDeptNo);
 
-        // 3. [중요] JSP 로직에 맞춰 두 리스트를 하나로 합침
-        List<NoticeBoardVO> combinedList = new ArrayList<>();
-        if (globalNotices != null) combinedList.addAll(globalNotices);
-        if (deptNotices != null) combinedList.addAll(deptNotices);
+	    List<NoticeBoardVO> combinedList = new ArrayList<>();
+	    if (globalNotices != null) combinedList.addAll(globalNotices);
+	    if (deptNotices != null) combinedList.addAll(deptNotices);
 
-        // 4. JSP 변수명인 'noticeBoardList'로 전달
-        m.addAttribute("noticeBoardList", combinedList);
+	    m.addAttribute("noticeBoardList", combinedList);
+	    
+	    // ⭐ [추가] 알림을 타고 들어왔다면, 열어야 할 글 번호를 JSP로 전달
+	    if (noticeNo != null) {
+	        m.addAttribute("targetNoticeNo", noticeNo);
+	    }
 
-        return "/board/getNoticeBoardList";
-    }
+	    return "/board/getNoticeBoardList";
+	}
 
 	@PostMapping("/board/insertNoticeBoard")
 	public String insertNoticeBoard(NoticeBoardVO vo, HttpSession session) {
