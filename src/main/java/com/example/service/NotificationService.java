@@ -3,20 +3,15 @@ package com.example.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.domain.AlertVO;
 
-import com.example.repository.ApproveDAO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class NotificationService {
-	
-	@Autowired
-	private ApproveDAO approveDao;
 	
 	// STOMP 메시지 브로커로 메시지를 보내는 핵심 컴포넌트
     private final SimpMessagingTemplate messagingTemplate;
@@ -57,7 +52,6 @@ public class NotificationService {
     }
     
     public void pushNewAlert(AlertVO alert) {
-    	System.out.println("들어왔나" + alert.toString());
     	
     	String destination = "/topic/notifications/" + alert.getEmpNo();
     	

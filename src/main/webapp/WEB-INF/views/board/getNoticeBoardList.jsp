@@ -233,7 +233,7 @@
 	</div>
 
 	<script>
-		// DataTables 초기화 (각각 다른 ID 사용)
+		// DataTables 초기화 (기존 유지)
 		window.addEventListener('DOMContentLoaded', event => {
 			const datatablesGlobal = document.getElementById('datatablesGlobal');
 			if (datatablesGlobal) {
@@ -251,19 +251,79 @@
 			var $btnModify = $('#btnModify');
 			var $modifyForm = $('#modifyForm');
 
-			// 상세보기 모달 OPEN
+			// ============================================================
+			// ⭐ [추가] 1. 알림을 타고 들어왔을 때 자동 실행 로직
+			// ============================================================
+			var targetNoticeNo = "${targetNoticeNo}"; // Controller에서 넘겨준 글 번호
+
+			if (targetNoticeNo && targetNoticeNo !== "") {
+				// 페이지 로딩 후 0.3초 뒤에 실행 (데이터 테이블 로딩 등 고려)
+				setTimeout(function() {
+					loadNoticeDetailDirectly(targetNoticeNo);
+				}, 300);
+			}
+
+			// 알림으로 들어왔을 때 모달을 띄워주는 전용 함수
+			function loadNoticeDetailDirectly(noticeNo) {
+				$.ajax({
+					url : '/board/getContentNoticeBoard',
+					type : 'POST',
+					data : { noticeNo : noticeNo },
+					dataType : 'json',
+					success : function(response) {
+						if (response && response.noticeContent) {
+							// 1. 헤더 색상 결정 (deptNo가 0이면 global, 아니면 dept)
+							var typeClass = (response.deptNo == 0) ? 'global-notice' : 'dept-notice';
+							$boardModal.removeClass('global-notice dept-notice').addClass(typeClass);
+
+							// 2. 내용 채우기
+							$boardModal.find('.modal-title').text(response.noticeTitle);
+							$boardModal.find('#modalContentText').text(response.noticeContent);
+							
+							// 3. 수정 버튼 권한 체크 및 데이터 바인딩
+							$btnModify.hide();
+							var loginGrade = "${sessionScope.login.gradeNo}";
+							var loginName = "${sessionScope.login.empName}";
+
+							if (loginGrade <= 2 || loginName == response.noticeWriter) {
+								$btnModify.show();
+								$('#currentNoticeNo').val(noticeNo);
+								$btnModify.data('title', response.noticeTitle);
+								$btnModify.data('content', response.noticeContent);
+								$btnModify.data('deptno', response.deptNo);
+							}
+							
+							// 4. 모달 강제로 띄우기
+							new bootstrap.Modal(document.getElementById('boardModal')).show();
+						} else {
+							alert("삭제되었거나 존재하지 않는 게시글입니다.");
+						}
+					},
+					error : function() {
+						console.log("공지사항 로딩 실패");
+					}
+				});
+			}
+			// ============================================================
+
+
+			// [기존 유지] 목록에서 클릭해서 모달 열 때 (show.bs.modal 이벤트)
 			$boardModal.on('show.bs.modal', function(event) {
 				var button = $(event.relatedTarget);
+				
+				// ⭐ [수정] 알림으로 자동 실행될 때는 relatedTarget이 없으므로 중단
+				if (!button || button.length === 0) return;
+
 				var noticeNo = button.data('no');
 				var title = button.data('title');
-				var type = button.data('type'); // global-notice or dept-notice
+				var type = button.data('type'); 
 
 				// 모달 헤더 색상 변경
 				$boardModal.removeClass('global-notice dept-notice').addClass(type);
 				
 				$boardModal.find('.modal-title').text(title);
 				$boardModal.find('#modalContentText').text('내용 로딩중...');
-				$btnModify.hide(); // 수정버튼 일단 숨김
+				$btnModify.hide(); 
 
 				$.ajax({
 					url : '/board/getContentNoticeBoard',
@@ -274,15 +334,12 @@
 						if (response && response.noticeContent) {
 							$boardModal.find('#modalContentText').text(response.noticeContent);
 							
-							// 수정 버튼 데이터 바인딩
-							// (실제로는 작성자 본인인지 체크 필요: 로그인 사번 == 작성자 사번)
-							// 여기서는 단순히 값이 있으면 보여주게 처리함 (JSP에서 gradeNo 체크하셨으므로)
 							if ("${sessionScope.login.gradeNo}" <= 2 || "${sessionScope.login.empName}" == response.noticeWriter) {
 								$btnModify.show();
 								$('#currentNoticeNo').val(noticeNo);
 								$btnModify.data('title', title);
 								$btnModify.data('content', response.noticeContent);
-								$btnModify.data('deptno', response.deptNo); // 부서번호도 저장
+								$btnModify.data('deptno', response.deptNo); 
 							}
 						}
 					},
@@ -292,10 +349,12 @@
 				});
 			});
 
-			// 수정 버튼 클릭 -> 수정 모달 OPEN
+			// [기존 유지] 수정 버튼 클릭 -> 수정 모달 OPEN
 			$btnModify.on('click', function() {
-				// 상세 모달 닫기
-				bootstrap.Modal.getInstance($boardModal[0]).hide();
+				// 상세 모달 닫기 (jQuery 방식 대신 bootstrap 인스턴스 사용 권장)
+				var boardModalEl = document.getElementById('boardModal');
+				var modalInstance = bootstrap.Modal.getInstance(boardModalEl);
+				if(modalInstance) modalInstance.hide();
 
 				var noticeNo = $('#currentNoticeNo').val();
 				var title = $(this).data('title');
@@ -307,7 +366,7 @@
 				$('#modifyContent').val(content);
 				$('#modifyDeptNo').val(deptNo);
 
-				new bootstrap.Modal($('#modifyModal')[0]).show();
+				new bootstrap.Modal(document.getElementById('modifyModal')).show();
 			});
 		});
 	</script>
