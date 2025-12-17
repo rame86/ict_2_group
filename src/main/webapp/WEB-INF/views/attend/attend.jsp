@@ -440,11 +440,16 @@
 
 <body class="sb-nav-fixed bg-gray-100">
     <jsp:include page="../common/header.jsp" flush="true" />
-    <div id="layoutSidenav">
+    
+    <div id="layoutSidenav">        
         <jsp:include page="../common/sidebar.jsp" flush="true" />
+        
         <div id="layoutSidenav_content">
             <main class="px-4 py-6">
-                <h3 class="font-bold text-2xl text-gray-800 mb-4">근태 현황</h3>
+                <h2 class="mt-4">근태 현황</h2>
+					<ol class="breadcrumb mb-4">
+						<li class="breadcrumb-item active">Attendance status</li>
+					</ol>
                 <div class="flex flex-col lg:flex-row gap-6">
                     <div class="w-full lg:w-1/3 bg-white p-4 rounded-xl shadow border">
                         <div class="chart-container">

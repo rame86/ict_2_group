@@ -10,8 +10,9 @@
 		d.DEPT_NAME,
 		d.PARENT_DEPT_NO,
 		d.MANAGER_EMP_NO,
-		e.EMP_NAME AS
-		managerName,
+		d.DEPT_ADDR,
+		d.DEPT_PHONE,
+		e.EMP_NAME AS managerName,
 		e.EMP_IMAGE AS managerImage,
 		e.JOB_TITLE AS managerJobTitle
 		FROM DEPT d
@@ -90,6 +91,13 @@
 		WHERE DEPT_NO = #{targetDeptNo}
 	</update>
 
-
-
+	<update id="updateDept" parameterType="com.example.domain.DeptVO">
+		UPDATE DEPT
+		SET
+		DEPT_NAME = #{deptName},
+		PARENT_DEPT_NO = #{parentDeptNo, jdbcType=NUMERIC},
+		MANAGER_EMP_NO = #{managerEmpNo, jdbcType=NUMERIC},
+		DEPT_PHONE = #{deptPhone, jdbcType=VARCHAR}
+		WHERE DEPT_NO = #{deptNo}
+	</update>
 </mapper>

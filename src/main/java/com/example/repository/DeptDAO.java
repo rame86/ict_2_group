@@ -22,13 +22,16 @@ public interface DeptDAO {
 
 	// 부서 삭제
 	int deleteDept(int deptNo);
-	
-	// 부서 이동	
-    int updateEmpDept(Map<String, Object> map);
 
-   // 부서 변경 이력 로그 저장
-    int insertEditLog(Map<String, Object> map);
-    
-    //부서장 임명
-    public void setDeptManager(Map<String, Object> map);
+	// 부서 이동
+	int updateEmpDept(Map<String, Object> map);
+
+	// 부서 변경 이력 로그 저장
+	int insertEditLog(Map<String, Object> map);
+
+	// 부서장 임명
+	public void setDeptManager(Map<String, Object> map);
+
+	// 부서 수정
+	public int updateDept(DeptVO vo);
 }

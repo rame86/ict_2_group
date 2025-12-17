@@ -317,7 +317,7 @@
                                         </a>
                                     </div>
                                     <div class="col-md-3 col-6">
-                                        <a href="/member/list" class="quick-menu-item">
+                                        <a href="#" class="quick-menu-item" data-bs-toggle="modal" data-bs-target="#deptAddressModal">
                                             <i class="fas fa-address-book text-info"></i>
                                             <span class="fw-bold small">주소록</span>
                                         </a>
@@ -396,6 +396,87 @@
 
                     </div> 
                 </div>
+                
+                <div class="modal fade" id="deptAddressModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-building me-2"></i>사내 부서 주소록
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                
+                <div class="input-group mb-3">
+                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                    <input type="text" id="deptSearchInput" class="form-control border-start-0" placeholder="부서명 또는 번호를 검색하세요...">
+                </div>
+
+                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <table class="table table-hover align-middle" id="deptAddressTable">
+                        <thead class="table-light sticky-top">
+                            <tr>
+                                <th style="width: 25%;">부서명 (번호)</th>
+                                <th style="width: 45%;">주소</th>
+                                <th style="width: 30%;">연락처</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <c:choose>
+                                <c:when test="${not empty deptList}">
+                                    <c:forEach var="dept" items="${deptList}">
+                                        <tr>
+                                            <td>
+                                                <div class="fw-bold text-dark">${dept.deptName}</div>
+                                                <span class="badge bg-secondary rounded-pill" style="font-size: 0.75rem;">
+                                                    Code: ${dept.deptNo}
+                                                </span>
+                                            </td>
+                                            
+                                            <td>
+                                                <div class="text-secondary small">
+                                                    <i class="fas fa-map-marker-alt me-1 text-danger opacity-50"></i>
+                                                    ${empty dept.deptAddr ? '<span class="text-muted">-</span>' : dept.deptAddr}
+                                                </div>
+                                            </td>
+                                            
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div class="icon-circle bg-success bg-opacity-10 text-success me-2" 
+                                                         style="width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                                        <i class="fas fa-phone-alt" style="font-size:0.8rem;"></i>
+                                                    </div>
+                                                    <span class="fw-bold text-dark">
+                                                        ${empty dept.deptPhone ? '<span class="text-muted small">미등록</span>' : dept.deptPhone}
+                                                    </span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </c:when>
+                                <c:otherwise>
+                                    <tr>
+                                        <td colspan="3" class="text-center py-5 text-muted">
+                                            <i class="fas fa-exclamation-circle fa-2x mb-3"></i><br>
+                                            등록된 부서 정보가 없습니다.
+                                        </td>
+                                    </tr>
+                                </c:otherwise>
+                            </c:choose>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+            </div>
+        </div>
+    </div>
+</div>
             </main>
             
             <jsp:include page="common/footer.jsp" flush="true"/>
@@ -426,6 +507,17 @@
                     }
                 });
             }
+        });
+        
+     // 모달 내부 검색 필터링 기능
+        document.getElementById('deptSearchInput').addEventListener('keyup', function() {
+            var value = this.value.toLowerCase();
+            var rows = document.querySelectorAll('#deptAddressTable tbody tr');
+            
+            rows.forEach(function(row) {
+                var text = row.textContent.toLowerCase();
+                row.style.display = text.indexOf(value) > -1 ? '' : 'none';
+            });
         });
     </script>
 </body>

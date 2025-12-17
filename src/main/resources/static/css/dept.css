@@ -1,8 +1,10 @@
-/* dept.css - 최종 수정본 (Z-Index 수정됨) */
+/* dept.css - Design & Z-Index Fixed */
 
 /* =========================================
    1. 트리 구조 핵심 CSS (선 그리기)
    ========================================= */
+
+
 .org-tree * { box-sizing: border-box; }
 
 .org-tree {
@@ -141,20 +143,74 @@
    [중요] 모달 및 레이어 순서 (Z-Index 완벽 정리)
    ========================================= */
 
-/* 1. 가장 밑바닥: 관리자 플로팅 버튼 */
-/* 모달이 뜨면 이 버튼은 모달 배경(어두운 막) 뒤로 가야 합니다 */
-.admin-action-area {
-    position: fixed;
-    left: 280px;
-    top: 220px;
-    bottom: auto;
-    /* 모달(4000~)보다 확실히 아래에 위치 */
-    z-index: 3000 !important; 
+/* 관리자용 툴바 스타일 개선 */
+.admin-toolbar {
+    background-color: #fff; /* 흰색 배경으로 깔끔하게 */
+    padding: 10px 20px;
+    border-radius: 50px; /* 둥근 모서리 */
+    border: 1px solid #e3e6f0;
+    margin-bottom: 25px;
     display: flex;
-    gap: 10px;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05); /* 은은한 그림자 */
+    z-index: 3000 !important;
 }
 
-/* 2. 모달 기본 설정 */
+/* 툴바 버튼 스타일 (세련된 아웃라인 스타일) */
+.btn-toolbar-custom {
+    padding: 8px 18px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+    background-color: transparent;
+}
+
+.btn-create {
+    color: #1cc88a;
+    border-color: #1cc88a;
+    background-color: rgba(28, 200, 138, 0.05);
+}
+.btn-create:hover {
+    background-color: #1cc88a;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(28, 200, 138, 0.2);
+}
+
+.btn-update {
+    color: #36b9cc;
+    border-color: #36b9cc;
+    background-color: rgba(54, 185, 204, 0.05);
+}
+.btn-update:hover {
+    background-color: #36b9cc;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(54, 185, 204, 0.2);
+}
+
+.btn-delete {
+    color: #e74a3b;
+    border-color: #e74a3b;
+    background-color: rgba(231, 74, 59, 0.05);
+}
+.btn-delete:hover {
+    background-color: #e74a3b;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(231, 74, 59, 0.2);
+}
+
+
+/* 모달 기본 설정 */
 .modal-custom {
     display: none;
     position: fixed;
@@ -166,40 +222,36 @@
     backdrop-filter: blur(3px);
 }
 
-/* ★★★ 레이어 순서(Hierarchy) 정의 ★★★ */
+/* ★★★ 레이어 순서(Hierarchy) 정의 [BUG FIX] ★★★ */
 
-/* [Layer 1] 기본 모달 (부서 정보, 생성, 삭제) */
-/* 이들은 가장 먼저 뜨는 창입니다. 버튼(3000)보다는 위에 있습니다. */
+/* [Layer 1] 기본 모달 (부서 정보, 생성, 삭제, 수정) */
+/* 기존에 deptUpdateModal이 빠져있어서 작동 안하던 문제 해결 */
 #deptInfoModal, 
 #deptCreateModal, 
-#deptDeleteModal { 
+#deptDeleteModal,
+#deptUpdateModal {  /* ✅ 수정 모달 ID 추가됨 */
     z-index: 4000; 
 }
 
-/* [Layer 2] 상세/작업 모달 (부서 정보 창에서 '이동'이나 '임명'을 눌렀을 때 뜨는 창) */
-/* Layer 1(4000)보다 무조건 위에 떠야 합니다. */
-#deptMoveModal,      /* 부서 이동 */
-#deptAppointModal,   /* 부서장 임명 */
-#employeeDetailModal /* 사원 상세(가정) */ { 
+/* [Layer 2] 상세/작업 모달 */
+#deptMoveModal,      
+#deptAppointModal,   
+#employeeDetailModal { 
     z-index: 5000; 
 }
 
-/* [Layer 3] 최상위 모달 (기안서 작성) */
-/* 모든 작업의 끝인 결재 기안 창은 무조건 가장 위에 떠야 합니다. */
+/* [Layer 3] 최상위 모달 */
 #approvalDraftModal { 
     z-index: 6000; 
 }
 
 
-/* --- 아래는 기존 디자인 유지 --- */
-
-/* 애니메이션 */
+/* --- 기존 디자인 유지 --- */
 @keyframes slideDown {
     from { transform: translateY(-30px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
 
-/* 모달 내용 박스 */
 .modal-content-custom {
     background-color: #fff;
     margin: 5% auto;
@@ -211,12 +263,10 @@
     animation: slideDown 0.3s ease-out;
 }
 
-/* 기안서 모달 넓게 */
 #approvalDraftModal .modal-content-custom {
     max-width: 600px;
 }
 
-/* 모달 헤더 */
 .modal-header-custom {
     padding: 15px 20px;
     background-color: #4e73df;
@@ -272,7 +322,6 @@
     object-fit: cover;
 }
 
-/* 버튼 스타일 */
 .btn-manage-custom {
     width: 100%;
     padding: 12px;
@@ -315,7 +364,6 @@
     outline: none;
 }
 
-/* 경고 문구 */
 .warning-text {
     color: #e74a3b;
     font-size: 0.9rem;
@@ -362,7 +410,7 @@
 }
 
 /* =========================================
-   내 부서 강조 (분홍색)
+   내 부서 강조
    ========================================= */
 .org-node.my-dept {
     border-color: #FF8FA3 !important;
@@ -374,36 +422,6 @@
 .org-node.head.my-dept { border-top-color: #FF8FA3 !important; }
 .org-node.ceo.my-dept { border-color: #FF8FA3 !important; }
 .org-node.my-dept .profile-pic { border-color: #FFB6C1; }
-
-/* =========================================
-   관리자용 플로팅 버튼 (Z-Index 수정됨)
-   ========================================= */
-.admin-action-area {
-    position: fixed;
-    left: 280px;
-    top: 220px;
-    bottom: auto;
-    z-index: 3000 !important; /* 모달보다 낮게 조정 */
-    display: flex;
-    gap: 10px;
-}
-.btn-float {
-    padding: 10px 16px;
-    border-radius: 30px;
-    border: none;
-    font-weight: bold;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
-    transition: transform 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-}
-.btn-float:hover { transform: translateY(-2px); }
-.btn-create { background-color: #09C9DE; }
-.btn-delete { background-color: #E55D3D; }
 
 /* =========================================
    사원 이동/제외 버튼
