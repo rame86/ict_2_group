@@ -88,4 +88,9 @@ public class DeptServiceImpl implements DeptService {
 		deptDAO.setDeptManager(map);
 		empDAO.setEmpJobTitle(map);
 	}
+	
+	// 부서 수정
+    public void editDept(DeptVO vo) {
+        deptDAO.updateDept(vo);
+    }
 }

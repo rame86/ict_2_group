@@ -50,19 +50,26 @@ public class DeptDAOImpl implements DeptDAO {
 		return sess.delete(NAMESPACE + ".deleteDept", deptNo);
 	}
 
+	
 	// 사원 부서 이동
-	@Override
+
 	public int updateEmpDept(Map<String, Object> map) {
 		// XML id="updateEmpDept" 호출
 		return sess.update(NAMESPACE + ".updateEmpDept", map);
 	}
 
 	// 변경 이력 로그 저장
-	@Override
+
 	public int insertEditLog(Map<String, Object> map) {
 		return sess.insert(NAMESPACE + ".insertEditLog", map);
 	}
 
+	
+	// 부서 수정
+    public int updateDept(DeptVO vo) {
+        return sess.update(NAMESPACE + ".updateDept", vo);
+    }
+    
 	// =======================================================================================
 	// setDeptManager()
 	public void setDeptManager(Map<String, Object> map) {

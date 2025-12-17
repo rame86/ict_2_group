@@ -93,6 +93,19 @@ public class DeptController {
 		}
 	}
 
+	// 부서 수정
+	@PostMapping("/dept/update")
+	@ResponseBody
+	public String updateDept(DeptVO vo) {
+		try {
+			deptService.editDept(vo);
+			return "OK";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "FAIL";
+		}
+	}
+
 	// 사원 부서 이동 / 제외 처리
 	@PostMapping("/dept/moveEmp")
 	@ResponseBody
@@ -105,7 +118,7 @@ public class DeptController {
 		String gNo = String.valueOf(login.getGradeNo());
 		// 권한 체크 (2000, 2010 부서의 관리자만 가능)
 		boolean isAuth = false;
-		if((dNo.equals("2000") || dNo.equals("2010")) && (gNo.equals("1") || gNo.equals("2"))) {
+		if ((dNo.equals("2000") || dNo.equals("2010")) && (gNo.equals("1") || gNo.equals("2"))) {
 			isAuth = true;
 		}
 
