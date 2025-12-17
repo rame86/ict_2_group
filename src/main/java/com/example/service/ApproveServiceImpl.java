@@ -274,12 +274,24 @@ public class ApproveServiceImpl implements ApproveService {
             log.info("Alert: 수신자 사원 번호가 유효하지 않아 알림을 저장하지 못했습니다. docNo: {}", docNo);
             return;
         }
+        
         log.info("Alert 시도: 수신자 {}, 문서 {}", receiveEmpNo, docNo);
         AlertVO alert = new AlertVO();
         alert.setEmpNo(String.valueOf(receiveEmpNo));
         alert.setLinkType("APPROVAL");
         alert.setLinkId(docNo);
         alert.setTitle(alertTitle);
+        alert.setContent(alertTitle + " 알림이 도착했습니다.");
+        
+        if (alertTitle.contains("요청")) {
+            alert.setAlertStatus("REQUEST");
+        } else if (alertTitle.contains("승인")) {
+            alert.setAlertStatus("FINAL_APPROVAL");
+        } else if (alertTitle.contains("반려")) {
+            alert.setAlertStatus("REJECT");
+        } else {
+            alert.setAlertStatus("IN_PROGRESS");
+        }
         
         try {
             alertService.saveNewAlert(alert);

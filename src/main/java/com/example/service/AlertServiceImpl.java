@@ -1,6 +1,8 @@
 package com.example.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ public class AlertServiceImpl implements AlertService {
 
 	@Override
 	public void saveNewAlert(AlertVO vo) {
+		System.out.println(vo.toString() + "alertService");
 		alertDao.insertAlert(vo);
 	}
 
@@ -38,6 +41,14 @@ public class AlertServiceImpl implements AlertService {
 	@Override
 	public List<AlertVO> getAllAlertView(String empNo) {
 		return alertDao.selectAllLatestAlerts(empNo);
+	}
+
+	@Override
+	public void deleteAlert(Integer alertId, String empNo) {
+		Map<String, String> param = new HashMap<>();
+		param.put("alertId", Integer.toString(alertId));
+		param.put("empNo", empNo);
+		alertDao.deleteAlert(param);
 	}
 
 }

@@ -75,9 +75,9 @@ small {
     
 				        <div class="col-xl-3 col-lg-4">
 						    <div class="card shadow mb-4" style="height: 700px;">
-						        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+						        <div class="card-header py-3 d-flex justify-content-between align-items-center table-Header">
 						            
-						            <h6 class="m-0 font-weight-bold text-primary">대화 목록</h6>
+						            <h6 class="m-0 font-weight-bold">대화 목록</h6>
 						            
 						            <button class="btn btn-sm btn-outline-primary" 
 						                    data-bs-toggle="modal" data-bs-target="#newChatModal">
@@ -94,8 +94,8 @@ small {
 
 				        <div class="col-xl-6 col-lg-4">
 				            <div class="card shadow mb-4" style="height: 700px;">
-				                <div class="card-header py-3">
-				                    <h6 class="m-0 font-weight-bold text-primary" id="chatWindowHeader">김철수 사원과의 대화</h6>
+				                <div class="card-header py-3 table-Header">
+				                    <h6 class="m-0 font-weight-bold" id="chatWindowHeader">김철수 사원과의 대화</h6>
 				                </div>
 				                
 				                <div class="card-body" style="height: 500px; overflow-y: auto;" id="messageArea">
@@ -129,12 +129,14 @@ small {
 				<div class="modal fade" id="newChatModal" tabindex="-1" role="dialog" aria-labelledby="newChatModalLabel" aria-hidden="true">
 				    <div class="modal-dialog" role="document">
 				        <div class="modal-content">
-				            <div class="modal-header">
+				        
+				            <div class="modal-header table-Header">
 				                <h5 class="modal-title" id="newChatModalLabel">새로운 대화 상대 찾기</h5>
 				                <button class="close btn" type="button" data-bs-dismiss="modal" aria-label="Close">
 				                    <span aria-hidden="true">×</span>
 				                </button>
 				            </div>
+				            
 				            <div class="modal-body">
 				                
 				                <div class="input-group mb-3">
@@ -148,7 +150,7 @@ small {
 				
 				            </div>
 				            <div class="modal-footer">
-				                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">닫기</button>
+				                <div></div>
 				            </div>
 				        </div>
 				    </div>
@@ -726,7 +728,7 @@ $(document).ready(function() {
     
 });
 
-// 알람창
+//알람창 렌더링 함수
 function renderNotifications(notifications) {
     
     console.log("🎨 [RENDER] renderNotifications 함수 실행. 데이터:", notifications); 
@@ -741,51 +743,81 @@ function renderNotifications(notifications) {
     }
 
     notifications.forEach(noti => {
-        // ⭐ [중요] 서버의 AlertVO와 isRead 필드가 'Y' 또는 'N' 형태인지 확인합니다.
-        const isRead = noti.isRead === 'Y'; 
         
-        // 카드 스타일 설정: 읽음 상태에 따라 다르게 설정
-        const cardBorderClass = isRead ? 'border-left-danger' : 'border-left-danger';
+        // ⭐ 1. 링크 결정 로직 (alertStatus 활용)
+        let targetLink = 'javascript:void(0);';
+        const context = CONTEXT_PATH || '';
+
+        if (noti.linkId) {
+            
+            if (noti.linkType === 'APPROVAL') {
+                
+                // DB에서 가져온 상태값 확인
+                const status = noti.alertStatus; 
+                
+                if (status === 'REQUEST') {
+                    // [결재 요청] -> 결재 처리 페이지 (documentDetail)
+                    targetLink = context + '/approve/documentDetail?docNo=' + noti.linkId;
+                    
+                } else if (status === 'FINAL_APPROVAL' || status === 'REJECT' || status === 'IN_PROGRESS') {
+                    // [결과 알림] -> 결과 확인 팝업 (documentDetailPopup)
+                    targetLink = context + '/approve/documentDetailPopup?docNo=' + noti.linkId;
+                    
+                } else {
+                     // 상태가 없거나 기타인 경우 -> 기본 상세 페이지
+                     targetLink = context + '/approve/documentDetail?docNo=' + noti.linkId;
+                }
+                
+            } else if (noti.linkType === 'BOARD') {
+                // 게시판 등 다른 알림
+                targetLink = context + '/board/detail?boardNo=' + noti.linkId; 
+            }
+        }
+        
+        // ⭐ 2. ID 및 스타일 설정
+        // noti.alertId가 없으면 noti.alert_id나 id 등을 찾도록 방어 코드 추가
+        const alertIdValue = noti.alertId || noti.ALERT_ID || noti.id || '0';
+        
+        const isRead = noti.isRead === 'Y'; 
+        const cardBorderClass = isRead ? 'border-left-secondary' : 'border-left-danger'; // 읽음/안읽음 색상 구분
         const headerBgClass = isRead ? 'bg-light' : 'bg-primary'; 
         const headerTextColor = isRead ? 'text-muted' : 'text-white';
         const bodyTextColor = isRead ? 'text-muted' : 'text-dark';
         
-        // 아이콘 및 텍스트 설정
         const headerText = isRead ? '확인됨' : '미확인 알림';
         const iconColor = isRead ? 'text-dark' : 'text-white';
-        const iconClass = noti.type === 'APPROVAL' ? 'fas fa-exclamation-triangle' : 
-                          noti.type === 'HR' ? 'fas fa-user-tie' : 
-                          'fas fa-info-circle';
+        const iconClass = noti.linkType === 'APPROVAL' ? 'fas fa-exclamation-triangle' : 'fas fa-info-circle';
         
-        
-        // 알림 항목 HTML 생성
+        // ⭐ 3. HTML 생성
         const itemHtml = 
-            // 1. 알림 카드 전체 (읽지 않은 알림에만 border-left 강조)
             '<div class="card shadow-sm mb-3 mx-2 ' + cardBorderClass + '" ' + 
-            'data-noti-id="' + noti.id + '">' +
+            'data-noti-id="' + alertIdValue + '">' +
                 
-                // 2. 카드 헤더 (제목 영역)
-                '<div class="card-header py-2 ' + headerBgClass + ' d-flex justify-content-between align-items-center">' +
-                    '<h6 class="m-0 small fw-bold ' + headerTextColor + '">' +
-                        '<i class="' + iconClass + ' me-1 ' + iconColor + '"></i>' + // 헤더 아이콘 색상 설정
-                        headerText +
-                    '</h6>' +
-                    '<small class="m-0 ' + headerTextColor + '">' + formatTime(noti.createdDate) + '</small>' +
-                '</div>' +
+                // 헤더 영역
+	            '<div class="card-header py-2 ' + headerBgClass + ' d-flex justify-content-between align-items-center">' +
+	                '<h6 class="m-0 small fw-bold ' + headerTextColor + '">' +
+	                    '<i class="' + iconClass + ' me-1 ' + iconColor + '"></i>' +
+	                    headerText +
+	                '</h6>' +
+	                
+                    // 삭제 버튼 영역
+	                '<div class="d-flex align-items-center">' +
+	                    '<small class="m-0 ' + headerTextColor + ' me-2">' + formatTime(noti.createdDate) + '</small>' +
+	                    '<button class="btn btn-sm p-0 ' + headerTextColor + '" onclick="deleteNotification(\'' + alertIdValue + '\', event)" title="알림 삭제">' +
+	                        '<i class="fas fa-times"></i>' +
+	                    '</button>' +
+	                '</div>' +
+	            '</div>' +
                 
-                // 3. 카드 본문 (내용 영역, 클릭 시 이동 및 읽음 처리)
-                '<a href="' + (noti.linkId || 'javascript:void(0);') + '" ' + 
+                // 본문 영역 (클릭 시 링크 이동)
+                '<a href="' + targetLink + '" ' + 
                 'class="card-body p-3 text-decoration-none" ' + 
                 'onclick="markOneNotificationAsRead(this, event)">' +
                 '<div>' + 
-	                // 보낸 사람 이름 (작은 텍스트)
 	                '<div class="small text-muted mb-1">' + noti.senderName + '</div>' + 
 	                
-	                // 알림 제목/간략 내용 (굵은 텍스트)
-	                '<p class="mb-0 fw-bold small ' + bodyTextColor + '">' + noti.title + '</p>' +
-	                
-	                // (선택 사항: 긴 내용이 있다면 주석 처리된 부분처럼 추가 가능)
-	                // '<p class="mb-0 small text-truncate" style="max-width: 100%;">' + noti.content + '</p>' +
+	                // ⭐ [핵심] 이제 noti.content에 "제목 + 메시지"가 모두 들어있으므로 이것만 출력하면 됨
+	                '<p class="mb-0 fw-bold small ' + bodyTextColor + '">' + (noti.content || '내용 없음') + '</p>' +
 	                
 	            '</div>' +
                 '</a>' +
@@ -832,7 +864,7 @@ function markOneNotificationAsRead(element, event) {
     if (notiId) {
         // 비동기 요청 (AJAX)으로 읽음 상태 업데이트
         $.ajax({
-            url: '/notification/markAsRead', // 서버 알림 읽음 처리 API
+            url: '/alert/markAsRead', // 서버 알림 읽음 처리 API
             type: 'POST',
             data: { notificationId: notiId }, // 서버에 알림 ID 전송
             success: function(response) {
@@ -858,6 +890,63 @@ function markOneNotificationAsRead(element, event) {
             }
         });
     }
+}
+
+//알림을 서버에서 삭제하고 목록에서 제거하는 함수
+function deleteNotification(notiId, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    
+    console.log("삭제 요청된 알림 ID:", notiId); 
+    
+    if (!notiId || notiId === 'undefined') {
+        console.error("오류: 삭제할 알림 ID가 유효하지 않습니다.");
+        return;
+    }
+    
+    if (!confirm("이 알림을 삭제하시겠습니까?")) {
+        return;
+    }
+    
+    const $card = $('div.card[data-noti-id="' + notiId + '"]');
+
+    $.ajax({
+        url: '/alert/delete', 
+        type: 'POST',
+        data: { alertId : notiId },
+        success: function(response) {
+            if (response === "success") {
+                console.log("✅ 알림 ID " + notiId + " 삭제 처리 완료.");
+                
+                // UI에서 즉시 제거
+                $card.fadeOut(300, function() {
+                    $(this).remove();
+                    
+                    // ⭐⭐⭐ [핵심 수정] 목록이 비었는지 확인하는 로직 삭제 ⭐⭐⭐
+                    // loadNotificationList()가 비동기로 서버에서 데이터를 가져와서
+                    // 목록 갱신 및 목록이 비었을 때 '새 알림 없음' 표시까지 담당하게 합니다.
+                    if (typeof loadNotificationList === 'function') {
+                        loadNotificationList(); 
+                    } else {
+                        console.error("loadNotificationList 함수를 찾을 수 없습니다. 수동 갱신 실패.");
+                    }
+                    
+                    // 헤더 뱃지 갱신이 필요한 경우 호출
+                    if (typeof updateHeaderAlertsBadge === 'function') {
+                        updateHeaderAlertsBadge(); 
+                    }
+                });
+            } else {
+                console.error("❌ 알림 삭제 서버 응답 오류:", response);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("❌ 알림 삭제 통신 실패:", error);
+            alert("알림 삭제에 실패했습니다.");
+        }
+    });
 }
 
 //알림 탭 (쪽지함 왼쪽)의 알림 목록을 로드하는 함수

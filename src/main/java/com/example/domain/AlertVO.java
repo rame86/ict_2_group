@@ -16,4 +16,5 @@ public class AlertVO {
     private String senderName;
     private String sentTime;
     private String content;
+    private String alertStatus;
 }

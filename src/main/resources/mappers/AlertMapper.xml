@@ -4,7 +4,7 @@
 
 <mapper namespace="com.example.repository.AlertDAO">
 
-	<insert id="insertAlert" parameterType="AlertVO">
+    <insert id="insertAlert" parameterType="AlertVO">
 	    <selectKey keyProperty="alertId" resultType="int" order="BEFORE">
 	        SELECT ALERT_SEQ.NEXTVAL FROM DUAL
 	    </selectKey>
@@ -12,12 +12,16 @@
 	        ALERT_ID,
 	        EMP_NO,
 	        LINK_TYPE,
-	        LINK_ID
+	        LINK_ID, 
+	        CONTENT, 
+	        ALERT_STATUS
 	    ) VALUES (
 	        #{alertId}, 
 	        #{empNo},
 	        #{linkType},
-	        #{linkId}
+	        #{linkId}, 
+	        #{content},
+	        #{alertStatus}
 	    )
 	</insert>
 	
@@ -72,7 +76,7 @@
 	        D.DOC_TITLE AS title, 
 	        D.DOC_DATE AS sentTime, 
 	        E.EMP_NAME AS senderName, 
-	        D.DOC_CONTENT AS content 
+	        A.CONTENT AS content,  A.ALERT_STATUS 
 		FROM ALERT A
 	    LEFT JOIN DOC D ON A.LINK_ID = D.DOC_NO AND A.LINK_TYPE = 'APPROVAL' 
 	    LEFT JOIN EMP E ON D.DOC_WRITER = E.EMP_NO    
@@ -80,5 +84,9 @@
 	    ORDER BY A.CREATED_DATE DESC 
 	    FETCH FIRST 50 ROWS ONLY 
     </select>
+    
+    <delete id="deleteAlert" parameterType="map">
+        DELETE FROM ALERT WHERE ALERT_ID = #{alertId} AND EMP_NO = #{empNo}
+    </delete>
 
 </mapper>
