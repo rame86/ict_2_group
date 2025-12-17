@@ -1,0 +1,339 @@
+/* ====== 전체 레이아웃 ====== */
+/* 폰트 전체 통일 (salList 페이지) */
+#layoutSidenav_content,
+#layoutSidenav_content * {
+  font-family: 'SUIT', 'Pretendard', 'Noto Sans KR', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.content-wrapper {
+    padding: 20px 30px;
+}
+
+.emp-info-box {
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+    font-size: 14px;
+}
+
+.mt-4{
+	font-size: 30px;
+	border-bottom: 4px double #869ABF;
+	padding : 0 0 15px;
+	
+}
+
+
+.emp-info-box span {
+    margin-right: 12px;
+}
+
+/* ====== 급여 테이블 기본 스타일 ====== */
+
+table.salary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+table.salary-table thead th {
+    background-color: #f1f1f1;
+    border: 1px solid #dee2e6;
+    padding: 8px 10px;
+    text-align: center;
+    font-weight: 600;
+}
+
+table.salary-table tbody td {
+    border: 1px solid #dee2e6;
+    padding: 8px 10px;
+    text-align: center;
+}
+
+table.salary-table tbody tr:hover {
+    background-color: #fafafa;
+}
+
+/* 지급월 링크 */
+.month-link {
+     cursor: pointer;
+}
+
+/* 지급월 링크 -> 알약 배지 */
+.month-pill{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #C7D2FE;
+  background: #EEF2FF;
+  color: #000000;
+  font-weight: 700;
+  text-decoration: none; /* 밑줄 제거 */
+  transition: transform .12s ease, filter .12s ease, background-color .12s ease;
+}
+
+.month-pill:hover{
+  background: #f0f3ff;
+  filter: brightness(0.98);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.month-pill:active{
+  transform: translateY(0);
+}
+
+.text-muted {
+	text-align: center;
+    color: #6c757d;
+}
+
+/* DataTables 기본 보더 제거 */
+table.dataTable.no-footer {
+    border-bottom: 1px solid #dee2e6;
+}
+
+table.dataTable tbody tr:nth-child(odd),
+table.dataTable tbody tr:nth-child(even) {
+    background-color: #fff;
+}
+
+/* ====== 검색창 스타일 ====== */
+
+.dataTables_filter {
+    text-align: right;
+    margin-bottom: 5px;
+}
+
+.dataTables_filter label {
+    font-size: 14px;
+    color: #333;
+}
+
+.dataTables_filter label > span {
+    display: none; /* Search: 제거 */
+}
+
+.dataTables_filter input {
+    border: 1px solid #ccc !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    width: 180px !important;
+    outline: none !important;
+    transition: 0.2s;
+}
+
+.dataTables_filter input:focus {
+    border-color: #888 !important;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.15);
+}
+
+/* ====== 페이징 버튼 스타일 ====== */
+
+div.dataTables_wrapper div.dataTables_paginate {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.dataTables_paginate .paginate_button {
+    padding: 0px 6px !important;
+    margin-left: 2px;
+    font-size: 12px !important;
+    height: 26px !important;
+    line-height: 26px !important;
+}
+
+/* ====== 데이터 정렬 화살표 ====== */
+
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_asc,
+table.dataTable thead .sorting_desc {
+    background-image: none;
+    position: relative;
+}
+
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_desc:after {
+    content: "▲▼";
+    font-size: 10px;
+    color: #999;
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+table.dataTable thead .sorting_asc:after {
+    content: "▲";
+    color: #666;
+}
+
+table.dataTable thead .sorting_desc:after {
+    content: "▼";
+    color: #666;
+}
+
+/* footer는 아래에 고정 (줄어들지 않게) */
+#layoutSidenav_content footer {
+    flex-shrink: 0;
+}
+
+/* 테이블을 카드처럼 */
+#salTable{
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* 헤더 조금 더 또렷하게 */
+table.salary-table thead th{
+  background-color: #F8FAFC;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+/* hover 효과 살짝 고급스럽게 */
+table.salary-table tbody tr:hover{
+  background-color: #F8FAFF;
+}
+
+/* ===== 사원용 요약 카드 ===== */
+.sal-summary-row{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 14px 0 16px;
+}
+
+.summary-card{
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+}
+
+.summary-label{
+  font-size: 12px;
+  color: #6B7280;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.summary-value{
+  font-size: 20px;
+  font-weight: 900;
+  color: #111827;
+  letter-spacing: -0.2px;
+}
+
+@media (max-width: 1100px){
+  .sal-summary-row{ grid-template-columns: 1fr; }
+}
+
+/* ===== 3단계: 실 지급액 강조 ===== */
+#salTable tbody td:last-child {
+  font-weight: 900;
+  color: #1D4ED8;
+}
+
+
+/* ===== 3단계: 툴팁 힌트 아이콘 ===== */
+.hint{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+  border-radius: 999px;
+  border: 1px solid #D1D5DB;
+  color: #6B7280;
+  font-size: 11px;
+  cursor: help;
+  user-select: none;
+}
+.hint:hover{
+  background: #F3F4F6;
+}
+
+.td-realpay.is-zero{
+  color:#9CA3AF !important;
+  font-weight:700 !important;
+}
+
+/* ===== 3단계 마무리: 숫자 컬럼 오른쪽 정렬 ===== */
+
+/* 총 지급액, 공제 총액, 실 지급액 */
+#salTable tbody td:nth-child(2),
+#salTable tbody td:nth-child(3),
+#salTable tbody td:nth-child(4) {
+  text-align: right;
+  padding-right: 10px;
+}
+
+/* 헤더도 정렬 맞추기 */
+#salTable thead th:nth-child(2),
+#salTable thead th:nth-child(3),
+#salTable thead th:nth-child(4) {
+  text-align: right;
+}
+
+/* 지급월은 그대로 가운데 */
+#salTable tbody td:first-child,
+#salTable thead th:first-child {
+  text-align: center;
+}
+
+/* ===== 정렬 화살표 위치 조정 ===== */
+
+/* 숫자 컬럼 헤더의 정렬 화살표를 더 오른쪽으로 */
+#salTable thead th:nth-child(2).sorting:after,
+#salTable thead th:nth-child(2).sorting_asc:after,
+#salTable thead th:nth-child(2).sorting_desc:after,
+#salTable thead th:nth-child(3).sorting:after,
+#salTable thead th:nth-child(3).sorting_asc:after,
+#salTable thead th:nth-child(3).sorting_desc:after,
+#salTable thead th:nth-child(4).sorting:after,
+#salTable thead th:nth-child(4).sorting_asc:after,
+#salTable thead th:nth-child(4).sorting_desc:after {
+  right: 10px;   /* 기존 6px → 여유 공간 확보 */
+}
+
+/* ===== 지급 상태 배지 ===== */
+.pay-badge{
+  display: inline-block;
+  margin-left: 8px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  vertical-align: middle;
+}
+
+/* 지급 완료 */
+.pay-badge.done{
+  background: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+/* 지급 예정 */
+.pay-badge.planned{
+  background: #FFF7ED;
+  color: #C2410C;
+  border: 1px solid #FED7AA;
+}
+
+/* ===== DataTables 페이징 가운데 정렬 ===== */
+div.dataTables_wrapper div.dataTables_paginate{
+  float: none !important;
+  text-align: center !important;
+  margin-top: 12px;
+}
+

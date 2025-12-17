@@ -11371,3 +11371,8 @@ body {
     max-width: 450px; 
     width: 100%; 
 }
+
+#notificationListContainer {
+	max-height : 700px;
+	overflow: auto;
+}

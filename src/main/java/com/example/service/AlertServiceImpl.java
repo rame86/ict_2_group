@@ -35,4 +35,9 @@ public class AlertServiceImpl implements AlertService {
 		alertDao.markAllAsRead(empNo);
 	}
 
+	@Override
+	public List<AlertVO> getAllAlertView(String empNo) {
+		return alertDao.selectAllLatestAlerts(empNo);
+	}
+
 }

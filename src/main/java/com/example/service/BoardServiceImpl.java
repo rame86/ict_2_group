@@ -1,7 +1,6 @@
 package com.example.service;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,44 +17,47 @@ public class BoardServiceImpl implements BoardService {
 	@Autowired
 	private BoardDAO boardDAO;
 
-	// 공지영역~
-
-	public List<NoticeBoardVO> getNoticeBoardList() {
-		return boardDAO.getNoticeBoardList();
+	// 1. 전체 조회
+	public List<NoticeBoardVO> getGlobalNoticeList() {
+		return boardDAO.getGlobalNoticeList();
 	}
 
+	public List<FreeBoardVO> getGlobalFreeBoardList() {
+		return boardDAO.getGlobalFreeBoardList();
+	}
+
+	// 2. 부서별 조회 (계층형)
+	public List<NoticeBoardVO> getDeptNoticeList(Integer deptNo) {
+		return boardDAO.getDeptNoticeList(deptNo);
+	}
+
+	public List<FreeBoardVO> getDeptFreeBoardList(Integer deptNo) {
+		return boardDAO.getDeptFreeBoardList(deptNo);
+	}
+
+	// CRUD
 	public String insertNoticeBoard(NoticeBoardVO vo) {
 		return boardDAO.insertNoticeBoard(vo);
-	};
+	}
 
 	public String updateNoticeBoard(NoticeBoardVO vo) {
 		return boardDAO.updateNoticeBoard(vo);
-	};
+	}
 
 	public NoticeBoardVO getContentNoticeBoard(String noticeNo) {
-		// 게시글 카운트 증가~
 		boardDAO.updateNoticeCnt(noticeNo);
 		return boardDAO.getContentNoticeBoard(noticeNo);
 	}
 
-	//=======================
-	// 자게영역~
-
-	public List<FreeBoardVO> getFreeBoardList() {
-		return boardDAO.getFreeBoardList();
-
+	public String insertFreeBoard(FreeBoardVO vo) {
+		return boardDAO.insertFreeBoard(vo);
 	}
 
-		public String insertFreeBoard(FreeBoardVO vo) {
-		return boardDAO.insertFreeBoard(vo);
-	};
-
-   	public String updateFreeBoard(FreeBoardVO vo) {
+	public String updateFreeBoard(FreeBoardVO vo) {
 		return boardDAO.updateFreeBoard(vo);
-	};
+	}
 
 	public FreeBoardVO getContentFreeBoard(String boardNo) {
-		// 게시글 카운트 올리기~
 		boardDAO.updateFreeBoardCnt(boardNo);
 		return boardDAO.getContentFreeBoard(boardNo);
 	}

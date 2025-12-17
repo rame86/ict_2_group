@@ -11,5 +11,6 @@ public class FreeBoardVO {
 	private String boardDate;	
 	private String boardTitle;
 	private Integer boardCnt;
-
+	private Integer deptNo;
+	private String deptName;
 }

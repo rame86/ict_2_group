@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -35,8 +36,6 @@ public class SalAdminController {
     @Autowired private EmpService empService;
     @Autowired private DeptService deptService;
 
-   
-    
     /** 관리자 여부 */
     private boolean isAdmin(HttpSession session) {
         LoginVO login = (LoginVO) session.getAttribute("login");
@@ -45,7 +44,6 @@ public class SalAdminController {
 
     /* =========================================================
        🔹 관리자용 급여 목록 (/sal/admin/list)
-       - 월/부서/초과근무 필터 + 정렬 + 요약 카드
        ========================================================= */
     @GetMapping("/list")
     public String adminSalList(@RequestParam(required = false) String month,
@@ -57,45 +55,28 @@ public class SalAdminController {
                                @RequestParam(required = false, defaultValue = "desc") String dir,
                                HttpSession session,
                                Model model) {
-    	
-    	
 
         if (!isAdmin(session)) {
             return "error/NoAuthPage";
         }
 
-        // MyBatis 파라미터
         Map<String, Object> param = new HashMap<>();
-        param.put("month", month);                 // "2025-11"
-        param.put("deptNo", deptNo);               // 부서번호
-        param.put("onlyOvertime", onlyOvertime);   // 초과근무자만
+        param.put("month", month);
+        param.put("deptNo", deptNo);
+        param.put("onlyOvertime", onlyOvertime);
         param.put("excludeRetired", excludeRetired);
         param.put("excludeDeletePlanned", excludeDeletePlanned);
+        param.put("sort", sort);
+        param.put("dir", dir);
 
-        param.put("sort", sort);                   // empNo / name / dept / date
-        param.put("dir", dir);                     // asc / desc
-
-        // 목록
         List<SalVO> salList = salService.getAdminSalList(param);
-
-        // 요약(총/평균/인원)
         Map<String, Object> summary = salService.getAdminSalSummary(param);
-        model.addAttribute("summary", summary);
-        
-
-        // 부서 목록(필터용)
         List<DeptVO> deptList = deptService.getDeptList();
 
-        log.info("[adminSalList] month={}, deptNo={}, onlyOvertime={}, sort={}, dir={}, size={}",
-                month, deptNo, onlyOvertime, sort, dir, (salList != null ? salList.size() : 0));
-
-        // 모델 세팅
         model.addAttribute("salList", salList);
         model.addAttribute("summary", summary);
         model.addAttribute("deptList", deptList);
-        
 
-        // 검색 조건 유지용
         model.addAttribute("searchMonth", month);
         String periodLabel = (month == null || month.isBlank()) ? "전체 기간 기준" : month + " 기준";
         model.addAttribute("periodLabel", periodLabel);
@@ -107,14 +88,13 @@ public class SalAdminController {
 
         model.addAttribute("sort", sort);
         model.addAttribute("dir", dir);
-
         model.addAttribute("menu", "saladmin");
-        
+
+        log.info("[adminSalList] month={}, deptNo={}, onlyOvertime={}, sort={}, dir={}, size={}",
+                month, deptNo, onlyOvertime, sort, dir, (salList != null ? salList.size() : 0));
         log.info("[summary] {}", summary);
 
-        // ✅ 카드 있는 JSP로 고정 (너희 프로젝트 파일명에 맞게)
         return "sal/adminList";
-        
     }
 
     /* =========================================================
@@ -141,8 +121,7 @@ public class SalAdminController {
     }
 
     /* =========================================================
-       🔹 관리자용 급여 목록 엑셀(CSV) 다운로드
-       - /sal/admin/export?month=2025-11&deptNo=10&onlyOvertime=true
+       🔹 관리자용 급여 목록 엑셀(CSV) 다운로드 (/sal/admin/export)
        ========================================================= */
     @GetMapping("/export")
     public void exportAdminSalary(@RequestParam(required = false) String month,
@@ -165,10 +144,6 @@ public class SalAdminController {
         param.put("excludeRetired", excludeRetired);
         param.put("excludeDeletePlanned", excludeDeletePlanned);
 
-        // export도 정렬이 필요하면 아래 2줄 추가 가능
-        // param.put("sort", "date");
-        // param.put("dir", "desc");
-
         List<SalVO> salList = salService.getAdminSalList(param);
 
         String fileName = "salary_" + (month != null && !month.isEmpty() ? month : "all") + ".csv";
@@ -178,10 +153,7 @@ public class SalAdminController {
         response.setHeader("Content-Disposition", "attachment; filename=\"" + encoded + "\"");
 
         try (PrintWriter writer = response.getWriter()) {
-        	
-        	// ✅ UTF-8 BOM 추가 (엑셀 한글 깨짐 방지 핵심!)
-            writer.write('\uFEFF');
-            // 헤더
+            writer.write('\uFEFF'); // BOM
             writer.println("지급월,사번,이름,부서,기본급,초과근무수당,성과급,기타수당,공제합계,실지급액");
 
             for (SalVO s : salList) {
@@ -201,8 +173,59 @@ public class SalAdminController {
         }
     }
 
-    /** null 방지용 숫자 변환 (CSV용) */
     private long n(Integer v) {
         return (v == null) ? 0L : v.longValue();
+    }
+
+    /* =========================================================
+       ✅ 관리자 급여 정정 (마감용 최종)
+       GET  /sal/admin/edit?salNum=...
+       POST /sal/admin/edit
+       저장 후 /sal/admin/list 로 복귀
+       ========================================================= */
+
+    @GetMapping("/edit")
+    public String editForm(@RequestParam int salNum,
+                           HttpSession session,
+                           Model model) {
+
+        if (!isAdmin(session)) {
+            return "error/NoAuthPage";
+        }
+
+        SalVO sal = salService.getSalDetailBySalNum(salNum);
+        if (sal == null) {
+            model.addAttribute("msg", "해당 급여 데이터가 없습니다.");
+            return "error/NoDataPage";
+        }
+
+        model.addAttribute("sal", sal);
+        model.addAttribute("menu", "saladmin");
+        return "sal/adminEdit";
+    }
+
+    @PostMapping("/edit")
+    public String editSubmit(@RequestParam int salNum,
+                             @RequestParam int salBase,
+                             @RequestParam int salBonus,
+                             @RequestParam int salPlus,
+                             @RequestParam int overtimePay,
+                             @RequestParam int insurance,
+                             @RequestParam int tax,
+                             @RequestParam String editReason,
+                             HttpSession session) {
+
+        if (!isAdmin(session)) {
+            return "error/NoAuthPage";
+        }
+
+        LoginVO login = (LoginVO) session.getAttribute("login");
+        String editorEmpNo = login.getEmpNo();
+
+        salService.editSalaryWithHistory(
+            salNum, salBase, salBonus, salPlus, overtimePay, insurance, tax, editReason, editorEmpNo
+        );
+
+        return "redirect:/sal/admin/list";
     }
 }

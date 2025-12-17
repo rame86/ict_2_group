@@ -53,6 +53,7 @@
 	<script src="/js/websocket.js"></script>
 	<script>
 		const currentEmpNoFromJSP = '${ sessionScope.login.empNo }';
+		const CONTEXT_PATH = "${pageContext.request.contextPath}";
 		$(document).ready(function() {
 			updateSidebarBadge();
 			// 전자결재 사이드바 알람
@@ -61,7 +62,7 @@
 	</script>
 	<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
 		<!-- Navbar Brand-->
-		<a class="navbar-brand ps-3" href="/index.html">PEOPLE CYNC</a>
+		<a class="navbar-brand ps-3" href="/">PEOPLE CYNC</a>
 		<!-- Sidebar Toggle-->
 		<button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
 			id="sidebarToggle" href="#!">
@@ -113,7 +114,7 @@
 					</div>
 
 					<li><hr class="dropdown-divider my-0" /></li>
-					<li><a class="dropdown-item text-center small text-gray-500 py-2" href="/notification/allList"> 모든 알림 보기 </a></li>
+					<li><a class="dropdown-item text-center small text-gray-500 py-2" href="/message/messageList"> 모든 알림 보기 </a></li>
 				</ul>
 			</li>
 

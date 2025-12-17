@@ -9,4 +9,5 @@ public interface AlertDAO {
 	List<AlertVO> selectLatestAlerts(String empNo);
 	void markAllAsRead(String empNo);
 	int selectUnreadCount(String empNo);
+	List<AlertVO> selectAllLatestAlerts(String empNo);
 }

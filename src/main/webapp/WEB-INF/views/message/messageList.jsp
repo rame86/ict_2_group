@@ -51,8 +51,29 @@ small {
 					<h3 class="mt-4">쪽지함</h3><br>
 					
 					<div class="row">
+						<div class="col-xl-3 col-lg-4">
+								
+						 	<div id="notificationListContainer">
+						        <div class="card shadow-sm mb-3 mx-2 border-left-danger" data-noti-id="1">
+	    							
+									    <div class="card-header py-2 bg-primary d-flex justify-content-between align-items-center">
+									        <h6 class="m-0 small fw-bold text-white">
+									            <i class="fas fa-exclamation-triangle me-1 text-white"></i> 미확인 알림
+									        </h6>
+									        <small class="m-0 text-white">방금 전</small>
+									    </div>
+								    
+								    
+								    <a href="#" class="card-body p-3 text-decoration-none" onclick="markOneNotificationAsRead(this, event)">
+								        <p class="mb-0 small text-dark">홍길동 사원의 휴가 신청 결재 요청이 도착했습니다. 확인 부탁드립니다.</p>
+								    </a>
+								    
+								</div>
+							</div>
+											
+					    </div>
     
-				        <div class="col-xl-4 col-lg-5">
+				        <div class="col-xl-3 col-lg-4">
 						    <div class="card shadow mb-4" style="height: 700px;">
 						        <div class="card-header py-3 d-flex justify-content-between align-items-center">
 						            
@@ -71,7 +92,7 @@ small {
 						    </div>
 						</div>
 
-				        <div class="col-xl-8 col-lg-7">
+				        <div class="col-xl-6 col-lg-4">
 				            <div class="card shadow mb-4" style="height: 700px;">
 				                <div class="card-header py-3">
 				                    <h6 class="m-0 font-weight-bold text-primary" id="chatWindowHeader">김철수 사원과의 대화</h6>
@@ -89,7 +110,7 @@ small {
 				                    <div class="d-flex justify-content-end mb-3">
 				                        <div class="p-2 rounded bg-primary text-white" style="max-width: 60%;">
 				                            네, 지금 바로 확인하겠습니다.
-				                            <div class="text-left small mt-1" style="color: rgba(255, 255, 255, 0.7);">오전 10:01</div>
+				                            <div class="text-left small mt-1">오전 10:01</div>
 				                        </div>
 				                    </div>
 				
@@ -145,6 +166,21 @@ small {
 let currentSubscription = null; // 현재 구독 중인 채널을 관리하기 위한 변수
 let currentReceiverEmpNo = null; // 현재 대화 상대 ID
 
+function createDateSeparatorHtml(dateString) {
+    const date = new Date(dateString);
+    // 한국어 형식으로 날짜 포맷 (예: 2025년 12월 16일 화요일)
+    const dateText = date.toLocaleDateString('ko-KR', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric', 
+        weekday: 'short' 
+    });
+    
+    console.log(dateText);
+    // 날짜 구분선 스타일
+    return '<div class="text-center my-3 small text-muted">--- ' + dateText + ' ---</div>';
+}
+
 //------------------------------------
 //💡 유틸리티 및 채팅방 로직 (유지)
 //------------------------------------
@@ -195,7 +231,7 @@ function renderConversationList(list) {
      const positionText = conv.otherUserPosition || ''; 
      // 직책을 이름과 분리하여 작게 표시하기 위해 괄호를 제거합니다.
      const positionHtml = positionText ? '<span class="text-muted fw-normal ms-1 conversation-position">' + positionText + '</span>' : '';
-
+     const otherUserImagePath = CONTEXT_PATH + '/upload/emp/' + (conv.otherUserImage || 'profile_placeholder.png');
 
      // 4. HTML 항목 생성 (가독성 개선)
      const itemHtml = 
@@ -206,7 +242,7 @@ function renderConversationList(list) {
          'onclick="loadChatWindow(\'' + conv.otherUserId + '\', \'' + conv.otherUserName + '\')">' + 
              
              '<div class="d-flex align-items-center">' +
-                 '<img src="/img/profile_placeholder.png" class="rounded-circle profile-img-small" alt="프로필">' +
+                 '<img src="'+ otherUserImagePath +'" class="rounded-circle profile-img-small" alt="프로필">' +
                  
                  '<div class="w-100">' +
                      
@@ -329,52 +365,90 @@ function loadChatWindow(otherUserId, otherUserName) {
 
 //대화 내용 렌더링 (유지)
 function renderChatMessages(messages, currentOtherUserId) {
- // ... (기존 renderChatMessages 로직 유지) ...
- // 이 함수는 header-notifications.js로 옮길 필요 없습니다.
  
 	const chatContainer = $('#messageArea');
- chatContainer.empty(); 
+	chatContainer.empty(); 
  
- const myUserId = '${login.empNo}';
-
- if (!messages || messages.length === 0) {
-     chatContainer.html('<div class="p-5 text-center text-muted">아직 대화가 없습니다. 새로운 메시지를 보내보세요!</div>');
-     return;
- }
+	const myUserId = '${login.empNo}';
+	
+	if (!messages || messages.length === 0) {
+		chatContainer.html('<div class="p-5 text-center text-muted">아직 대화가 없습니다. 새로운 메시지를 보내보세요!</div>');
+		return;
+	}
+	
+	const defaultImageSrc = CONTEXT_PATH + '/img/profile_placeholder.png';
+	
+	const $otherUserListItem = $(".list-group-item[data-other-id='" + currentOtherUserId + "']");
+	const otherUserImageFile = $otherUserListItem.find('img').attr('src');
+	
+	let otherUserImageSrc;
+	
+	if (otherUserImageFile) {
+		otherUserImageSrc = otherUserImageFile;
+		console.log(otherUserImageSrc);
+    } else {
+        otherUserImageSrc = defaultImageSrc;
+        console.warn("WARN: 상대방 이미지 경로를 찾을 수 없어 기본 이미지를 사용합니다.", currentOtherUserId);
+    }
+	
+	let lastDate = null;
+	let lastSenderId = null;
  
- messages.forEach(message => {
+	messages.forEach(message => {
  	
- 	console.log("처리 중인 메시지 내용:", message.msgContent);
- 	
+		const currentDateString = new Date(message.sendDate).toDateString();
+		
+		if (currentDateString !== lastDate) {
+            chatContainer.append(createDateSeparatorHtml(message.sendDate));
+            lastSenderId = null;
+        }
+		
+		lastDate = currentDateString;
+		
 		// 메시지 발신자가 '나'인지 '상대방'인지 판단
-     const isMyMessage = (message.senderEmpNo === myUserId);
+		const isMyMessage = (message.senderEmpNo === myUserId);
+		const showImage = !isMyMessage && (message.senderEmpNo !== lastSenderId);
+		
+		if (showImage) {
+			console.log('=== 이미지 렌더링 시점 데이터 확인 ===');
+			console.log('1. 메시지 내용:', message.msgContent);
+			console.log('2. 넣으려는 이미지 경로(otherUserImageSrc):', otherUserImageSrc);
+			// 여기서 otherUserImageSrc가 비어있다면, 위에서 변수 할당이 잘못된 것입니다.
+		}
      
-     // CSS 클래스 설정
-     const alignmentClass = isMyMessage ? 'justify-content-end' : 'justify-content-start';
-     const bubbleClass = isMyMessage ? 'bg-primary text-white' : 'bg-light';
+		// CSS 클래스 설정
+		const alignmentClass = isMyMessage ? 'justify-content-end' : 'justify-content-start';
+		const bubbleClass = isMyMessage ? 'bg-primary text-white' : 'bg-light';
+		const timeAlignmentClass = isMyMessage ? 'text-end' : 'text-start';
      
-     // 시간 형식 변환
-     let timeString = '';
-     if (message.sendDate) {
-         const date = new Date(message.sendDate);
-         if (!isNaN(date.getTime())) {
-             timeString = date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-         }
-     }
+		// 시간 형식 변환
+		let timeString = '';
+		if (message.sendDate) {
+			const date = new Date(message.sendDate);
+			if (!isNaN(date.getTime())) {
+				timeString = date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+			}
+		}
+		
+		const profileImageHtml = showImage 
+        ? '<img src="' + otherUserImageSrc + '" class="rounded-circle" style="width: 35px; height: 35px; margin-right: 8px;" alt="' + currentOtherUserId + ' 프로필">'
+        : '<div style="width: 35px; height: 35px; margin-right: 8px;"></div>';
      
-  	// 메시지 HTML 생성
-     const messageHtml =
-     	'<div class="d-flex ' + alignmentClass + ' mb-3">' +
-	            '<div class="message-bubble-container" style="display: inline-block; max-width: 70%;">' + 
-	                '<div class="message-bubble p-2 rounded ' + bubbleClass + '">' +
-	                    message.msgContent + 
+		// 메시지 HTML 생성
+		const messageHtml =
+			'<div class="d-flex ' + alignmentClass + ' mb-3">' +
+			(!isMyMessage ? profileImageHtml : '') +
+				'<div class="message-bubble-container" style="display: inline-block; max-width: 70%;">' + 
+					'<div class="message-bubble p-2 rounded ' + bubbleClass + '">' +
+						message.msgContent + 
 	                '</div>' +
-	                '<div class="text-end text-muted small mt-1">' + timeString +
+					'<div class="' + timeAlignmentClass + ' text-muted small mt-1">' + timeString +
 	                '</div>' +
 	            '</div>' +
-	        '</div>';
+			'</div>';
 			
 		chatContainer.append(messageHtml);
+		lastSenderId = message.senderEmpNo;
  });
  
 }
@@ -417,59 +491,103 @@ function sendMessage(){
 
 }
 
-//새 메시지 추가 및 실시간 읽음 처리 (유지)
+//새 메시지 추가 및 실시간 읽음 처리 (그룹화 로직 적용됨)
 function appendNewMessageToChat(messageVO, myEmpNo) {
- const chatContainer = $('#messageArea');
+	
+	const chatContainer = $('#messageArea');
  
- // ... (기존 HTML 생성 로직 유지) ...
+	const isMyMessage = messageVO.senderEmpNo === myEmpNo;
+ 	const alignmentClass = isMyMessage ? 'justify-content-end' : 'justify-content-start';
+ 	const bubbleClass = isMyMessage ? 'bg-primary text-white' : 'bg-light';
+ 	const timeAlignmentClass = isMyMessage ? 'text-end' : 'text-start';
  
- const isMyMessage = messageVO.senderEmpNo === myEmpNo;
- 
- const alignmentClass = isMyMessage ? 'justify-content-end' : 'justify-content-start';
- const bubbleClass = isMyMessage ? 'bg-primary text-white' : 'bg-light';
- 
- let timeString = '';
- if (messageVO.sendDate) { 
-     try {
-         const date = new Date(messageVO.sendDate);
-         if (!isNaN(date.getTime())) {
-             timeString = date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-         }
-     } catch (e) {
-         timeString = '시간 오류';
-     }
- }
- 
- const messageHtml =
-     '<div class="d-flex ' + alignmentClass + ' mb-3">' +
+ 	// 1. 시간 포맷팅
+ 	let timeString = '';
+ 	let dateObj;
+    if (messageVO.sendDate instanceof Date) {
+        dateObj = messageVO.sendDate;
+    } else {
+        dateObj = new Date(messageVO.sendDate);
+    }
+ 	
+    if (!isNaN(dateObj.getTime())) {
+    	timeString = dateObj.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    } else {
+    	if(isMyMessage){
+    		timeString = new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    	} else {
+    		timeString = '시간 정보 없음';
+    	}
+    }
+    
+    // 💡 [그룹화 핵심 로직] ---------------------------------------------------
+    // 화면에 있는 '가장 마지막 메시지'를 가져옵니다.
+    const $lastMessage = chatContainer.children('.d-flex').last();
+    
+    // 마지막 메시지가 '상대방(justify-content-start)'이 보낸 것인지 확인합니다.
+    const isLastMessageFromOther = $lastMessage.length > 0 && $lastMessage.hasClass('justify-content-start');
+    
+    // 이미지를 보여줄지 결정합니다.
+    // 1. 내 메시지면 안 보여줌
+    // 2. 상대방 메시지인데, 바로 위 메시지도 상대방 거면(연속) 안 보여줌 (Spacer 사용)
+    const showImage = !isMyMessage && !isLastMessageFromOther;
+    // ----------------------------------------------------------------------
+    
+	// 2. 이미지 경로 가져오기
+    const currentOtherUserId = currentReceiverEmpNo;
+	const defaultImageSrc = CONTEXT_PATH + '/img/profile_placeholder.png';
+	
+    // (기존 방식 유지) 리스트에서 이미지 경로 추출
+	const $otherUserListItem = $(".list-group-item[data-other-id='" + currentOtherUserId + "']");
+	const otherUserImageFile = $otherUserListItem.find('img').attr('src');
+	let otherUserImageSrc = otherUserImageFile ? otherUserImageFile : defaultImageSrc;
+	
+    // 3. 프로필 이미지 HTML 생성 (showImage 변수에 따라 결정)
+    let profileImageHtml = '';
+    
+    if (!isMyMessage) {
+        if (showImage) {
+            // 새 그룹의 시작: 이미지 표시
+             profileImageHtml = '<img src="' + otherUserImageSrc + '" class="rounded-circle" style="width: 35px; height: 35px; margin-right: 8px;" alt="' + currentOtherUserId + ' 프로필">';
+        } else {
+            // 연속된 메시지: 빈 공간(Spacer) 표시
+             profileImageHtml = '<div style="width: 35px; height: 35px; margin-right: 8px;"></div>';
+        }
+    }
+    // 내 메시지일 경우 profileImageHtml은 빈 문자열('')
+ 	 
+    // 4. 전체 HTML 조립
+ 	const messageHtml =
+		'<div class="d-flex ' + alignmentClass + ' mb-3">' +
+		(!isMyMessage ? profileImageHtml : '') + // 여기에 이미지 혹은 빈 공간이 들어갑니다.
          '<div class="message-bubble-container" style="display: inline-block; max-width: 70%;">' + 
              '<div class="message-bubble p-2 rounded ' + bubbleClass + '">' + 
                  messageVO.msgContent + 
              '</div>' +
-             '<div class="text-end text-muted small mt-1">' + timeString +
+             '<div class="' + timeAlignmentClass + ' text-muted small mt-1">' + timeString +
              '</div>' +
          '</div>' +
      '</div>';
      
- chatContainer.append(messageHtml);
- chatContainer.scrollTop(chatContainer[0].scrollHeight);
+    chatContainer.append(messageHtml);
+    chatContainer.scrollTop(chatContainer[0].scrollHeight);
  
- if (!isMyMessage) {
-     if (currentReceiverEmpNo) {
-         $.ajax({
-             url: '/chat/markAsRead',
-             type: 'POST',
-             data: { otherUserId: currentReceiverEmpNo },
-             success: function(response) {
-                 if (response === "success") {
-                     console.log("✅ 채팅 중 실시간 읽음 처리 성공.");
-                     // 💡 loadConversationList 호출 (헤더 파일의 전역 함수 사용)
-                     loadConversationList(myEmpNo); 
-                 }
-             }
-         });
-     }
- }
+    // 5. 읽음 처리
+    if (!isMyMessage) {
+        if (currentReceiverEmpNo) {
+            $.ajax({
+                url: '/chat/markAsRead',
+                type: 'POST',
+                data: { otherUserId: currentReceiverEmpNo },
+                success: function(response) {
+                    if (response === "success") {
+                        console.log("✅ 채팅 중 실시간 읽음 처리 성공.");
+                        loadConversationList(myEmpNo); 
+                    }
+                }
+            });
+        }
+    }
  
 }
 
@@ -509,11 +627,15 @@ function renderSearchResults(employees, container) {
     // 현재 로그인 사용자 ID (본인 제외를 위해 사용)
     const myEmpNo = $('#sessionEmpNo').val();
     
+    const defaultImagePath = CONTEXT_PATH + '/img/profile_placeholder.png';
+    
     employees.forEach(emp => {
     	console.log(emp);
         const empNo = emp.empNo;
         const empName = emp.name;
-        const positionDept = (emp.position || '') + (emp.dept ? ' (' + emp.dept + ')' : '');
+        const profileImagePath = (emp.empImage && emp.empImage !== 'null')
+	        ? CONTEXT_PATH + '/upload/emp/' + emp.empImage
+	        : defaultImagePath;
 
         // 🚨 검색 결과에서 자기 자신 제외 (선택 사항)
         if (empNo === myEmpNo) {
@@ -528,7 +650,7 @@ function renderSearchResults(employees, container) {
             
                 '<div class="d-flex align-items-center justify-content-between">' + 
                     '<div class="d-flex align-items-center me-2" style="width: 50%; min-width: 50%; flex-shrink: 0;">' + 
-                        '<img src="/images/sorry.gif" class="rounded-circle" style="width: 35px; height: 35px; margin-right: 10px;" alt="프로필">' +
+                        '<img src="' + profileImagePath + '" class="rounded-circle" style="width: 35px; height: 35px; margin-right: 10px;" alt="프로필">' +
                         
                         '<div class="d-flex flex-column gap-2">' + 
                             '<h6 class="mb-0 fw-bold text-dark text-truncate" style="font-size: 0.95rem; line-height: 1.2;">' + emp.empName  + ' ( ' + emp.empNo + ' ) ' + '</h6>' +
@@ -594,7 +716,180 @@ $(document).ready(function() {
         }
     });
     
+    // 알람창!
+    if (typeof loadNotificationList === 'function') {
+        console.log("🚀 [READY] 페이지 로드 완료. 알림 목록 로드 시작.");
+        loadNotificationList();
+    } else {
+        console.error("❌ [ERROR] loadNotificationList 함수가 정의되지 않았습니다.");
+    }
+    
 });
+
+// 알람창
+function renderNotifications(notifications) {
+    
+    console.log("🎨 [RENDER] renderNotifications 함수 실행. 데이터:", notifications); 
+    
+    const container = $('#notificationListContainer');
+    container.empty();
+    
+    if (!notifications || notifications.length === 0) {
+        container.html('<div class="p-3 text-center text-muted">새로운 알림이 없습니다.</div>');
+        console.log("🎨 [RENDER] 알림 데이터가 없어 '새로운 알림 없음' 표시");
+        return;
+    }
+
+    notifications.forEach(noti => {
+        // ⭐ [중요] 서버의 AlertVO와 isRead 필드가 'Y' 또는 'N' 형태인지 확인합니다.
+        const isRead = noti.isRead === 'Y'; 
+        
+        // 카드 스타일 설정: 읽음 상태에 따라 다르게 설정
+        const cardBorderClass = isRead ? 'border-left-danger' : 'border-left-danger';
+        const headerBgClass = isRead ? 'bg-light' : 'bg-primary'; 
+        const headerTextColor = isRead ? 'text-muted' : 'text-white';
+        const bodyTextColor = isRead ? 'text-muted' : 'text-dark';
+        
+        // 아이콘 및 텍스트 설정
+        const headerText = isRead ? '확인됨' : '미확인 알림';
+        const iconColor = isRead ? 'text-dark' : 'text-white';
+        const iconClass = noti.type === 'APPROVAL' ? 'fas fa-exclamation-triangle' : 
+                          noti.type === 'HR' ? 'fas fa-user-tie' : 
+                          'fas fa-info-circle';
+        
+        
+        // 알림 항목 HTML 생성
+        const itemHtml = 
+            // 1. 알림 카드 전체 (읽지 않은 알림에만 border-left 강조)
+            '<div class="card shadow-sm mb-3 mx-2 ' + cardBorderClass + '" ' + 
+            'data-noti-id="' + noti.id + '">' +
+                
+                // 2. 카드 헤더 (제목 영역)
+                '<div class="card-header py-2 ' + headerBgClass + ' d-flex justify-content-between align-items-center">' +
+                    '<h6 class="m-0 small fw-bold ' + headerTextColor + '">' +
+                        '<i class="' + iconClass + ' me-1 ' + iconColor + '"></i>' + // 헤더 아이콘 색상 설정
+                        headerText +
+                    '</h6>' +
+                    '<small class="m-0 ' + headerTextColor + '">' + formatTime(noti.createdDate) + '</small>' +
+                '</div>' +
+                
+                // 3. 카드 본문 (내용 영역, 클릭 시 이동 및 읽음 처리)
+                '<a href="' + (noti.linkId || 'javascript:void(0);') + '" ' + 
+                'class="card-body p-3 text-decoration-none" ' + 
+                'onclick="markOneNotificationAsRead(this, event)">' +
+                '<div>' + 
+	                // 보낸 사람 이름 (작은 텍스트)
+	                '<div class="small text-muted mb-1">' + noti.senderName + '</div>' + 
+	                
+	                // 알림 제목/간략 내용 (굵은 텍스트)
+	                '<p class="mb-0 fw-bold small ' + bodyTextColor + '">' + noti.title + '</p>' +
+	                
+	                // (선택 사항: 긴 내용이 있다면 주석 처리된 부분처럼 추가 가능)
+	                // '<p class="mb-0 small text-truncate" style="max-width: 100%;">' + noti.content + '</p>' +
+	                
+	            '</div>' +
+                '</a>' +
+                
+            '</div>';
+            
+        container.append(itemHtml);
+    });
+}
+
+// 알림창 시간 포맷팅 함수 (예: '방금 전', '1일 전')
+function formatTime(sendDate) {
+    if (!sendDate) return '';
+    
+    try {
+        const now = new Date();
+        const sent = new Date(sendDate);
+        const diffInSeconds = Math.floor((now - sent) / 1000);
+
+        if (diffInSeconds < 60) {
+            return '방금 전';
+        } else if (diffInSeconds < 3600) { // 1시간 미만
+            return Math.floor(diffInSeconds / 60) + '분 전';
+        } else if (diffInSeconds < 86400) { // 24시간 미만
+            return Math.floor(diffInSeconds / 3600) + '시간 전';
+        } else if (diffInSeconds < 604800) { // 7일 미만
+             return Math.floor(diffInSeconds / 86400) + '일 전';
+        } else {
+            // 7일 이상은 날짜 표시
+            return sent.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\./g, '.');
+        }
+    } catch (e) {
+        return sendDate;
+    }
+}
+
+//알림 상세 페이지 이동 시 읽음 처리하는 함수
+function markOneNotificationAsRead(element, event) {
+    // <a> 태그의 부모인 .card 엘리먼트에서 data-noti-id를 가져옵니다.
+    const $card = $(element).closest('.card');
+    const notiId = $card.data('noti-id');
+    
+    // 1. 알림 ID가 유효한 경우에만 읽음 처리 요청
+    if (notiId) {
+        // 비동기 요청 (AJAX)으로 읽음 상태 업데이트
+        $.ajax({
+            url: '/notification/markAsRead', // 서버 알림 읽음 처리 API
+            type: 'POST',
+            data: { notificationId: notiId }, // 서버에 알림 ID 전송
+            success: function(response) {
+                console.log("✅ 알림 ID " + notiId + " 읽음 처리 완료.");
+                
+                // UI 갱신: card 스타일 변경 (읽음 상태로 변경)
+                $card.removeClass('border-left-danger');
+                $card.find('.card-header').removeClass('bg-primary').addClass('bg-light');
+                $card.find('.card-header h6').removeClass('text-white').addClass('text-muted');
+                $card.find('.card-header i').removeClass('text-white').addClass('text-dark');
+                $card.find('.card-header small').removeClass('text-white').addClass('text-muted');
+                $card.find('.card-body p').removeClass('text-dark').addClass('text-muted');
+                $card.find('.card-header h6').html('<i class="fas fa-info-circle me-1 text-dark"></i> 확인됨');
+                
+                // 헤더 뱃지 갱신이 필요한 경우 호출
+                if (typeof updateHeaderAlertsBadge === 'function') {
+                    updateHeaderAlertsBadge(); 
+                }
+                
+            },
+            error: function(xhr, status, error) {
+                console.error("❌ 알림 ID " + notiId + " 읽음 처리 실패:", error);
+            }
+        });
+    }
+}
+
+//알림 탭 (쪽지함 왼쪽)의 알림 목록을 로드하는 함수
+function loadNotificationList() {
+    
+    // [중요] JSP 코드의 알림 탭 영역에 id="notificationListContainer"가 있다고 가정합니다.
+    const $listContainer = $('#notificationListContainer'); 
+    
+    // 로딩 상태 표시
+    $listContainer.html('<div class="p-3 text-center text-primary">알림 목록을 불러오는 중...</div>');
+
+    $.ajax({
+        url: '/alert/allLatestView', // ⭐ 기존 AlertController의 엔드포인트 사용
+        type: 'GET',
+        dataType: 'json',
+        success: function(notifications) {
+            console.log("✅ 알림 목록 로드 성공:", notifications);
+            
+            // 기존에 정의된 renderNotifications 함수를 호출하여 목록 렌더링
+            if (typeof renderNotifications === 'function') {
+                renderNotifications(notifications);
+            } else {
+                 console.error("renderNotifications 함수가 정의되지 않았습니다.");
+                 $listContainer.html('<div class="p-3 text-center text-danger">렌더링 오류 발생</div>');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error("❌ 알림 목록 로드 실패:", status, error);
+            $listContainer.html('<div class="p-3 text-center text-danger">알림 목록 로드 실패: 서버 연결 확인 필요</div>');
+        }
+    });
+}
 
 </script>
 </html>

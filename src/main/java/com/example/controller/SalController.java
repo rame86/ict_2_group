@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
 import com.example.domain.EmpVO;
 import com.example.domain.LoginVO;
+import com.example.domain.SalEditVO;
 import com.example.domain.SalVO;
 
 import com.example.service.EmpService;
@@ -34,7 +36,6 @@ public class SalController {
     @Autowired
     private SalService salService;
 
-   
 
     /** 🔹 사원용: 본인 월별 급여 목록 */
     @GetMapping("/list")
@@ -79,21 +80,37 @@ public class SalController {
         }
 
         boolean isAdmin = "1".equals(login.getGradeNo());
+        model.addAttribute("isAdmin", isAdmin);
         boolean isMine  = login.getEmpNo().equals(empNo);
 
         if (!isAdmin && !isMine) {
             return "error/NoAuthPage";
         }
 
+        // ✅ 1) 상세 급여 조회 (empNo + monthAttno 기준)
         SalVO sal = salService.getSalaryDetail(empNo, monthAttno);
+
+        // 혹시 데이터 없을 때 방어
+        if (sal == null) {
+            model.addAttribute("msg", "해당 월의 급여 정보가 없습니다.");
+            return "error/NoDataPage"; // 너희 프로젝트 에러 페이지에 맞춰 변경
+        }
+
+        // ✅ 2) 정정 이력 조회는 salNum으로
+        Integer salNum = sal.getSalNum();   // ⭐ 핵심
+        List<SalEditVO> edits = salService.getEditsBySalNum(salNum);
+
+        // ✅ 3) 사원 정보
         EmpVO emp = empService.getEmp(empNo);
 
-        model.addAttribute("emp", emp);
         model.addAttribute("sal", sal);
+        model.addAttribute("edits", edits);
+        model.addAttribute("emp", emp);
         model.addAttribute("menu", isAdmin ? "saladmin" : "salemp");
 
         return "sal/salDetail";
     }
+
 
     /** 🔹 급여 생성 테스트용: /sal/salMake?month=2025-11 */
     @GetMapping("/salMake")
@@ -111,11 +128,9 @@ public class SalController {
         salService.createSalaryByMonth(month);
         return "redirect:/sal/admin/list?month=" + month; 
     }
-    
-    @GetMapping("/adminList")
-    public String adminListAlias(@RequestParam(required = false) String month) {
-        return "redirect:/sal/admin/list" + (month != null ? "?month=" + month : "");
-    }
+ 
+
+
 
 
    

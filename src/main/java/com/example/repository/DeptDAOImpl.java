@@ -1,6 +1,6 @@
 package com.example.repository;
 
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
 
@@ -9,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.example.domain.DeptVO;
-import com.example.domain.DocVO;
-import com.example.domain.EditVO;
+
 import com.example.domain.EmpVO;
 
 import lombok.extern.slf4j.Slf4j;

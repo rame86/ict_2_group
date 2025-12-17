@@ -60,5 +60,25 @@
 	        EMP_NO = #{empNo}
 	        AND IS_READ = 'N'
 	</select>
+	
+	<select id="selectAllLatestAlerts" parameterType="String" resultType="AlertVO">
+	    SELECT 
+	        A.ALERT_ID,
+	        A.EMP_NO,
+	        A.LINK_TYPE,
+	        A.LINK_ID,
+	        A.CREATED_DATE,
+	        A.IS_READ,
+	        D.DOC_TITLE AS title, 
+	        D.DOC_DATE AS sentTime, 
+	        E.EMP_NAME AS senderName, 
+	        D.DOC_CONTENT AS content 
+		FROM ALERT A
+	    LEFT JOIN DOC D ON A.LINK_ID = D.DOC_NO AND A.LINK_TYPE = 'APPROVAL' 
+	    LEFT JOIN EMP E ON D.DOC_WRITER = E.EMP_NO    
+	    WHERE A.EMP_NO = #{empNo} 
+	    ORDER BY A.CREATED_DATE DESC 
+	    FETCH FIRST 50 ROWS ONLY 
+    </select>
 
 </mapper>
