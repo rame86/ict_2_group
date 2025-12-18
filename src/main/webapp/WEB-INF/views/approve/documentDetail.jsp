@@ -26,13 +26,14 @@
 
     /* 패딩 및 간격 최적화 (createForm 기준) */
     .detail-body {
-        padding: 2.5rem !important; /* 전체적인 내부 간격을 넓힘 [cite: 221] */
+        padding: 2.5rem !important;
+        /* 전체적인 내부 간격을 넓힘 */
     }
 
     .form-group-row {
         display: flex;
         align-items: center;
-        margin-bottom: 1.5rem; /* 요소 간 간격 확대 [cite: 187] */
+        margin-bottom: 1.5rem; /* 요소 간 간격 확대 */
         width: 100%;
     }
     .info-item {
@@ -41,7 +42,8 @@
         flex: 1;
     }
     .label-box {
-        width: 110px; /* 라벨 너비 최적화 [cite: 189] */
+        width: 110px;
+        /* 라벨 너비 최적화 */
         font-size: 0.9rem;
         font-weight: 700;
         color: #4a5568;
@@ -57,7 +59,8 @@
         border-radius: 8px;
         background-color: #f8f9fc;
         color: #333;
-        border: none; /* 선을 없애 더 깔끔하게 처리 가능 */
+        border: none;
+        /* 선을 없애 더 깔끔하게 처리 가능 */
     }
     
     .textarea-custom {
@@ -67,10 +70,13 @@
         border: 1px solid #d1d9e6;
         border-radius: 8px;
         resize: none;
-        font-size: 0.95rem; /* createForm 기준 [cite: 196] */
+        font-size: 0.95rem;
+        /* createForm 기준 */
         line-height: 1.7;
         background-color: #fff;
         outline: none;
+        /* div로 변경 시 스크롤 처리를 위해 추가 */
+        overflow-y: auto; 
     }
 
     /* 콤팩트한 결재 진행 상황 (가로 배치) */
@@ -187,7 +193,10 @@
 
                     <div class="mt-4">
                         <div class="label-box mb-2">상세 내용</div>
-                        <textarea class="textarea-custom" readonly>${vo.docContent}</textarea>
+                        <%-- 수정됨: textarea를 div로 변경하여 HTML 태그가 렌더링 되도록 함 --%>
+                        <div class="textarea-custom">
+                            ${vo.docContent}
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-center gap-3 mt-4 pt-4 border-top">
@@ -198,7 +207,7 @@
                                 <button class="btn btn-danger px-5 fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#rejectModal" style="border-radius:8px;">반려</button>
                             </form>
                         </c:if>
-                        <a href="receiveList" class="btn btn-secondary px-4 fw-bold" style="border-radius:8px;">목록으로</a>
+                        <a href="/approve/receiveList" class="btn btn-secondary px-4 fw-bold" style="border-radius:8px;">목록으로</a>
                     </div>
                 </div>
 
@@ -253,9 +262,9 @@ $(document).ready(function(){
         $("#approveStamp").addClass("show");
         setTimeout(function(){
             $.ajax({
-                url : "approveDocument", type : "post",
+                url : "/approve/approveDocument", type : "post",
                 data : { docNo : "${vo.docNo}", status : "A" },
-                success : function(){ alert("승인 완료!"); window.location.href = "receiveList"; },
+                success : function(){ alert("승인 완료!"); window.location.href = "/approve/receiveList"; },
                 error : function(){ alert("오류 발생"); $("#approveStamp").removeClass("show"); }
             });
         }, 700);
@@ -266,9 +275,9 @@ $(document).ready(function(){
         const reason = $("textarea[name='rejectReason']").val();
         if(!reason.trim()){ alert("사유를 입력하세요."); return; }
         $.ajax({
-            url : "approveDocument", type : "post",
+            url : "/approve/approveDocument", type : "post",
             data : { docNo : "${vo.docNo}", status : "R", rejectReason : reason },
-            success : function(){ alert("반려 완료"); window.location.href = "receiveList"; },
+            success : function(){ alert("반려 완료"); window.location.href = "/approve/receiveList"; },
             error : function(){ alert("오류 발생"); }
         });
     });

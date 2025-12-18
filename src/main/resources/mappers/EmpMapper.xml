@@ -313,7 +313,7 @@
 	<update id="setEmpJobTitle" parameterType="map">
 		UPDATE EMP
 		SET JOB_TITLE = #{jobTitle},
-		    GRADE_NO = #{targetGradeNo}
+		    GRADE_NO = #{targetGradeNo},
 		    STATUS_NO = 1
 		WHERE EMP_NO = #{empNo}
 	</update>
