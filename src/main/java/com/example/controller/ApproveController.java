@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.domain.AlertVO;
 import com.example.domain.ApproveListVO;
@@ -140,12 +141,15 @@ public class ApproveController {
 
 	// 문서 작성
 	@GetMapping("approve/createForm")
-	public void createForm() {
+	public void createForm(@ModelAttribute("login") LoginVO login, Model m) {
+		Map<String, Object> managerInfo = approveService.getManagerInfo(login.getEmpNo());
+		log.info("매니저 정보: {}", managerInfo);
+		m.addAttribute("manager", managerInfo);
 	}
 
 	// 문서 작성
 	@PostMapping("approve/approve-form")
-	public String approveForm(DocVO dvo, ApproveVO avo) {
+	public String approveForm(DocVO dvo, ApproveVO avo, @RequestParam(value="upfile", required=false) MultipartFile upfile) {
 		log.info("approve/approve-form 요청받음");
 		log.info(dvo.toString());
 		approveService.ApprovalApplication(dvo, avo);

@@ -1,5 +1,35 @@
 @charset "UTF-8";
 
-.approve-main .datatable-info{
-	display : none;
+.approve-main .datatable-info {
+	display: none;
 }
+
+/* 아이콘 스타일 재정의 */
+    .dashboard-card-icon {
+        font-size: 4.5rem;      /* 아이콘 크기 대폭 확대 */
+        opacity: 0.25;          /* 은은하게 배경처럼 보이도록 투명도 조절 */
+        position: absolute;     /* 절대 위치 지정 */
+        right: 10px;            /* 오른쪽 여백 */
+        bottom: 10px;           /* [핵심] 위가 아니라 아래쪽을 기준으로 배치 */
+        z-index: 0;             /* 글자 뒤로 가도록 설정 */
+        pointer-events: none;   /* 마우스 클릭 방해하지 않도록 설정 */
+    }
+    
+    /* 카드의 기준점 설정 및 내용물 위로 올리기 */
+    .card {
+        position: relative;     /* 아이콘 위치 기준점 */
+        overflow: hidden;       /* 아이콘이 카드 밖으로 튀어나가지 않게 */
+    }
+    
+    /* 글씨들이 아이콘 위에 보이도록 설정 */
+    .card-header, .card-body {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* 기존 스타일 유지 */
+    .modal-body table thead th { font-size: 0.875rem; font-weight: bold; }
+    .modal-body .table { margin-bottom: 0; }
+    #documentListTableBody { font-size: 0.875rem; }
+    .clickable { cursor: pointer; }
+    .clickable:hover { color: #dee2e6; transition: background-color 0.2s ease; }

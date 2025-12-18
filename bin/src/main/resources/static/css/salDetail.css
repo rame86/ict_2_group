@@ -1,0 +1,766 @@
+/* =========================================================
+   ✅ salDetail.css (salDetail.jsp 전용)
+   - 인쇄 시: 도넛(차트) 숨김 + 지급/공제 2칸(2열) 유지
+   ========================================================= */
+
+/* ---- 폰트 통일 ---- */
+.mt-4, .sal-List-Title, .info-card, .info-card *, .salary-wrapper,
+	.salary-wrapper *, .net-salary-box, .net-salary-box *, .btn-print,
+	.btn-area {
+	font-family: 'SUIT', 'Pretendard', 'Noto Sans KR', -apple-system,
+		BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ---- 상단 타이틀 ---- */
+.mt-4 {
+	font-size: 30px;
+}
+
+/* ---- 공통 래퍼 ---- */
+.content-wrapper {
+	padding: 20px 30px;
+}
+
+/* ---- 타이틀 밑줄 ---- */
+.page-title-wrap {
+	width: 100%;
+	border-bottom: 4px double #869ABF;
+	margin-top: 18px;
+	margin-bottom: 14px;
+	padding-bottom: 12px;
+}
+
+/* =========================================================
+   1) 상단 정보 카드
+   ========================================================= */
+.info-card {
+	border: 1px solid #dee2e6;
+	border-radius: 8px;
+	padding: 18px 20px;
+	margin-bottom: 20px;
+	background: #f8f9fa;
+	font-size: 14px;
+}
+
+.info-card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.info-label {
+	font-weight: 700;
+	color: #374151;
+	white-space: nowrap;
+}
+
+.info-value {
+	color: #111827;
+	font-weight: 600;
+}
+
+/* ✅ 지급일(한 줄) */
+.info-row--single {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	margin: 8px 0 0;
+}
+
+/* ===== 상단 사번/이름/부서/재직상태 (슬림 카드) ===== */
+.info-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 0.15fr); /* 🔥 1fr → auto */
+	gap: 10px 16px;
+	margin-top: 10px;
+}
+
+.info-pair {
+	display: flex;
+	align-items: center;
+	padding: 8px 12px;
+	height: 40px;
+	border: 1px solid #E5E7EB;
+	border-radius: 10px;
+	background: #FFFFFF;
+	/* 🔥 핵심 */
+	max-width: 260px; /* 카드 최대 폭 제한 */
+	width: fit-content; /* 내용 기준으로 줄어듦 */
+}
+
+/* 라벨 */
+.info-pair .k {
+	font-size: 12px;
+	font-weight: 700;
+	color: #6B7280;
+	min-width: auto; /* 라벨 폭 고정 */
+	white-space: nowrap;
+}
+
+/* 값 */
+.info-pair .v {
+	font-size: 14px;
+	font-weight: 600;
+	color: #111827;
+	line-height: 1;
+}
+
+.info-pair .v::before {
+	content: "";
+	display: inline-block;
+	width: 1px;
+	height: 14px;
+	background: #D1D5DB;
+	margin: 0 6px;
+	vertical-align: middle;
+	font-weight: 400;
+}
+
+/* 상단 카드 내부 섹션 분리 */
+.info-body {
+	margin-top: 10px;
+}
+
+.info-chips {
+	margin-top: 12px;
+	padding-top: 12px;
+	border-top: 1px dashed #E5E7EB;
+}
+
+/* 화면이 좁아지면 2줄로 */
+@media ( max-width : 900px) {
+	.info-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ---- 출력 버튼 ---- */
+.btn-print {
+	padding: 8px 14px;
+	border-radius: 8px;
+	background: #8cb1d2;
+	border: 1px solid #63a7cf;
+	color: #fff;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.btn-print:hover {
+	background: #424e84;
+}
+
+/* ---- 요약 칩 ---- */
+.summary-chips {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-top: 12px;
+}
+
+.chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 6px 10px;
+	border-radius: 999px;
+	font-size: 13px;
+	border: 1px solid #e5e7eb;
+	background: #fff;
+	font-weight: 700;
+}
+
+.chip-pay {
+	border-color: #45b66c;
+	background: #edf8e9;
+	color: #13866c;
+}
+
+.chip-deduct {
+	border-color: #fbbbd0;
+	background: #fef3f8;
+	color: #d74477;
+}
+
+.chip-net {
+	border-color: #80a9f4;
+	background: #eff6ff;
+	color: #3851a5;
+}
+
+/* =========================================================
+   2) 가운데 3박스(차트/지급/공제)
+   ========================================================= */
+.salary-wrapper {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	gap: 18px;
+	align-items: stretch;
+}
+
+/* 박스 높이 맞춤 핵심 */
+.salary-wrapper>.detail-card {
+	display: flex;
+}
+
+.salary-wrapper>.detail-card>.salary-box {
+	width: 100%;
+	height: 100%;
+}
+
+/* 카드 공통 */
+.salary-box {
+	width: 100%;
+	border: 1px solid #dee2e6;
+	border-radius: 8px;
+	padding: 16px;
+	background: #fff;
+	min-width: 260px; /* 화면에서 보기 좋게 */
+	box-sizing: border-box;
+}
+
+.salary-box h5 {
+	margin: 0 0 10px 0;
+	font-size: 16px;
+	font-weight: 800;
+	color: #111827;
+}
+
+/* 상단 색 띠 */
+.pay-card {
+	border-top: 4px solid #c8e963;
+}
+
+.deduct-card {
+	border-top: 4px solid #f4cad9;
+}
+
+.chart-card {
+	border-top: 4px solid #6cc0ee;
+}
+
+/* ---- 테이블 ---- */
+.salary-table {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 6px;
+	font-size: 14px;
+	table-layout: fixed;
+}
+
+.salary-table th, .salary-table td {
+	border: 1px solid #dee2e6;
+	vertical-align: middle;
+	padding: 12px 10px;
+	text-align: center;
+	padding: 12px 10px;
+}
+
+.salary-table th {
+	background: #f1f1f1;
+	text-align: left;
+	width: 50%;
+}
+
+.salary-table td {
+	text-align: right;
+	width: 50%;
+}
+
+/* 0원 회색 */
+.amount-zero {
+	color: #9ca3af;
+}
+
+/* ---- 차트 캔버스 ---- */
+.chart-card canvas {
+	display: block;
+	margin: 0 auto;
+}
+
+.chart-card .salary-box {
+	min-height: 260px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+#payDonutChart {
+	display:block;
+	 width: 200px !important;
+  height: 200px !important;
+		margin: 0 auto;
+	aspect-ratio: 1 / 1;
+}
+
+/* 범례 */
+.chart-legend {
+	display: flex;
+	justify-content: center;
+	gap: 14px;
+	margin-top: 10px;
+	font-size: 13px;
+	font-weight: 800;
+}
+
+.chart-legend .pay {
+	color: #7783BD;
+}
+
+.chart-legend .deduct {
+	color: #BA5A6D;
+}
+
+/* ✅ 화면이 좁아지면 2열/1열로 자연스럽게 */
+@media ( max-width : 1200px) {
+	.salary-wrapper {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+@media ( max-width : 820px) {
+	.salary-wrapper {
+		grid-template-columns: 1fr;
+	}
+	.salary-box {
+		min-width: 0;
+	}
+}
+
+/* =========================================================
+   3) 하단 실지급 요약
+   ========================================================= */
+.net-salary-box {
+	background: #F8FAFF;
+	border: 1px solid #E5E7EB;
+	padding: 16px 20px;
+	border-radius: 14px;
+	margin-top: 18px;
+	position: relative;
+	overflow: hidden;
+	display: grid;
+	grid-template-columns: 1fr auto; /* 왼쪽 넓게 / 오른쪽 내용 */
+	align-items: center;
+	column-gap: 18px;
+}
+
+/* 문구는 왼쪽에 딱 붙게 */
+.net-left {
+	min-width: 0;
+}
+
+.summary-box {
+	margin: 0 0 0 auto;
+}
+
+.summary-row {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 6px;
+	font-size: 14px;
+}
+
+.summary-row.real-pay-row {
+	display: grid;
+	grid-template-columns: 90px 1fr auto;
+	align-items: center;
+	column-gap: 12px;
+	margin-top: 10px;
+	font-size: 18px;
+	font-weight: 900;
+}
+
+.pay-note {
+	font-size: 13px;
+	font-weight: 700;
+	color: #6B7280;
+	margin: -50px 0 0;
+	overflow: hidden;
+}
+
+.net-salary {
+	font-size: 24px;
+	font-weight: 900;
+	color: #2563eb;
+	letter-spacing: -0.2px;
+	justify-self: end;
+}
+
+/* 도장(스탬프) */
+.net-salary-box::after {
+	content: "PAID";
+	position: absolute;
+	right: 18px;
+	top: 14px;
+	width: 86px;
+	height: 86px;
+	border-radius: 999px;
+	border: 3px solid rgba(56, 81, 165, 0.28);
+	color: rgba(56, 81, 165, 0.35);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 900;
+	letter-spacing: 1px;
+	transform: rotate(-14deg);
+	pointer-events: none;
+}
+
+/* 도장 안쪽 링 느낌 */
+.net-salary-box::before {
+	content: "";
+	position: absolute;
+	right: 28px;
+	top: 24px;
+	width: 66px;
+	height: 66px;
+	border-radius: 999px;
+	border: 2px dashed rgba(56, 81, 165, 0.22);
+	transform: rotate(-14deg);
+	pointer-events: none;
+}
+
+/* ---- 하단 버튼 ---- */
+.btn-area {
+	text-align: right;
+	margin-top: 10px;
+}
+
+.btn-area button {
+	padding: 6px 12px;
+	border-radius: 8px;
+	border: 1px solid #6395c2;
+	background: #8cb1d2;
+	color: #fff;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.btn-area button:hover {
+	background: #424e84;
+}
+
+/* =========================================================
+   4) 인쇄 (최종 목표 반영)
+   - 차트(도넛) 무조건 숨김
+   - 지급/공제만 2칸(2열)
+   ========================================================= */
+
+/* ✅ @page는 최상위가 안정적 */
+@page {
+	size: A4;
+	margin: 12mm;
+}
+
+@media print {
+	
+	/* 지급/공제 표가 인쇄에서 찢어지지 않게 */
+  .salary-table{
+    table-layout: auto !important;  /* ✅ fixed 해제 */
+  }
+  .salary-table th,
+  .salary-table td{
+    padding: 10px 8px !important;   /* ✅ 조금만 슬림하게 */
+    font-size: 13px !important;
+  }
+  .salary-table th{
+    width: auto !important;         /* ✅ 50% 강제 제거 */
+    text-align: center !important;
+  }
+  .salary-table td{
+    width: auto !important;
+    text-align: right !important;
+  }
+
+  /* 2열 유지 + 각 카드가 인쇄 폭을 꽉 쓰게 */
+  .salary-wrapper{
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  .salary-box{
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+	 .detail-card.edit-history{ display:none !important; }
+	 
+	 .info-grid{
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+  .info-pair{
+    width: 100% !important;
+    max-width: none !important;
+  }
+	 
+	/* 카드 3개 세로 정렬 */
+	.salary-detail-wrap {
+		display: block !important;
+	}
+	.salary-detail-wrap>div {
+		width: 100% !important;
+		margin-bottom: 16px;
+		page-break-inside: avoid;
+	}
+	.edit-history {
+		display: none !important;
+	}
+
+	/* 화면용 UI 숨김 */
+	.no-print {
+		display: none !important;
+	}
+
+	/* 네비/사이드바/푸터 숨김 */
+	#layoutSidenav_nav, .sb-sidenav, .navbar, footer, .footer, #footer,
+		.sb-sidenav-footer, #layoutSidenav_content footer {
+		display: none !important;
+		height: 0 !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		border: 0 !important;
+	}
+
+	/* ✅ 차트는 무조건 숨김 */
+	.chart-card {
+		display: none !important;
+	}
+
+	/* 컨테이너 패딩 제거(인쇄 튀어나옴 방지) */
+	#layoutSidenav_content main .container-fluid.px-4 {
+		padding-left: 0 !important;
+		padding-right: 0 !important;
+	}
+	.content-wrapper {
+		padding: 0 !important;
+	}
+
+	/* ✅ 차트가 빠지니까 2열로 */
+	.salary-wrapper {
+		grid-template-columns: 1fr 1fr !important;
+		gap: 10px !important;
+	}
+	.salary-box {
+		min-width: 0 !important;
+		box-sizing: border-box !important;
+	}
+
+	/* 도장 효과는 인쇄에선 깔끔하게 제거(선택) */
+	.net-salary-box::before, .net-salary-box::after {
+		display: none !important;
+	}
+	@page {
+		size: A4;
+		margin: 12mm;
+	}
+}
+
+.k {
+	padding-right: 10px;
+}
+
+
+.detail-card .salary-table th, .detail-card .salary-table td {
+	text-align: center;
+	vertical-align: middle;
+	padding: 12px 10px;
+}
+
+.detail-card .salary-table td.edit-reason {
+	text-align: center;
+	white-space: normal; /* 여러 줄 허용 */
+	word-break: break-word;
+	line-height: 1.5;
+}
+
+.detail-card .salary-table th {
+	background-color: #f5f6f8;
+	font-weight: 600;
+}
+
+.m-title {
+	font-weight: 600;
+}
+
+/* =========================================================
+   ✅ 급여 정정 이력(관리자만) - 폭/정렬/구분선/인쇄 숨김 최종본
+   ========================================================= */
+
+/* 정정이력 카드: 화면에서 좌우 20% 여백 느낌(=내용폭 60%) */
+.detail-card.edit-history{
+	position: relative;
+  width: 100%;
+  max-width: none;           /* ✅ 절대 줄이지 않기 */
+  margin-top: 20px;          /* ✅ 전체적으로 20px 아래 */
+  padding-top: 18px;         /* 제목이 점선에 붙지 않게 */
+ /*  border-top: 2px dashed #D1D5DB;  ✅ 회색 점선(전체 폭) */
+}
+
+/* ✅ 회색 점선: content-wrapper(좌우 padding 30px)까지 “가로로 길게” */
+.detail-card.edit-history::before{
+  content:"";
+  position:absolute;
+  top: 0;
+  left: -30px;                 /* content-wrapper padding-left 만큼 */
+  width: calc(100% + 60px);    /* 좌우 padding 합 */
+  border-top: 2px dashed #D1D5DB;
+}
+
+/* 제목 여백 정리 */
+.detail-card.edit-history h5{
+  margin: 0 0 12px 0;
+  font-weight: 800;
+}
+
+/* 컬럼 폭(원하시는 비율로 조절 가능) */
+.detail-card.edit-history .salary-table th:nth-child(1),
+.detail-card.edit-history .salary-table td:nth-child(1){ width: 30%; } /* 정정일시 */
+.detail-card.edit-history .salary-table th:nth-child(2),
+.detail-card.edit-history .salary-table td:nth-child(2){ width: 18%; } /* 수정자 */
+.detail-card.edit-history .salary-table th:nth-child(3),
+.detail-card.edit-history .salary-table td:nth-child(3){ width: 26%; } /* 정정사유 */
+.detail-card.edit-history .salary-table th:nth-child(4),
+.detail-card.edit-history .salary-table td:nth-child(4){ width: 26%; } /* 실지급액 */
+
+/* 정정사유: 가운데 + 줄바꿈 허용 */
+.detail-card.edit-history .salary-table td.edit-reason{
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+
+/* 정정이력 테이블: 가운데 정렬은 유지하되, 위치(가운데 배치) 건들지 않음 */
+.salary-table.edit-table th,
+.salary-table.edit-table td{
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* 실지급액(전→후) 칸: 한 줄에 가깝게 */
+.salary-table.edit-table td:last-child{
+  white-space: nowrap;       /* ✅ 줄바꿈 최소화 */
+}
+
+/* =========================================================
+   ✅ salDetail.jsp - 관리자 수정이력(SAL_EDIT) 블록
+   (기존 CSS에 영향 없게 sal-detail-page 스코프 사용)
+   ========================================================= */
+
+.sal-detail-page .sal-edit-history-card{
+  margin-top: 18px;
+  background:#fff;
+  border:1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+}
+
+.sal-detail-page .seh-head{
+  display:flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.sal-detail-page .seh-title{
+  margin:0;
+  font-size: 16px;
+  font-weight: 900;
+  color:#111827;
+}
+
+.sal-detail-page .seh-sub{
+  font-size: 12px;
+  color:#6B7280;
+  font-weight: 600;
+}
+
+.sal-detail-page .seh-table-wrap{
+  width:100%;
+  overflow:auto;
+  border-radius: 12px;
+  border: 1px solid #EEF2F7;
+}
+
+.sal-detail-page .seh-table{
+  width:100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 900px; /* 컬럼 많아서 가로 스크롤 안정 */
+}
+
+.sal-detail-page .seh-table thead th{
+  position: sticky;
+  top: 0;
+  background:#F8FAFC;
+  font-size: 12px;
+  font-weight: 900;
+  color:#374151;
+  border-bottom:1px solid #E5E7EB;
+  padding: 10px 12px;
+  text-align:left;
+  vertical-align: middle;
+}
+
+.sal-detail-page .seh-table tbody td{
+  font-size: 12px;
+  color:#111827;
+  padding: 10px 12px;
+  border-bottom: 1px solid #F1F5F9;
+  vertical-align: top;
+}
+
+.sal-detail-page .seh-date{ white-space: nowrap; color:#374151; font-weight: 800; }
+.sal-detail-page .seh-by{ white-space: nowrap; color:#111827; font-weight: 800; }
+.sal-detail-page .seh-reason{ color:#374151; font-weight: 700; }
+
+.sal-detail-page .seh-diff .diff-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 6px 14px;
+}
+
+.sal-detail-page .seh-diff .diff-item{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+
+.sal-detail-page .seh-diff .diff-item .k{
+  width: 70px;
+  color:#6B7280;
+  font-weight: 800;
+  flex: 0 0 auto;
+}
+
+.sal-detail-page .seh-diff .diff-item .v{
+  color:#111827;
+  font-weight: 700;
+}
+
+.sal-detail-page .seh-diff .diff-strong .k{ color:#1D4ED8; }
+.sal-detail-page .seh-diff .diff-strong .v b{ color:#1D4ED8; }
+
+.sal-detail-page .seh-row.is-hidden{
+  display:none;
+}
+
+.sal-detail-page .seh-more{
+  display:flex;
+  justify-content:center;
+  margin-top: 12px;
+}
+
+.sal-detail-page .seh-btn-more{
+  border: 1px solid #C7D2FE;
+  background: #EEF2FF;
+  color:#1D4ED8;
+  font-weight: 900;
+  border-radius: 12px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.sal-detail-page .seh-btn-more:hover{
+  filter: brightness(0.98);
+}
+

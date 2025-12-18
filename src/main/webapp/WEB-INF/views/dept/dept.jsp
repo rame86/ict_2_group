@@ -75,8 +75,8 @@
 							        <c:forEach var="ceo" items="${deptList}">
 							            <c:if test="${ceo.deptNo == 1001}">
 							                <li>
-							                    <div class="org-node ceo ${sessionScope.login.deptNo == ceo.deptNo ? 'my-dept' : ''}"
-							                         onclick="showDeptModal('${ceo.deptNo}', '${ceo.deptName}', '${ceo.managerName}')">
+							                   <div class="org-node ceo ${myDeptNo == ceo.deptNo ? 'my-dept' : ''}" 
+    												 onclick="showDeptModal('${ceo.deptNo}', '${ceo.deptName}', '${ceo.managerName}')">
 							                        
 							                        <i class="fas fa-crown crown-icon crown-gold"></i>
 							
@@ -93,8 +93,8 @@
 							                            <%-- CEO 직속 부서 (운영총괄, 기술총괄 등) --%>
 							                            <c:if test="${sub.parentDeptNo == 1001 && sub.deptNo != 1001}">
 							                                <li>
-							                                    <div class="org-node head ${sessionScope.login.deptNo == sub.deptNo ? 'my-dept' : ''}"
-							                                         onclick="showDeptModal('${sub.deptNo}', '${sub.deptName}', '${sub.managerName}')">
+							                         	       <div class="org-node head ${myDeptNo == sub.deptNo ? 'my-dept' : ''}"
+     																onclick="showDeptModal('${sub.deptNo}', '${sub.deptName}', '${sub.managerName}')">
 							                                        
 							                                        <i class="fas fa-crown crown-icon crown-silver"></i>
 							
@@ -111,8 +111,8 @@
 							                                        <c:forEach var="team" items="${deptList}">
 							                                            <c:if test="${team.parentDeptNo == sub.deptNo}">
 							                                                <li>
-							                                                    <div class="org-node team ${sessionScope.login.deptNo == team.deptNo ? 'my-dept' : ''}"
-							                                                         onclick="showDeptModal('${team.deptNo}', '${team.deptName}', '${team.managerName}')">
+							                  	                                <div class="org-node team ${myDeptNo == team.deptNo ? 'my-dept' : ''}"
+   																					  onclick="showDeptModal('${team.deptNo}', '${team.deptName}', '${team.managerName}')">
 							                                                        <span class="dept-name">${team.deptName}</span> 
 							                                                        <span class="manager-name">${team.managerName}</span>
 							                                                    </div>
@@ -141,9 +141,9 @@
 										<c:forEach var="etc" items="${deptList}">
 											<c:if test="${etc.deptNo == 0}">
 												<li>
-													<div class="org-node team ${sessionScope.login.deptNo == etc.deptNo ? 'my-dept' : ''}"
-														 style="background-color: #f8f9fa; border: 2px dashed #b7b9cc;"
-														 onclick="showDeptModal('${etc.deptNo}', '${etc.deptName}', '${etc.managerName}')">
+													<div class="org-node team ${myDeptNo == etc.deptNo ? 'my-dept' : ''}"
+   												       style="background-color: #f8f9fa; border: 2px dashed #b7b9cc;"
+  													   onclick="showDeptModal('${etc.deptNo}', '${etc.deptName}', '${etc.managerName}')">
 														
 														<div class="profile-pic" style="background: #b7b9cc; display: flex; align-items: center; justify-content: center;">
 															<i class="fas fa-users-slash" style="color: white; font-size: 20px;"></i>

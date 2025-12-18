@@ -112,4 +112,9 @@ public class ApproveDAOImpl implements ApproveDAO {
 		return sess.selectList("com.example.repository.ApproveDAO.selectSendStatusChangeAlerts", param);
 	}
 
+	@Override
+	public Map<String, Object> selectApprovalLineInfo(String empNo) {
+		return sess.selectMap("com.example.repository.ApproveDAO.selectApprovalLineInfo", empNo);
+	}
+
 }

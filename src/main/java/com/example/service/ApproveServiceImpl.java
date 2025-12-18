@@ -302,4 +302,39 @@ public class ApproveServiceImpl implements ApproveService {
             log.error("Alert: 알림 저장 중 오류 발생 (수신자: {}): {}", receiveEmpNo, e.getMessage());
         }
     }
+
+	@Override
+	public Map<String, Object> getManagerInfo(String empNo) {
+		
+		Map<String, Object> rawData = approveDao.selectApprovalLineInfo(empNo);
+		Map<String, Object> result = new HashMap<>();
+		
+		log.info("DB 원본 데이터: {}", rawData);
+		
+		if (rawData != null) {
+			String parentDeptNo = String.valueOf(rawData.get("parentDeptNo"));
+	        
+	        result.put("deptName", rawData.get("deptName"));
+
+	        // 3. 로직 처리 (상위부서가 1001일 때의 예외 처리)
+	        if ("1001".equals(parentDeptNo)) {
+	            result.put("managerEmpNo", null);
+	            result.put("managerName", "없음(최상위부서)");
+	            
+	            // 상위가 1001이면 현재 부서의 장을 2차 결재자로 승격
+	            result.put("parentManagerEmpNo", rawData.get("managerEmpNo"));
+	            result.put("parentManagerName", rawData.get("managerName"));
+	        } else {
+	            // 일반적인 경우
+	            result.put("managerEmpNo", rawData.get("managerEmpNo"));
+	            result.put("managerName", rawData.get("managerName"));
+	            
+	            result.put("parentManagerEmpNo", rawData.get("parentManagerEmpNo"));
+	            result.put("parentManagerName", rawData.get("parentManagerName"));
+	        }
+	    }
+		
+		return result;
+		
+	}
 }

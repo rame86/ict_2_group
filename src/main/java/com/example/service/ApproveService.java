@@ -17,4 +17,5 @@ public interface ApproveService {
 	public DocVO selectDocNo(Integer docNo);
 	public void approveDocument(Integer docNo, String status, Integer empNo, String rejectReason);
 	public Map<String, Integer> getSendCount(String empNo);
+	public Map<String, Object> getManagerInfo(String empNo);
 }

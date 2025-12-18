@@ -1,0 +1,207 @@
+/*attend.css*/
+
+/* 1. 배경 및 메인 영역 설정 */
+#content-area {
+	padding: 10px;
+	background-color: #ffffff; /* 회색 배경 */
+	min-height: 100vh;
+}
+
+/* 2. 흰색 전체 카드 (가장 중요: Flex Row 적용) */
+.main-layout-container {
+	display: flex !important;
+	flex-direction: row !important;
+	align-items: stretch;
+	/* ❌ 라운드 및 흰색 배경, 그림자 제거 ❌ */
+	background-color: transparent; /* 배경을 투명하게 변경 */
+	border-radius: 0; /* 모서리 둥글게 제거 */
+	padding: 40px;
+	box-shadow: none; /* 그림자 제거 */
+	max-width: 1400px;
+	margin: 0 auto;
+	gap: 40px;
+}
+
+/* 4. [오른쪽] 달력 및 버튼 영역 전체 */
+.calendar-section {
+	flex-grow: 1; /* 남은 공간 다 차지 */
+	display: flex;
+	flex-direction: column; /* 위(달력세트) 아래(신청버튼) 배치 */
+	gap: 20px;
+}
+
+/* 4-1. 오른쪽 상단 (버튼+달력) 가로 배치 */
+.top-calendar-group {
+	display: flex;
+	flex-direction: row; /* 가로 배치 */
+	gap: 30px;
+	height: 100%; /* 높이 꽉 채우기 */
+}
+
+/* 4-1-A. 컨트롤 버튼 (출근/퇴근) */
+.controls {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	width: 120px; /* 버튼 영역 너비 고정 */
+	min-width: 120px;
+	justify-content: center; /* 세로 중앙 정렬 */
+}
+
+.controls button {
+	width: 100%;
+	padding: 15px 0;
+	border: 1px solid #ddd;
+	background: #fff;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.time-display p {
+	margin: 5px 0;
+	font-size: 13px;
+	color: #555;
+}
+
+/* 4-1-B. 진짜 달력 영역 */
+.calendar {
+	flex-grow: 1;
+	border: 1px solid #eee;
+	border-radius: 10px;
+	background-color: #fff; /* ⭐ 달력 자체는 흰색 배경 유지 ⭐ */
+	min-height: 400px;
+}
+
+/* 5. 오른쪽 하단 (신청 버튼들) */
+.actions {
+	display: flex;
+	justify-content: flex-end; /* 오른쪽 정렬 */
+	gap: 10px;
+	margin-top: auto; /* 바닥에 붙이기 */
+}
+
+.actions button {
+	padding: 10px 20px;
+	border: none;
+	background-color: #f1f1f1;
+	border-radius: 5px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.modal {
+	display: none; /* 초기에는 숨김 */
+	position: fixed; /* 화면에 고정 */
+	z-index: 1000; /* 다른 요소 위에 표시 */
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4); /* 반투명 검은색 배경 */
+	opacity: 0; /* 부드러운 효과를 위한 초기 투명도 */
+	transition: opacity 0.3s ease-in-out; /* 부드러운 효과 */
+}
+
+.modal.show {
+	display: block;
+	opacity: 1;
+}
+
+.modal-content {
+	background-color: #fefefe;
+	margin: 2% auto; /* 상단에서 5% 위치, 가운데 정렬 */
+	padding: 20px;
+	border: 1px solid #888;
+	width: 80%; /* 모달 너비 */
+	max-width: 600px; /* 최대 너비 설정 */
+	border-radius: 8px;
+	box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0
+		rgba(0, 0, 0, 0.19);
+	position: relative;
+	/* 모달이 아래에서 위로 부드럽게 나타나는 효과 */
+	transform: translateY(20px);
+	transition: transform 0.3s ease-in-out;
+}
+
+.modal.show .modal-content {
+	transform: translateY(0);
+}
+
+.close {
+	color: #aaa;
+	float: right;
+	font-size: 28px;
+	font-weight: bold;
+}
+
+.close:hover, .close:focus {
+	color: black;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+/***************** 달력 영역 **************/
+
+/* 토요일과 일요일의 날짜 텍스트를 빨간색으로 설정 */
+.fc-day-sat .fc-daygrid-day-number, .fc-day-sun .fc-daygrid-day-number {
+	color: #F44336; /* 빨간색 */
+}
+
+/* 요일 헤더(토/일)도 빨간색으로 설정 */
+.fc-day-sat.fc-col-header-cell .fc-col-header-cell-cushion, .fc-day-sun.fc-col-header-cell .fc-col-header-cell-cushion
+	{
+	color: #F44336;
+}
+
+/* FullCalendar의 날짜 셀과 이벤트에 마우스를 올렸을 때 손가락 모양 커서 표시 */
+.fc-daygrid-day-frame, .fc-event {
+	cursor: pointer;
+}
+
+/******************* 도우넛 그래프 영역 ********************/
+.chart-container {
+	width: 350px;
+	height: 350px;
+	margin: 50px auto 10px;
+	position: relative;
+}
+
+#summaryBox {
+	width: 350px;
+	margin: 10px auto 50px;
+	padding: 15px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	text-align: center;
+	background-color: #f9f9f9;
+}
+
+#summaryBox h3 {
+	margin: 0 0 5px 0;
+	font-size: 1.2em;
+	color: #333;
+}
+
+#summaryBox p {
+	margin: 5px 0;
+	font-size: 0.95em;
+	color: #666;
+}
+
+.sb-sidenav-menu-nested.nav a {
+	visibility: visible !important;
+}
+/* 컨테이너 내부의 제목 스타일 */
+.custom-title {
+	/* 기본 h3 스타일보다 굵게 */
+	font-weight: 700;
+	/* 제목 크기 조정 (원래 h3 크기 유지 또는 약간 키움) */
+	font-size: 1.8rem;
+	/* 텍스트 색상을 진한 검정색으로 지정 */
+	color: #333333;
+	/* 상단 마진을 더 명확히 주기 위해 mt-4 (부트스트랩)와 함께 사용 */
+	margin-bottom: 5px !important;
+}
+

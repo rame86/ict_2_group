@@ -315,10 +315,9 @@
 	<!-- ============================ 8) 부서장/직책 설정 ============================ -->
 	<update id="setEmpJobTitle" parameterType="map">
 		UPDATE EMP
-
 		SET JOB_TITLE = #{jobTitle},
-		    GRADE_NO = #{targetGradeNo, jdbcType=NUMERIC}
-
+		    GRADE_NO = #{targetGradeNo}
+		    STATUS_NO = 1
 		WHERE EMP_NO = #{empNo}
 	</update>
 	

@@ -1,15 +1,5 @@
 @charset "UTF-8";
-/*!
-* Start Bootstrap - SB Admin v7.0.7 (https://startbootstrap.com/template/sb-admin)
-* Copyright 2013-2023 Start Bootstrap
-* Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-sb-admin/blob/master/LICENSE)
-*/
-/*!
- * Bootstrap  v5.2.3 (https://getbootstrap.com/)
- * Copyright 2011-2022 The Bootstrap Authors
- * Copyright 2011-2022 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
- */
+
 :root {
   --bs-blue: #0d6efd;
   --bs-indigo: #6610f2;
@@ -73,7 +63,7 @@
   --bs-border-radius-xl: 1rem;
   --bs-border-radius-2xl: 2rem;
   --bs-border-radius-pill: 50rem;
-  --bs-link-color: #0d6efd;
+  --bs-link-color: #3a6dcb; /*a링크컬러*/
   --bs-link-hover-color: #0a58ca;
   --bs-code-color: #d63384;
   --bs-highlight-bg: #fff3cd;
@@ -2862,11 +2852,11 @@ textarea.form-control-lg {
 
 .btn-primary {
   --bs-btn-color: #fff;
-  --bs-btn-bg: #0d6efd;
-  --bs-btn-border-color: #0d6efd;
+  --bs-btn-bg: rgb(247, 202, 201);
+  --bs-btn-border-color: rgb(247, 202, 201);
   --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: #0b5ed7;
-  --bs-btn-hover-border-color: #0a58ca;
+  --bs-btn-hover-bg: rgb(234,168,179);
+  --bs-btn-hover-border-color: rgb(234,168,179);
   --bs-btn-focus-shadow-rgb: 49, 132, 253;
   --bs-btn-active-color: #fff;
   --bs-btn-active-bg: #0a58ca;
@@ -11064,13 +11054,14 @@ body {
   color: #adb5bd;
 }
 .sb-sidenav-light .sb-sidenav-menu .nav-link:hover {
-  color: #0d6efd;
+  color: #3a6dcb;
 }
+/*사이드 메뉴 active*/
 .sb-sidenav-light .sb-sidenav-menu .nav-link.active {
-  color: #0d6efd;
+  color: #3a6dcb;
 }
 .sb-sidenav-light .sb-sidenav-menu .nav-link.active .sb-nav-link-icon {
-  color: #0d6efd;
+  color: #3a6dcb;
 }
 .sb-sidenav-light .sb-sidenav-footer {
   background-color: #e9ecef;
@@ -11240,4 +11231,148 @@ body {
   width: 20px !important;
   font-size: 0.75rem;
   border-radius: 0.375rem !important;
+}
+
+/* approve 새로 추가*/
+.table-Header{
+	background-color: rgb(146, 168, 209);
+	color : white;
+}
+
+.notification-badge {
+    background-color: rgb(247 202 201);
+    color: white;
+    border-radius: 50%;
+    padding: 5px 6px;
+    font-size: 8px;
+    font-weight: bold;
+    line-height: 1;
+    text-align: center;
+    display: inline-block;
+    margin-left: 5px;
+}
+
+.icon-notify {
+    color: rgb(247 202 201) !important; 
+    transition: color 0.3s ease-in-out; 
+}
+
+.toast-custom-sere {
+    background-color: rgb(146, 168, 209) !important;
+    color : white;
+    box-shadow: 0 0 12px #CCCCCC;
+}
+
+.border-left {
+    border-left: 1px solid rgba(0, 0, 0, .125) !important; 
+    margin-left : 1.2em;
+}
+
+.nav-item .badge {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 15px;
+    height: 15px;
+    padding: 0; 
+    font-size: 0.6rem;
+    line-height: 15px;
+    text-align: center;
+    border-radius: 50% !important;
+}
+
+/* 메세지 좌 */
+.profile-img-small {
+    width: 40px; /* 약간 축소 */
+    height: 40px; /* 약간 축소 */
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.list-group-item .conversation-name {
+    font-size: 0.95rem; 
+}
+
+.list-group-item .conversation-position {
+    font-size: 0.75rem; /* 직책을 아주 작게 */
+}
+
+.list-group-item .conversation-message {
+    font-size: 0.85rem; 
+}
+
+.list-group-item .unread-count-badge {
+    font-size: 0.6rem; 
+    padding: 0.2em 0.5em;
+    min-width: 18px;
+    margin-left: 5px; /* 메시지와 뱃지 간격 */
+}
+
+.list-group-item.unread {
+    background-color: #f8f9fa; 
+}
+
+/* 2. SB Admin 2의 list-group-item.active 스타일을 부드럽게 재정의 */
+.list-group-item.active {
+    background-color: #e9ecef !important; 
+    border-color: #e9ecef !important;
+    color: #343a40 !important;
+    font-weight: bold;
+}
+.list-group-item.active .text-white {
+    color: #6c757d !important;
+}
+
+.list-group-item.unread {
+    background-color: #f8f9fa;
+}
+
+.message-bubble-container {
+    display: inline-block; 
+    max-width: 70%; 
+}
+
+.content-message2{
+	font-size : 14px;
+}
+
+#latestAlertsContainer .list-group-item,
+#latestMessagesContainer .list-group-item {
+    padding-top: 0.5rem !important;    /* 상단 패딩 축소 (기존 py-3 대신) */
+    padding-bottom: 0.5rem !important; /* 하단 패딩 축소 (기존 py-3 대신) */
+}
+
+#latestAlertsContainer .list-group-item .me-3,
+#latestMessagesContainer .list-group-item .me-3 {
+    width: 35px !important;            /* 너비 40px -> 35px */
+    height: 35px !important;           /* 높이 40px -> 35px */
+    flex-shrink: 0;                    /* 크기 고정 */
+}
+
+#latestAlertsContainer .list-group-item .small.text-gray-500,
+#latestMessagesContainer .list-group-item .small.text-gray-500 {
+    font-size: 0.75rem; /* 기존보다 더 작게 */
+}
+
+#latestAlertsContainer .list-group-item .text-truncate,
+#latestMessagesContainer .list-group-item .text-truncate {
+    font-size: 0.85rem; /* 메시지 내용 폰트 크기 지정 (약간 작게) */
+    font-weight: bold !important; /* 볼드체 해제 */
+}
+
+.dropdown-menu .dropdown-header {
+    font-size: 0.9rem !important; 
+    padding-top: 0.6rem !important; 
+    padding-bottom: 0.6rem !important;
+    font-weight: 500; 
+}
+
+#newChatModal .modal-dialog {
+    max-width: 450px; 
+    width: 100%; 
+}
+
+#notificationListContainer {
+	max-height : 700px;
+	overflow: auto;
 }
