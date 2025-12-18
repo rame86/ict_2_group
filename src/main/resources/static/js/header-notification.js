@@ -57,7 +57,18 @@ function connectSocket() {
 			}
 			
 			if(notificationData.action === 'REFRESH_HEADER_ALERTS') {
-				console.log("--> 헤더 알림 목록 갱신 신호 수신");
+				console.log("--> 헤더 알림 목록 갱신 및 토스트 알림 신호 수신");
+				
+				toastr.info(notificationData.content, '게시판 알림', {
+					timeOut: 5000,           // 5초간 표시
+					closeButton: true,       // 닫기 버튼
+					progressBar: true,       // 진행 바 표시
+					positionClass: 'toast-bottom-right', // 우측 하단 위치
+					onclick: function() {
+						// 클릭 시 공지사항 목록으로 이동
+						window.location.href = "/board/getNoticeBoardList";
+					}
+				});
 				
 				if(typeof updateHeaderAlerts === 'function') {
 					updateHeaderAlerts();

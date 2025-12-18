@@ -72,20 +72,26 @@ public class DeptServiceImpl implements DeptService {
 		map.put("empNo", vo.getTargetEmpNo());
 		map.put("writer", vo.getEmpNo());
 		map.put("targetDeptNo", vo.getTargetDeptNo());
+		
 		if (vo.getDocType().equals("6")) {
 			map.put("jobTitle", vo.getMemo()+" 부서장");
 			map.put("eNote", vo.getMemo() + "부서장 임명 및 권한등급 상향");
-			map.put("targetGradeNo", "2");
+			map.put("targetGradeNo", 2);
 			map.put("managerEmpNo", vo.getTargetEmpNo());
 			
 		}else if  (vo.getDocType().equals("7")) {			
 			map.put("jobTitle", "사원");
 			map.put("eNote", vo.getMemo() + "부서장 해임 및 권한등급 하향");
-			map.put("targetGradeNo", "3");
+			map.put("targetGradeNo", 3);
 			map.put("managerEmpNo", null);
 		}
 
 		deptDAO.setDeptManager(map);
 		empDAO.setEmpJobTitle(map);
 	}
+	
+	// 부서 수정
+    public void editDept(DeptVO vo) {
+        deptDAO.updateDept(vo);
+    }
 }

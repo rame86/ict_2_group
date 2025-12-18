@@ -196,6 +196,19 @@ public class EmpServiceImpl implements EmpService {
         return editMapper.selectLastEditByEmpNo(empNo);
     }
 
+ 	
+ 	// 알람용
+	@Override
+	public List<String> getEmpNoListByDept(String deptNo) {
+		return empMapper.selectEmpNoListByDept(deptNo);
+	}
+
+	@Override
+	public List<String> getAllEmpNoList() {
+		return empMapper.selectAllEmpNoList();
+	}
+ 	
+
     /* =====================================================
        조직/직책 연계
        ===================================================== */
@@ -206,4 +219,5 @@ public class EmpServiceImpl implements EmpService {
         log.info("[EmpServiceImpl] setEmpJobTitle 호출 - 부서/직책 일괄 처리");
         // 실제 로직은 Doc/Dept 모듈에서 처리
     }
+
 }

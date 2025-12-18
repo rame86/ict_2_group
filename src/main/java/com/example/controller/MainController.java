@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import com.example.domain.ApproveListVO;
 import com.example.domain.DayAttendVO;
+import com.example.domain.DeptVO;
 import com.example.domain.EmpVO;
 import com.example.domain.FreeBoardVO;
 import com.example.domain.LoginVO;
@@ -20,6 +21,7 @@ import com.example.domain.NoticeBoardVO;
 import com.example.service.ApproveService;
 import com.example.service.AttendService;
 import com.example.service.BoardService;
+import com.example.service.DeptService;
 import com.example.service.EmpService;
 
 import jakarta.servlet.http.HttpSession;
@@ -40,6 +42,9 @@ public class MainController {
     
     @Autowired
     private EmpService empService;
+    
+    @Autowired
+    private DeptService deptService;
     
     // 로그인 세션 편의 메소드
     @ModelAttribute("login")
@@ -145,6 +150,16 @@ public class MainController {
             
         } catch (Exception e) {
              log.error("게시판 데이터 로딩 중 에러", e);
+        }
+        
+        // ==========================================
+        // 5. [주소록] 부서 목록 데이터 로딩 (모달용) 🔹 [추가됨]
+        // ==========================================
+        try {
+        	List<DeptVO> deptList = deptService.getOrgChartData(); // DAO에서 selectAllDeptList 호출함
+        	m.addAttribute("deptList", deptList);
+        } catch (Exception e) {
+        	log.error("부서 주소록 로딩 중 에러", e);
         }
 
         return "index";

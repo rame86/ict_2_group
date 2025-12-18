@@ -17,9 +17,11 @@ public interface DeptService {
 	void createDept(DeptVO vo);
 
 	void removeDept(int deptNo);
-	
+
 	void changeEmpDept(int empNo, int newDeptNo, String writerEmpNo, String note);
-	
+
 	public void setDeptManager(DocVO vo);
-	
+
+	public void editDept(DeptVO vo);
+
 }
