@@ -99,10 +99,6 @@ html, body {
   width: 100%;
 }
 
-/* grid/flex 환경에서 내용이 길어질 때 가로로 튀는 현상 방지 */
-.emp-wrapper,
-.emp-list-card,
-.emp-detail-area { min-width: 0; }
 
 /* 화면이 좁아지면 1열 */
 @media (max-width: 1100px) {
@@ -402,7 +398,7 @@ table.dataTable thead th.sorting_desc:after {
    ========================================= */
 .emp-detail-area {
   margin-top: 36px;
-  width: 100%;
+  width : 900px;
   max-width: none;
   background: #ffffff;
   border-radius: 24px;
@@ -450,7 +446,7 @@ table.dataTable thead th.sorting_desc:after {
 
 /* 기본정보 텍스트 */
 .emp-basic-info h3 {
-  font-size: 14px;
+  font-size: 13px;
   margin-bottom: 4px;
   color: #5a5c69;
 }
@@ -462,13 +458,13 @@ table.dataTable thead th.sorting_desc:after {
 
 /* 상세정보 테이블 */
 .emp-card-table {
-  width: 94%;
-  margin: 4px auto 0;
-  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;           /* colgroup 폭이 정확히 적용되게 */
 }
 
-.emp-card-table col.col-label { width: 120px; }
-.emp-card-table col.col-value { width: 260px; }
+.emp-card-table col.col-label { width: 160px; }  /* 기존 유지 */
+.emp-card-table col.col-value { width: 180px; }  /* 2번째 값칸(연락처 등)만 적당히 */
+.emp-card-table col.col-value-wide { width: auto; } /* ✅ 4번째 값칸은 남는 폭 전부 */
 
 .emp-card-table th,
 .emp-card-table td {
@@ -546,3 +542,14 @@ table.dataTable thead th.sorting_desc:after {
   --dt-row-selected: 146, 168, 209 !important;        /* #92A8D1 */
   --dt-row-selected-text: 255, 255, 255 !important;   /* #ffffff */
 }
+
+.grade-guide{
+  font-size: 13px;
+  line-height: 1.6;
+  color: #6B7280;
+  white-space: normal;   /* 줄바꿈 허용 */
+  word-break: keep-all; /* 한글 단어 깨짐 방지 */
+}
+
+
+
