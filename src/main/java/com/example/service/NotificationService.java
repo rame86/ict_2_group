@@ -58,7 +58,9 @@ public class NotificationService {
     	Map<String, Object> payload = new HashMap<>();
     	
     	payload.put("action", "REFRESH_HEADER_ALERTS");
-    	payload.put("content", "새로운 알람이 도착했습니다.");
+    	payload.put("content", alert.getContent()); 
+    	payload.put("linkType", alert.getLinkType()); 
+    	payload.put("alertStatus", alert.getAlertStatus());
     	
     	messagingTemplate.convertAndSend(destination, payload);
     	

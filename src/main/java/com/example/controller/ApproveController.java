@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.domain.AlertVO;
 import com.example.domain.ApproveListVO;
 import com.example.domain.ApproveVO;
 import com.example.domain.DocVO;
@@ -30,7 +29,6 @@ import com.example.domain.LoginVO;
 import com.example.service.ApproveService;
 import com.example.service.AttendService;
 import com.example.service.DeptService;
-import com.example.service.EmpService;
 import com.example.service.NotificationService;
 
 import jakarta.servlet.http.HttpSession;
@@ -60,7 +58,7 @@ public class ApproveController {
 	}
 
 	// 결재 현황
-	@GetMapping("approve/statusList")
+	@GetMapping("/approve/statusList")
 	public void statusList(@ModelAttribute("login") LoginVO login, Model m) {
 
 		String empNo = login.getEmpNo();
@@ -99,7 +97,7 @@ public class ApproveController {
 
 	// 결재 현황 카드
 	@ResponseBody
-	@GetMapping("approve/simpleList")
+	@GetMapping("/approve/simpleList")
 	public Map<String, Object> simpleList(@ModelAttribute("login") LoginVO login,
 			@RequestParam("status") String status) {
 
@@ -124,7 +122,7 @@ public class ApproveController {
 	}
 
 	// 결재 할 문서들이 있는곳
-	@GetMapping("approve/receiveList")
+	@GetMapping("/approve/receiveList")
 	public String receiveList(@ModelAttribute("login") LoginVO login, Model m) {
 		List<ApproveListVO> list = approveService.selectWaitingReceiveList(login.getEmpNo());
 		m.addAttribute("list", list);
@@ -132,14 +130,14 @@ public class ApproveController {
 	}
 
 	// 결재 할 문서들의 수(뱃지)
-	@GetMapping("approve/getWaitingCount")
+	@GetMapping("/approve/getWaitingCount")
 	@ResponseBody
 	public Integer getWaitingCount(@ModelAttribute("login") LoginVO login) {
 		return approveService.selectWaitingReceiveList(login.getEmpNo()).size();
 	}
 
 	// 결재 신청한 문서들이 있는곳
-	@GetMapping("approve/sendList")
+	@GetMapping("/approve/sendList")
 	public String sendList(@ModelAttribute("login") LoginVO login, Model m) {
 		Map<String, List<ApproveListVO>> list = approveService.selectSendApproveList(login.getEmpNo());
 		m.addAttribute("waitList", list.get("waitList"));
@@ -148,7 +146,7 @@ public class ApproveController {
 	}
 
 	// 문서 작성
-	@GetMapping("approve/createForm")
+	@GetMapping("/approve/createForm")
 	public void createForm(@ModelAttribute("login") LoginVO login, Model m) {
 		Map<String, Object> managerInfo = approveService.getManagerInfo(login.getEmpNo());
 		log.info("매니저 정보: {}", managerInfo);
@@ -156,7 +154,7 @@ public class ApproveController {
 	}
 
 	// 문서 작성
-	@PostMapping("approve/approve-form")
+	@PostMapping("/approve/approve-form")
 	public String approveForm(DocVO dvo, ApproveVO avo, @RequestParam(value="upfile", required=false) MultipartFile upfile) {
 		log.info("approve/approve-form 요청받음");
 		log.info(dvo.toString());
@@ -178,7 +176,7 @@ public class ApproveController {
 
 	// 문서 결재
 	@ResponseBody
-	@PostMapping("approve/approveDocument")
+	@PostMapping("/approve/approveDocument")
 	public void approveDocument(@RequestParam Integer docNo, @RequestParam String status,
 			@RequestParam(required = false) String rejectReason, @ModelAttribute("login") LoginVO login) {
 
@@ -212,7 +210,7 @@ public class ApproveController {
 	}
 
 	// 결재 완료된 문서들
-	@GetMapping("approve/finishList")
+	@GetMapping("/approve/finishList")
 	public void finishList(@ModelAttribute("login") LoginVO login, Model m) {
 		List<ApproveListVO> receiveList = approveService.selectFinishReceiveList(login.getEmpNo());
 		Map<String, List<ApproveListVO>> sendList = approveService.selectSendApproveList(login.getEmpNo());
@@ -221,7 +219,7 @@ public class ApproveController {
 	}
 
 	// 내가 보낸 문서 상세보기
-	@GetMapping("approve/documentDetailPopup")
+	@GetMapping("/approve/documentDetailPopup")
 	public void documentDetailPopup(@RequestParam Integer docNo, Model m, @ModelAttribute("login") LoginVO login) {
 		DocVO vo = approveService.selectDocNo(docNo);
 		m.addAttribute("dept", login.getDeptName());
@@ -253,7 +251,7 @@ public class ApproveController {
     }
 
 	// 다른 폼에서 오는 ajax 결제관리
-	@PostMapping("approve/approve-ajax")
+	@PostMapping("/approve/approve-ajax")
     @ResponseBody 
     public Map<String, Object> approveFormAjax(DocVO dvo, ApproveVO avo, @ModelAttribute("login") LoginVO login) {
         log.info("[ApproveController] approve-ajax 요청받음");
