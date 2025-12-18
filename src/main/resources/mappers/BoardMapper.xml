@@ -6,14 +6,15 @@
 
 	<select id="getGlobalNoticeList" resultType="NoticeBoardVO">
 		SELECT
-		N.NOTICE_NO,
-		N.EMP_NO,
-		TO_CHAR(N.NOTICE_DATE, 'YYYY-MM-DD') as NOTICE_DATE,
-		N.NOTICE_TITLE,
-		N.NOTICE_CNT,
-		U.EMP_NAME AS NOTICE_WRITER,
-		N.DEPT_NO,
-		'전체' AS DEPT_NAME
+			N.NOTICE_NO,
+			N.EMP_NO,
+			TO_CHAR(N.NOTICE_DATE, 'YYYY-MM-DD') as NOTICE_DATE,
+			N.NOTICE_TITLE,
+			N.NOTICE_CNT,
+			U.EMP_NAME AS NOTICE_WRITER,
+			N.DEPT_NO,
+			'전체' AS DEPT_NAME,
+			(SELECT COUNT(*) FROM REPLY R WHERE R.NOTICE_NO = N.NOTICE_NO) AS REPLY_CNT
 		FROM NOTICE_BOARD N
 		JOIN EMP U ON N.EMP_NO = U.EMP_NO
 		WHERE N.DEPT_NO = 0
@@ -22,13 +23,15 @@
 
 	<select id="getGlobalFreeBoardList" resultType="FreeBoardVO">
 		SELECT
-		F.BOARD_NO, 
-		F.EMP_NO, 
-		TO_CHAR(F.BOARD_DATE, 'YYYY-MM-DD') as BOARD_DATE, 
-		F.BOARD_TITLE, F.BOARD_CNT,
-		U.EMP_NAME AS BOARD_WRITER, 
-		F.DEPT_NO, 
-		'전체' AS DEPT_NAME
+			F.BOARD_NO,
+			F.EMP_NO,
+			TO_CHAR(F.BOARD_DATE, 'YYYY-MM-DD') as BOARD_DATE,
+			F.BOARD_TITLE, 
+			F.BOARD_CNT,
+			U.EMP_NAME AS BOARD_WRITER,
+			F.DEPT_NO,
+			'전체' AS DEPT_NAME,
+			(SELECT COUNT(*) FROM REPLY R WHERE R.BOARD_NO = F.BOARD_NO) AS REPLY_CNT
 		FROM FREE_BOARD F
 		JOIN EMP U ON F.EMP_NO = U.EMP_NO
 		WHERE F.DEPT_NO = 0
@@ -37,22 +40,23 @@
 
 	<select id="getDeptNoticeList" resultType="NoticeBoardVO" parameterType="int">
 		SELECT
-		N.NOTICE_NO,
-		N.EMP_NO,
-		TO_CHAR(N.NOTICE_DATE, 'YYYY-MM-DD') as NOTICE_DATE,
-		N.NOTICE_TITLE,
-		N.NOTICE_CNT,
-		U.EMP_NAME AS NOTICE_WRITER,
-		N.DEPT_NO,
-		D.DEPT_NAME
+			N.NOTICE_NO,
+			N.EMP_NO,
+			TO_CHAR(N.NOTICE_DATE, 'YYYY-MM-DD') as NOTICE_DATE,
+			N.NOTICE_TITLE,
+			N.NOTICE_CNT,
+			U.EMP_NAME AS NOTICE_WRITER,
+			N.DEPT_NO,
+			D.DEPT_NAME,
+			(SELECT COUNT(*) FROM REPLY R WHERE R.NOTICE_NO = N.NOTICE_NO) AS REPLY_CNT
 		FROM NOTICE_BOARD N
 		JOIN EMP U ON N.EMP_NO = U.EMP_NO
 		JOIN DEPT D ON N.DEPT_NO = D.DEPT_NO
 		WHERE N.DEPT_NO IN (
-		SELECT DEPT_NO
-		FROM DEPT
-		START WITH DEPT_NO = #{deptNo}
-		CONNECT BY PRIOR DEPT_NO = PARENT_DEPT_NO
+			SELECT DEPT_NO
+			FROM DEPT
+			START WITH DEPT_NO = #{deptNo}
+			CONNECT BY PRIOR DEPT_NO = PARENT_DEPT_NO
 		)
 		AND N.DEPT_NO != 0
 		ORDER BY N.NOTICE_NO DESC
@@ -60,54 +64,55 @@
 
 	<select id="getDeptFreeBoardList" resultType="FreeBoardVO" parameterType="int">
 		SELECT
-		F.BOARD_NO,
-		F.EMP_NO,
-		TO_CHAR(F.BOARD_DATE, 'YYYY-MM-DD') as BOARD_DATE,
-		F.BOARD_TITLE,
-		F.BOARD_CNT,
-		U.EMP_NAME AS BOARD_WRITER,
-		F.DEPT_NO,
-		D.DEPT_NAME
+			F.BOARD_NO,
+			F.EMP_NO,
+			TO_CHAR(F.BOARD_DATE, 'YYYY-MM-DD') as BOARD_DATE,
+			F.BOARD_TITLE,
+			F.BOARD_CNT,
+			U.EMP_NAME AS BOARD_WRITER,
+			F.DEPT_NO,
+			D.DEPT_NAME,
+			(SELECT COUNT(*) FROM REPLY R WHERE R.BOARD_NO = F.BOARD_NO) AS REPLY_CNT
 		FROM FREE_BOARD F
 		JOIN EMP U ON F.EMP_NO = U.EMP_NO
 		JOIN DEPT D ON F.DEPT_NO = D.DEPT_NO
 		WHERE F.DEPT_NO IN (
-		SELECT DEPT_NO
-		FROM DEPT
-		START WITH DEPT_NO = #{deptNo}
-		CONNECT BY PRIOR DEPT_NO = PARENT_DEPT_NO
+			SELECT DEPT_NO
+			FROM DEPT
+			START WITH DEPT_NO = #{deptNo}
+			CONNECT BY PRIOR DEPT_NO = PARENT_DEPT_NO
 		)
 		ORDER BY F.BOARD_NO DESC
 	</select>
 
 	<insert id="insertNoticeBoard" parameterType="NoticeBoardVO">
 		<selectKey keyProperty="noticeNo" resultType="string" order="BEFORE">
-	        SELECT NOTICE_NO_SEQ.NEXTVAL FROM DUAL
-	    </selectKey>
+			SELECT NOTICE_NO_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
 		INSERT INTO NOTICE_BOARD (
-	        NOTICE_NO, 
-	        EMP_NO, 
-	        NOTICE_CONTENT, 
-	        NOTICE_DATE,
-	        NOTICE_TITLE, 
-	        NOTICE_CNT, 
-	        NOTICE_WRITER, 
-	        DEPT_NO
-	    ) VALUES (
-	        #{noticeNo}, #{empNo}, 
-	        #{noticeContent}, 
-	        SYSDATE,
-	        #{noticeTitle}, 
-	        0, 
-	        #{noticeWriter}, 
-	        #{deptNo}
-	    )
+		NOTICE_NO,
+		EMP_NO,
+		NOTICE_CONTENT,
+		NOTICE_DATE,
+		NOTICE_TITLE,
+		NOTICE_CNT,
+		NOTICE_WRITER,
+		DEPT_NO
+		) VALUES (
+		#{noticeNo}, #{empNo},
+		#{noticeContent},
+		SYSDATE,
+		#{noticeTitle},
+		0,
+		#{noticeWriter},
+		#{deptNo}
+		)
 	</insert>
 
 	<update id="updateNoticeBoard" parameterType="NoticeBoardVO">
 		UPDATE NOTICE_BOARD
-		SET 
-		NOTICE_TITLE = #{noticeTitle}, 
+		SET
+		NOTICE_TITLE = #{noticeTitle},
 		NOTICE_CONTENT = #{noticeContent}
 		WHERE NOTICE_NO = #{noticeNo}
 	</update>
@@ -148,5 +153,50 @@
 	<update id="updateFreeBoardCnt" parameterType="string">
 		UPDATE FREE_BOARD SET BOARD_CNT = BOARD_CNT + 1 WHERE BOARD_NO = #{boardNo}
 	</update>
+
+	<insert id="insertReply" parameterType="ReplyVO">
+		INSERT INTO REPLY (
+		REPLY_NO,
+		BOARD_NO,
+		NOTICE_NO,
+		REPLY_WRITER_EMP_NO,
+		REPLY_CONTENT,
+		REPLY_CREATED_AT
+		) VALUES (
+		REPLY_NO_SEQ.NEXTVAL,
+		#{boardNo, jdbcType=INTEGER},
+		#{noticeNo, jdbcType=INTEGER},
+		#{replyWriterEmpNo},
+		#{replyContent},
+		SYSDATE
+		)
+	</insert>
+
+	<select id="getReplyList" parameterType="ReplyVO" resultType="ReplyVO">
+		SELECT
+		R.REPLY_NO,
+		R.BOARD_NO,
+		R.NOTICE_NO,
+		R.REPLY_WRITER_EMP_NO AS replyWriterEmpNo,
+		R.REPLY_CONTENT,
+		R.REPLY_CREATED_AT,
+		E.EMP_NAME AS replyWriterName, E.JOB_TITLE AS replyWriterJob FROM REPLY R
+		JOIN EMP E ON R.REPLY_WRITER_EMP_NO = E.EMP_NO
+		<where>
+			<if test="boardNo != null">AND R.BOARD_NO = #{boardNo}</if>
+			<if test="noticeNo != null">AND R.NOTICE_NO = #{noticeNo}</if>
+		</where>
+		ORDER BY R.REPLY_NO ASC
+	</select>
+
+	<update id="updateReply" parameterType="ReplyVO">
+		UPDATE REPLY
+		SET REPLY_CONTENT = #{replyContent}
+		WHERE REPLY_NO = #{replyNo} AND REPLY_WRITER_EMP_NO = #{replyWriterEmpNo}
+	</update>
+
+	<delete id="deleteReply" parameterType="long">
+		DELETE FROM REPLY WHERE REPLY_NO = #{replyNo}
+	</delete>
 
 </mapper>

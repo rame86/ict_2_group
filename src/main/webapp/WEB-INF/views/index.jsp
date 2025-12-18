@@ -9,118 +9,103 @@
     <title>PeopleSync - Dashboard</title>
     
     <style>
-        /* 대시보드 통계 카드 아이콘 */
-        .dashboard-card-icon {
-            font-size: 3rem;
-            opacity: 0.3;
-            position: absolute;
-            right: 20px;
-            top: 20px;
-        }
+        /* [기존 대시보드 스타일 유지] */
+        .dashboard-card-icon { font-size: 3rem; opacity: 0.3; position: absolute; right: 20px; top: 20px; }
+        .welcome-banner { background: linear-gradient(45deg, #212529, #343a40); color: white; border-radius: 0.5rem; }
+        .quick-menu-container { background-color: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
+        .quick-menu-item { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 15px; border: 1px solid #e9ecef; border-radius: 12px; background-color: #f8f9fa; text-decoration: none; color: #495057; transition: all 0.3s ease; height: 100%; }
+        .quick-menu-item:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); background-color: #fff; border-color: #0d6efd; color: #0d6efd; }
+        .quick-menu-item i { font-size: 2rem; margin-bottom: 10px; }
         
-        /* 웰컴 배너 */
-        .welcome-banner {
-            background: linear-gradient(45deg, #212529, #343a40);
-            color: white;
-            border-radius: 0.5rem;
+        /* 프로필 카드 스타일 */
+        .profile-card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15); text-align: center; padding: 30px 20px; }
+        .profile-img-container { width: 140px; height: 140px; margin: 0 auto 20px; border-radius: 50%; padding: 5px; border: 3px solid #e3e6f0; overflow: hidden; position: relative; }
+        .profile-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+        .profile-name { font-size: 1.5rem; font-weight: 800; color: #2e384d; margin-bottom: 5px; }
+        .profile-dept { color: #858796; font-size: 0.95rem; margin-bottom: 15px; }
+        .profile-badge { display: inline-block; padding: 6px 15px; background-color: #4e73df; color: white; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
+        .profile-info-row { margin-top: 25px; display: flex; justify-content: space-around; border-top: 1px solid #eaecf4; padding-top: 20px; }
+        .profile-info-item h6 { color: #b7b9cc; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+        .profile-info-item span { color: #5a5c69; font-weight: 700; font-size: 1.1rem; }
+
+        /* ---------------------------------------------------------------------------------- */
+        /* [중요] getNoticeBoardList.jsp의 스타일을 그대로 가져옴 (라인 275~283) */
+        /* ---------------------------------------------------------------------------------- */
+        #boardModal .modal-content {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* 빠른 실행 (가로형) 스타일 */
-        .quick-menu-container {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        }
-        .quick-menu-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            background-color: #f8f9fa;
-            text-decoration: none;
-            color: #495057;
-            transition: all 0.3s ease;
-            height: 100%;
-        }
-        .quick-menu-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            background-color: #fff;
-            border-color: #0d6efd;
-            color: #0d6efd;
-        }
-        .quick-menu-item i {
-            font-size: 2rem;
-            margin-bottom: 10px;
+        #boardModal .modal-header {
+            border-bottom: none; /* 헤더 구분선 제거 */
+            padding-bottom: 0;   /* 패딩 제거 */
         }
 
-        /* 내 정보 미니 프로필 카드 스타일 */
-        .profile-card {
-            background: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
-            text-align: center;
-            padding: 30px 20px;
+        #boardModal .modal-body {
+            padding: 20px 30px; /* 바디 패딩 설정 */
         }
-        .profile-img-container {
-            width: 140px;
-            height: 140px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            padding: 5px;
-            border: 3px solid #e3e6f0;
-            overflow: hidden;
-            position: relative;
-        }
-        .profile-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-        .profile-name {
+
+        /* 제목 영역 - 파란색 포인트 (왼쪽 보더) */
+        .view-title {
             font-size: 1.5rem;
-            font-weight: 800;
-            color: #2e384d;
-            margin-bottom: 5px;
-        }
-        .profile-dept {
-            color: #858796;
-            font-size: 0.95rem;
+            font-weight: bold;
+            color: #333;
             margin-bottom: 15px;
+            border-left: 5px solid #0d6efd; 
+            padding-left: 15px;
         }
-        .profile-badge {
-            display: inline-block;
-            padding: 6px 15px;
-            background-color: #4e73df;
-            color: white;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-        .profile-info-row {
-            margin-top: 25px;
+
+        /* 작성자 및 날짜 정보 박스 (회색 박스) */
+        .view-info-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 20px;
             display: flex;
-            justify-content: space-around;
-            border-top: 1px solid #eaecf4;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .info-item {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .info-item i {
+            margin-right: 5px;
+            color: #adb5bd;
+        }
+
+        /* 본문 영역 (그림자 효과 포함) */
+        .view-content-box {
+            min-height: 200px;
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 20px;
+        }
+
+        /* 댓글 영역 스타일 */
+        .comment-section {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
             padding-top: 20px;
         }
-        .profile-info-item h6 {
-            color: #b7b9cc;
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-        .profile-info-item span {
-            color: #5a5c69;
-            font-weight: 700;
-            font-size: 1.1rem;
+
+        .comment-card {
+            background-color: #fcfcfc;
+            border: 1px solid #f1f1f1;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: left; /* 대시보드는 중앙정렬이 많아 왼쪽 정렬 명시 */
         }
     </style>
 </head>
@@ -274,7 +259,17 @@
                                                         <c:when test="${not empty noticeList}">
                                                             <c:forEach var="notice" items="${noticeList}">
                                                                 <tr>
-                                                                    <td><a href="/board/detail?no=${notice.noticeNo}" class="text-dark text-decoration-none"><span class="badge bg-danger me-1">전체</span>${notice.noticeTitle}</a></td>
+                                                                    <td>
+                                                                        <a href="#" class="text-dark text-decoration-none"
+                                                                           data-bs-toggle="modal" data-bs-target="#boardModal" 
+                                                                           data-no="${notice.noticeNo}" 
+                                                                           data-title="<c:out value='${notice.noticeTitle}'/>" 
+                                                                           data-writer="${notice.noticeWriter}"
+                                                                           data-date="${notice.noticeDate}"
+                                                                           data-type="global-notice">
+                                                                             <span class="badge bg-danger me-1">전체</span>${notice.noticeTitle}
+                                                                        </a>
+                                                                    </td>
                                                                     <td>${notice.noticeWriter}</td>
                                                                     <td>${notice.noticeDate}</td>
                                                                 </tr>
@@ -285,7 +280,7 @@
                                                 </tbody>
                                             </table>
                                         </div>
-                                        
+                                       
                                         <div class="tab-pane fade" id="dept-notice">
                                             <div class="d-flex justify-content-between mb-2">
                                                 <span class="small text-muted">우리 부서 중요 공지입니다.</span>
@@ -299,8 +294,14 @@
                                                             <c:forEach var="dNotice" items="${deptNoticeList}">
                                                                 <tr>
                                                                     <td>
-                                                                        <a href="/board/detail?no=${dNotice.noticeNo}" class="text-dark text-decoration-none">
-                                                                            <span class="badge bg-primary me-1">부서</span>${dNotice.noticeTitle}
+                                                                        <a href="#" class="text-dark text-decoration-none"
+                                                                           data-bs-toggle="modal" data-bs-target="#boardModal" 
+                                                                           data-no="${dNotice.noticeNo}" 
+                                                                           data-title="<c:out value='${dNotice.noticeTitle}'/>" 
+                                                                           data-writer="${dNotice.noticeWriter}"
+                                                                           data-date="${dNotice.noticeDate}"
+                                                                           data-type="dept-notice">
+                                                                             <span class="badge bg-primary me-1">부서</span>${dNotice.noticeTitle}
                                                                         </a>
                                                                     </td>
                                                                     <td>${dNotice.noticeWriter}</td>
@@ -327,8 +328,14 @@
                                                             <c:forEach var="free" items="${deptFreeList}">
                                                                 <tr>
                                                                     <td>
-                                                                        <a href="/board/detail?no=${free.boardNo}" class="text-dark text-decoration-none">
-                                                                            <span class="badge bg-success me-1">자유</span>${free.boardTitle}
+                                                                        <a href="#" class="text-dark text-decoration-none"
+                                                                           data-bs-toggle="modal" data-bs-target="#boardModal" 
+                                                                           data-no="${free.boardNo}" 
+                                                                           data-title="<c:out value='${free.boardTitle}'/>" 
+                                                                           data-writer="${free.boardWriter}"
+                                                                           data-date="${free.boardDate}"
+                                                                           data-type="dept-free">
+                                                                             <span class="badge bg-success me-1">자유</span>${free.boardTitle}
                                                                         </a>
                                                                     </td>
                                                                     <td>${free.boardWriter}</td>
@@ -377,7 +384,6 @@
                         </div>
 
                         <div class="col-xl-4">
-                            
                             <div class="profile-card mb-4">
                                 <div class="profile-img-container">
                                     <img id="dashboardProfileImg" 
@@ -401,25 +407,24 @@
                                     <div class="profile-info-item">
                                         <h6>Status</h6>
                                         <span>
-                                            <c:choose>
-                                                <c:when test="${sessionScope.login.statusNo == 1}">재직</c:when>
-                                                <c:when test="${sessionScope.login.statusNo == 7}">파견</c:when>
-                                                <c:when test="${sessionScope.login.statusNo == 2}">휴직(자발적)</c:when>
-                                                <c:when test="${sessionScope.login.statusNo == 3}">휴직(복지)</c:when>
-                                                <c:when test="${sessionScope.login.statusNo == 4}">대기</c:when>
-                                                <c:when test="${sessionScope.login.statusNo == 5}">징계</c:when>
-                                                <c:when test="${sessionScope.login.statusNo == 6}">인턴/수습</c:when>
-                                                <c:when test="${sessionScope.login.statusNo == 0}">퇴직</c:when>
-                                                <c:otherwise>기타</c:otherwise>
-                                            </c:choose>
+                                        <c:choose>
+                                            <c:when test="${sessionScope.login.statusNo == 1}">재직</c:when>
+                                            <c:when test="${sessionScope.login.statusNo == 7}">파견</c:when>
+                                            <c:when test="${sessionScope.login.statusNo == 2}">휴직(자발적)</c:when>
+                                            <c:when test="${sessionScope.login.statusNo == 3}">휴직(복지)</c:when>
+                                            <c:when test="${sessionScope.login.statusNo == 4}">대기</c:when>
+                                            <c:when test="${sessionScope.login.statusNo == 5}">징계</c:when>
+                                            <c:when test="${sessionScope.login.statusNo == 6}">인턴/수습</c:when>
+                                            <c:when test="${sessionScope.login.statusNo == 0}">퇴직</c:when>
+                                            <c:otherwise>기타</c:otherwise>
+                                        </c:choose>
                                         </span>
                                     </div>
 
                                     <div class="profile-info-item">
                                         <h6>Position</h6>
                                         <span>
-                                           ${sessionScope.login.gradeNo == 1 ? 'CEO' : 
-                                             sessionScope.login.gradeNo == 2 ? '관리자' : '사원'}
+                                           ${sessionScope.login.gradeNo == 1 ? 'CEO' : sessionScope.login.gradeNo == 2 ? '관리자' : '사원'}
                                         </span>
                                     </div>
                                 </div>
@@ -448,83 +453,118 @@
                 </div>
                 
                 <div class="modal fade" id="deptAddressModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-            
-            <div class="modal-header bg-info text-white">
-                <h5 class="modal-title fw-bold">
-                    <i class="fas fa-building me-2"></i>사내 부서 주소록
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body p-4">
-                <div class="input-group mb-3">
-                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
-                    <input type="text" id="deptSearchInput" class="form-control border-start-0" placeholder="부서명 또는 번호를 검색하세요...">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg">
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title fw-bold"><i class="fas fa-building me-2"></i>사내 부서 주소록</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <div class="input-group mb-3">
+                                    <span class="input-group-text bg-light border-end-0"><i class="fas fa-search text-muted"></i></span>
+                                    <input type="text" id="deptSearchInput" class="form-control border-start-0" placeholder="부서명 또는 번호를 검색하세요...">
+                                </div>
+                                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                                    <table class="table table-hover align-middle" id="deptAddressTable">
+                                        <thead class="table-light sticky-top">
+                                            <tr>
+                                                <th style="width: 25%;">부서명 (번호)</th>
+                                                <th style="width: 45%;">주소</th>
+                                                <th style="width: 30%;">연락처</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <c:choose>
+                                                <c:when test="${not empty deptList}">
+                                                    <c:forEach var="dept" items="${deptList}">
+                                                        <tr>
+                                                            <td>
+                                                                <div class="fw-bold text-dark">${dept.deptName}</div>
+                                                                <span class="badge bg-secondary rounded-pill" style="font-size: 0.75rem;">Code: ${dept.deptNo}</span>
+                                                            </td>
+                                                            <td>
+                                                                <div class="text-secondary small">
+                                                                    <i class="fas fa-map-marker-alt me-1 text-danger opacity-50"></i>
+                                                                    ${empty dept.deptAddr ? '<span class="text-muted">-</span>' : dept.deptAddr}
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex align-items-center">
+                                                                    <div class="icon-circle bg-success bg-opacity-10 text-success me-2" style="width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                                                        <i class="fas fa-phone-alt" style="font-size:0.8rem;"></i>
+                                                                    </div>
+                                                                    <span class="fw-bold text-dark">${empty dept.deptPhone ? '<span class="text-muted small">미등록</span>' : dept.deptPhone}</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </c:forEach>
+                                                </c:when>
+                                                <c:otherwise><tr><td colspan="3" class="text-center py-5 text-muted"><i class="fas fa-exclamation-circle fa-2x mb-3"></i><br>등록된 부서 정보가 없습니다.</td></tr></c:otherwise>
+                                            </c:choose>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="modal-footer bg-light">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
-                    <table class="table table-hover align-middle" id="deptAddressTable">
-                        <thead class="table-light sticky-top">
-                            <tr>
-                                <th style="width: 25%;">부서명 (번호)</th>
-                                <th style="width: 45%;">주소</th>
-                                <th style="width: 30%;">연락처</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:choose>
-                                <c:when test="${not empty deptList}">
-                                    <c:forEach var="dept" items="${deptList}">
-                                        <tr>
-                                            <td>
-                                                <div class="fw-bold text-dark">${dept.deptName}</div>
-                                                <span class="badge bg-secondary rounded-pill" style="font-size: 0.75rem;">
-                                                    Code: ${dept.deptNo}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="text-secondary small">
-                                                    <i class="fas fa-map-marker-alt me-1 text-danger opacity-50"></i>
-                                                    ${empty dept.deptAddr ? '<span class="text-muted">-</span>' : dept.deptAddr}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="icon-circle bg-success bg-opacity-10 text-success me-2" 
-                                                         style="width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
-                                                        <i class="fas fa-phone-alt" style="font-size:0.8rem;"></i>
-                                                    </div>
-                                                    <span class="fw-bold text-dark">
-                                                        ${empty dept.deptPhone ? '<span class="text-muted small">미등록</span>' : dept.deptPhone}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <tr>
-                                        <td colspan="3" class="text-center py-5 text-muted">
-                                            <i class="fas fa-exclamation-circle fa-2x mb-3"></i><br>
-                                            등록된 부서 정보가 없습니다.
-                                        </td>
-                                    </tr>
-                                </c:otherwise>
-                            </c:choose>
-                        </tbody>
-                    </table>
+                <div class="modal fade" id="boardModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+
+                                <div class="view-title" id="modalTitleText">제목 로딩중...</div>
+
+                                <div class="view-info-box">
+                                    <span class="info-item"> 
+                                        <i class="fas fa-user-circle"></i> <span id="modalWriterText">작성자</span>
+                                    </span> 
+                                    <span class="info-item"> 
+                                        <i class="far fa-clock"></i> <span id="modalDateText">0000-00-00</span>
+                                    </span>
+                                </div>
+
+                                <div id="modalContentText" class="view-content-box">내용 로딩중...</div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-4">
+                                    <button class="btn btn-outline-secondary" type="button" id="btnToggleComment" data-bs-toggle="collapse" data-bs-target="#collapseComments" aria-expanded="false" aria-controls="collapseComments">
+                                        <i class="far fa-comment-dots me-1"></i> 댓글
+                                    </button>
+                                    <div>
+                                        <input type="hidden" id="currentNoticeNo">
+                                        <input type="hidden" id="currentBoardNo">
+                                        <input type="hidden" id="currentBoardType">
+                                        
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                                    </div>
+                                </div>
+
+                                <div class="collapse comment-section" id="collapseComments">
+                                    <div class="d-flex mb-3">
+                                        <div class="flex-shrink-0 me-2">
+                                            <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <input type="text" id="replyInput" class="form-control" placeholder="댓글을 입력하세요...">
+                                        </div>
+                                        <button type="button" id="btnReplySubmit" class="btn btn-primary ms-2">등록</button>
+                                    </div>
+
+                                    <div class="comment-list-container">
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-            </div>
-        </div>
-    </div>
-</div>
-            </main>
+                </main>
             
             <jsp:include page="common/footer.jsp" flush="true"/>
             <jsp:include page="common/developer_info.jsp" flush="true"/>
@@ -537,8 +577,11 @@
         const dateElement = document.getElementById('currentDate');
         const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
         dateElement.innerText = new Date().toLocaleDateString('ko-KR', options);
+        
+        var LOGIN_EMP_NO = "${sessionScope.login.empNo}";
+
         $(document).ready(function() {
-            /* 프로필 사진 로드 (기존 로직 유지) */
+            /* 프로필 사진 로드 */
             var myEmpNo = '${sessionScope.login.empNo}';
             if(myEmpNo) {
                 $.ajax({
@@ -553,17 +596,178 @@
                     }
                 });
             }
-        });
-        // 모달 내부 검색 필터링 기능
-        document.getElementById('deptSearchInput').addEventListener('keyup', function() {
-            var value = this.value.toLowerCase();
-            var rows = document.querySelectorAll('#deptAddressTable tbody tr');
-            
-            rows.forEach(function(row) {
-                var text = row.textContent.toLowerCase();
-                row.style.display = text.indexOf(value) > -1 ? '' : 'none';
+
+            // 부서 주소록 검색 필터링
+            var searchInput = document.getElementById('deptSearchInput');
+            if(searchInput){
+                searchInput.addEventListener('keyup', function() {
+                    var value = this.value.toLowerCase();
+                    var rows = document.querySelectorAll('#deptAddressTable tbody tr');
+                    rows.forEach(function(row) {
+                        var text = row.textContent.toLowerCase();
+                        row.style.display = text.indexOf(value) > -1 ? '' : 'none';
+                    });
+                });
+            }
+
+            // --------------------------------------------------------------------
+            // [중요] 게시판 상세 모달 JS 로직 (새로운 HTML 구조에 맞게 ID 매핑 확인됨)
+            // --------------------------------------------------------------------
+            var $boardModal = $('#boardModal');
+            $boardModal.on('show.bs.modal', function(event) {
+                var button = $(event.relatedTarget);
+                var no = button.data('no');
+                var title = button.data('title');
+                var writer = button.data('writer');
+                var date = button.data('date');
+                var type = button.data('type'); 
+
+                // 초기 UI 텍스트 세팅
+                $boardModal.find('#modalTitleText').text(title);
+                $boardModal.find('#modalWriterText').text(writer || '작성자 정보 없음');
+                $boardModal.find('#modalDateText').text(date || '-');
+                $boardModal.find('#modalContentText').text('내용 로딩중...');
+                
+                $('#collapseComments').collapse('hide');
+                $('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글');
+
+                var url = '';
+                var dataObj = {};
+
+                // 대시보드 로직: 공지사항 vs 자유게시판 구분
+                if (type === 'global-notice' || type === 'dept-notice') {
+                    url = '/board/getContentNoticeBoard';
+                    dataObj = { noticeNo: no };
+                    $('#currentNoticeNo').val(no);
+                    $('#currentBoardNo').val('');
+                } else {
+                    url = '/board/getContentFreeBoard';
+                    dataObj = { boardNo: no };
+                    $('#currentBoardNo').val(no);
+                    $('#currentNoticeNo').val('');
+                }
+                $('#currentBoardType').val(type);
+
+                // 내용 로드 AJAX
+                $.ajax({
+                    url : url,
+                    type : 'POST',
+                    data : dataObj,
+                    dataType : 'json',
+                    success : function(response) {
+                        var content = response.noticeContent || response.boardContent;
+                        if (content) {
+                            $boardModal.find('#modalContentText').text(content);
+                        } else {
+                            $boardModal.find('#modalContentText').text('내용을 불러올 수 없습니다.');
+                        }
+                    },
+                    error : function() {
+                        $boardModal.find('#modalContentText').text('오류가 발생했습니다.');
+                    }
+                });
+            });
+
+            // 모달이 열린 후 댓글 로드
+            $boardModal.on('shown.bs.modal', function() {
+                loadReplies();
+            });
+
+            // 댓글 등록 이벤트
+            $('#btnReplySubmit').on('click', function() {
+                let content = $('#replyInput').val();
+                let noticeNo = $('#currentNoticeNo').val();
+                let boardNo = $('#currentBoardNo').val();
+
+                if(!content.trim()) {
+                    alert("댓글 내용을 입력하세요.");
+                    return;
+                }
+
+                let sendData = {
+                    replyContent: content,
+                    noticeNo: noticeNo || null,
+                    boardNo: boardNo || null
+                };
+
+                $.ajax({
+                    url: '/replies/insert',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(sendData),
+                    success: function(res) {
+                        if(res === "success") {
+                            $('#replyInput').val('');
+                            loadReplies();
+                        } else {
+                            alert("댓글 등록에 실패했습니다.");
+                        }
+                    },
+                    error: function(err) { console.log("에러 발생", err); }
+                });
             });
         });
+
+        // 댓글 목록 로드 함수
+        function loadReplies() {
+            let noticeNo = $('#currentNoticeNo').val();
+            let boardNo = $('#currentBoardNo').val();
+            let dataObj = noticeNo ? { noticeNo: noticeNo } : { boardNo: boardNo };
+
+            $.ajax({
+                url: '/replies/list',
+                type: 'GET',
+                data: dataObj,
+                dataType: 'json', 
+                success: function(list) {
+                    let totalCount = list ? list.length : 0;
+                    $('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글 (' + totalCount + ')');
+                    
+                    let html = '';
+                    if(!list || list.length === 0){
+                        html = '<p class="text-center text-muted my-3">작성된 댓글이 없습니다.</p>';
+                    } else {
+                        list.forEach(reply => {
+                            let date = new Date(reply.replyCreatedAt);
+                            let dateStr = date.toISOString().split('T')[0] + " " + date.toTimeString().split(' ')[0].substring(0,5);
+                            let writerDisplay = (reply.replyWriterName || reply.replyWriterEmpNo) + (reply.replyWriterJob ? ' (' + reply.replyWriterJob + ')' : '');
+                            
+                            html += '<div class="comment-card" id="reply-' + reply.replyNo + '">';
+                            html += '  <div class="d-flex justify-content-between">';
+                            html += '    <strong class="text-dark">' + writerDisplay + '</strong>';
+                            html += '    <small class="text-muted">' + dateStr + '</small>';
+                            html += '  </div>';
+                            html += '  <p class="mb-0 mt-1 text-secondary small">' + reply.replyContent + '</p>';
+                            if (LOGIN_EMP_NO == reply.replyWriterEmpNo) {
+                                html += '  <div class="mt-2 text-end">';
+                                html += '    <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none" onclick="deleteReply(' + reply.replyNo + ')">삭제</button>';
+                                html += '  </div>';
+                            }
+                            html += '</div>';
+                        });
+                    }
+                    $('.comment-list-container').html(html);
+                },
+                error: function(err){ console.log("댓글 로드 실패", err); }
+            });
+        }
+
+        // 댓글 삭제 함수
+        window.deleteReply = function(replyNo) {
+            if(!confirm("정말 삭제하시겠습니까?")) return;
+            $.ajax({
+                url: '/replies/delete',
+                type: 'POST',
+                data: { replyNo: replyNo },
+                success: function(res) {
+                    if(res === "success") {
+                        loadReplies();
+                    } else {
+                        alert("삭제 실패");
+                    }
+                }
+            });
+        };
     </script>
 </body>
 </html>

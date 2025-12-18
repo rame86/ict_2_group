@@ -3,6 +3,7 @@ package com.example.repository;
 import java.util.List;
 import com.example.domain.FreeBoardVO;
 import com.example.domain.NoticeBoardVO;
+import com.example.domain.ReplyVO;
 
 public interface BoardDAO {
 
@@ -16,7 +17,7 @@ public interface BoardDAO {
 
 	public List<FreeBoardVO> getDeptFreeBoardList(Integer deptNo);
 
-	// CRUD 
+	// CRUD
 	public String insertNoticeBoard(NoticeBoardVO vo);
 
 	public String updateNoticeBoard(NoticeBoardVO vo);
@@ -32,4 +33,13 @@ public interface BoardDAO {
 	public FreeBoardVO getContentFreeBoard(String boardNo);
 
 	public void updateFreeBoardCnt(String boardNo);
+
+	// 댓글 관련
+	int insertReply(ReplyVO vo);
+
+	List<ReplyVO> getReplyList(ReplyVO vo); // boardNo 또는 noticeNo로 조회
+
+	int updateReply(ReplyVO vo);
+
+	int deleteReply(Long replyNo);
 }
