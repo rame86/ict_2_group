@@ -16,6 +16,9 @@ import com.example.repository.DeptDAO;
 import com.example.repository.EmpDAO;
 import com.example.repository.EmpDeptMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class DeptServiceImpl implements DeptService {
 
@@ -67,25 +70,34 @@ public class DeptServiceImpl implements DeptService {
 		deptDAO.insertEditLog(map);
 	}
 
+	@Transactional
 	public void setDeptManager(DocVO vo) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("empNo", vo.getTargetEmpNo());
 		map.put("writer", vo.getEmpNo());
 		map.put("targetDeptNo", vo.getTargetDeptNo());
+		
 		if (vo.getDocType().equals("6")) {
 			map.put("jobTitle", vo.getMemo()+" 부서장");
 			map.put("eNote", vo.getMemo() + "부서장 임명 및 권한등급 상향");
-			map.put("targetGradeNo", "2");
+			map.put("targetGradeNo", 2);
 			map.put("managerEmpNo", vo.getTargetEmpNo());
 			
 		}else if  (vo.getDocType().equals("7")) {			
 			map.put("jobTitle", "사원");
 			map.put("eNote", vo.getMemo() + "부서장 해임 및 권한등급 하향");
-			map.put("targetGradeNo", "3");
+			map.put("targetGradeNo", 3);
 			map.put("managerEmpNo", null);
 		}
 
+		log.info("사원수정 정보"+map.toString());
+		
 		deptDAO.setDeptManager(map);
 		empDAO.setEmpJobTitle(map);
 	}
+	
+	// 부서 수정
+    public void editDept(DeptVO vo) {
+        deptDAO.updateDept(vo);
+    }
 }

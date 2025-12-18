@@ -24,8 +24,10 @@ public class ApproveServiceImpl implements ApproveService {
 
     @Autowired
     private ApproveDAO approveDao;
+    
     @Autowired
     AlertService alertService;
+    
     @Autowired
     private NotificationService notificationService;
     
@@ -124,12 +126,12 @@ public class ApproveServiceImpl implements ApproveService {
         }
     }
     
-    // ... 나머지 메서드는 그대로 유지 ...
     @Override
     public Map<String, List<ApproveListVO>> selectReceiveApproveList(String empNo) {
-        // 기존 코드 그대로...
+
         Map<String, Object> param = new HashMap<>();
         param.put("empNo", empNo);
+        
         List<ApproveListVO> list = approveDao.selectReceiveApproveList(param);
         List<ApproveListVO> waitingList = new ArrayList<>();
         List<ApproveListVO> finishList = new ArrayList<>();
@@ -274,12 +276,24 @@ public class ApproveServiceImpl implements ApproveService {
             log.info("Alert: 수신자 사원 번호가 유효하지 않아 알림을 저장하지 못했습니다. docNo: {}", docNo);
             return;
         }
+        
         log.info("Alert 시도: 수신자 {}, 문서 {}", receiveEmpNo, docNo);
         AlertVO alert = new AlertVO();
         alert.setEmpNo(String.valueOf(receiveEmpNo));
         alert.setLinkType("APPROVAL");
         alert.setLinkId(docNo);
         alert.setTitle(alertTitle);
+        alert.setContent(alertTitle + " 알림이 도착했습니다.");
+        
+        if (alertTitle.contains("요청")) {
+            alert.setAlertStatus("REQUEST");
+        } else if (alertTitle.contains("승인")) {
+            alert.setAlertStatus("FINAL_APPROVAL");
+        } else if (alertTitle.contains("반려")) {
+            alert.setAlertStatus("REJECT");
+        } else {
+            alert.setAlertStatus("IN_PROGRESS");
+        }
         
         try {
             alertService.saveNewAlert(alert);
@@ -288,4 +302,39 @@ public class ApproveServiceImpl implements ApproveService {
             log.error("Alert: 알림 저장 중 오류 발생 (수신자: {}): {}", receiveEmpNo, e.getMessage());
         }
     }
+
+	@Override
+	public Map<String, Object> getManagerInfo(String empNo) {
+		
+		Map<String, Object> rawData = approveDao.selectApprovalLineInfo(empNo);
+		Map<String, Object> result = new HashMap<>();
+		
+		log.info("DB 원본 데이터: {}", rawData);
+		
+		if (rawData != null) {
+			String parentDeptNo = String.valueOf(rawData.get("parentDeptNo"));
+	        
+	        result.put("deptName", rawData.get("deptName"));
+
+	        // 3. 로직 처리 (상위부서가 1001일 때의 예외 처리)
+	        if ("1001".equals(parentDeptNo)) {
+	            result.put("managerEmpNo", null);
+	            result.put("managerName", "없음(최상위부서)");
+	            
+	            // 상위가 1001이면 현재 부서의 장을 2차 결재자로 승격
+	            result.put("parentManagerEmpNo", rawData.get("managerEmpNo"));
+	            result.put("parentManagerName", rawData.get("managerName"));
+	        } else {
+	            // 일반적인 경우
+	            result.put("managerEmpNo", rawData.get("managerEmpNo"));
+	            result.put("managerName", rawData.get("managerName"));
+	            
+	            result.put("parentManagerEmpNo", rawData.get("parentManagerEmpNo"));
+	            result.put("parentManagerName", rawData.get("parentManagerName"));
+	        }
+	    }
+		
+		return result;
+		
+	}
 }

@@ -1,27 +1,17 @@
 package com.example.service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.example.domain.AlertVO;
-import com.example.domain.ApproveListVO;
 
-import com.example.repository.ApproveDAO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class NotificationService {
-	
-	@Autowired
-	private ApproveDAO approveDao;
 	
 	// STOMP 메시지 브로커로 메시지를 보내는 핵심 컴포넌트
     private final SimpMessagingTemplate messagingTemplate;

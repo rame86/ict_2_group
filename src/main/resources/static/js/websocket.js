@@ -84,76 +84,84 @@ function getAlertDetails(type) {
 
 // 알림 드롭다운 아래 목록
 function createAlertItemHtml(alert) {
-    const details = getAlertDetails(alert.type); // 알림 유형에 따른 정보 가져오기
-    console.log(alert);
-    // 시간 포맷팅 (예: 58m 전, 10:30 AM)
-    let formattedTime = '시간 오류';
+    const details = getAlertDetails(alert.type); 
+    
+    // 시간 포맷팅
+    let formattedTime = '방금 전';
     if (alert.sentTime) {
         try {
             const date = new Date(alert.sentTime);
-            // 한국 시간 기준 포맷팅 (예시)
             formattedTime = date.toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit' }); 
-        } catch (e) {
-			formattedTime = alert.sentTime;
-		}
+        } catch (e) { formattedTime = alert.sentTime; }
     }
 	
-	let fullUrl = '#'; // 기본값은 #
+    let targetAction = '';
+    let targetUrl = 'javascript:void(0);'; // 기본 클릭 동작 차단
 
-	// alert 객체에 linkType과 linkId가 있는지 확인합니다.
-	if (alert.linkType && alert.linkId) {
-	        
-	switch (alert.linkType) {
-		case 'APPROVAL':
-		// 결재 문서는 문서 번호를 쿼리 파라미터로 보냅니다.
-		// 예: /approve/detail?docNo=188
-		fullUrl = '/approve/detail?docNo=' + alert.linkId;
-		break;
-	                
-		case 'NOTICE':
-		// 공지사항은 문서 번호를 경로로 보냅니다.
-		// 예: /notice/view/15
-		fullUrl = '/notice/view/' + alert.linkId; 
-		break;
-	                
-		// 필요하다면 다른 linkType도 추가합니다.
-		case 'MESSAGE':
-		// 메시지 관련 링크 (예시)
-		fullUrl = '/message/view/' + alert.linkId;
-		break;
-	                
-		default:
-		// 매핑되지 않은 기타 알림은 기본 링크 사용 (details.link)
-		fullUrl = details.link || '#';
-		break;
-		}
-	} else {
-		// linkType이나 linkId가 누락된 경우
-		fullUrl = details.link || '#';
-	}
+    if (alert.linkType && alert.linkId) {
+        switch (alert.linkType) {
+            case 'APPROVAL':
+                // ⭐ [핵심 수정] 결재 알림 클릭 시 동작 정의
+                // 1. 문서 번호와 상태 확인
+                const docNo = alert.linkId;
+                const status = alert.alertStatus; // DTO에 alertStatus가 포함되어 있어야 함
+                const contextPath = typeof CONTEXT_PATH !== 'undefined' ? CONTEXT_PATH : '';
 
-	let html = '<a class="list-group-item list-group-item-action" href="' + fullUrl + '">';
-	    html += '<div class="d-flex align-items-center">'; // ⭐ py-2 클래스 유지
-	    html += '<div class="me-3" style="width: 40px; height: 40px;">'; // ⭐ width/height 스타일 유지
-	    // 아이콘 설정: icon-circle bg-light p-2 rounded-circle text-primary (text-primary 대신 details.iconClass 사용)
-	    html += '<div class="icon-circle bg-light p-2 rounded-circle ' + details.iconClass + '">';
-	    html += '<i class="' + details.icon + '"></i>'; // ⭐ 아이콘 클래스 사용
-	    html += '</div>';
-	    html += '</div>';
-	    // 2. 내용 영역
-	    html += '<div class="w-100">'; // ⭐ w-100 클래스 유지
-	    // 시간 및 발신자
-	    html += '<div class="small text-gray-500 mb-1">' + (alert.senderName || '시스템') + ' · ' + formattedTime + '</div>'; // ⭐ mb-1 클래스 유지
-	    // 제목
-	    html += '<span class="fw-bold text-truncate" style="max-width: 250px;">'; // ⭐ fw-bold 및 max-width 스타일 유지
-	    html += alert.title;
-	    html += '</span>';
-	    html += '</div>';
-	    html += '</div>';
-	    html += '</a>';
-	    
-	    return html;
-		
+                // 2. 상태에 따른 이동 로직 분기 (messageList.jsp와 유사하게 맞춤)
+                if (status === 'REQUEST') {
+                    // [결재 요청] -> 결재 대기 문서함으로 이동 (가장 안전)
+                    // 또는 팝업을 띄우고 싶다면 아래 else if처럼 window.open 사용 가능
+                    targetUrl = '/approve/receiveList';
+                } else if (['FINAL_APPROVAL', 'REJECT', 'IN_PROGRESS'].includes(status)) {
+                    // [결재 완료/진행] -> 상세 팝업 띄우기 (오류 없이 문서 확인 가능)
+                    targetAction = `onclick="window.open('${contextPath}/approve/documentDetailPopup?docNo=${docNo}', 'detailPopup', 'width=800,height=900,scrollbars=yes'); return false;"`;
+                } else {
+                    // [기타] -> 팝업으로 기본 연결
+                    targetAction = `onclick="window.open('${contextPath}/approve/documentDetailPopup?docNo=${docNo}', 'detailPopup', 'width=800,height=900,scrollbars=yes'); return false;"`;
+                }
+                break;
+                
+            case 'BOARD':
+                // 공지사항: 리스트 이동 + 모달 자동 띄우기
+                targetUrl = '/board/getNoticeBoardList?noticeNo=' + alert.linkId;
+                break;
+            
+            case 'MESSAGE':
+                // 쪽지
+                targetUrl = '/message/messageList?otherEmpNo=' + alert.linkId;
+                break;
+                
+            default:
+                targetUrl = details.link || '#';
+                break;
+        }
+    }
+
+    // onclick 액션이 따로 지정되지 않았다면 href 이동 처리
+    if (!targetAction) {
+        targetAction = `href="${targetUrl}"`;
+    } else {
+        targetAction += ` href="#"`; // 팝업인 경우 href는 무시
+    }
+
+    // HTML 생성 (백틱 방식이 아닌 + 연결 방식 유지 요청 반영)
+    let html = '<a class="list-group-item list-group-item-action" ' + targetAction + '>';
+    html += '<div class="d-flex align-items-center">';
+    html += '<div class="me-3" style="width: 40px; height: 40px;">';
+    html += '<div class="icon-circle bg-light p-2 rounded-circle ' + details.iconClass + '">';
+    html += '<i class="' + details.icon + '"></i>';
+    html += '</div>';
+    html += '</div>';
+    html += '<div class="w-100">';
+    html += '<div class="small text-gray-500 mb-1">' + (alert.senderName || '시스템') + ' · ' + formattedTime + '</div>';
+    html += '<span class="fw-bold text-truncate" style="max-width: 250px; display: block;">';
+    html += (alert.title || '알림');
+    html += '</span>';
+    html += '</div>';
+    html += '</div>';
+    html += '</a>';
+    
+    return html;
 }
 
 function updateHeaderAlerts() {

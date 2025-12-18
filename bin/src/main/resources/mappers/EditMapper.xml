@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.repository.EditMapper">
+
+    <!-- 🔹 공통 ResultMap -->
+    <resultMap id="editMap" type="com.example.domain.EditVO">
+        <id     column="EDIT_NO"     property="editNo"/>
+        <result column="EMP_NO"      property="empNo"/>
+        <result column="E_NOTE"      property="eNote"/>
+        <result column="UPDATE_DAY"  property="updateDay"/>
+        <result column="WRITER"      property="writer"/>
+    </resultMap>
+
+    <!-- INSERT -->
+    <insert id="insertEdit" parameterType="com.example.domain.EditVO">
+        INSERT INTO EDIT (
+            EDIT_NO,
+            EMP_NO,
+            E_NOTE,
+            UPDATE_DAY,
+            WRITER
+        ) VALUES (
+            EDIT_SEQ.NEXTVAL,
+            #{empNo},
+            #{eNote},
+            SYSDATE,
+            #{writer}
+        )
+    </insert>
+
+    <!-- UPDATE (지금은 안 써도 되지만 두셔도 괜찮아요) -->
+    <update id="updateEdit" parameterType="com.example.domain.EditVO">
+        UPDATE EDIT
+           SET E_NOTE     = #{eNote},
+               UPDATE_DAY = SYSDATE,
+               WRITER     = #{writer}
+         WHERE EDIT_NO    = #{editNo}
+    </update>
+
+    <!-- 🔹 사원별 마지막 EDIT 이력 1건 조회 -->
+    <select id="selectLastEditByEmpNo"
+            parameterType="string"
+            resultMap="editMap">
+
+        SELECT
+            EDIT_NO,
+            EMP_NO,
+            E_NOTE,
+            TO_CHAR(UPDATE_DAY, 'YYYY-MM-DD') AS UPDATE_DAY,
+            WRITER
+        FROM (
+            SELECT *
+            FROM EDIT
+            WHERE EMP_NO = #{empNo}
+            ORDER BY UPDATE_DAY DESC, EDIT_NO DESC
+        )
+        WHERE ROWNUM = 1
+    </select>
+
+    <!-- 🔹 이력 전체 조회 (최신순) -->
+    <select id="selectEditListByEmpNo"
+            parameterType="string"
+            resultMap="editMap">
+        SELECT
+            EDIT_NO,
+            EMP_NO,
+            E_NOTE,
+            TO_CHAR(UPDATE_DAY, 'YYYY-MM-DD') AS UPDATE_DAY,
+            WRITER
+        FROM EDIT
+        WHERE EMP_NO = #{empNo}
+        ORDER BY UPDATE_DAY DESC, EDIT_NO DESC
+    </select>
+
+</mapper>

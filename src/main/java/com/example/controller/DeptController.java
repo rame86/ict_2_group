@@ -29,11 +29,14 @@ public class DeptController {
 	public String department(Model m, HttpSession session) {
 		List<DeptVO> deptList = deptService.getOrgChartData();
 		m.addAttribute("deptList", deptList);
+		
 		// 2. 권한 체크 로직 (여기서 확실하게 계산)
 		LoginVO login = (LoginVO) session.getAttribute("login");
 		boolean isAdmin = false;
 
-		if (login != null) {
+		if (login != null) {		
+			m.addAttribute("myDeptNo", login.getDeptNo()); 
+
 			// String으로 변환해서 비교
 			String dNo = String.valueOf(login.getDeptNo());
 			String gNo = String.valueOf(login.getGradeNo()).trim();
@@ -93,6 +96,19 @@ public class DeptController {
 		}
 	}
 
+	// 부서 수정
+	@PostMapping("/dept/update")
+	@ResponseBody
+	public String updateDept(DeptVO vo) {
+		try {
+			deptService.editDept(vo);
+			return "OK";
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "FAIL";
+		}
+	}
+
 	// 사원 부서 이동 / 제외 처리
 	@PostMapping("/dept/moveEmp")
 	@ResponseBody
@@ -105,7 +121,7 @@ public class DeptController {
 		String gNo = String.valueOf(login.getGradeNo());
 		// 권한 체크 (2000, 2010 부서의 관리자만 가능)
 		boolean isAuth = false;
-		if((dNo.equals("2000") || dNo.equals("2010")) && (gNo.equals("1") || gNo.equals("2"))) {
+		if ((dNo.equals("2000") || dNo.equals("2010")) && (gNo.equals("1") || gNo.equals("2"))) {
 			isAuth = true;
 		}
 
@@ -121,5 +137,4 @@ public class DeptController {
 			return "FAIL";
 		}
 	}
-
 }

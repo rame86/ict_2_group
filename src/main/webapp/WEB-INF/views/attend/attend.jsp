@@ -41,6 +41,7 @@
     .fc-day-sat .fc-daygrid-day-number, .fc-day-sun .fc-daygrid-day-number { color: #F44336; }
     .fc-daygrid-day-frame, .fc-event { cursor: pointer; }
     .sb-sidenav-menu-nested.nav a { visibility: visible !important; }
+  
 </style>
 
 <script>
@@ -417,7 +418,7 @@
                 dataType: 'json',
                 success: function(res) {
                     if(res.success) {
-                        alert('✅ 상신 완료되었습니다.\n[전자결재 > 상신함]에서 확인 가능합니다.');
+                        alert('✅ 상신 완료되었습니다.\n[전자결재 > 결재 현황]에서 확인 가능합니다.');
                         $modal.removeClass('show');
                         location.reload(); 
                     } else {
@@ -439,11 +440,16 @@
 
 <body class="sb-nav-fixed bg-gray-100">
     <jsp:include page="../common/header.jsp" flush="true" />
-    <div id="layoutSidenav">
+    
+    <div id="layoutSidenav">        
         <jsp:include page="../common/sidebar.jsp" flush="true" />
+        
         <div id="layoutSidenav_content">
             <main class="px-4 py-6">
-                <h3 class="font-bold text-2xl text-gray-800 mb-4">근태 현황</h3>
+                <h2 class="mt-4">근태 현황</h2>
+					<ol class="breadcrumb mb-4">
+						<li class="breadcrumb-item active">Attendance status</li>
+					</ol>
                 <div class="flex flex-col lg:flex-row gap-6">
                     <div class="w-full lg:w-1/3 bg-white p-4 rounded-xl shadow border">
                         <div class="chart-container">
@@ -466,8 +472,8 @@
                         </div>
                         <div id="calendar"></div>
                         <div class="flex justify-end gap-3 mt-4 border-t pt-4">
-                            <button id="btnVacation" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl"><i class="fas fa-plane-departure text-warning"></i>휴가 신청</button>
-                            <button id="btnCommuteCorrection" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl">출/퇴근 정정</button>
+                            <button id="btnVacation" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl"><i class="fas fa-plane-departure text-gray-200"></i> 휴가 신청</button>
+                            <button id="btnCommuteCorrection" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl"><i class="fas fa-wrench text-gray-200"></i> 출/퇴근 정정</button>
                         </div>
                     </div>
                 </div>

@@ -1,10 +1,74 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.example.domain.MemberVO">
-	<select id="loginCheck" parameterType="MemberVO" resultType="MemberVO">
-		SELECT *
-		FROM  member
-		where id=#{id} and pass=#{pass}		
+<mapper namespace="com.example.repository.MemberDAO">
+
+	<select id="kakaoLoginInfo" parameterType="String"
+		resultType="loginVO">
+		SELECT
+		E.*,
+		D.MANAGER_EMP_NO,
+		D.DEPT_NAME,
+		D.PARENT_DEPT_NO,
+		D.DEPT_ADDR,
+		D.DEPT_PHONE
+		FROM
+		EMP E
+		JOIN
+		DEPT D ON E.DEPT_NO = D.DEPT_NO
+		WHERE
+		E.kakao_id =
+		#{kakaoId}
 	</select>
+
+	<select id="loginCheck" parameterType="MemberVO"
+		resultType="loginVO">
+		SELECT
+		E.*,
+		D.MANAGER_EMP_NO,
+		D.DEPT_NAME,
+		D.PARENT_DEPT_NO,
+		D.DEPT_ADDR,
+		D.DEPT_PHONE
+		FROM
+		EMP E
+		JOIN
+		DEPT D ON E.DEPT_NO = D.DEPT_NO
+		WHERE
+		E.EMP_NO = #{empNo}
+		AND E.EMP_PASS
+		= #{empPass}
+	</select>
+
+	<select id="empNoCheck" parameterType="EmpVO"
+		resultType="EmpVO">
+		SELECT *
+		FROM EMP
+		WHERE EMP_NO = #{empNo} AND EMP_NAME =	#{empName}
+	</select>
+
+	<select id="KakaoMemberCheck" parameterType="String"
+		resultType="String">
+		SELECT KAKAO_ID
+		FROM EMP
+		WHERE KAKAO_ID = #{kakaoId}
+	</select>
+
+	<select id="getNextMemberNo" resultType="java.lang.Long">
+		SELECT
+		MEMBER_SEQ.NEXTVAL FROM DUAL
+	</select>
+
+
+	<insert id="insertMember" parameterType="MemberSaveVO">
+		UPDATE EMP
+		SET
+		KAKAO_ID = #{kakaoId, jdbcType=VARCHAR},
+		EMP_PASS = #{empPass},
+		EMP_EMAIL = #{empEmail}
+		WHERE EMP_NO =
+		#{empNo}
+	</insert>
+
+
 </mapper>

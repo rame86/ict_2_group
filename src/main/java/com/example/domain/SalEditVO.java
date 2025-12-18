@@ -22,5 +22,6 @@ public class SalEditVO {
     private Integer beforeDeduct, afterDeduct;
     private Integer beforeRealPay, afterRealPay;
     
+    private String editByName; // 정정사원 이름
     
 }

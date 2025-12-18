@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.domain.AlertVO;
 import com.example.domain.ApproveListVO;
@@ -140,25 +141,19 @@ public class ApproveController {
 
 	// 문서 작성
 	@GetMapping("approve/createForm")
-	public void createForm() {
+	public void createForm(@ModelAttribute("login") LoginVO login, Model m) {
+		Map<String, Object> managerInfo = approveService.getManagerInfo(login.getEmpNo());
+		log.info("매니저 정보: {}", managerInfo);
+		m.addAttribute("manager", managerInfo);
 	}
 
 	// 문서 작성
 	@PostMapping("approve/approve-form")
-	public String approveForm(DocVO dvo, ApproveVO avo) {
+	public String approveForm(DocVO dvo, ApproveVO avo, @RequestParam(value="upfile", required=false) MultipartFile upfile) {
 		log.info("approve/approve-form 요청받음");
 		log.info(dvo.toString());
 		approveService.ApprovalApplication(dvo, avo);
 		notificationService.sendApprovalNotification(Integer.toString(avo.getStep1ManagerNo()), "새로운 결재가 도착했습니다");
-		
-		// 헤더바 알람처리
-		AlertVO alert = new AlertVO();
-		String message = dvo.getDocTitle() + "새로운 결재 요청이 도착했습니다.";
-		
-		alert.setEmpNo(Integer.toString(avo.getStep1ManagerNo()));
-		alert.setContent(message);
-		
-		notificationService.pushNewAlert(alert);
 		
 		if (dvo.getDocType().equals("4") || dvo.getDocType().equals("5") || dvo.getDocType().equals("6"))
 			return "OK";
@@ -206,20 +201,6 @@ public class ApproveController {
 			
 		}
 		
-		if (step2Status != null && step2Status.equals("A"))
-			writeNotificationMessage = "문서가 최종 승인 되었습니다.";			
-		else if (status.equals("R"))
-			writeNotificationMessage = "문서가 반려되었습니다";
-		else
-			writeNotificationMessage = "문서결재가 진행되고있습니다.";
-
-		notificationService.sendApprovalNotification(docWriter, writeNotificationMessage);
-
-		if (step2Manager != null && step2Status.equals("W")) {
-			String manager = Integer.toString(step2Manager);
-			notificationService.sendApprovalNotification(manager, "새로운 결재가 도착했습니다");
-		}
-
 	}
 
 	// 결재 완료된 문서들
@@ -262,11 +243,6 @@ public class ApproveController {
                 try {
                     // 알림 서비스 호출
                     notificationService.sendApprovalNotification(String.valueOf(managerNo), "새로운 결재가 도착했습니다");
-                    
-                    AlertVO alert = new AlertVO();
-                    alert.setEmpNo(String.valueOf(managerNo));
-                    alert.setContent(dvo.getDocTitle() + " 새로운 결재 요청이 도착했습니다.");
-                    notificationService.pushNewAlert(alert);
                 } catch (Exception e) {
                     log.error("알림 발송 중 경미한 오류 (무시 가능): " + e.getMessage());
                 }
