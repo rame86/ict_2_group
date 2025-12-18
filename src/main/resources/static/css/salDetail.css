@@ -640,4 +640,127 @@
   white-space: nowrap;       /* ✅ 줄바꿈 최소화 */
 }
 
+/* =========================================================
+   ✅ salDetail.jsp - 관리자 수정이력(SAL_EDIT) 블록
+   (기존 CSS에 영향 없게 sal-detail-page 스코프 사용)
+   ========================================================= */
+
+.sal-detail-page .sal-edit-history-card{
+  margin-top: 18px;
+  background:#fff;
+  border:1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+}
+
+.sal-detail-page .seh-head{
+  display:flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.sal-detail-page .seh-title{
+  margin:0;
+  font-size: 16px;
+  font-weight: 900;
+  color:#111827;
+}
+
+.sal-detail-page .seh-sub{
+  font-size: 12px;
+  color:#6B7280;
+  font-weight: 600;
+}
+
+.sal-detail-page .seh-table-wrap{
+  width:100%;
+  overflow:auto;
+  border-radius: 12px;
+  border: 1px solid #EEF2F7;
+}
+
+.sal-detail-page .seh-table{
+  width:100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 900px; /* 컬럼 많아서 가로 스크롤 안정 */
+}
+
+.sal-detail-page .seh-table thead th{
+  position: sticky;
+  top: 0;
+  background:#F8FAFC;
+  font-size: 12px;
+  font-weight: 900;
+  color:#374151;
+  border-bottom:1px solid #E5E7EB;
+  padding: 10px 12px;
+  text-align:left;
+  vertical-align: middle;
+}
+
+.sal-detail-page .seh-table tbody td{
+  font-size: 12px;
+  color:#111827;
+  padding: 10px 12px;
+  border-bottom: 1px solid #F1F5F9;
+  vertical-align: top;
+}
+
+.sal-detail-page .seh-date{ white-space: nowrap; color:#374151; font-weight: 800; }
+.sal-detail-page .seh-by{ white-space: nowrap; color:#111827; font-weight: 800; }
+.sal-detail-page .seh-reason{ color:#374151; font-weight: 700; }
+
+.sal-detail-page .seh-diff .diff-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 6px 14px;
+}
+
+.sal-detail-page .seh-diff .diff-item{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+
+.sal-detail-page .seh-diff .diff-item .k{
+  width: 70px;
+  color:#6B7280;
+  font-weight: 800;
+  flex: 0 0 auto;
+}
+
+.sal-detail-page .seh-diff .diff-item .v{
+  color:#111827;
+  font-weight: 700;
+}
+
+.sal-detail-page .seh-diff .diff-strong .k{ color:#1D4ED8; }
+.sal-detail-page .seh-diff .diff-strong .v b{ color:#1D4ED8; }
+
+.sal-detail-page .seh-row.is-hidden{
+  display:none;
+}
+
+.sal-detail-page .seh-more{
+  display:flex;
+  justify-content:center;
+  margin-top: 12px;
+}
+
+.sal-detail-page .seh-btn-more{
+  border: 1px solid #C7D2FE;
+  background: #EEF2FF;
+  color:#1D4ED8;
+  font-weight: 900;
+  border-radius: 12px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.sal-detail-page .seh-btn-more:hover{
+  filter: brightness(0.98);
+}
 

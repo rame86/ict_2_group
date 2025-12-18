@@ -1,506 +1,429 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.example.repository.SalMapper">
 
-	<!-- 1. 사원 개인 급여 목록 -->
-	<select id="selectSalList" parameterType="string"
-		resultType="com.example.domain.SalVO">
-		SELECT
-		s.SAL_NUM AS salNum,
-		s.MONTH_ATTNO AS monthAttno,
-		s.EMP_NO AS empNo,
-
-		-- 지급월 라벨: 2025년 11월
-		TO_CHAR(s.SAL_DATE, 'YYYY"년
-		"MM"월"') AS yearMonthLabel,
-
-		s.SAL_BASE AS salBase,
-		NVL(s.SAL_BONUS, 0)
-		AS salBonus,
-
-		-- 기타 수당
-		NVL(s.SAL_PLUS, 0) AS salPlus,
-		-- 초과근무 수당
-		NVL(s.OVERTIME_PAY, 0) AS overtimePay,
-
-		s.INSURANCE AS insurance,
-		s.TAX
-		AS tax,
-
-		-- ✅ 지급일(지급완료/예정 판단용)
-		TO_CHAR(s.SAL_DATE, 'YYYY-MM-DD') AS
-		salDate,
-
-		-- 총 지급액 / 공제 총액 / 실지급액
-		(
-		s.SAL_BASE
-		+ NVL(s.SAL_BONUS, 0)
-		+
-		NVL(s.SAL_PLUS, 0)
-		+ NVL(s.OVERTIME_PAY, 0)
-		) AS payTotal,
-
-		(s.INSURANCE +
-		s.TAX) AS deductTotal,
-		s.REALPAY AS realPay
-		FROM SAL s
-		WHERE s.EMP_NO =
-		#{empNo}
-		ORDER BY s.MONTH_ATTNO ASC
-	</select>
-
-
-	<!-- 2. 급여 상세 -->
-	<select id="selectSalDetail" parameterType="map"
-		resultType="com.example.domain.SalVO">
-		SELECT
-		s.SAL_NUM AS salNum,
-		s.EMP_NO AS empNo,
-		s.MONTH_ATTNO
-		AS monthAttno,
-
-		-- 'YYYY-MM-DD'
-		TO_CHAR(s.SAL_DATE, 'YYYY-MM-DD') AS
-		salDate,
-		-- "2025년 10월"
-		TO_CHAR(s.SAL_DATE, 'YYYY"년 "MM"월"') AS
-		yearMonthLabel,
-
-		s.SAL_BASE AS salBase,
-		NVL(s.SAL_BONUS, 0) AS salBonus,
-
-		-- 기타 수당
-		NVL(s.SAL_PLUS, 0) AS salPlus,
-		-- 초과근무 수당
-		NVL(s.OVERTIME_PAY, 0)
-		AS overtimePay,
-
-		s.INSURANCE AS insurance,
-		s.TAX AS tax,
-
-		(
-		s.SAL_BASE
-		+
-		NVL(s.SAL_BONUS, 0)
-		+ NVL(s.SAL_PLUS, 0)
-		+ NVL(s.OVERTIME_PAY, 0)
-		) AS
-		payTotal,
-		(s.INSURANCE + s.TAX) AS deductTotal,
-		s.REALPAY AS realPay
-		FROM SAL s
-		WHERE s.EMP_NO = #{empNo}
-		AND s.MONTH_ATTNO = #{monthAttno}
-	</select>
-
-	<!-- 3. 해당 월 급여 존재 여부 -->
-	<select id="existsSal" parameterType="int" resultType="int">
-		SELECT
-		COUNT(*)
-		FROM SAL
-		WHERE MONTH_ATTNO = #{monthAttno}
-	</select>
-
-	<!-- 4. 사번+월 급여 존재 여부 -->
-	<select id="existsMonthlySalary" parameterType="map"
-		resultType="int">
-		SELECT COUNT(*)
-		FROM SAL
-		WHERE EMP_NO = #{empNo}
-		AND
-		MONTH_ATTNO = #{monthAttno}
-	</select>
-
-	<!-- 5. 급여 1건 삽입 (수동 입력용) -->
-	<insert id="insertSal" parameterType="com.example.domain.SalVO">
-		INSERT INTO SAL (
-		SAL_NUM,
-		MONTH_ATTNO,
-		EMP_NO,
-		SAL_DATE,
-		SAL_BASE,
-		SAL_BONUS,
-		SAL_PLUS,
-		OVERTIME_PAY,
-		INSURANCE,
-		TAX
-		) VALUES (
-		SEQ_SAL_NUM.NEXTVAL, -- 실제 시퀀스명 확인
-		#{monthAttno},
-		#{empNo},
-		TO_DATE(#{salDate}, 'YYYY-MM-DD'),
-		#{salBase},
-		#{salBonus},
-		#{salPlus},
-		#{overtimePay},
-		#{insurance},
-		#{tax}
-		)
-	</insert>
-
-	<!-- 6. (구버전) 관리자 전체 급여 목록 -->
-	<select id="selectAdminSalList" parameterType="map"
-		resultType="com.example.domain.SalVO">
-		SELECT
-		S.SAL_NUM AS salNum,
-		S.MONTH_ATTNO AS monthAttno,
-		E.EMP_NO AS empNo,
-		E.EMP_NAME AS empName,
-		D.DEPT_NAME AS deptName,
-		S.SAL_BASE AS salBase,
-		-- ★ 수정: 중복 alias 제거 + NVL 적용
-		NVL(S.OVERTIME_PAY, 0) AS overtimePay,
-		S.SAL_BONUS AS salBonus,
-		NVL(S.SAL_PLUS, 0) AS salPlus,
-		S.INSURANCE AS insurance,
-		S.TAX AS tax
-		FROM SAL S
-		JOIN EMP E ON S.EMP_NO = E.EMP_NO
-		JOIN DEPT D ON E.DEPT_NO =
-		D.DEPT_NO
-	</select>
-
-	<!-- 7. MONTH_ATTEND 기준 급여 일괄 생성 (월 기준 중복 방지 최종본) -->
-	<insert id="insertSalaryByMonth" parameterType="string">
-
-		<bind name="startDate" value="_parameter + '-01'" />
-
-		INSERT INTO SAL (
-		SAL_NUM,
-		MONTH_ATTNO,
-		EMP_NO,
-		SAL_DATE,
-		SAL_BASE,
-		SAL_BONUS,
-		SAL_PLUS,
-		OVERTIME_PAY,
-		INSURANCE,
-		TAX,
-		REALPAY
-		)
-		SELECT
-		SEQ_SAL_NUM.NEXTVAL,
-		T.MONTH_ATTNO,
-		T.EMP_NO,
-		TRUNC(T.MONTH_DATE_ATTEND,
-		'MM') + 14,
-		T.SAL_BASE,
-		0,
-		0,
-		T.OVERTIME_PAY,
-		T.INSURANCE,
-		T.TAX,
-		T.REALPAY
-		FROM (
-		SELECT
-		M.MONTH_ATTNO,
-		M.EMP_NO,
-		M.MONTH_DATE_ATTEND,
-		E.SAL_BASE,
-
-		ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5) AS OVERTIME_PAY,
-
-		ROUND(
-		(E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.045
-		)
-		AS INSURANCE,
-
-		ROUND(
-		(E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME
-		* 1.5)) * 0.03
-		) AS TAX,
-
-		(
-		E.SAL_BASE
-		+ ROUND((E.SAL_BASE / 160) *
-		M.OVERTIME * 1.5)
-		- ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) *
-		M.OVERTIME * 1.5)) *
-		0.045)
-		- ROUND((E.SAL_BASE + ROUND((E.SAL_BASE /
-		160) * M.OVERTIME * 1.5)) *
-		0.03)
-		) AS REALPAY
-
-		FROM MONTH_ATTEND M
-		JOIN
-		EMP E ON M.EMP_NO = E.EMP_NO
-		WHERE M.MONTH_DATE_ATTEND >=
-		TO_DATE(#{startDate}, 'YYYY-MM-DD')
-		AND M.MONTH_DATE_ATTEND &lt;
-		ADD_MONTHS(TO_DATE(#{startDate},
-		'YYYY-MM-DD'), 1)
-		) T
-		WHERE NOT EXISTS (
-		SELECT 1
-		FROM SAL S
-		WHERE S.EMP_NO = T.EMP_NO
-		AND TRUNC(S.SAL_DATE, 'MM')
-		= TRUNC(T.MONTH_DATE_ATTEND, 'MM')
-		)
-
-	</insert>
-
-
-
-	<!-- 8. 관리자 화면용 (월 필터 + 정렬) -->
-	<select id="getAdminSalList" parameterType="map" resultType="com.example.domain.SalVO">
-  SELECT
-    S.SAL_NUM AS salNum,
-    S.MONTH_ATTNO AS monthAttno,
-    S.EMP_NO AS empNo,
-    E.EMP_NAME AS empName,
-    D.DEPT_NAME AS deptName,
-    TO_CHAR(S.SAL_DATE, 'YYYY-MM-DD') AS salDate,
-    TO_CHAR(S.SAL_DATE, 'YYYY"년 "MM"월"') AS yearMonthLabel,
-
-    NVL(S.SAL_BASE, 0) AS salBase,
-    NVL(S.SAL_BONUS, 0) AS salBonus,
-    NVL(S.SAL_PLUS, 0) AS salPlus,
-    NVL(S.OVERTIME_PAY, 0) AS overtimePay,
-    NVL(S.INSURANCE, 0) AS insurance,
-    NVL(S.TAX, 0) AS tax,
-
-    (NVL(S.SAL_BASE,0)+NVL(S.SAL_BONUS,0)+NVL(S.SAL_PLUS,0)+NVL(S.OVERTIME_PAY,0)) AS payTotal,
-    (NVL(S.INSURANCE,0)+NVL(S.TAX,0)) AS deductTotal,
-    NVL(S.REALPAY, 0) AS realPay
-
-  FROM SAL S
-  JOIN EMP E ON S.EMP_NO = E.EMP_NO
-  LEFT JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
-
-  <where>
-    <if test="month != null and month != ''">
-      AND TO_CHAR(S.SAL_DATE, 'YYYY-MM') = #{month}
-    </if>
-
-    <if test="deptNo != null and deptNo != ''">
-      AND E.DEPT_NO = #{deptNo}
-    </if>
-
-    <if test="onlyOvertime == true">
-      AND NVL(S.OVERTIME_PAY, 0) > 0
-    </if>
-
-    <if test="excludeRetired == true">
-      AND E.STATUS_NO != 0
-    </if>
-  </where>
-
-  <choose>
-    <when test="sort == 'empNo'">
-      ORDER BY S.EMP_NO ${dir}
-    </when>
-    <when test="sort == 'name'">
-      ORDER BY E.EMP_NAME ${dir}
-    </when>
-    <when test="sort == 'dept'">
-      ORDER BY D.DEPT_NAME ${dir}
-    </when>
-    <otherwise>
-      ORDER BY S.SAL_DATE ${dir}, S.EMP_NO ASC
-    </otherwise>
-  </choose>
-</select>
-	
-
-	<!-- 9. 관리자 상단 요약 카드용 집계 -->
-	<select id="getAdminSalSummary" parameterType="map"
-		resultType="map">
-		SELECT
-		NVL(SUM(S.REALPAY), 0) AS "totalRealPay",
-		NVL(ROUND(AVG(S.REALPAY)), 0) AS "avgRealPay",
-		COUNT(DISTINCT S.EMP_NO)
-		AS "empCount"
-		FROM SAL S
-		JOIN EMP E ON S.EMP_NO = E.EMP_NO
-		LEFT JOIN DEPT
-		D ON E.DEPT_NO = D.DEPT_NO
-
-		<where>
-			<if test="month != null and month != ''">
-				AND TO_CHAR(S.SAL_DATE, 'YYYY-MM') = #{month}
-			</if>
-
-			<if test="deptNo != null and deptNo != ''">
-				AND E.DEPT_NO = #{deptNo}
-			</if>
-
-			<if test="onlyOvertime == true">
-				AND NVL(S.OVERTIME_PAY, 0) > 0
-			</if>
-
-			<if test="excludeRetired == true">
-				AND E.STATUS_NO != 0
-			</if>
-
-			<!-- <if test="excludeDeletePlanned == true"> DB 방식에 맞는 조건 1개만 선택 </if> -->
-
-		</where>
-	</select>
-
-	<!-- (사원용) 급여 요약 카드 -->
-	<select id="getEmpSalSummary" parameterType="string"
-		resultType="map">
-		SELECT
-		/* 1) 최근 지급월 실지급액 */
-		NVL((
-		SELECT s.REALPAY
-		FROM SAL s
-		WHERE s.EMP_NO = #{_parameter}
-		ORDER BY s.SAL_DATE DESC
-		FETCH FIRST 1
-		ROWS ONLY
-		), 0) AS "latestRealPay",
-
-		/* 2) 최근 3개월 평균 실지급액 */
-		NVL(ROUND((
-		SELECT AVG(s.REALPAY)
-		FROM (
-		SELECT s.REALPAY
-		FROM SAL s
-		WHERE s.EMP_NO =
-		#{_parameter}
-		ORDER BY s.SAL_DATE DESC
-		FETCH FIRST 3 ROWS ONLY
-		) s
-		)), 0)
-		AS "avg3mRealPay",
-
-		/* 3) 올해 누적(YTD) 실지급액 */
-		NVL((
-		SELECT SUM(s.REALPAY)
-		FROM SAL s
-		WHERE s.EMP_NO = #{_parameter}
-		AND TO_CHAR(s.SAL_DATE,
-		'YYYY') = TO_CHAR(SYSDATE, 'YYYY')
-		), 0) AS "ytdRealPay"
-
-		FROM DUAL
-	</select>
-
-	<select id="selectSalBySalNum" parameterType="int"
-        resultType="com.example.domain.SalVO">
-  SELECT
-    s.SAL_NUM AS salNum,
-    s.MONTH_ATTNO AS monthAttno,
-    s.EMP_NO AS empNo,
-    TO_CHAR(s.SAL_DATE,'YYYY-MM-DD') AS salDate,
-
-    NVL(s.SAL_BASE,0)       AS salBase,
-    NVL(s.SAL_BONUS,0)      AS salBonus,
-    NVL(s.SAL_PLUS,0)       AS salPlus,
-    NVL(s.OVERTIME_PAY,0)   AS overtimePay,
-    NVL(s.INSURANCE,0)      AS insurance,
-    NVL(s.TAX,0)            AS tax,
-
-    ( NVL(s.SAL_BASE,0)
-    + NVL(s.SAL_BONUS,0)
-    + NVL(s.SAL_PLUS,0)
-    + NVL(s.OVERTIME_PAY,0)
-    ) AS payTotal,
-
-    ( NVL(s.INSURANCE,0) + NVL(s.TAX,0) ) AS deductTotal,
-
-    NVL(s.REALPAY,0) AS realPay,   <!-- ✅ 여기 콤마 필수! -->
-
-    e.EMP_NAME AS empName,
-    d.DEPT_NAME AS deptName
-
-  FROM SAL s
-  JOIN EMP e  ON s.EMP_NO = e.EMP_NO
-  JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
-  WHERE s.SAL_NUM = #{salNum}
-</select>
-
-
-
-
-
-	<insert id="insertSalEdit"
-		parameterType="com.example.domain.SalEditVO">
-		INSERT INTO SAL_EDIT (
-		EDIT_NO,
-		SAL_NUM,
-		EDIT_BY,
-		EDIT_REASON,
-		BEFORE_BASE, AFTER_BASE,
-		BEFORE_BONUS, AFTER_BONUS,
-		BEFORE_PLUS, AFTER_PLUS,
-		BEFORE_OT, AFTER_OT,
-		BEFORE_INS, AFTER_INS,
-		BEFORE_TAX, AFTER_TAX,
-		BEFORE_PAYTOTAL, AFTER_PAYTOTAL,
-		BEFORE_DEDUCT,
-		AFTER_DEDUCT,
-		BEFORE_REALPAY, AFTER_REALPAY,
-		EDIT_DATE
-		) VALUES (
-		SEQ_SAL_EDIT.NEXTVAL,
-		#{salNum},
-		#{editBy},
-		#{editReason},
-		#{beforeBase},
-		#{afterBase},
-		#{beforeBonus}, #{afterBonus},
-		#{beforePlus},
-		#{afterPlus},
-		#{beforeOt}, #{afterOt},
-		#{beforeIns}, #{afterIns},
-		#{beforeTax}, #{afterTax},
-		#{beforePayTotal}, #{afterPayTotal},
-		#{beforeDeduct}, #{afterDeduct},
-		#{beforeRealPay}, #{afterRealPay},
-		SYSDATE
-		)
-	</insert>
-
-	<update id="updateSalaryByAdmin"
-		parameterType="com.example.domain.SalVO">
-		UPDATE SAL
-		SET
-		SAL_BASE = #{salBase},
-		SAL_BONUS =
-		#{salBonus},
-		SAL_PLUS = #{salPlus},
-		OVERTIME_PAY = #{overtimePay},
-		INSURANCE = #{insurance},
-		TAX = #{tax},
-		REALPAY = #{realPay}
-		WHERE
-		SAL_NUM = #{salNum}
-	</update>
-
-	<select id="selectSalEditsBySalNum" parameterType="int"
-		resultType="com.example.domain.SalEditVO">
-		SELECT
-		EDIT_NO AS editNo,
-		SAL_NUM AS salNum,
-		EDIT_BY AS
-		editBy,
-		EDIT_REASON AS editReason,
-		TO_CHAR(EDIT_DATE,'YYYY-MM-DD
-		HH24:MI') AS editDate,
-		BEFORE_BASE AS beforeBase, AFTER_BASE AS
-		afterBase,
-		BEFORE_BONUS AS beforeBonus, AFTER_BONUS AS afterBonus,
-		BEFORE_PLUS AS beforePlus, AFTER_PLUS AS afterPlus,
-		BEFORE_OT AS
-		beforeOt, AFTER_OT AS afterOt,
-		BEFORE_INS AS beforeIns, AFTER_INS AS
-		afterIns,
-		BEFORE_TAX AS beforeTax, AFTER_TAX AS afterTax,
-		BEFORE_PAYTOTAL AS beforePayTotal, AFTER_PAYTOTAL AS afterPayTotal,
-		BEFORE_DEDUCT AS beforeDeduct, AFTER_DEDUCT AS afterDeduct,
-		BEFORE_REALPAY AS beforeRealPay, AFTER_REALPAY AS afterRealPay
-		FROM
-		SAL_EDIT
-		WHERE SAL_NUM = #{salNum}
-		ORDER BY EDIT_NO DESC
-	</select>
-
-
+  <!-- =======================================================================
+       ✅ SalMapper.xml (통합 최종본)
+       [공통 규칙]
+       - 날짜는 화면 표시용 TO_CHAR 별칭 제공
+       - 금액 컬럼은 NVL로 NULL 안전 처리
+       - payTotal / deductTotal / realPay 는 화면 표시용 계산 컬럼
+       ======================================================================= -->
+
+  <!-- ==================================================
+       1) 사원용 급여 목록
+       - 사번 기준
+       ================================================== -->
+  <select id="selectSalList" parameterType="string"
+          resultType="com.example.domain.SalVO">
+    SELECT
+      s.SAL_NUM       AS salNum,
+      s.MONTH_ATTNO   AS monthAttno,
+      s.EMP_NO        AS empNo,
+
+      TO_CHAR(s.SAL_DATE,'YYYY"년 "MM"월"') AS yearMonthLabel,
+
+      NVL(s.SAL_BASE,0)      AS salBase,
+      NVL(s.SAL_BONUS,0)     AS salBonus,
+      NVL(s.SAL_PLUS,0)      AS salPlus,
+      NVL(s.OVERTIME_PAY,0)  AS overtimePay,
+
+      NVL(s.INSURANCE,0)     AS insurance,
+      NVL(s.TAX,0)           AS tax,
+
+      TO_CHAR(s.SAL_DATE,'YYYY-MM-DD') AS salDate,
+
+      ( NVL(s.SAL_BASE,0)
+      + NVL(s.SAL_BONUS,0)
+      + NVL(s.SAL_PLUS,0)
+      + NVL(s.OVERTIME_PAY,0) ) AS payTotal,
+
+      ( NVL(s.INSURANCE,0) + NVL(s.TAX,0) ) AS deductTotal,
+      NVL(s.REALPAY,0) AS realPay
+    FROM SAL s
+    WHERE s.EMP_NO = #{empNo}
+    ORDER BY s.MONTH_ATTNO ASC
+  </select>
+
+
+  <!-- ==================================================
+       2) 사원용 급여 상세
+       - 사번 + 월근태번호 기준
+       ================================================== -->
+  <select id="selectSalDetail" parameterType="map"
+          resultType="com.example.domain.SalVO">
+    SELECT
+      s.SAL_NUM      AS salNum,
+      s.EMP_NO       AS empNo,
+      s.MONTH_ATTNO  AS monthAttno,
+
+      TO_CHAR(s.SAL_DATE,'YYYY-MM-DD') AS salDate,
+      TO_CHAR(s.SAL_DATE,'YYYY"년 "MM"월"') AS yearMonthLabel,
+
+      NVL(s.SAL_BASE,0)      AS salBase,
+      NVL(s.SAL_BONUS,0)     AS salBonus,
+      NVL(s.SAL_PLUS,0)      AS salPlus,
+      NVL(s.OVERTIME_PAY,0)  AS overtimePay,
+
+      NVL(s.INSURANCE,0)     AS insurance,
+      NVL(s.TAX,0)           AS tax,
+
+      ( NVL(s.SAL_BASE,0)
+      + NVL(s.SAL_BONUS,0)
+      + NVL(s.SAL_PLUS,0)
+      + NVL(s.OVERTIME_PAY,0) ) AS payTotal,
+
+      ( NVL(s.INSURANCE,0) + NVL(s.TAX,0) ) AS deductTotal,
+      NVL(s.REALPAY,0) AS realPay
+    FROM SAL s
+    WHERE s.EMP_NO = #{empNo}
+      AND s.MONTH_ATTNO = #{monthAttno}
+  </select>
+
+
+  <!-- ============================================================
+       3) (선택) 해당 월근태번호 급여 존재 여부
+       - 혹시 쓰는 곳 있으면 유지
+       ============================================================ -->
+  <select id="existsSal" parameterType="int" resultType="int">
+    SELECT COUNT(*)
+    FROM SAL
+    WHERE MONTH_ATTNO = #{monthAttno}
+  </select>
+
+
+  <!-- ============================================================
+       4) 사번+월근태번호 급여 존재 여부
+       ============================================================ -->
+  <select id="existsMonthlySalary" parameterType="map" resultType="int">
+    SELECT COUNT(*)
+    FROM SAL
+    WHERE EMP_NO = #{empNo}
+      AND MONTH_ATTNO = #{monthAttno}
+  </select>
+
+
+  <!-- ============================================================
+       5) 급여 수동 등록(관리자 입력용)
+       ============================================================ -->
+  <insert id="insertSal" parameterType="com.example.domain.SalVO">
+    INSERT INTO SAL (
+      SAL_NUM, MONTH_ATTNO, EMP_NO, SAL_DATE,
+      SAL_BASE, SAL_BONUS, SAL_PLUS, OVERTIME_PAY,
+      INSURANCE, TAX
+    ) VALUES (
+      SEQ_SAL_NUM.NEXTVAL,
+      #{monthAttno},
+      #{empNo},
+      TO_DATE(#{salDate}, 'YYYY-MM-DD'),
+      #{salBase},
+      #{salBonus},
+      #{salPlus},
+      #{overtimePay},
+      #{insurance},
+      #{tax}
+    )
+  </insert>
+
+
+  <!-- ============================================================
+       6) MONTH_ATTEND 기준 급여 일괄 생성
+       - month 파라미터: 'YYYY-MM'
+       - 중복 방지: NOT EXISTS
+       ============================================================ -->
+  <insert id="insertSalaryByMonth" parameterType="string">
+
+    <!-- month = 'YYYY-MM' -> startDate = 'YYYY-MM-01' -->
+    <bind name="startDate" value="_parameter + '-01'" />
+
+    INSERT INTO SAL (
+      SAL_NUM, MONTH_ATTNO, EMP_NO, SAL_DATE,
+      SAL_BASE, SAL_BONUS, SAL_PLUS, OVERTIME_PAY,
+      INSURANCE, TAX, REALPAY
+    )
+    SELECT
+      SEQ_SAL_NUM.NEXTVAL,
+      T.MONTH_ATTNO,
+      T.EMP_NO,
+      TRUNC(T.MONTH_DATE_ATTEND,'MM') + 14,  <!-- 지급일: 해당월 15일 -->
+      T.SAL_BASE,
+      0,
+      0,
+      T.OVERTIME_PAY,
+      T.INSURANCE,
+      T.TAX,
+      T.REALPAY
+    FROM (
+      SELECT
+        M.MONTH_ATTNO,
+        M.EMP_NO,
+        M.MONTH_DATE_ATTEND,
+        E.SAL_BASE,
+
+        ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5) AS OVERTIME_PAY,
+
+        ROUND(
+          (E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.045
+        ) AS INSURANCE,
+
+        ROUND(
+          (E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.03
+        ) AS TAX,
+
+        (
+          E.SAL_BASE
+          + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)
+          - ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.045)
+          - ROUND((E.SAL_BASE + ROUND((E.SAL_BASE / 160) * M.OVERTIME * 1.5)) * 0.03)
+        ) AS REALPAY
+
+      FROM MONTH_ATTEND M
+      JOIN EMP E ON M.EMP_NO = E.EMP_NO
+      WHERE M.MONTH_DATE_ATTEND >= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+        AND M.MONTH_DATE_ATTEND &lt;  ADD_MONTHS(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 1)
+    ) T
+    WHERE NOT EXISTS (
+      SELECT 1
+      FROM SAL S
+      WHERE S.EMP_NO = T.EMP_NO
+        AND TRUNC(S.SAL_DATE,'MM') = TRUNC(T.MONTH_DATE_ATTEND,'MM')
+    )
+  </insert>
+
+
+  <!-- ============================================================
+       7) 관리자 급여 목록 (필터)
+       - month(YYYY-MM), deptNo, onlyOvertime, excludeRetired
+       ============================================================ -->
+  <select id="getAdminSalList" parameterType="map"
+          resultType="com.example.domain.SalVO">
+    SELECT
+      S.SAL_NUM     AS salNum,
+      S.MONTH_ATTNO AS monthAttno,
+      S.EMP_NO      AS empNo,
+      E.EMP_NAME    AS empName,
+      D.DEPT_NAME   AS deptName,
+
+      TO_CHAR(S.SAL_DATE,'YYYY-MM-DD') AS salDate,
+      TO_CHAR(S.SAL_DATE,'YYYY"년 "MM"월"') AS yearMonthLabel,
+
+      NVL(S.SAL_BASE,0)      AS salBase,
+      NVL(S.SAL_BONUS,0)     AS salBonus,
+      NVL(S.SAL_PLUS,0)      AS salPlus,
+      NVL(S.OVERTIME_PAY,0)  AS overtimePay,
+      NVL(S.INSURANCE,0)     AS insurance,
+      NVL(S.TAX,0)           AS tax,
+
+      ( NVL(S.SAL_BASE,0)
+      + NVL(S.SAL_BONUS,0)
+      + NVL(S.SAL_PLUS,0)
+      + NVL(S.OVERTIME_PAY,0) ) AS payTotal,
+
+      ( NVL(S.INSURANCE,0) + NVL(S.TAX,0) ) AS deductTotal,
+      NVL(S.REALPAY,0) AS realPay
+    FROM SAL S
+    JOIN EMP E ON S.EMP_NO = E.EMP_NO
+    LEFT JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
+
+    <where>
+      <if test="month != null and month != ''">
+        AND TO_CHAR(S.SAL_DATE,'YYYY-MM') = #{month}
+      </if>
+      <if test="deptNo != null and deptNo != ''">
+        AND E.DEPT_NO = #{deptNo}
+      </if>
+      <if test="onlyOvertime == true">
+        AND NVL(S.OVERTIME_PAY,0) > 0
+      </if>
+      <if test="excludeRetired == true">
+        AND E.STATUS_NO != 0
+      </if>
+    </where>
+
+    ORDER BY S.SAL_DATE DESC, S.EMP_NO ASC
+  </select>
+
+
+  <!-- ============================================================
+       8) 관리자 상단 요약 카드 집계
+       ============================================================ -->
+  <select id="getAdminSalSummary" parameterType="map" resultType="map">
+    SELECT
+      NVL(SUM(S.REALPAY), 0)           AS "totalRealPay",
+      NVL(ROUND(AVG(S.REALPAY)), 0)    AS "avgRealPay",
+      COUNT(DISTINCT S.EMP_NO)         AS "empCount"
+    FROM SAL S
+    JOIN EMP E ON S.EMP_NO = E.EMP_NO
+    LEFT JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
+    <where>
+      <if test="month != null and month != ''">
+        AND TO_CHAR(S.SAL_DATE, 'YYYY-MM') = #{month}
+      </if>
+      <if test="deptNo != null and deptNo != ''">
+        AND E.DEPT_NO = #{deptNo}
+      </if>
+      <if test="onlyOvertime == true">
+        AND NVL(S.OVERTIME_PAY, 0) > 0
+      </if>
+      <if test="excludeRetired == true">
+        AND E.STATUS_NO != 0
+      </if>
+    </where>
+  </select>
+
+
+  <!-- ============================================================
+       9) ✅ 사원용 요약 카드
+       - ServiceImpl에서 호출하는 id라서 반드시 있어야 함
+       ============================================================ -->
+  <select id="getEmpSalSummary" parameterType="string" resultType="map">
+    SELECT
+      NVL((
+        SELECT s.REALPAY
+        FROM SAL s
+        WHERE s.EMP_NO = #{_parameter}
+        ORDER BY s.SAL_DATE DESC
+        FETCH FIRST 1 ROWS ONLY
+      ), 0) AS "latestRealPay",
+
+      NVL(ROUND((
+        SELECT AVG(s.REALPAY)
+        FROM (
+          SELECT s.REALPAY
+          FROM SAL s
+          WHERE s.EMP_NO = #{_parameter}
+          ORDER BY s.SAL_DATE DESC
+          FETCH FIRST 3 ROWS ONLY
+        ) s
+      )), 0) AS "avg3mRealPay",
+
+      NVL((
+        SELECT SUM(s.REALPAY)
+        FROM SAL s
+        WHERE s.EMP_NO = #{_parameter}
+          AND TO_CHAR(s.SAL_DATE,'YYYY') = TO_CHAR(SYSDATE,'YYYY')
+      ), 0) AS "ytdRealPay"
+    FROM DUAL
+  </select>
+
+
+  <!-- ============================================================
+       10) 관리자 정정 화면 단건 조회 (salNum 기준)
+       ============================================================ -->
+  <select id="selectSalBySalNum" parameterType="int"
+          resultType="com.example.domain.SalVO">
+    SELECT
+      s.SAL_NUM     AS salNum,
+      s.MONTH_ATTNO AS monthAttno,
+      s.EMP_NO      AS empNo,
+      TO_CHAR(s.SAL_DATE,'YYYY-MM-DD') AS salDate,
+
+      NVL(s.SAL_BASE,0)      AS salBase,
+      NVL(s.SAL_BONUS,0)     AS salBonus,
+      NVL(s.SAL_PLUS,0)      AS salPlus,
+      NVL(s.OVERTIME_PAY,0)  AS overtimePay,
+      NVL(s.INSURANCE,0)     AS insurance,
+      NVL(s.TAX,0)           AS tax,
+
+      ( NVL(s.SAL_BASE,0)
+      + NVL(s.SAL_BONUS,0)
+      + NVL(s.SAL_PLUS,0)
+      + NVL(s.OVERTIME_PAY,0) ) AS payTotal,
+
+      ( NVL(s.INSURANCE,0) + NVL(s.TAX,0) ) AS deductTotal,
+      NVL(s.REALPAY,0) AS realPay,
+
+      e.EMP_NAME  AS empName,
+      d.DEPT_NAME AS deptName
+    FROM SAL s
+    JOIN EMP e  ON s.EMP_NO = e.EMP_NO
+    JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+    WHERE s.SAL_NUM = #{salNum}
+  </select>
+
+
+  <!-- ============================================================
+       11) 정정 이력 INSERT
+       ============================================================ -->
+  <insert id="insertSalEdit" parameterType="com.example.domain.SalEditVO">
+    INSERT INTO SAL_EDIT (
+      EDIT_NO, SAL_NUM, EDIT_BY, EDIT_REASON,
+      BEFORE_BASE, AFTER_BASE,
+      BEFORE_BONUS, AFTER_BONUS,
+      BEFORE_PLUS, AFTER_PLUS,
+      BEFORE_OT, AFTER_OT,
+      BEFORE_INS, AFTER_INS,
+      BEFORE_TAX, AFTER_TAX,
+      BEFORE_PAYTOTAL, AFTER_PAYTOTAL,
+      BEFORE_DEDUCT, AFTER_DEDUCT,
+      BEFORE_REALPAY, AFTER_REALPAY,
+      EDIT_DATE
+    ) VALUES (
+      SEQ_SAL_EDIT.NEXTVAL,
+      #{salNum},
+      #{editBy},
+      #{editReason},
+      #{beforeBase}, #{afterBase},
+      #{beforeBonus}, #{afterBonus},
+      #{beforePlus}, #{afterPlus},
+      #{beforeOt}, #{afterOt},
+      #{beforeIns}, #{afterIns},
+      #{beforeTax}, #{afterTax},
+      #{beforePayTotal}, #{afterPayTotal},
+      #{beforeDeduct}, #{afterDeduct},
+      #{beforeRealPay}, #{afterRealPay},
+      SYSDATE
+    )
+  </insert>
+
+
+  <!-- ============================================================
+       12) 관리자 급여 정정 UPDATE
+       - realPay는 Service에서 계산해서 내려줌
+       ============================================================ -->
+  <update id="updateSalaryByAdmin" parameterType="com.example.domain.SalVO">
+    UPDATE SAL
+    SET
+      SAL_BASE     = #{salBase},
+      SAL_BONUS    = #{salBonus},
+      SAL_PLUS     = #{salPlus},
+      OVERTIME_PAY = #{overtimePay},
+      INSURANCE    = #{insurance},
+      TAX          = #{tax},
+      REALPAY      = #{realPay}
+    WHERE SAL_NUM = #{salNum}
+  </update>
+
+
+  <!-- ============================================================
+       13) 정정 이력 조회
+       ============================================================ -->
+  <select id="selectSalEditsBySalNum" parameterType="int"
+          resultType="com.example.domain.SalEditVO">
+    SELECT
+      EDIT_NO   AS editNo,
+      SAL_NUM   AS salNum,
+      EDIT_BY   AS editBy,
+      E.EMP_NAME AS editByName,
+      EDIT_REASON AS editReason,
+      TO_CHAR(EDIT_DATE,'YYYY-MM-DD HH24:MI') AS editDate,
+
+      BEFORE_BASE AS beforeBase, AFTER_BASE AS afterBase,
+      BEFORE_BONUS AS beforeBonus, AFTER_BONUS AS afterBonus,
+      BEFORE_PLUS AS beforePlus, AFTER_PLUS AS afterPlus,
+      BEFORE_OT AS beforeOt, AFTER_OT AS afterOt,
+      BEFORE_INS AS beforeIns, AFTER_INS AS afterIns,
+      BEFORE_TAX AS beforeTax, AFTER_TAX AS afterTax,
+      BEFORE_PAYTOTAL AS beforePayTotal, AFTER_PAYTOTAL AS afterPayTotal,
+      BEFORE_DEDUCT AS beforeDeduct, AFTER_DEDUCT AS afterDeduct,
+      BEFORE_REALPAY AS beforeRealPay, AFTER_REALPAY AS afterRealPay
+    FROM SAL_EDIT SE
+    LEFT JOIN EMP E ON E.EMP_NO = SE.EDIT_BY
+    WHERE SAL_NUM = #{salNum}
+    ORDER BY EDIT_NO DESC
+  </select>
 
 </mapper>

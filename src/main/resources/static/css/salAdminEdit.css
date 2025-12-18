@@ -1,6 +1,10 @@
+/* =========================================================
+   ✅ salAdminEdit.css (adminEdit.jsp 전용)
+   - 복붙 안정화 최종본
+   - 폰트 변수(--sal-font) 정의
+   - edit-header 중복 선언 제거
+   ========================================================= */
 
-
-/* salAdminEdit.css */
 :root{
   --navy:#05244d;
   --bg:#ffffff;
@@ -12,58 +16,54 @@
   --primary2:#1D4ED8;
   --danger:#EF4444;
   --shadow: 0 8px 24px rgba(17,24,39,.08);
-}
 
-
-/* =========================
-   sal 관리자 수정 화면 - 폰트 통일
-   ========================= */
-.sal-admin-edit,
-.sal-admin-edit * {
-  font-family: 'SUIT','Pretendard','Noto Sans KR',
+  /* ✅ 누락되어 있던 폰트 변수 추가 */
+  --sal-font: 'SUIT','Pretendard','Noto Sans KR',
     -apple-system, BlinkMacSystemFont,
     'Segoe UI', Roboto, sans-serif;
 }
-/* 페이지 전체 폰트 적용 */
-#layoutSidenav_content, 
-#layoutSidenav_content *{
+
+/* =========================
+   폰트 통일(스코프)
+   ========================= */
+.sal-admin-edit,
+.sal-admin-edit *{
   font-family: var(--sal-font);
 }
 
-/* edit-header가 가로로 늘어나게 */
-.edit-header{
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding-bottom: 0;   /* ⛔ 아래 여백 제거 */
-  margin-bottom: 18px;
+/* main 배경 + 높이 */
+#layoutSidenav_content main{
+  background: var(--bg);
+  min-height: 100vh;
 }
 
-/* 제목 블록이 헤더에서 남는 폭을 전부 차지하게 */
-.edit-header > div:first-child{
-  flex: 1;
+/* =========================
+   헤더 영역 (중복 선언 제거 통합본)
+   ========================= */
+.edit-header{
+  position: relative;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap: 12px;
+  margin: 24px 0 14px;
+  padding-bottom: 18px; /* 밑줄 공간 */
 }
+
+/* 제목 블록이 남는 폭 차지 */
+.edit-header-left{
+  flex: 1;
+  min-width: 0;
+}
+
 /* ✅ 페이지 전체 폭 이중선 */
 .edit-header::after{
   content:"";
   position:absolute;
   left:0;
   right:0;
-  bottom:18px;        /* ⭐ 버튼 위로 올리는 핵심 */
+  bottom: 0;
   border-bottom: 4px double #869ABF;
-}
-
-#layoutSidenav_content main{
-  background: var(--bg);
-  min-height: 100vh;
-}
-
-.edit-header{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-end;
-  margin: 24px 0 14px;
 }
 
 .edit-title{
@@ -72,39 +72,41 @@
   color: var(--text);
   margin: 0;
 }
+
 .edit-sub{
   margin: 6px 0 0;
   color: var(--muted);
   font-size: 13px;
 }
 
+/* 목록으로 버튼 (레이아웃 안정화: transform 제거) */
+.edit-header-actions{
+  display:flex;
+  align-items:flex-start;
+}
+
+/* 목록으로 버튼 */
 .btn-line{
-  padding: 5px 15px;
+  padding: 6px 15px;
   border:1px solid var(--line);
   border-radius:12px;
-  font-weight: 600;
+  font-weight: 700;
   background:#f0f7fd;
- border-color:#8080c0; 
-  color : #000080;
+  border-color:#8080c0;
+  color: #000080;
+  text-decoration: none !important;
+  white-space: nowrap;
 }
-.btn-line:hover{ 
-	border-color:#C9D4E6; 
-	background : #424e84;
-	color : #ffffff;
-	}
-	
-	/* 목록으로 버튼 밑줄 완전 제거 */
-.btn-line,
-.btn-line:hover,
-.btn-line:focus {
+.btn-line:hover{
+  border-color:#C9D4E6;
+  background: #424e84;
+  color:#ffffff;
   text-decoration: none !important;
 }
 
-.edit-header-actions{
-  transform: translateY(-30px);
-}
-
-
+/* =========================
+   상단 요약 카드
+   ========================= */
 .edit-top-card{
   background: var(--card);
   border:1px solid var(--line);
@@ -130,12 +132,16 @@
   font-weight: 700;
   font-size: 12px;
 }
+
 .top-meta{
   color: var(--muted);
   font-size: 13px;
 }
 .top-meta b{ color: var(--text); }
 
+/* =========================
+   폼 레이아웃
+   ========================= */
 .edit-form{ margin-bottom: 40px; }
 
 .grid-2{
@@ -143,7 +149,6 @@
   grid-template-columns: 1fr 1fr;
   gap: 14px;
 }
-
 @media (max-width: 992px){
   .grid-2{ grid-template-columns: 1fr; }
 }
@@ -198,9 +203,8 @@
   font-size: 13px;
 }
 
-.input-wrap{
-  position:relative;
-}
+.input-wrap{ position:relative; }
+
 .input{
   width: 100%;
   height: 42px;
@@ -256,6 +260,9 @@
   box-shadow: 0 0 0 4px rgba(37,99,235,.12);
 }
 
+/* =========================
+   버튼
+   ========================= */
 .edit-actions{
   display:flex;
   justify-content:flex-end;
@@ -267,7 +274,7 @@
   border:none;
   border-radius: 12px;
   padding: 10px 16px;
-  font-weight: 600;
+  font-weight: 700;
   text-decoration:none;
   display:inline-flex;
   align-items:center;
@@ -279,18 +286,18 @@
   background:#e8acca;
   color:#fff;
 }
-.btn-gray:hover{ 
-	background:#e298bd;
-	color:#fff;
-	}
+.btn-gray:hover{
+  background:#e298bd;
+  color:#fff;
+}
 
 .btn-primary{
   background: #a8c4f0;
   color:#fff;
 }
-.btn-primary:hover{ 
-	background: #74a2e7;
-	color:#fff;
+.btn-primary:hover{
+  background: #74a2e7;
+  color:#fff;
 }
 
 /* =========================
@@ -302,7 +309,6 @@
   gap: 12px;
   margin-top: 10px;
 }
-
 @media (max-width: 992px){
   .preview-card .preview-grid{ grid-template-columns: 1fr; }
 }
@@ -330,7 +336,6 @@
 .preview-item .val.strong{
   font-size: 18px;
 }
-
 
 .preview-item .sub{
   margin-top: 6px;
@@ -374,26 +379,6 @@
 }
 
 /* =========================
-   정정 미리보기(차액) 강조
-   ========================= */
-.preview-item .val.up {
-  color: #2563eb;
-  animation: pop 220ms ease-out;
-}
-.preview-item .val.down {
-  color: #dc2626;
-  animation: pop 220ms ease-out;
-}
-.preview-item .val.same {
-  color: #6b7280;
-}
-
-@keyframes pop {
-  0%   { transform: scale(0.98); opacity: 0.7; }
-  100% { transform: scale(1);    opacity: 1; }
-}
-
-/* =========================
    정정 사유 글자수 카운터
    ========================= */
 .text-counter{
@@ -404,5 +389,3 @@
 }
 .text-counter .slash{ margin: 0 2px; }
 .text-counter.is-max{ color: #dc2626; font-weight: 700; }
-
-
