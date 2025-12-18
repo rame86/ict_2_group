@@ -336,4 +336,9 @@
 	    WHERE STATUS_NO != 0
 	</select>
 
+	<update id="updateProfileImage" parameterType="map">
+        UPDATE EMP
+           SET EMP_IMAGE = #{empImage}
+         WHERE EMP_NO    = #{empNo}
+    </update>
 </mapper>

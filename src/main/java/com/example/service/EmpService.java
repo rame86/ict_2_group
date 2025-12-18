@@ -91,5 +91,7 @@ public interface EmpService {
 	List<String> getEmpNoListByDept(String deptNo);
 
 	List<String> getAllEmpNoList();
+	
+	int updateProfileImage(String empNo, String newImageName);
 
 }

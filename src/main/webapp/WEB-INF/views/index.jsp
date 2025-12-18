@@ -128,6 +128,57 @@
             margin-bottom: 10px;
             text-align: left; 
         }
+        
+        /* 대시보드 프로필 사진 클릭 가능 표시 */
+		#dashboardProfileImg {
+		    cursor: pointer;
+		    transition: transform 0.2s;
+		}
+		#dashboardProfileImg:hover {
+		    transform: scale(1.05);
+		    opacity: 0.9;
+		}
+		
+		/* 모달 내 프로필 이미지 컨테이너 */
+		.modal-profile-container {
+		    position: relative;
+		    display: inline-block;
+		    width: 100%;
+		    text-align: center;
+		    background-color: #f8f9fa;
+		    border-radius: 10px;
+		    padding: 20px;
+		}
+		
+		/* 모달 내 이미지 */
+		.modal-profile-img-preview {
+		    max-width: 100%;
+		    max-height: 400px;
+		    object-fit: contain;
+		    border-radius: 8px;
+		    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+		}
+		
+		/* 이미지 수정 버튼 (반투명 오버레이) */
+		.btn-edit-photo-overlay {
+		    position: absolute;
+		    bottom: 30px;
+		    left: 50%;
+		    transform: translateX(-50%);
+		    background-color: rgba(0, 0, 0, 0.6); /* 반투명 검정 */
+		    color: white;
+		    border: 1px solid rgba(255, 255, 255, 0.5);
+		    padding: 8px 20px;
+		    border-radius: 30px;
+		    font-size: 0.9rem;
+		    transition: all 0.3s;
+		    backdrop-filter: blur(2px);
+		}
+		
+		.btn-edit-photo-overlay:hover {
+		    background-color: rgba(0, 0, 0, 0.85);
+		    color: #fff;
+}
     </style>
 </head>
 
@@ -406,56 +457,57 @@
 
                         <div class="col-xl-4">
                             <div class="profile-card mb-4">
-                                <div class="profile-img-container">
-                                    <img id="dashboardProfileImg" 
-                                        src="${pageContext.request.contextPath}/images/default_profile.png" 
-                                         class="profile-img" alt="프로필 사진">
-                                </div>
-                                
-                                <h3 class="profile-name">${sessionScope.login.empName}</h3>
-                                <p class="profile-dept">
-                                    ${sessionScope.login.deptName} / ${sessionScope.login.empNo}
-                                </p>
-
-                                <div class="mb-3">
-                                    <span class="profile-badge">
-                                        <i class="fas fa-crown me-1"></i>
-                                        권한 등급 : ${sessionScope.login.gradeNo} 등급
-                                    </span>
-                                </div>
-                                
-                                <div class="profile-info-row">
-                                    <div class="profile-info-item">
-                                        <h6>Status</h6>
-                                        <span>
-                                        <c:choose>
-                                            <c:when test="${sessionScope.login.statusNo == 1}">재직</c:when>
-                                            <c:when test="${sessionScope.login.statusNo == 7}">파견</c:when>
-                                            <c:when test="${sessionScope.login.statusNo == 2}">휴직(자발적)</c:when>
-                                            <c:when test="${sessionScope.login.statusNo == 3}">휴직(복지)</c:when>
-                                            <c:when test="${sessionScope.login.statusNo == 4}">대기</c:when>
-                                            <c:when test="${sessionScope.login.statusNo == 5}">징계</c:when>
-                                            <c:when test="${sessionScope.login.statusNo == 6}">인턴/수습</c:when>
-                                            <c:when test="${sessionScope.login.statusNo == 0}">퇴직</c:when>
-                                            <c:otherwise>기타</c:otherwise>
-                                        </c:choose>
-                                        </span>
-                                    </div>
-
-                                    <div class="profile-info-item">
-                                        <h6>Position</h6>
-                                        <span>
-                                           ${sessionScope.login.gradeNo == 1 ? 'CEO' : sessionScope.login.gradeNo == 2 ? '관리자' : '사원'}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="d-grid mt-4">
-                                    <button class="btn btn-outline-primary btn-sm" onclick="location.href='/attend/attend'">
-                                        <i class="fas fa-cog me-1"></i> 근태/설정 관리
-                                    </button>
-                                </div>
-                            </div>
+							    <div class="profile-img-container">
+							        <img id="dashboardProfileImg" 
+							            src="${pageContext.request.contextPath}/images/default_profile.png" 
+							             class="profile-img" alt="프로필 사진">
+							    </div>
+							    
+							    <h3 class="profile-name">${sessionScope.login.empName}</h3>
+							    <p class="profile-dept">
+							        ${sessionScope.login.deptName} / ${sessionScope.login.empNo}
+							    </p>
+							
+							    <div class="mb-3">
+							        <span class="profile-badge">
+							            <i class="fas fa-crown me-1"></i>
+							            권한 등급 : ${sessionScope.login.gradeNo} 등급
+							        </span>
+							    </div>
+							    
+							    <div class="profile-info-row">
+							        <div class="profile-info-item">
+							            <h6>Status</h6>
+							            <span>
+							                <c:choose>
+							                    <c:when test="${sessionScope.login.statusNo == 1}">재직</c:when>
+							                    <c:when test="${sessionScope.login.statusNo == 7}">파견</c:when>
+							                    <c:when test="${sessionScope.login.statusNo == 2}">휴직(자발적)</c:when>
+							                    <c:when test="${sessionScope.login.statusNo == 3}">휴직(복지)</c:when>
+							                    <c:when test="${sessionScope.login.statusNo == 4}">대기</c:when>
+							                    <c:when test="${sessionScope.login.statusNo == 5}">징계</c:when>
+							                    <c:when test="${sessionScope.login.statusNo == 6}">인턴/수습</c:when>
+							                    <c:when test="${sessionScope.login.statusNo == 0}">퇴직</c:when>
+							                    <c:otherwise>기타</c:otherwise>
+							                </c:choose>
+							            </span>
+							        </div>
+							
+							        <div class="profile-info-item">
+							            <h6>Position</h6>
+							            <span>
+							                <%-- 수정됨: gradeNo 삼항연산자 대신 jobTitle 사용 --%>
+							                ${sessionScope.login.jobTitle}
+							            </span>
+							        </div>
+							    </div>
+							
+							    <div class="d-grid mt-4">
+							        <button class="btn btn-outline-primary btn-sm" onclick="location.href='/attend/attend'">
+							            <i class="fas fa-cog me-1"></i> 근태/설정 관리
+							        </button>
+							    </div>
+							</div>
 
                             <div class="card mb-4 shadow-sm">
                                 <div class="card-body py-3">
@@ -586,6 +638,30 @@
                         </div>
                     </div>
                 </div>
+                <div class="modal fade" id="profileImageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-profile-container">
+                    <img id="modalProfilePreview" src="" class="modal-profile-img-preview" alt="프로필 확대">
+                    
+                    <button type="button" class="btn-edit-photo-overlay" id="btnTriggerFile">
+                        <i class="fas fa-camera me-2"></i>사진 변경
+                    </button>
+                </div>
+                <input type="file" id="profileFileInput" accept="image/*" style="display: none;">
+                
+                <div class="text-center mt-3 d-none" id="saveBtnContainer">
+                     <p class="text-info small mb-2"><i class="fas fa-info-circle"></i> '저장'을 눌러야 반영됩니다.</p>
+                     <button type="button" class="btn btn-primary px-4" id="btnSaveProfileImage">저장하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                 </main>
             
             <jsp:include page="common/footer.jsp" flush="true"/>
@@ -740,6 +816,75 @@
                         }
                     },
                     error: function(err) { console.log("에러 발생", err); }
+                });
+            });
+         // 1. 대시보드 프로필 사진 클릭 -> 모달 열기
+            $('#dashboardProfileImg').on('click', function() {
+                var currentSrc = $(this).attr('src');
+                $('#modalProfilePreview').attr('src', currentSrc);
+                $('#saveBtnContainer').addClass('d-none'); // 저장 버튼 숨김 초기화
+                $('#profileImageModal').modal('show');
+            });
+
+            // 2. '사진 변경' 버튼 클릭 -> 숨겨진 file input 클릭
+            $('#btnTriggerFile').on('click', function() {
+                $('#profileFileInput').click();
+            });
+
+            // 3. 파일 선택 시 -> 미리보기 변경 및 저장 버튼 표시
+            $('#profileFileInput').on('change', function(e) {
+                var file = e.target.files[0];
+                if(file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#modalProfilePreview').attr('src', e.target.result); // 미리보기 갱신
+                        $('#saveBtnContainer').removeClass('d-none'); // 저장 버튼 표시
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // 4. '저장하기' 버튼 클릭 -> AJAX 전송
+            $('#btnSaveProfileImage').on('click', function() {
+                var file = $('#profileFileInput')[0].files[0];
+                if(!file) {
+                    alert("선택된 파일이 없습니다.");
+                    return;
+                }
+
+                // FormData 생성
+                var formData = new FormData();
+                formData.append("empNo", "${sessionScope.login.empNo}"); // 세션의 사번
+                formData.append("empImageFile", file);
+
+                $.ajax({
+                    url: '${pageContext.request.contextPath}/emp/updateProfileImage', // 새로 만든 컨트롤러 메소드
+                    type: 'POST',
+                    data: formData,
+                    processData: false, // 파일 전송 시 필수
+                    contentType: false, // 파일 전송 시 필수
+                    success: function(response) {
+                        if(response === "FAIL" || response === "DENY" || response === "ERROR") {
+                            alert("사진 변경에 실패했습니다. (코드: " + response + ")");
+                        } else if (response === "FILE_SIZE" || response === "FILE_TYPE") {
+                            alert("파일 형식이 맞지 않거나 용량이 너무 큽니다.");
+                        } else {
+                            // 성공 시 (response는 새로운 파일명)
+                            alert("프로필 사진이 변경되었습니다.");
+                            
+                            // 화면의 모든 프로필 이미지 소스 갱신 (새로고침 없이 반영)
+                            var newSrc = '${pageContext.request.contextPath}/upload/emp/' + response;
+                            $('#dashboardProfileImg').attr('src', newSrc);
+                            $('#modalProfilePreview').attr('src', newSrc);
+                            $('#myCommentProfileImg').attr('src', newSrc); // 댓글창 내 사진도 있다면 갱신
+                            
+                            // 모달 닫기
+                            $('#profileImageModal').modal('hide');
+                        }
+                    },
+                    error: function() {
+                        alert("서버 통신 오류가 발생했습니다.");
+                    }
                 });
             });
         });
