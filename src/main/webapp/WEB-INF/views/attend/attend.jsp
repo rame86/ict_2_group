@@ -418,7 +418,7 @@
                 dataType: 'json',
                 success: function(res) {
                     if(res.success) {
-                        alert('✅ 상신 완료되었습니다.\n[전자결재 > 상신함]에서 확인 가능합니다.');
+                        alert('✅ 상신 완료되었습니다.\n[전자결재 > 결재 현황]에서 확인 가능합니다.');
                         $modal.removeClass('show');
                         location.reload(); 
                     } else {
