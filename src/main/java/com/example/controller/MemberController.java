@@ -31,7 +31,6 @@ public class MemberController {
 		log.info("요청받은 step : " + step);
 	}
 
- 
 	@GetMapping("/member/empNoCheck")
 	@ResponseBody
 	public String empNoCheck(String empNo, String empName, EmpVO vo, HttpSession session) {
@@ -56,30 +55,33 @@ public class MemberController {
 	}
 
 	@PostMapping("/member/loginCheck")
-    public String loginCheck(MemberVO vo, HttpSession session) {
+	public String loginCheck(MemberVO vo, HttpSession session) {
+		// 테스트용 임시 자동로그인
+//		vo.setEmpNo("7777");
+//		vo.setEmpPass("7777");
+		log.info("[MemberController - loginCheck] 요청받음 :" + vo.toString());
 
-        log.info("[MemberController - loginCheck] 요청받음 :" + vo.toString());
+		LoginVO check = memberService.loginCheck(vo);
 
-        LoginVO check = memberService.loginCheck(vo);
+		if (check != null) {
+			session.setAttribute("login", check);
 
-        if (check != null) {           
-            session.setAttribute("login", check);
-            
-            log.info("로그인 성공: " + check.getEmpName());
-                       
-            return "redirect:/"; 
-            
-        } else {
-            log.info("로그인 실패");
-            return "member/login"; // 실패 시 다시 로그인 페이지
-        }
-    }
+			log.info("로그인 성공: " + check.getEmpName());
+
+			return "redirect:/";
+
+		} else {
+			log.info("로그인 실패");
+			return "member/login"; // 실패 시 다시 로그인 페이지
+		}
+	}
+
 	// 로그인 페이지 이동
-    @GetMapping("/member/login")
-    public String memberLoginPage() {
-        return "member/login";
-    }
-    
+	@GetMapping("/member/login")
+	public String memberLoginPage() {
+		return "member/login";
+	}
+
 	@GetMapping("/login")
 	public String loginPage() {
 		return "member/login";

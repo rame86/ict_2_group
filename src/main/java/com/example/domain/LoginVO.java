@@ -21,4 +21,5 @@ public class LoginVO {
 	private String parentDeptNo;
 	private String deptAddr;
 	private String deptPhone;
+	private String jobTitle;
 }

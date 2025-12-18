@@ -219,5 +219,16 @@ public class EmpServiceImpl implements EmpService {
         log.info("[EmpServiceImpl] setEmpJobTitle 호출 - 부서/직책 일괄 처리");
         // 실제 로직은 Doc/Dept 모듈에서 처리
     }
+    
+    public int updateProfileImage(String empNo, String newImageName) {
+        
+        // Mapper에 전달할 파라미터 맵 생성
+        java.util.Map<String, Object> map = new java.util.HashMap<>();
+        map.put("empNo", empNo);
+        map.put("empImage", newImageName);
+
+        // Mapper 호출
+        return empMapper.updateProfileImage(map);
+    }
 
 }
