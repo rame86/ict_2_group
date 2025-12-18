@@ -216,8 +216,15 @@
                                         <input type="hidden" name="step2ManagerNo" value="${ loginVO.parentDeptNo }">
 
                                         <div class="form-group-row">
-                                            <div class="label-box">문서 제목</div>
-                                            <div class="input-box"><input class="input-custom" id="documentTitle" name="docTitle" type="text" placeholder="제목을 입력해 주세요" required></div>
+                                        	<div class="info-item">
+                                            	<div class="label-box">문서 제목</div>
+                                            	<div class="input-box"><input class="input-custom" id="documentTitle" name="docTitle" type="text" placeholder="제목을 입력해 주세요" required></div>
+                                            </div>
+                                            <div class="info-item ms-4">
+                                            	<div class="label-box">부서명</div>
+                                                <div class="input-box">
+                                                <input type="text" class="input-custom" name="empName" value="${ sessionScope.login.empName }" readonly></div>
+                                            </div>
                                         </div>
 
                                         <div class="form-group-row">
@@ -225,7 +232,8 @@
                                                 <div class="label-box">기안일</div>
                                                 <div class="input-box"><input type="date" class="input-custom" id="draftDate" name="docDate" value="<%= today %>" required></div>
                                             </div>
-                                            <div class="info-item ms-4"> <div class="label-box">기안자</div>
+                                            <div class="info-item ms-4">
+                                            	<div class="label-box">기안자</div>
                                                 <div class="input-box"><input type="text" class="input-custom" name="empName" value="${ sessionScope.login.empName }" readonly></div>
                                             </div>
                                         </div>

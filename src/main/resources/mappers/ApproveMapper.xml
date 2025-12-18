@@ -379,5 +379,26 @@
 			WHERE ROWNUM &lt;= #{limit}
 		</if>
 	</select>
+	
+	<select id="selectApprovalLineInfo" resultType="map" parameterType="string">
+	    SELECT 
+	        D.DEPT_NAME AS deptName, 
+	        D.PARENT_DEPT_NO AS parentDeptNo, 
+	        M1.EMP_NO AS managerEmpNo, 
+	        M1.EMP_NAME AS managerName, 
+	        PD.MANAGER_EMP_NO AS parentManagerEmpNo, 
+	        M2.EMP_NAME AS parentManagerName 
+	    FROM 
+	        EMP E
+	    LEFT JOIN  DEPT D ON E.DEPT_NO = D.DEPT_NO
+	    LEFT JOIN 
+	        EMP M1 ON D.MANAGER_EMP_NO = M1.EMP_NO
+	    LEFT JOIN 
+	        DEPT PD ON D.PARENT_DEPT_NO = PD.DEPT_NO
+	    LEFT JOIN 
+	        EMP M2 ON PD.MANAGER_EMP_NO = M2.EMP_NO
+	    WHERE 
+	        E.EMP_NO = #{empNo}
+	</select>
 
 </mapper>

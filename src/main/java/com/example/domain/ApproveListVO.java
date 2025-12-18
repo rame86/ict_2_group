@@ -13,4 +13,5 @@ public class ApproveListVO {
     private String progressStatus;
     private String completionType;
     private String docType;
+    private String deptName;
 }
