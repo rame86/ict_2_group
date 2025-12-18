@@ -24,7 +24,9 @@
 		MEMO,
 		ATT_STATUS,
 		TARGET_EMP_NO,
-		TARGET_DEPT_NO
+		TARGET_DEPT_NO, 
+		ORIGIN_NAME, 
+		CHANGE_NAME 
 		)
 		VALUES(
 		#{docNo},
@@ -41,7 +43,9 @@
 		#{memo, jdbcType=VARCHAR},
 		#{attStatus, jdbcType=VARCHAR},
 		#{targetEmpNo, jdbcType=VARCHAR},
-		#{targetDeptNo, jdbcType=VARCHAR}
+		#{targetDeptNo, jdbcType=VARCHAR}, 
+		#{originName}, 
+		#{changeName}
 		)
 	</insert>
 
@@ -253,13 +257,22 @@
 	</select>
 
 	<select id="selectDocNo" parameterType="int" resultType="DocVO">
-		SELECT *
-		FROM DOC d
-		JOIN EMP w ON d.DOC_WRITER = w.EMP_NO
-		LEFT JOIN APPROVE a ON d.DOC_NO = a.DOC_NO
-		LEFT JOIN EMP m1 ON a.STEP1_MANAGER_NO = m1.EMP_NO
-		LEFT JOIN EMP m2 ON a.STEP2_MANAGER_NO = m2.EMP_NO
-		WHERE d.DOC_NO = #{docNo}
+		SELECT 
+	        d.*,
+	        w.EMP_NAME  AS writerName, 
+	        m1.EMP_NAME AS step1ManagerName,
+	        m2.EMP_NAME AS step2ManagerName,
+	        a.STEP1_STATUS,
+	        a.STEP2_STATUS,
+	        a.STEP1_MANAGER_NO,
+	        a.STEP2_MANAGER_NO,
+	        a.REJECT_REASON
+	    FROM DOC d
+	    JOIN EMP w ON d.DOC_WRITER = w.EMP_NO
+	    LEFT JOIN APPROVE a ON d.DOC_NO = a.DOC_NO
+	    LEFT JOIN EMP m1 ON a.STEP1_MANAGER_NO = m1.EMP_NO
+	    LEFT JOIN EMP m2 ON a.STEP2_MANAGER_NO = m2.EMP_NO
+	    WHERE d.DOC_NO = #{docNo}
 	</select>
 
 	<update id="updateApproveStatus" parameterType="hashmap">
@@ -382,15 +395,16 @@
 	
 	<select id="selectApprovalLineInfo" resultType="map" parameterType="string">
 	    SELECT 
-	        D.DEPT_NAME AS deptName, 
-	        D.PARENT_DEPT_NO AS parentDeptNo, 
-	        M1.EMP_NO AS managerEmpNo, 
-	        M1.EMP_NAME AS managerName, 
-	        PD.MANAGER_EMP_NO AS parentManagerEmpNo, 
-	        M2.EMP_NAME AS parentManagerName 
+	        D.DEPT_NAME       AS deptName,      
+	        D.PARENT_DEPT_NO  AS parentDeptNo,
+	        D.MANAGER_EMP_NO  AS managerEmpNo,
+	        M1.EMP_NAME       AS managerName,
+	        PD.MANAGER_EMP_NO AS parentManagerEmpNo,
+	        M2.EMP_NAME       AS parentManagerName 
 	    FROM 
 	        EMP E
-	    LEFT JOIN  DEPT D ON E.DEPT_NO = D.DEPT_NO
+	    LEFT JOIN 
+	        DEPT D ON E.DEPT_NO = D.DEPT_NO
 	    LEFT JOIN 
 	        EMP M1 ON D.MANAGER_EMP_NO = M1.EMP_NO
 	    LEFT JOIN 

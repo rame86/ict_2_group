@@ -3,12 +3,14 @@ package com.example.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.example.domain.ApproveListVO;
 import com.example.domain.ApproveVO;
 import com.example.domain.DocVO;
 
 public interface ApproveService {
-	public void ApprovalApplication(DocVO dvo, ApproveVO avo);
+	public void ApprovalApplication(DocVO dvo, ApproveVO avo, MultipartFile upfile);
 	public Map<String, List<ApproveListVO>> selectReceiveApproveList(String empNo);
 	public List<ApproveListVO> selectWaitingReceiveList(String empNo);
 	public List<ApproveListVO> selectFinishReceiveList(String empNo);
