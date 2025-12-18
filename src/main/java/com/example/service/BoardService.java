@@ -37,4 +37,13 @@ public interface BoardService {
 	public int updateReply(ReplyVO vo);
 
 	public int deleteReply(Long replyNo);
+	
+	// 공지 삭제
+	void deleteNoticeBoard(String noticeNo);
+
+	// 자유게시판 삭제
+	void deleteFreeBoard(String boardNo);
+
+	// 공지권한
+	boolean checkGlobalWriteAuth(String empNo);
 }

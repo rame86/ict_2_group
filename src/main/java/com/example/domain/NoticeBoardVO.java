@@ -14,4 +14,5 @@ public class NoticeBoardVO {
 	private Integer deptNo;
 	private String deptName;
 	private Integer replyCnt;
+	private String empImage;
 }

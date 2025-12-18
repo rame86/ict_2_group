@@ -1,6 +1,6 @@
 package com.example.controller;
 
-import java.util.ArrayList; // 리스트 합치기 위해 추가
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ public class BoardController {
 
 	@GetMapping("/board/getNoticeBoardList")
 	public String getNoticeBoardList(Model m, HttpSession session,
-			@RequestParam(value = "noticeNo", required = false) String noticeNo) { // 👈 파라미터 추가
+			@RequestParam(value = "noticeNo", required = false) String noticeNo) {
 		Object login = session.getAttribute("login");
 		if (login == null)
 			return "redirect:/";
@@ -53,7 +53,7 @@ public class BoardController {
 		LoginVO loginUser = (LoginVO) login;
 		Integer userDeptNo = Integer.parseInt(loginUser.getDeptNo());
 
-		// 1. 공지 목록 가져오기 (기존 로직 유지)
+		// 1. 공지 목록 가져오기
 		List<NoticeBoardVO> globalNotices = boardService.getGlobalNoticeList();
 		List<NoticeBoardVO> deptNotices = boardService.getDeptNoticeList(userDeptNo);
 
@@ -65,10 +65,14 @@ public class BoardController {
 
 		m.addAttribute("noticeBoardList", combinedList);
 
-		// ⭐ [추가] 알림을 타고 들어왔다면, 열어야 할 글 번호를 JSP로 전달
+		// 2. 알림 타고 들어온 경우 처리
 		if (noticeNo != null) {
 			m.addAttribute("targetNoticeNo", noticeNo);
 		}
+
+		// ⭐ [추가] 전체 공지 작성 권한 체크 (상위부서 1001인 부서장만)
+		boolean canWriteGlobal = boardService.checkGlobalWriteAuth(loginUser.getEmpNo());
+		m.addAttribute("canWriteGlobal", canWriteGlobal);
 
 		return "/board/getNoticeBoardList";
 	}
@@ -81,10 +85,17 @@ public class BoardController {
 			vo.setNoticeWriter(login.getEmpName());
 		}
 
-		// JSP <select>에서 넘어온 deptNo (0 또는 부서번호) 사용
-		// 만약 값이 없으면 기본값(내 부서) 설정
+		// JSP에서 넘어온 deptNo가 없으면(null) 내 부서로 설정
 		if (vo.getDeptNo() == null) {
 			vo.setDeptNo(Integer.parseInt(login.getDeptNo()));
+		}
+
+		// 만약 사용자가 '0'(전체공지)을 보냈는데 권한이 없으면 강제로 본인 부서로 변경
+		if (vo.getDeptNo() == 0) {
+			boolean canWriteGlobal = boardService.checkGlobalWriteAuth(login.getEmpNo());
+			if (!canWriteGlobal) {
+				vo.setDeptNo(Integer.parseInt(login.getDeptNo()));
+			}
 		}
 
 		if (vo.getNoticeNo() == null || vo.getNoticeNo().isEmpty()) {
@@ -96,13 +107,20 @@ public class BoardController {
 		return "redirect:/board/getNoticeBoardList";
 	}
 
+	// 공지사항 삭제
+	@PostMapping("/board/deleteNoticeBoard")
+	public String deleteNoticeBoard(@RequestParam("noticeNo") String noticeNo) {
+		boardService.deleteNoticeBoard(noticeNo);
+		return "redirect:/board/getNoticeBoardList";
+	}
+
 	@PostMapping("/board/getContentNoticeBoard")
 	@ResponseBody
 	public NoticeBoardVO getContentNoticeBoard(@RequestParam("noticeNo") String noticeNo) {
 		return boardService.getContentNoticeBoard(noticeNo);
 	}
 
-	// ************* 자유게시판 영역 (기존 유지) *************
+	// ************* 자유게시판 영역 *************
 
 	@GetMapping("/board/getFreeBoardList")
 	public String getFreeBoardList(Model m, HttpSession session) {
@@ -113,13 +131,9 @@ public class BoardController {
 		LoginVO loginUser = (LoginVO) login;
 		Integer userDeptNo = Integer.parseInt(loginUser.getDeptNo());
 
-		// 1. [전체 자유게시판] 가져오기
 		List<FreeBoardVO> globalFreeBoards = boardService.getGlobalFreeBoardList();
-
-		// 2. [부서 자유게시판] (내 부서 + 하위 부서) 가져오기
 		List<FreeBoardVO> deptFreeBoards = boardService.getDeptFreeBoardList(userDeptNo);
 
-		// 3. JSP 변수명인 'freeBoardList'로 전달하기 위해 두 리스트를 하나로 합침
 		List<FreeBoardVO> combinedList = new ArrayList<>();
 		if (globalFreeBoards != null)
 			combinedList.addAll(globalFreeBoards);
@@ -149,76 +163,64 @@ public class BoardController {
 		return "redirect:/board/getFreeBoardList";
 	}
 
+	// 자유게시판 삭제
+	@PostMapping("/board/deleteFreeBoard")
+	public String deleteFreeBoard(@RequestParam("boardNo") String boardNo) {
+		boardService.deleteFreeBoard(boardNo);
+		return "redirect:/board/getFreeBoardList";
+	}
+
 	@PostMapping("/board/getContentFreeBoard")
 	@ResponseBody
 	public FreeBoardVO getContentFreeBoard(@RequestParam("boardNo") String boardNo) {
 		return boardService.getContentFreeBoard(boardNo);
 	}
 
+	// 알림 전송 로직 (기존 유지)
 	private void sendNoticeAlert(NoticeBoardVO vo) {
 		List<String> targetEmpList;
-
 		if (vo.getDeptNo() == 0) {
-			// 전사 공지: 모든 사원 리스트 조회
 			targetEmpList = empService.getAllEmpNoList();
 		} else {
-			// 부서 공지: 해당 부서 사원 리스트 조회
 			targetEmpList = empService.getEmpNoListByDept(Integer.toString(vo.getDeptNo()));
 		}
-
 		for (String targetEmpNo : targetEmpList) {
-			// 작성자 본인은 제외 (선택 사항)
 			if (targetEmpNo.equals(vo.getEmpNo()))
 				continue;
-
 			AlertVO alert = new AlertVO();
 			alert.setEmpNo(targetEmpNo);
 			alert.setLinkType("BOARD");
 			alert.setLinkId(Integer.parseInt(vo.getNoticeNo()));
 			alert.setAlertStatus("NOTICE");
-
 			String deptPrefix = (vo.getDeptNo() == 0) ? "[전체공지] " : "[부서공지] ";
 			alert.setContent(deptPrefix + " " + vo.getNoticeTitle() + " 공지가 등록되었습니다.");
-
-			// DB 저장 및 실시간 알림 전송
 			alertService.saveNewAlert(alert);
 			notificationService.pushNewAlert(alert);
 		}
 	}
 
-// ************* 댓글(Reply) AJAX 컨트롤러 영역 *************
-
-	// 댓글 등록
+	// ************* 댓글(Reply) AJAX 컨트롤러 영역 (기존 유지) *************
 	@PostMapping("/replies/insert")
 	@ResponseBody
 	public String insertReply(@RequestBody ReplyVO vo, HttpSession session) {
 		LoginVO login = (LoginVO) session.getAttribute("login");
 		if (login == null)
-			return "fail"; // 로그인 안됨
-
+			return "fail";
 		vo.setReplyWriterEmpNo(login.getEmpNo());
-
-		// NoticeNo나 BoardNo가 제대로 들어왔는지 확인
-		System.out.println("댓글 등록 요청: " + vo);
-
 		int result = boardService.insertReply(vo);
 		return result > 0 ? "success" : "fail";
 	}
 
-	// 댓글 목록 조회
 	@GetMapping("/replies/list")
 	@ResponseBody
 	public List<ReplyVO> getReplyList(ReplyVO vo) {
 		return boardService.getReplyList(vo);
 	}
 
-	// 댓글 삭제
 	@PostMapping("/replies/delete")
 	@ResponseBody
 	public String deleteReply(@RequestParam("replyNo") Long replyNo, HttpSession session) {
-		// 본인 확인 로직 추가 권장
 		int result = boardService.deleteReply(replyNo);
 		return result > 0 ? "success" : "fail";
 	}
-
 }

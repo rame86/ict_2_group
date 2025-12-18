@@ -29,7 +29,7 @@
         .profile-info-item span { color: #5a5c69; font-weight: 700; font-size: 1.1rem; }
 
         /* ---------------------------------------------------------------------------------- */
-        /* [중요] getNoticeBoardList.jsp의 스타일을 그대로 가져옴 (라인 275~283) */
+        /* [중요] 게시판 모달 및 프로필 이미지 스타일 추가 */
         /* ---------------------------------------------------------------------------------- */
         #boardModal .modal-content {
             border: none;
@@ -38,15 +38,15 @@
         }
 
         #boardModal .modal-header {
-            border-bottom: none; /* 헤더 구분선 제거 */
-            padding-bottom: 0;   /* 패딩 제거 */
+            border-bottom: none; 
+            padding-bottom: 0;   
         }
 
         #boardModal .modal-body {
-            padding: 20px 30px; /* 바디 패딩 설정 */
+            padding: 20px 30px; 
         }
 
-        /* 제목 영역 - 파란색 포인트 (왼쪽 보더) */
+        /* 제목 영역 */
         .view-title {
             font-size: 1.5rem;
             font-weight: bold;
@@ -56,7 +56,7 @@
             padding-left: 15px;
         }
 
-        /* 작성자 및 날짜 정보 박스 (회색 박스) */
+        /* 작성자 및 날짜 정보 박스 */
         .view-info-box {
             background-color: #f8f9fa;
             border-radius: 10px;
@@ -71,6 +71,8 @@
         .info-item {
             font-size: 0.9rem;
             color: #666;
+            display: flex;
+            align-items: center;
         }
 
         .info-item i {
@@ -78,7 +80,26 @@
             color: #adb5bd;
         }
 
-        /* 본문 영역 (그림자 효과 포함) */
+        /* [NEW] 작성자/댓글 프로필 이미지 스타일 */
+        .writer-profile-img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .comment-profile-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 1px solid #dee2e6;
+        }
+
+        /* 본문 영역 */
         .view-content-box {
             min-height: 200px;
             background-color: white;
@@ -105,7 +126,7 @@
             border-radius: 8px;
             padding: 10px;
             margin-bottom: 10px;
-            text-align: left; /* 대시보드는 중앙정렬이 많아 왼쪽 정렬 명시 */
+            text-align: left; 
         }
     </style>
 </head>
@@ -524,7 +545,8 @@
 
                                 <div class="view-info-box">
                                     <span class="info-item"> 
-                                        <i class="fas fa-user-circle"></i> <span id="modalWriterText">작성자</span>
+                                        <img id="modalWriterImg" src="${pageContext.request.contextPath}/images/default_profile.png" class="writer-profile-img" alt="작성자">
+                                        <span id="modalWriterText">작성자</span>
                                     </span> 
                                     <span class="info-item"> 
                                         <i class="far fa-clock"></i> <span id="modalDateText">0000-00-00</span>
@@ -549,7 +571,7 @@
                                 <div class="collapse comment-section" id="collapseComments">
                                     <div class="d-flex mb-3">
                                         <div class="flex-shrink-0 me-2">
-                                            <i class="fas fa-user-circle fa-2x text-secondary"></i>
+                                            <img id="myCommentProfileImg" src="${pageContext.request.contextPath}/images/default_profile.png" class="comment-profile-img" alt="나">
                                         </div>
                                         <div class="flex-grow-1">
                                             <input type="text" id="replyInput" class="form-control" placeholder="댓글을 입력하세요...">
@@ -579,9 +601,10 @@
         dateElement.innerText = new Date().toLocaleDateString('ko-KR', options);
         
         var LOGIN_EMP_NO = "${sessionScope.login.empNo}";
+        var DEFAULT_IMG = "${pageContext.request.contextPath}/images/default_profile.png"; // 기본 이미지 경로
 
         $(document).ready(function() {
-            /* 프로필 사진 로드 */
+            /* 1. 프로필 사진 로드 (왼쪽 사이드바 & 대시보드 내 정보 & 댓글창 내 프사) */
             var myEmpNo = '${sessionScope.login.empNo}';
             if(myEmpNo) {
                 $.ajax({
@@ -592,6 +615,7 @@
                         var imgSrc = $temp.find('.emp-photo-placeholder img').attr('src');
                         if(imgSrc) {
                             $('#dashboardProfileImg').attr('src', imgSrc);
+                            $('#myCommentProfileImg').attr('src', imgSrc); // 댓글 입력창 옆 내 사진도 업데이트
                         }
                     }
                 });
@@ -611,7 +635,7 @@
             }
 
             // --------------------------------------------------------------------
-            // [중요] 게시판 상세 모달 JS 로직 (새로운 HTML 구조에 맞게 ID 매핑 확인됨)
+            // [중요] 게시판 상세 모달 JS 로직 (이미지 처리 추가)
             // --------------------------------------------------------------------
             var $boardModal = $('#boardModal');
             $boardModal.on('show.bs.modal', function(event) {
@@ -628,6 +652,9 @@
                 $boardModal.find('#modalDateText').text(date || '-');
                 $boardModal.find('#modalContentText').text('내용 로딩중...');
                 
+                // [NEW] 작성자 이미지 초기화 (일단 기본 이미지로) -> AJAX 성공 시 교체
+                $boardModal.find('#modalWriterImg').attr('src', DEFAULT_IMG);
+
                 $('#collapseComments').collapse('hide');
                 $('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글');
 
@@ -656,6 +683,15 @@
                     dataType : 'json',
                     success : function(response) {
                         var content = response.noticeContent || response.boardContent;
+                        
+                        // [NEW] 작성자 이미지 처리
+                        var writerImg = response.empImage; 
+                        if(writerImg) {
+                            $boardModal.find('#modalWriterImg').attr('src', '${pageContext.request.contextPath}/upload/emp/' + writerImg);
+                        } else {
+                            $boardModal.find('#modalWriterImg').attr('src', DEFAULT_IMG);
+                        }
+
                         if (content) {
                             $boardModal.find('#modalContentText').text(content);
                         } else {
@@ -732,18 +768,37 @@
                             let dateStr = date.toISOString().split('T')[0] + " " + date.toTimeString().split(' ')[0].substring(0,5);
                             let writerDisplay = (reply.replyWriterName || reply.replyWriterEmpNo) + (reply.replyWriterJob ? ' (' + reply.replyWriterJob + ')' : '');
                             
-                            html += '<div class="comment-card" id="reply-' + reply.replyNo + '">';
-                            html += '  <div class="d-flex justify-content-between">';
-                            html += '    <strong class="text-dark">' + writerDisplay + '</strong>';
-                            html += '    <small class="text-muted">' + dateStr + '</small>';
-                            html += '  </div>';
-                            html += '  <p class="mb-0 mt-1 text-secondary small">' + reply.replyContent + '</p>';
-                            if (LOGIN_EMP_NO == reply.replyWriterEmpNo) {
-                                html += '  <div class="mt-2 text-end">';
-                                html += '    <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none" onclick="deleteReply(' + reply.replyNo + ')">삭제</button>';
-                                html += '  </div>';
+                            // [NEW] 댓글 작성자 이미지 경로 설정
+                            let replyImgSrc = DEFAULT_IMG;
+                            if(reply.replyWriterImage) {
+                                replyImgSrc = '${pageContext.request.contextPath}/upload/emp/' + reply.replyWriterImage;
                             }
-                            html += '</div>';
+
+                            html += '<div class="comment-card" id="reply-' + reply.replyNo + '">';
+                            
+                            // [NEW] 댓글 레이아웃 수정: flex 사용 (왼쪽 사진, 오른쪽 내용)
+                            html += '  <div class="d-flex">';
+                            // 1. 프로필 이미지
+                            html += '    <div class="flex-shrink-0">';
+                            html += '      <img src="' + replyImgSrc + '" class="comment-profile-img" alt="프로필">';
+                            html += '    </div>';
+                            
+                            // 2. 내용 영역
+                            html += '    <div class="flex-grow-1">';
+                            html += '      <div class="d-flex justify-content-between align-items-center">';
+                            html += '        <strong class="text-dark">' + writerDisplay + '</strong>';
+                            html += '        <small class="text-muted">' + dateStr + '</small>';
+                            html += '      </div>';
+                            html += '      <p class="mb-0 mt-1 text-secondary small">' + reply.replyContent + '</p>';
+                            
+                            if (LOGIN_EMP_NO == reply.replyWriterEmpNo) {
+                                html += '      <div class="mt-1 text-end">';
+                                html += '        <button class="btn btn-sm btn-link text-danger p-0 text-decoration-none" onclick="deleteReply(' + reply.replyNo + ')">삭제</button>';
+                                html += '      </div>';
+                            }
+                            html += '    </div>'; // end flex-grow-1
+                            html += '  </div>'; // end d-flex
+                            html += '</div>'; // end comment-card
                         });
                     }
                     $('.comment-list-container').html(html);

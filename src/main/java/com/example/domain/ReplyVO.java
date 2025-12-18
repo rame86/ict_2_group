@@ -14,4 +14,6 @@ public class ReplyVO {
 
 	private String replyWriterName; // 조인용 이름이구요~
 	private String replyWriterJob; // 조인용 직급이구용
+	
+	private String replyWriterImage; // 사진가져올거야
 }
