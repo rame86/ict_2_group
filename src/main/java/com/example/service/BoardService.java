@@ -3,6 +3,7 @@ package com.example.service;
 import java.util.List;
 import com.example.domain.FreeBoardVO;
 import com.example.domain.NoticeBoardVO;
+import com.example.domain.ReplyVO;
 
 public interface BoardService {
 	// 전체 조회
@@ -27,4 +28,13 @@ public interface BoardService {
 	public String updateFreeBoard(FreeBoardVO vo);
 
 	public FreeBoardVO getContentFreeBoard(String boardNo);
+
+	// 댓글 CRUD
+	public int insertReply(ReplyVO vo);
+
+	public List<ReplyVO> getReplyList(ReplyVO vo);
+
+	public int updateReply(ReplyVO vo);
+
+	public int deleteReply(Long replyNo);
 }

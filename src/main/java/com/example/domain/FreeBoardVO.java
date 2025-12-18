@@ -13,4 +13,5 @@ public class FreeBoardVO {
 	private Integer boardCnt;
 	private Integer deptNo;
 	private String deptName;
+	private Integer replyCnt;
 }
