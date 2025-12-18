@@ -486,4 +486,63 @@ public class EmpController {
 			System.out.println("⚠ 삭제 대상 파일이 존재하지 않습니다: " + f.getAbsolutePath());
 		}
 	}
+	
+	
+	//사원이 직접 사진 수정
+	@PostMapping("/emp/updateProfileImage")
+    @ResponseBody
+    public String updateProfileImage(
+            @RequestParam("empNo") String empNo,
+            @RequestParam("empImageFile") MultipartFile empImageFile,
+            HttpSession session) {
+
+        System.out.println("📌 /emp/updateProfileImage 호출, empNo = " + empNo);
+
+        LoginVO login = (LoginVO) session.getAttribute("login");
+        if (login == null) return RES_FAIL;
+
+        // 본인 확인 (또는 관리자)
+        if (!login.getEmpNo().equals(empNo) && !isAdmin(session)) {
+            return RES_DENY;
+        }
+
+        String newSavedName = null;
+        String oldSavedName = login.getEmpImage(); // 현재 세션에 있는 이미지 이름
+
+        try {
+            // 1. 파일 검증 및 저장
+            String valid = validateImageFile(empImageFile);
+            if (!RES_OK.equals(valid)) return valid;
+
+            newSavedName = saveEmpImage(empImageFile); 
+
+           
+            int cnt = empService.updateProfileImage(empNo, newSavedName);
+            
+            if (cnt > 0) {
+                // 3. 성공 시 기존 파일 삭제 (기존 파일명은 세션에서 가져온 것 활용)
+                // 주의: "default_profile.png"는 삭제하면 안 됨
+                if (oldSavedName != null 
+                        && !oldSavedName.isBlank() 
+                        && !oldSavedName.equals("default_profile.png")) {
+                    deleteEmpImage(oldSavedName);
+                }
+                
+                // 4. 세션 정보 갱신 (화면 즉시 반영)
+                login.setEmpImage(newSavedName);
+                session.setAttribute("login", login);
+                
+                return newSavedName; // 성공 시 변경된 파일명 리턴
+            }
+            
+            // DB 실패 시 업로드한 파일 롤백
+            deleteEmpImage(newSavedName);
+            return RES_FAIL;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (newSavedName != null) deleteEmpImage(newSavedName);
+            return RES_ERROR;
+        }
+    }
 }

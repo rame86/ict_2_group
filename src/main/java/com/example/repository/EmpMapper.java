@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -38,5 +39,7 @@ public interface EmpMapper {
     // 알람용
     List<String> selectEmpNoListByDept(String deptNo);
     List<String> selectAllEmpNoList();
+    
+    int updateProfileImage(Map<String, Object> map);
     
 }
