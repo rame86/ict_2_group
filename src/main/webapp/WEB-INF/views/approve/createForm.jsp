@@ -223,7 +223,7 @@
                                             <div class="info-item ms-4">
                                             	<div class="label-box">부서명</div>
                                                 <div class="input-box">
-                                                <input type="text" class="input-custom" name="empName" value="${ sessionScope.login.empName }" readonly></div>
+                                                <input type="text" class="input-custom" name="empName" value="${ manager.deptName }" readonly></div>
                                             </div>
                                         </div>
 
@@ -241,8 +241,8 @@
                                         <div class="form-group-row">
                                             <div class="label-box">결재자</div>
                                             <div class="input-box d-flex gap-3">
-                                                <input type="text" class="input-custom" value="1차: ${ loginVO.managerName }" readonly placeholder="결재자 1">
-                                                <input type="text" class="input-custom" value="2차: ${ loginVO.parentDeptName }" readonly placeholder="결재자 2">
+                                                <input type="text" class="input-custom" value="1차: ${ manager.managerName }" readonly placeholder="결재자 1">
+                                                <input type="text" class="input-custom" value="2차: ${ manager.parentManagerName }" readonly placeholder="결재자 2">
                                             </div>
                                         </div>
 

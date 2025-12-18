@@ -1,10 +1,18 @@
 package com.example.controller;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -64,7 +72,7 @@ public class ApproveController {
 		// 결재 요청한 문서 현황
 		Map<String, Integer> sendCount = approveService.getSendCount(empNo);
 
-		int sendWaitCount = sendCount.get("ACTIVE");
+		int sendWaitCount = sendCount.get("ACTIVE"); 
 		int sendFinishCount = sendCount.get("FINISH");
 		int sendrejectCount = sendCount.get("REJECT");
 
@@ -152,7 +160,7 @@ public class ApproveController {
 	public String approveForm(DocVO dvo, ApproveVO avo, @RequestParam(value="upfile", required=false) MultipartFile upfile) {
 		log.info("approve/approve-form 요청받음");
 		log.info(dvo.toString());
-		approveService.ApprovalApplication(dvo, avo);
+		approveService.ApprovalApplication(dvo, avo, upfile);
 		notificationService.sendApprovalNotification(Integer.toString(avo.getStep1ManagerNo()), "새로운 결재가 도착했습니다");
 		
 		if (dvo.getDocType().equals("4") || dvo.getDocType().equals("5") || dvo.getDocType().equals("6"))
@@ -219,6 +227,30 @@ public class ApproveController {
 		m.addAttribute("dept", login.getDeptName());
 		m.addAttribute("vo", vo);
 	}
+	
+	// 첨부파일 다운로드 처리
+	@GetMapping("/approve/download")
+	public ResponseEntity<Resource> downloadFile(@RequestParam String changeName, @RequestParam String originName) {
+        try {
+            // 파일이 저장된 절대 경로 (ApproveServiceImpl에서 설정한 경로와 일치해야 함)
+            Path filePath = Paths.get("C:/upload/approve/").resolve(changeName);
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                // 한글 파일명 깨짐 방지 처리
+                String encodedOriginName = URLEncoder.encode(originName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+                
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedOriginName + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("파일 다운로드 중 오류 발생: {}", e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
 	// 다른 폼에서 오는 ajax 결제관리
 	@PostMapping("approve/approve-ajax")
@@ -235,7 +267,7 @@ public class ApproveController {
             dvo.setDocWriter(login.getEmpNo()); // 문서 작성자 세팅
 
             // 1. 서비스 로직 수행
-            approveService.ApprovalApplication(dvo, avo);
+            approveService.ApprovalApplication(dvo, avo, null);
             
             // 2. 알림 발송 로직 (Null 체크 포함)
             Integer managerNo = avo.getStep1ManagerNo();

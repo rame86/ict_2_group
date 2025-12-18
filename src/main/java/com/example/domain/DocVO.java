@@ -13,6 +13,8 @@ public class DocVO {
 	private String targetEmpNo;
 	private String targetDeptNo;
 	private String targetGradeNo;
+	private String originName;
+	private String changeName;
 	
 	// 추가로 사용할 필드
 	private String writerName;
