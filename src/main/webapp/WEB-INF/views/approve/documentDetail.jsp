@@ -1,229 +1,245 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <style>
+    /* 도장 이미지 */
+    .stamp {
+        position: absolute;
+        right: 30px;
+        top: 30px;
+        width: 130px;
+        opacity: 0;
+        transform: rotate(-20deg) scale(0.3);
+        transition: 0.4s ease;
+    }
+    .stamp.show {
+        opacity: 1;
+        transform: rotate(-20deg) scale(1);
+    }
 
-    .card-header.table-Header {
-        background-color: #f8f9fa;
+    /* 결재선 박스 */
+    .approval-box {
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #f9f9f9;
+        margin-top: 20px;
+    }
+
+    .approval-title {
         font-weight: bold;
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+
+    .approval-item {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        padding: 10px 20px;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
     }
-    
-    /* 결재선 디자인 */
-    .sign-table {
-        border-collapse: collapse;
-        text-align: center;
-        margin-bottom: 20px;
-        float: right; /* 결재선을 우측으로 배치 */
-    }
-    .sign-table th {
-        background: #f8fafc;
-        border: 1px solid #dee2e6;
-        padding: 5px 12px;
-        font-size: 12px;
-    }
-    .sign-table td {
-        border: 1px solid #dee2e6;
-        height: 60px;
-        width: 80px;
-        vertical-align: middle;
-    }
-    .stamp-circle {
-        width: 45px;
-        height: 45px;
-        border: 2px solid #e2e8f0;
-        border-radius: 50%;
-        margin: 0 auto;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 12px;
+
+    .approval-status {
         font-weight: bold;
     }
-    .stamp-circle.approved { border-color: #10b981; color: #10b981; }
-    .stamp-circle.rejected { border-color: #ef4444; color: #ef4444; }
-    .stamp-circle.request { border-color: #1e293b; color: #1e293b; }
-
-    /* 문서 정보 레이아웃 */
-    .doc-info-table {
-        width: 100%;
-        margin-bottom: 20px;
-        border: 1px solid #dee2e6;
+    .approved {
+        color: green;
     }
-    .doc-info-table th {
-        background-color: #f8f9fa;
-        width: 15%;
-        padding: 12px;
-        border: 1px solid #dee2e6;
-        text-align: center;
+    .pending {
+        color: #777;
     }
-    .doc-info-table td {
-        padding: 12px;
-        border: 1px solid #dee2e6;
-        background-color: #fff;
-    }
-    
-    .content-box {
-        min-height: 300px;
-        padding: 15px;
-        border: 1px solid #dee2e6;
-        background: #fff;
-        white-space: pre-wrap;
-    }
-
-    .btn-group-custom { display: flex; gap: 5px; }
-    
-    /* 승인 도장 애니메이션 위치 조정 */
-    .big-stamp {
-        position: absolute;
-        top: 100px;
-        right: 150px;
-        width: 120px;
-        opacity: 0;
-        transform: scale(2) rotate(-15deg);
-        transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        pointer-events: none;
-        z-index: 100;
-    }
-    .big-stamp.show { opacity: 0.8; transform: scale(1) rotate(-15deg); }
 </style>
 
-<div class="container-fluid px-4 detail-container">
-    <h3 class="mt-4">결재 문서 상세 보기</h3><br>
+<div class="container-fluid px-4">
 
-    <div class="card mb-4 position-relative">
-        <img src="/images/stamp.png" id="approveStamp" class="big-stamp">
+    <h3 class="mt-4 mb-4">문서 상세 보기</h3>
 
-        <div class="card-header table-Header">
-            <div>
-                <i class="fas fa-file-alt me-1"></i> 문서 정보 [cite: 3]
-            </div>
-            <div class="btn-group-custom">
-                <a href="receiveList" class="btn btn-sm btn-secondary"><i class="fas fa-list"></i> 목록으로</a>
-                <c:if test="${sessionScope.login.empNo == vo.step1ManagerNo || sessionScope.login.empNo == vo.step2ManagerNo}">
-                    <button type="button" class="btn btn-sm btn-success" id="approveBtn"><i class="fas fa-check"></i> 승인</button>
-                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal"><i class="fas fa-times"></i> 반려</button>
-                </c:if>
-            </div>
-        </div>
+    <div class="card position-relative">
+
+        <!-- 도장 -->
+        <img src="/images/stamp.png" id="approveStamp" class="stamp">
 
         <div class="card-body">
-            <div class="clearfix">
-                <table class="sign-table">
-                    <tr>
-                        <th>기안</th>
-                        <th>1차 결재</th>
-                        <th>2차 결재</th>
-                    </tr>
-                    <tr>
-                        <td><div class="stamp-circle request">신청</div></td>
-                        <td>
-                            <c:choose>
-                                <c:when test="${vo.step1Status == 'A'}"><div class="stamp-circle approved">승인</div></c:when>
-                                <c:when test="${vo.step1Status == 'R'}"><div class="stamp-circle rejected">반려</div></c:when>
-                                <c:otherwise><div class="stamp-circle">대기</div></c:otherwise>
-                            </c:choose>
-                        </td>
-                        <td>
-                            <c:choose>
-                                <c:when test="${vo.step2Status == 'A'}"><div class="stamp-circle approved">승인</div></c:when>
-                                <c:when test="${vo.step2Status == 'R'}"><div class="stamp-circle rejected">반려</div></c:when>
-                                <c:otherwise><div class="stamp-circle">대기</div></c:otherwise>
-                            </c:choose>
-                        </td>
-                    </tr>
-                    <tr style="font-size: 11px; color: #6c757d;">
-                        <td>${vo.writerName}</td>
-                        <td>${vo.step1ManagerName}</td>
-                        <td>${vo.step2ManagerName}</td>
-                    </tr>
-                </table>
-            </div>
 
-            <table class="doc-info-table">
+            <!-- 문서 정보 -->
+            <table class="table table-bordered">
                 <tr>
-                    <th>문서번호</th>
+                    <th style="width: 150px;">문서번호</th>
                     <td>${vo.docNo}</td>
-                    <th>기안일</th>
-                    <td>${vo.docDate}</td>
-                </tr>
-                <tr>
-                    <th>기안자</th>
-                    <td>${vo.writerName}</td>
-                    <th>기안부서</th>
-                    <td></td>
                 </tr>
                 <tr>
                     <th>제목</th>
-                    <td colspan="3"><strong>${vo.docTitle}</strong></td>
+                    <td>${vo.docTitle}</td>
+                </tr>
+                <tr>
+                    <th>작성자</th>
+                    <td>${vo.writerName}</td>
+                </tr>
+                <tr>
+                    <th>작성일</th>
+                    <td>${vo.docDate}</td>
                 </tr>
             </table>
 
-            <div class="form-group">
-                <label class="fw-bold mb-2"><i class="fas fa-align-left"></i> 상세 내용</label>
-                <div class="content-box">${vo.docContent}</div>
+            <!-- 문서 내용 -->
+            <h5 class="fw-bold mt-4">내용</h5>
+            <div class="border rounded p-3" style="white-space: pre-line;">
+                ${vo.docContent}
             </div>
+
+            <!-- 결재선 -->
+            <div class="approval-box">
+                <div class="approval-title">결재선</div>
+
+                <div class="approval-item">
+                    <span>1차 결재자: ${vo.step1ManagerName}</span>
+                    <span class="approval-status">
+                        <c:choose>
+                            <c:when test="${vo.step1Status == 'A'}">
+                                <span class="approved">승인됨 ✔</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="pending">대기중</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </span>
+                </div>
+
+                <div class="approval-item">
+                    <span>2차 결재자: ${vo.step2ManagerName}</span>
+                    <span class="approval-status">
+                        <c:choose>
+                            <c:when test="${vo.step2Status == 'A'}">
+                                <span class="approved">승인됨 ✔</span>
+                            </c:when>
+                            <c:otherwise>
+                                <span class="pending">대기중</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </span>
+                </div>
+            </div>
+
+            <!-- 승인/반려 버튼 -->
+            <c:if test="${sessionScope.login.empNo == vo.step1ManagerNo || sessionScope.login.empNo == vo.step2ManagerNo}">
+                <div class="mt-4 d-flex justify-content-between align-items-center">
+                	<form action="approveDocument" method="post" id="approveForm" class="d-flex">
+                		<input type="hidden" name="docNo" value="${ vo.docNo }">
+                		<button class="btn btn-success me-2" id="approveBtn" type="button">승인</button>
+                    	<button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#rejectModal">반려</button>
+                	</form>
+                	<a href="receiveList" class="btn btn-secondary">목록으로</a>
+                </div>
+			</c:if>
         </div>
     </div>
 </div>
 
+
+<!-- 🔻 반려 사유 모달 -->
 <div class="modal fade" id="rejectModal" tabindex="-1">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <form method="post" action="approveDocument" class="modal-content">
+            <input type="hidden" name="docNo" value="${ vo.docNo }">
             <div class="modal-header">
                 <h5 class="modal-title">반려 사유 입력</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+
             <div class="modal-body">
-                <textarea id="rejectReason" class="form-control" rows="5" placeholder="반려 사유를 입력하세요"></textarea>
+                <textarea name="rejectReason" class="form-control" rows="5" placeholder="반려 사유를 입력하세요" required></textarea>
             </div>
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                <button type="button" class="btn btn-danger" id="rejectBtn">반려하기</button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">닫기</button>
+                <button class="btn btn-danger" id="rejectBtn">반려하기</button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
-<script>
-$(document).ready(function(){
-    // 승인 처리 [cite: 65, 68]
-    $("#approveBtn").on("click", function(){
-        let stamp = $("#approveStamp");
-        stamp.addClass("show");
-        setTimeout(function(){
-            $.ajax({
-                url : "approveDocument",
-                type : "post",
-                data : { docNo : "${ vo.docNo }", status : "A" },
-                success : function(){
-                    alert("승인이 완료되었습니다.");
-                    location.href = "receiveList";
-                },
-                error : function(){
-                    alert("오류 발생");
-                    stamp.removeClass("show");
-                }
-            });
-        }, 600);
-    });
 
-    // 반려 처리 [cite: 69, 70]
-    $("#rejectBtn").on("click", function(){
-        let reason = $("#rejectReason").val();
-        if(!reason.trim()){ alert("사유를 입력하세요."); return; }
-        $.ajax({
-            url : "approveDocument",
-            type : "post",
-            data : { docNo : "${ vo.docNo }", status : "R", rejectReason : reason },
-            success : function(){
-                alert("반려 처리되었습니다.");
-                location.href = "receiveList";
-            }
-        });
+<!-- 🔻 승인 도장 애니메이션 + 자동 전송 -->
+<script>
+
+$(document).ready(function(){
+	
+	$("#approveBtn").on("click", function(){
+		
+		let stamp = $("#approveStamp");
+		let docNo = "${ vo.docNo }";
+		
+		stamp.addClass("show");
+		
+		setTimeout(function(){
+			
+			let postData = {
+				docNo : docNo,
+				status : "A"
+			};
+			
+			$.ajax({
+				url : "approveDocument",
+				type : "post",
+				data : postData,
+				success : function(){
+					console.log("승인이 완료되었습니다😍");
+					window.location.href = "receiveList";
+				},
+				error : function(xhr, status, error){
+					console.error("AJAX Error:", status, error);
+					console.log("서버 통신 중 오류가 발생했습니다.");
+                    stamp.removeClass("show");
+				}
+			});
+			
+		}, 700);
+		
+	});
+	
+	$("#rejectBtn").on("click", function(e){
+		
+		e.preventDefault();
+		
+		let form = $(this).closest("form");
+		let rejectReason = form.find("textarea[name='rejectReason']").val();
+		
+		if (!rejectReason || rejectReason.trim() === "") {
+	        alert("반려 사유를 입력해 주세요.");
+	        return; // AJAX 전송 중단
+	    }
+		
+		let postData = {
+				docNo : "${ vo.docNo }",
+				status : "R", 
+				rejectReason : rejectReason
+		};
+		
+		$.ajax({
+			url : "approveDocument",
+			type : "post",
+			data : postData,
+			success : function(){
+				alert("반려가 처리되었습니다😭");
+				$("#rejectModal").modal("hide"); // 모달 닫기
+				window.location.href = "receiveList";
+			},
+			error : function(xhr, status, error){
+				console.error("AJAX Error:", status, error);
+				alert("서버 통신 중 오류가 발생했습니다.");
+			}
+		});
+		
+	});
+	
+	// 모달창 초기화
+	$('#rejectModal').on('hidden.bs.modal', function () {
+		let textarea = $(this).find('textarea[name="rejectReason"]');
+		textarea.val('');
+		textarea.removeClass('is-invalid');
     });
+	
 });
+
 </script>
