@@ -244,7 +244,7 @@
   color: #333 !important;
 }
 
-/* ===== adminList에서만 하단 여백 확보(푸터 겹침 방지용) ===== */
+/* =====  adminList 전용: footer 겹침 방지용 하단 여백 ===== */
 .sal-admin-page #layoutSidenav_content main .container-fluid{
   padding-bottom: 260px;
 }

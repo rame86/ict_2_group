@@ -199,8 +199,8 @@
 														pattern="#,##0" />원</td>
 
 												<!-- 자세히(상세) -->
-												<td class="text-center"><a
-													href="${pageContext.request.contextPath}/sal/detail?empNo=${s.empNo}&monthAttno=${s.monthAttno}">
+												<td class="text-center">
+												<a href="${pageContext.request.contextPath}/sal/admin/detail?empNo=${s.empNo}&monthAttno=${s.monthAttno}">
 														보기 </a></td>
 
 												<!-- 정정(관리자 편집폼) -->
@@ -247,7 +247,7 @@
 						.DataTable(
 								{
 									ordering : true,
-									order : [ [ 0, 'desc' ], [ 1, 'asc' ] ],
+									order : [ [ 0, 'desc' ], [ 1, 'asc' ] ],// 초기 정렬(서버 정렬 보조용)
 									paging : true,
 									pageLength : 10,
 									lengthChange : false,
