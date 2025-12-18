@@ -52,37 +52,28 @@ function connectSocket() {
 			
 			if(notificationData.action === 'REFRESH_HEADER_ALERTS') {
 				
-				if (notificationData.linkType === 'APPROVAL' || 
-				                   (notificationData.content && notificationData.content.includes('결재'))) {
-				                    
-				                    console.log("--> [Personal] 결재 알림 수신. (파란 토스트는 생략)");
-				                    
-				                    // 🚨 [핵심 수정] DB가 커밋될 시간을 벌어주기 위해 0.5초 딜레이 후 갱신
-				                    setTimeout(function() {
-				                        console.log("--> 0.5초 후 뱃지 갱신 실행");
-				                        if(typeof updateHeaderAlertsBadge === 'function') updateHeaderAlertsBadge();
-				                        if(typeof updateHeaderAlerts === 'function') updateHeaderAlerts();
-				                    }, 500); 
-				                    
-				                    return; // 파란 토스트 안 띄우고 종료
-				                }
+                // 🚨 [핵심 해결] 결재(APPROVAL) 알림이 오면 파란 토스트 차단!
+                // 이미 연두색 토스트가 뜨고 있으므로 여기선 뱃지 숫자만 갱신하고 끝냅니다.
+                if (notificationData.linkType === 'APPROVAL') {
+                    console.log("--> [중복방지] 결재 알림은 개인 채널 토스트를 생략합니다.");
+                    if(typeof updateHeaderAlertsBadge === 'function') updateHeaderAlertsBadge();
+                    if(typeof updateHeaderAlerts === 'function') updateHeaderAlerts();
+                    return; 
+                }
 
-				                // [2] 그 외 (게시판 등) 알림인 경우 -> 파란 토스트 띄움
-				                toastr.info(notificationData.content, '알림', {
-				                    timeOut: 5000,
-				                    closeButton: true,
-				                    progressBar: true,
-				                    positionClass: 'toast-bottom-right',
-				                    onclick: function() {
-				                        window.location.href = "/board/getNoticeBoardList";
-				                    }
-				                });
-				                
-				                // 여기도 딜레이를 주면 더 안전합니다
-				                setTimeout(function() {
-				                    if(typeof updateHeaderAlertsBadge === 'function') updateHeaderAlertsBadge();
-				                    if(typeof updateHeaderAlerts === 'function') updateHeaderAlerts();
-				                }, 500);
+                // 결재가 아닌 경우(게시판 등)에만 파란색 토스트 표시
+				toastr.info(notificationData.content, '알림', {
+					timeOut: 5000,
+					closeButton: true,
+					progressBar: true,
+					positionClass: 'toast-bottom-right',
+					onclick: function() {
+						window.location.href = "/board/getNoticeBoardList";
+					}
+				});
+				
+				if(typeof updateHeaderAlerts === 'function') updateHeaderAlerts();
+                if(typeof updateHeaderAlertsBadge === 'function') updateHeaderAlertsBadge();
 				
 				return;
 			}
