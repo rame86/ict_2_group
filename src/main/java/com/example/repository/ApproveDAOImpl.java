@@ -114,7 +114,7 @@ public class ApproveDAOImpl implements ApproveDAO {
 
 	@Override
 	public Map<String, Object> selectApprovalLineInfo(String empNo) {
-		return sess.selectMap("com.example.repository.ApproveDAO.selectApprovalLineInfo", empNo);
+		return sess.selectOne("com.example.repository.ApproveDAO.selectApprovalLineInfo", empNo);
 	}
 
 }

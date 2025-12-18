@@ -58,7 +58,13 @@
     <div class="card position-relative">
 
         <!-- 도장 -->
-        <img src="/images/stamp.png" id="approveStamp" class="stamp">
+        <svg id="approveStamp" class="stamp" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" 
+		     style="position: absolute; right: 30px; top: 30px; width: 130px; z-index: 10;">
+		    <circle cx="50" cy="50" r="45" fill="none" stroke="#e74c3c" stroke-width="5"/>
+		    <circle cx="50" cy="50" r="38" fill="none" stroke="#e74c3c" stroke-width="2" stroke-dasharray="4 2"/>
+		    <text x="50" y="58" font-family="'Malgun Gothic', sans-serif" 
+		          font-size="24" fill="#e74c3c" text-anchor="middle" font-weight="bold">승인</text>
+		</svg>
 
         <div class="card-body">
 
@@ -80,6 +86,21 @@
                     <th>작성일</th>
                     <td>${vo.docDate}</td>
                 </tr>
+                <tr>
+			        <th>첨부파일</th>
+			        <td>
+			            <c:choose>
+			                <c:when test="${not empty vo.originName}">
+			                    <a href="/approve/download?changeName=${vo.changeName}&originName=${vo.originName}" class="btn btn-sm btn-outline-primary">
+			                        <i class="fas fa-download"></i> ${vo.originName}
+			                    </a>
+			                </c:when>
+			                <c:otherwise>
+			                    <span class="text-muted">첨부된 파일이 없습니다.</span>
+			                </c:otherwise>
+			            </c:choose>
+			        </td>
+			    </tr>
             </table>
 
             <!-- 문서 내용 -->

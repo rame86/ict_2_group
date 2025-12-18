@@ -194,7 +194,7 @@ $(document).ready(function () {
             <div class="page-header">
               <h1 class="page-title">사원 목록</h1>
             </div>
-
+				 <div class="page-title-line"></div>
             <!-- =========================================================
                  ✅ 안정화: 요약 계산
                  - empList가 비어있을 수도 있으므로 empty 방어

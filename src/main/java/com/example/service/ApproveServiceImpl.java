@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.domain.AlertVO;
 import com.example.domain.ApproveListVO;
@@ -34,13 +35,43 @@ public class ApproveServiceImpl implements ApproveService {
     // 결재 신청
     @Override
     @Transactional
-    public void ApprovalApplication(DocVO dvo, ApproveVO avo) {
+    public void ApprovalApplication(DocVO dvo, ApproveVO avo, MultipartFile upfile) {
         
         // 1. [수정] 사원번호 Null 체크 및 안전한 추출
         if (avo.getEmpNo() == null) {
             throw new IllegalArgumentException("로그인 정보(사원번호)가 누락되었습니다.");
         }
         int empNo = avo.getEmpNo(); // 이제 안전함
+        
+        // 2. [파일 처리 로직 추가]
+        if (upfile != null && !upfile.isEmpty()) {
+            // 저장 경로 설정 (사용자님 요청: upload/approve)
+            // 실제 서버의 절대 경로로 설정하는 것이 좋습니다 (예: C:/upload/approve/)
+            String savePath = "C:/upload/approve/"; 
+            java.io.File folder = new java.io.File(savePath);
+            
+            // 폴더가 없으면 생성
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+
+            // 원본 파일명 및 저장용 파일명 생성
+            String originName = upfile.getOriginalFilename();
+            String changeName = System.currentTimeMillis() + "_" + originName;
+
+            try {
+                // 파일 실제 저장
+                upfile.transferTo(new java.io.File(savePath + changeName));
+                
+                // DocVO에 파일 정보 세팅 (DB 컬럼명에 맞춰 VO에 필드가 있어야 함)
+                dvo.setOriginName(originName);
+                dvo.setChangeName(changeName);
+                
+            } catch (java.io.IOException e) {
+                log.error("파일 저장 중 오류 발생: {}", e.getMessage());
+                throw new RuntimeException("파일 업로드 중 서버 에러가 발생했습니다.");
+            }
+        }
         
         // 문서 번호 채번 및 저장
         int docNo = approveDao.selectDocSeqNextVal();
@@ -303,38 +334,42 @@ public class ApproveServiceImpl implements ApproveService {
         }
     }
 
-	@Override
-	public Map<String, Object> getManagerInfo(String empNo) {
-		
-		Map<String, Object> rawData = approveDao.selectApprovalLineInfo(empNo);
-		Map<String, Object> result = new HashMap<>();
-		
-		log.info("DB 원본 데이터: {}", rawData);
-		
-		if (rawData != null) {
-			String parentDeptNo = String.valueOf(rawData.get("parentDeptNo"));
-	        
-	        result.put("deptName", rawData.get("deptName"));
+    @Override
+    public Map<String, Object> getManagerInfo(String empNo) {
 
-	        // 3. 로직 처리 (상위부서가 1001일 때의 예외 처리)
-	        if ("1001".equals(parentDeptNo)) {
-	            result.put("managerEmpNo", null);
-	            result.put("managerName", "없음(최상위부서)");
-	            
-	            // 상위가 1001이면 현재 부서의 장을 2차 결재자로 승격
-	            result.put("parentManagerEmpNo", rawData.get("managerEmpNo"));
-	            result.put("parentManagerName", rawData.get("managerName"));
-	        } else {
-	            // 일반적인 경우
-	            result.put("managerEmpNo", rawData.get("managerEmpNo"));
-	            result.put("managerName", rawData.get("managerName"));
-	            
-	            result.put("parentManagerEmpNo", rawData.get("parentManagerEmpNo"));
-	            result.put("parentManagerName", rawData.get("parentManagerName"));
-	        }
-	    }
-		
-		return result;
-		
-	}
+    	log.info("DAO로 던지는 사원번호 파라미터: [{}]", empNo);
+
+    	Map<String, Object> rawData = approveDao.selectApprovalLineInfo(empNo);
+    	Map<String, Object> result = new HashMap<>();
+
+    	log.info("DB 원본 데이터: {}", rawData);
+
+    	if (rawData != null && !rawData.isEmpty()) {
+    		// [수정] 로그에 찍힌 대문자 Key와 정확히 일치시킴
+    		String parentDeptNo = String.valueOf(rawData.get("PARENTDEPTNO"));
+
+    		result.put("deptName", rawData.get("DEPTNAME"));
+
+    		// 로직 처리 (상위부서가 1001일 때 예외 처리)
+    		if ("1001".equals(parentDeptNo)) {
+    			result.put("managerEmpNo", null);
+    			result.put("managerName", "없음(최상위부서)");
+
+    			// 상위가 1001이면 현재 부서의 장을 2차 결재자로 승격
+    			result.put("parentManagerEmpNo", rawData.get("MANAGEREMPNO"));
+    			result.put("parentManagerName", rawData.get("MANAGERNAME"));
+    		} else {
+    			// 일반적인 경우
+    			result.put("managerEmpNo", rawData.get("MANAGEREMPNO"));
+    			result.put("managerName", rawData.get("MANAGERNAME"));
+
+    			result.put("parentManagerEmpNo", rawData.get("PARENTMANAGEREMPNO"));
+    			result.put("parentManagerName", rawData.get("PARENTMANAGERNAME"));
+    		}
+    	}
+
+    	return result;
+
+    }
+    
 }

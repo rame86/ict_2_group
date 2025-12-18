@@ -140,7 +140,7 @@ public class EmpController {
 		// ✅ 안정화: empNo로 조회 결과가 null일 수 있음
 		EmpVO emp = empService.selectEmpByEmpNo(empNo);
 		if (emp == null) {
-			// 실서비스라면 404 화면 등을 띄우지만, 팀프로젝트는 오류 방지 목적
+			// 오류 방지 목적
 			model.addAttribute("msg", "해당 사원을 찾을 수 없습니다.");
 			return "error/NoAuthPage"; // 프로젝트에 맞는 공용 에러 JSP 있으면 그걸로 변경 추천
 		}
