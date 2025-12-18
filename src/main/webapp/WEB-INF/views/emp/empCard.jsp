@@ -53,7 +53,7 @@
 					<col class="col-label">
 					<col class="col-value">
 					<col class="col-label">
-					<col class="col-value">
+					<col class="col-value col-value-wide">
 				</colgroup>
 
 				<tr>
@@ -171,7 +171,6 @@
 									<option value="6" ${emp.statusNo == 6 ? 'selected' : ''}>인턴/수습</option>
 									<option value="0" ${emp.statusNo == 0 ? 'selected' : ''}>퇴직</option>
 							</select></td>
-
 							<th>직급번호</th>
 							<td><select name="gradeNo">
 									<option value="1" ${emp.gradeNo == 1 ? 'selected' : ''}>1
@@ -186,8 +185,11 @@
 										- 인턴/수습</option>
 									<option value="6" ${emp.gradeNo == 6 ? 'selected' : ''}>6
 										- 기타</option>
-							</select> <br /> <small class="text-muted"> ※ 재직/파견만 1~4등급 선택 가능,
-									인턴/수습은 5등급, 휴직·대기·징계·퇴직 등은 6등급으로 고정됩니다. </small></td>
+							</select> <br /> <span class="grade-guide"> 
+							※ 재직/파견만 1~4등급 선택 가능,<br>
+							인턴/수습은 5등급,<br> 
+							휴직·대기·징계·퇴직 등은 6등급으로 고정됩니다.
+							</span></td>
 						</tr>
 
 						<%-- 퇴직일용 달력 행 (처음엔 숨김) --%>
@@ -495,47 +497,57 @@
 			toggleRetireDate();
 		}
 	})();
-	
+
 	// ✅ 삭제 (안정화)
 	// - 성공 시: 오른쪽 상세 카드 비우고 placeholder 표시
 	// - 왼쪽 목록: DataTable에서 해당 행 제거(가능하면)
 	window.deleteEmp = function(empNo) {
-	  if (!empNo) return;
-	  if (!confirm('정말 삭제할까요?')) return;
+		if (!empNo)
+			return;
+		if (!confirm('정말 삭제할까요?'))
+			return;
 
-	  $.ajax({
-	    type: 'POST',
-	    url: '${pageContext.request.contextPath}/emp/delete',
-	    data: { empNo: empNo },
-	    success: function(result) {
-	      if (result === 'DENY') { alert('삭제 권한이 없습니다.'); return; }
-	      if (result !== 'OK') { alert('삭제 중 오류가 발생했습니다.'); return; }
+		$.ajax({
+			type : 'POST',
+			url : '${pageContext.request.contextPath}/emp/delete',
+			data : {
+				empNo : empNo
+			},
+			success : function(result) {
+				if (result === 'DENY') {
+					alert('삭제 권한이 없습니다.');
+					return;
+				}
+				if (result !== 'OK') {
+					alert('삭제 중 오류가 발생했습니다.');
+					return;
+				}
 
-	      // 1) 오른쪽 상세 영역 정리
-	      $('#emp-detail-card').hide().empty();
-	      $('#emp-detail-placeholder').show();
+				// 1) 오른쪽 상세 영역 정리
+				$('#emp-detail-card').hide().empty();
+				$('#emp-detail-placeholder').show();
 
-	      // 2) 왼쪽 DataTable에서 해당 행 제거 (있을 때만)
-	      try {
-	        const dt = $('#empTable').DataTable();
-	        const $row = $('#empTable tbody tr.emp-row[data-empno="' + empNo + '"]');
-	        if ($row.length) {
-	          dt.row($row).remove().draw(false);
-	        } else {
-	          // 못 찾으면 새로고침(안전)
-	          // location.reload();
-	        }
-	      } catch (e) {
-	        // DataTable이 없거나 에러면 새로고침이 제일 안전
-	        // location.reload();
-	      }
+				// 2) 왼쪽 DataTable에서 해당 행 제거 (있을 때만)
+				try {
+					const dt = $('#empTable').DataTable();
+					const $row = $('#empTable tbody tr.emp-row[data-empno="'
+							+ empNo + '"]');
+					if ($row.length) {
+						dt.row($row).remove().draw(false);
+					} else {
+						// 못 찾으면 새로고침(안전)
+						// location.reload();
+					}
+				} catch (e) {
+					// DataTable이 없거나 에러면 새로고침이 제일 안전
+					// location.reload();
+				}
 
-	      alert('삭제되었습니다.');
-	    },
-	    error: function() {
-	      alert('삭제 요청 중 오류가 발생했습니다.');
-	    }
-	  });
+				alert('삭제되었습니다.');
+			},
+			error : function() {
+				alert('삭제 요청 중 오류가 발생했습니다.');
+			}
+		});
 	};
-
 </script>
