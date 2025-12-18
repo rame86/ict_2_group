@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.repository.BoardDAO">
+
+    <select id="getGlobalNoticeList" resultType="NoticeBoardVO">
+        SELECT
+            N.NOTICE_NO, N.EMP_NO, TO_CHAR(N.NOTICE_DATE, 'YYYY-MM-DD') as NOTICE_DATE,
+            N.NOTICE_TITLE, N.NOTICE_CNT, N.DEPT_NO, '전체' AS DEPT_NAME,
+            U.EMP_NAME AS NOTICE_WRITER,
+            U.EMP_IMAGE AS empImage,  (SELECT COUNT(*) FROM REPLY R WHERE R.NOTICE_NO = N.NOTICE_NO) AS REPLY_CNT
+        FROM NOTICE_BOARD N
+        JOIN EMP U ON N.EMP_NO = U.EMP_NO
+        WHERE N.DEPT_NO = 0
+        ORDER BY N.NOTICE_NO DESC
+    </select>
+
+    <select id="getGlobalFreeBoardList" resultType="FreeBoardVO">
+        SELECT
+            F.BOARD_NO, F.EMP_NO, TO_CHAR(F.BOARD_DATE, 'YYYY-MM-DD') as BOARD_DATE,
+            F.BOARD_TITLE, F.BOARD_CNT, F.DEPT_NO, '전체' AS DEPT_NAME,
+            U.EMP_NAME AS BOARD_WRITER,
+            U.EMP_IMAGE AS empImage, (SELECT COUNT(*) FROM REPLY R WHERE R.BOARD_NO = F.BOARD_NO) AS REPLY_CNT
+        FROM FREE_BOARD F
+        JOIN EMP U ON F.EMP_NO = U.EMP_NO
+        WHERE F.DEPT_NO = 0
+        ORDER BY F.BOARD_NO DESC
+    </select>
+
+    <select id="getDeptNoticeList" resultType="NoticeBoardVO" parameterType="int">
+        SELECT
+            N.NOTICE_NO, N.EMP_NO, TO_CHAR(N.NOTICE_DATE, 'YYYY-MM-DD') as NOTICE_DATE,
+            N.NOTICE_TITLE, N.NOTICE_CNT, N.DEPT_NO, D.DEPT_NAME,
+            U.EMP_NAME AS NOTICE_WRITER,
+            U.EMP_IMAGE AS empImage, (SELECT COUNT(*) FROM REPLY R WHERE R.NOTICE_NO = N.NOTICE_NO) AS REPLY_CNT
+        FROM NOTICE_BOARD N
+        JOIN EMP U ON N.EMP_NO = U.EMP_NO
+        JOIN DEPT D ON N.DEPT_NO = D.DEPT_NO
+        WHERE N.DEPT_NO IN (
+            SELECT DEPT_NO FROM DEPT
+            START WITH DEPT_NO = #{deptNo}
+            CONNECT BY PRIOR DEPT_NO = PARENT_DEPT_NO
+        )
+        AND N.DEPT_NO != 0
+        ORDER BY N.NOTICE_NO DESC
+    </select>
+
+    <select id="getDeptFreeBoardList" resultType="FreeBoardVO" parameterType="int">
+        SELECT
+            F.BOARD_NO, F.EMP_NO, TO_CHAR(F.BOARD_DATE, 'YYYY-MM-DD') as BOARD_DATE,
+            F.BOARD_TITLE, F.BOARD_CNT, F.DEPT_NO, D.DEPT_NAME,
+            U.EMP_NAME AS BOARD_WRITER,
+            U.EMP_IMAGE AS empImage, (SELECT COUNT(*) FROM REPLY R WHERE R.BOARD_NO = F.BOARD_NO) AS REPLY_CNT
+        FROM FREE_BOARD F
+        JOIN EMP U ON F.EMP_NO = U.EMP_NO
+        JOIN DEPT D ON F.DEPT_NO = D.DEPT_NO
+        WHERE F.DEPT_NO IN (
+            SELECT DEPT_NO FROM DEPT
+            START WITH DEPT_NO = #{deptNo}
+            CONNECT BY PRIOR DEPT_NO = PARENT_DEPT_NO
+        )
+        ORDER BY F.BOARD_NO DESC
+    </select>
+
+    <insert id="insertNoticeBoard" parameterType="NoticeBoardVO">
+        <selectKey keyProperty="noticeNo" resultType="string" order="BEFORE">
+            SELECT NOTICE_NO_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO NOTICE_BOARD (
+            NOTICE_NO, EMP_NO, NOTICE_CONTENT, NOTICE_DATE,
+            NOTICE_TITLE, NOTICE_CNT, NOTICE_WRITER, DEPT_NO
+        ) VALUES (
+            #{noticeNo}, #{empNo}, #{noticeContent}, SYSDATE,
+            #{noticeTitle}, 0, #{noticeWriter}, #{deptNo}
+        )
+    </insert>
+
+    <update id="updateNoticeBoard" parameterType="NoticeBoardVO">
+        UPDATE NOTICE_BOARD
+        SET NOTICE_TITLE = #{noticeTitle}, NOTICE_CONTENT = #{noticeContent}
+        WHERE NOTICE_NO = #{noticeNo}
+    </update>
+
+    <select id="getContentNoticeBoard" resultType="NoticeBoardVO" parameterType="string">
+        SELECT N.*, U.EMP_IMAGE AS empImage 
+        FROM NOTICE_BOARD N
+        LEFT JOIN EMP U ON N.EMP_NO = U.EMP_NO
+        WHERE N.NOTICE_NO = #{noticeNo}
+    </select>
+
+    <update id="updateNoticeCnt" parameterType="string">
+        UPDATE NOTICE_BOARD SET NOTICE_CNT = NOTICE_CNT + 1 WHERE NOTICE_NO = #{noticeNo}
+    </update>
+
+    <insert id="insertFreeBoard" parameterType="FreeBoardVO">
+        INSERT INTO FREE_BOARD (
+            BOARD_NO, EMP_NO, BOARD_CONTENT, BOARD_DATE,
+            BOARD_TITLE, BOARD_CNT, BOARD_WRITER, DEPT_NO
+        ) VALUES (
+            BOARD_NO_SEQ.NEXTVAL, #{empNo}, #{boardContent}, SYSDATE,
+            #{boardTitle}, 0, #{boardWriter}, #{deptNo}
+        )
+    </insert>
+
+    <update id="updateFreeBoard" parameterType="FreeBoardVO">
+        UPDATE FREE_BOARD
+        SET BOARD_TITLE = #{boardTitle}, BOARD_CONTENT = #{boardContent}
+        WHERE BOARD_NO = #{boardNo}
+    </update>
+
+    <select id="getContentFreeBoard" resultType="FreeBoardVO" parameterType="string">
+        SELECT F.*, D.DEPT_NAME, U.EMP_IMAGE AS empImage
+        FROM FREE_BOARD F
+        JOIN DEPT D ON F.DEPT_NO = D.DEPT_NO
+        LEFT JOIN EMP U ON F.EMP_NO = U.EMP_NO
+        WHERE BOARD_NO = #{boardNo}
+    </select>
+
+    <update id="updateFreeBoardCnt" parameterType="string">
+        UPDATE FREE_BOARD SET BOARD_CNT = BOARD_CNT + 1 WHERE BOARD_NO = #{boardNo}
+    </update>
+    
+    <insert id="insertReply" parameterType="ReplyVO">
+        INSERT INTO REPLY (
+            REPLY_NO, BOARD_NO, NOTICE_NO, REPLY_WRITER_EMP_NO, REPLY_CONTENT, REPLY_CREATED_AT
+        ) VALUES (
+            REPLY_NO_SEQ.NEXTVAL, #{boardNo, jdbcType=INTEGER}, #{noticeNo, jdbcType=INTEGER},
+            #{replyWriterEmpNo}, #{replyContent}, SYSDATE
+        )
+    </insert>
+
+    <select id="getReplyList" parameterType="ReplyVO" resultType="ReplyVO">
+        SELECT
+            R.REPLY_NO, R.BOARD_NO, R.NOTICE_NO,
+            R.REPLY_WRITER_EMP_NO AS replyWriterEmpNo,
+            R.REPLY_CONTENT, R.REPLY_CREATED_AT,
+            E.EMP_NAME AS replyWriterName, 
+            E.JOB_TITLE AS replyWriterJob,
+            E.EMP_IMAGE AS replyWriterImage  FROM REPLY R
+        JOIN EMP E ON R.REPLY_WRITER_EMP_NO = E.EMP_NO
+        <where>
+            <if test="boardNo != null">AND R.BOARD_NO = #{boardNo}</if>
+            <if test="noticeNo != null">AND R.NOTICE_NO = #{noticeNo}</if>
+        </where>
+        ORDER BY R.REPLY_NO ASC
+    </select>
+
+    <update id="updateReply" parameterType="ReplyVO">
+        UPDATE REPLY
+        SET REPLY_CONTENT = #{replyContent}
+        WHERE REPLY_NO = #{replyNo} AND REPLY_WRITER_EMP_NO = #{replyWriterEmpNo}
+    </update>
+
+    <delete id="deleteReply" parameterType="long">
+        DELETE FROM REPLY WHERE REPLY_NO = #{replyNo}
+    </delete>
+
+    <delete id="deleteRepliesByNoticeNo" parameterType="string">
+        DELETE FROM REPLY WHERE NOTICE_NO = #{noticeNo}
+    </delete>
+
+    <delete id="deleteNoticeBoard" parameterType="string">
+        DELETE FROM NOTICE_BOARD WHERE NOTICE_NO = #{noticeNo}
+    </delete>
+
+    <delete id="deleteRepliesByBoardNo" parameterType="string">
+        DELETE FROM REPLY WHERE BOARD_NO = #{boardNo}
+    </delete>
+
+    <delete id="deleteFreeBoard" parameterType="string">
+        DELETE FROM FREE_BOARD WHERE BOARD_NO = #{boardNo}
+    </delete>
+
+    <select id="checkGlobalWriteAuth" parameterType="string" resultType="int">
+        SELECT COUNT(*)
+        FROM EMP E
+        JOIN DEPT D ON E.DEPT_NO = D.DEPT_NO
+        WHERE E.EMP_NO = #{empNo}
+          AND E.GRADE_NO = 2 
+          AND D.PARENT_DEPT_NO = 1001
+    </select>
+</mapper>

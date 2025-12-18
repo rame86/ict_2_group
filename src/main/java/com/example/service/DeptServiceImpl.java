@@ -16,6 +16,9 @@ import com.example.repository.DeptDAO;
 import com.example.repository.EmpDAO;
 import com.example.repository.EmpDeptMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class DeptServiceImpl implements DeptService {
 
@@ -67,6 +70,7 @@ public class DeptServiceImpl implements DeptService {
 		deptDAO.insertEditLog(map);
 	}
 
+	@Transactional
 	public void setDeptManager(DocVO vo) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("empNo", vo.getTargetEmpNo());
@@ -86,6 +90,8 @@ public class DeptServiceImpl implements DeptService {
 			map.put("managerEmpNo", null);
 		}
 
+		log.info("사원수정 정보"+map.toString());
+		
 		deptDAO.setDeptManager(map);
 		empDAO.setEmpJobTitle(map);
 	}

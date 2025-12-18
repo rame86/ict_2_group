@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.repository.DayAttendDAO">
+
+	<select id="dayAttend" parameterType="java.util.Map" resultType="DayAttendVO">
+		SELECT * FROM DAY_ATTEND WHERE EMP_NO = #{empNo} AND TO_CHAR(DATE_ATTEND, 'YYYY-MM') = #{toDay}
+	</select>
+
+	<select id="dateCheck" parameterType="DayAttendVO" resultType="DayAttendVO">
+		SELECT TO_CHAR(IN_TIME, 'HH24:MI:SS') AS IN_TIME, TO_CHAR(OUT_TIME, 'HH24:MI:SS') AS OUT_TIME,
+		DAY_ATTNO, EMP_NO, ATT_STATUS, IN_TIME
+		FROM DAY_ATTEND WHERE EMP_NO = #{empNo} AND TO_CHAR(DATE_ATTEND, 'YYYY-MM-DD') = #{dateAttend}
+	</select>
+
+	<insert id="insertCheckIn" parameterType="DayAttendVO">
+		INSERT INTO DAY_ATTEND (DAY_ATTNO, EMP_NO, IN_TIME, FIRST_DAYTIME, DATE_ATTEND, ATT_STATUS)
+		VALUES (DAY_ATTEND_SEQ.NEXTVAL, #{empNo}, SYSDATE, SYSDATE, SYSDATE, #{attStatus})
+	</insert>
+
+	<update id="updateCheckIn" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND SET IN_TIME = #{inTime}, ATT_STATUS = #{attStatus} WHERE DAY_ATTNO = #{dayAttno}
+	</update>
+
+	<update id="updateCheckOut" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND SET OUT_TIME = #{outTime}, ATT_STATUS = #{attStatus} WHERE DAY_ATTNO = #{dayAttno}
+	</update>
+
+	<update id="updateDayFullTime" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND SET
+		DAY_FULLTIME = NUMTODSINTERVAL(
+		TO_NUMBER(SUBSTR(#{dayFulltime}, 1, 2)) * 3600 +
+		TO_NUMBER(SUBSTR(#{dayFulltime}, 4, 2)) * 60 +
+		TO_NUMBER(SUBSTR(#{dayFulltime}, 7, 2)), 'SECOND'),
+		UPDATE_TIME = SYSDATE
+		WHERE DAY_ATTNO = #{dayAttno}
+	</update>
+
+	<update id="updateFieldwork" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND SET MEMO = #{memo}, ATT_STATUS = #{attStatus} WHERE DAY_ATTNO = #{dayAttno}
+	</update>
+
+	<insert id="insertVacation" parameterType="DayAttendVO">
+		INSERT INTO DAY_ATTEND (DAY_ATTNO, EMP_NO, FIRST_DAYTIME, ATT_STATUS, DATE_ATTEND, MEMO)
+		VALUES (DAY_ATTEND_SEQ.NEXTVAL, #{empNo}, SYSDATE, #{attStatus}, TO_DATE(#{dateAttend}, 'YYYY-MM-DD'), #{memo})
+	</insert>
+
+	<select id="selectDayAttend" parameterType="DocVO" resultType="DayAttendVO">
+		SELECT * FROM DAY_ATTEND WHERE EMP_NO =#{empNo} AND TO_CHAR(DATE_ATTEND, 'YYYY-MM-DD') = #{startDate}
+	</select>
+
+	<update id="commuteCorrectionCheckIn" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND SET IN_TIME = #{inTime}, ATT_STATUS = #{attStatus}, MEMO = #{memo}, UPDATE_TIME = SYSDATE WHERE DAY_ATTNO = #{dayAttno}
+	</update>
+
+	<update id="commuteCorrectionCheckOut" parameterType="DayAttendVO">
+		UPDATE DAY_ATTEND SET OUT_TIME = #{outTime}, ATT_STATUS = #{attStatus}, MEMO = #{memo}, UPDATE_TIME = SYSDATE WHERE DAY_ATTNO = #{dayAttno}
+	</update>
+
+	<select id="getAllEmpNos" resultType="string">
+		SELECT EMP_NO FROM EMP WHERE STATUS_NO != 99
+	</select>
+
+	<insert id="insertAbsenceRecords">
+		INSERT INTO DAY_ATTEND (DAY_ATTNO, EMP_NO, ATT_STATUS, IN_TIME, OUT_TIME, DAY_FULLTIME, FIRST_DAYTIME, UPDATE_TIME, MEMO, DATE_ATTEND)
+		SELECT DAY_ATTEND_SEQ.NEXTVAL, E.EMP_NO, '10', NULL, NULL, NULL, SYSDATE, NULL, '결근', TRUNC(SYSDATE)
+		FROM EMP E
+		WHERE E.STATUS_NO != 99 AND E.EMP_NO NOT IN (SELECT A.EMP_NO FROM DAY_ATTEND A WHERE TRUNC(A.DATE_ATTEND) = TRUNC(SYSDATE))
+	</insert>
+
+	<update id="updateIncompleteAttendanceToAbsence">
+		UPDATE DAY_ATTEND
+		SET
+		ATT_STATUS = '10',
+		MEMO = '미퇴근 결근 처리됨',
+		UPDATE_TIME = SYSDATE
+		WHERE
+		TRUNC(DATE_ATTEND) = TRUNC(SYSDATE)
+		AND ATT_STATUS IN ('1', '2')
+		AND OUT_TIME IS NULL
+	</update>
+
+	<select id="countAttendRecordByDate" parameterType="DayAttendVO" resultType="int">
+		SELECT COUNT(*) FROM DAY_ATTEND WHERE EMP_NO = #{empNo} AND TO_CHAR(DATE_ATTEND, 'YYYY-MM-DD') = #{dateAttend}
+	</select>
+
+</mapper>

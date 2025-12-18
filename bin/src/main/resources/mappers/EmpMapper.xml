@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- ========================================================= 📌 EmpMapper 
+	(사원관리 안정화 최종본) [역할] - 사원관리(empList / empCard / empNewForm)의 기준 데이터 제공 - 급여관리 
+	/ 근태관리에서 참조 가능한 "사원 마스터" 역할 [설계 원칙] 1) 날짜 컬럼 - DB : DATE - VO : String - 
+	Mapper에서 TO_CHAR('YYYY-MM-DD')로 통일 → 화면 표시용으로만 사용 (계산 로직 ❌) 2) JOIN 정책 - 
+	LEFT JOIN 사용 → 부서/코드 누락 시에도 화면 깨짐 방지 3) 상태/직급 한글명 - Mapper에서 CASE WHEN 처리 
+	→ JSP 로직 단순화 & 안정성 확보 4) 삭제 정책 - 현재는 물리 삭제(DELETE) - 팀 프로젝트/발표 기준 OK - 실무 
+	확장 시 논리 삭제(STATUS_NO=0)로 전환 가능 ========================================================= -->
+
+<mapper namespace="com.example.repository.EmpMapper">
+
+	<!-- ============================ 공통 ResultMap - EMP 테이블 + 화면용 가공 필드 매핑 
+		============================ -->
+	<resultMap id="empMap" type="com.example.domain.EmpVO">
+
+		<!-- PK -->
+		<id column="EMP_NO" property="empNo" />
+
+		<!-- 기본 FK/코드 값 -->
+		<result column="STATUS_NO" property="statusNo" />
+		<result column="DEPT_NO" property="deptNo" />
+		<result column="GRADE_NO" property="gradeNo" />
+
+		<!-- 로그인/외부연동 -->
+		<result column="EMP_PASS" property="empPass" />
+		<result column="KAKAO_ID" property="kakaoId" />
+
+		<!-- 기본 정보 -->
+		<result column="EMP_NAME" property="empName" />
+		<result column="EMP_PHONE" property="empPhone" />
+		<result column="EMP_ADDR" property="empAddr" />
+		<result column="EMP_EMAIL" property="empEmail" />
+		<result column="EMP_IMAGE" property="empImage" />
+		<result column="EMP_REG_NO" property="empRegNo" />
+
+		<!-- 📌 입사일 - DB는 DATE - 화면/VO에서는 String - Mapper에서 포맷 통일 -->
+		<result column="EMP_REGDATE" property="empRegdate" />
+
+		<!-- 급여 기준 기본급 -->
+		<result column="SAL_BASE" property="salBase" />
+
+		<!-- JOIN으로 가져오는 화면용 한글명 -->
+		<result column="DEPT_NAME" property="deptName" />
+		<result column="STATUS_NAME" property="statusName" />
+		<result column="GRADE_NAME" property="gradeName" />
+	</resultMap>
+
+	<!-- ============================ 1) 전체 사원 목록 (검색 없음) - 관리자 기본 목록 화면 ============================ -->
+	<select id="selectEmpList" resultMap="empMap">
+		SELECT
+		e.EMP_NO,
+		e.STATUS_NO,
+		e.DEPT_NO,
+		e.GRADE_NO,
+		e.EMP_PASS,
+		e.KAKAO_ID,
+		e.EMP_NAME,
+		e.EMP_PHONE,
+		e.EMP_ADDR,
+		e.EMP_EMAIL,
+		e.EMP_IMAGE,
+		e.EMP_REG_NO,
+		TO_CHAR(e.EMP_REGDATE, 'YYYY-MM-DD') AS EMP_REGDATE,
+		e.SAL_BASE,
+		d.DEPT_NAME,
+
+		<!-- 재직상태 한글명 -->
+		CASE e.STATUS_NO
+		WHEN 0 THEN '퇴직'
+		WHEN 1 THEN '재직'
+		WHEN 2 THEN '휴직(자발적)'
+		WHEN 3 THEN '휴직(병가 등 복지)'
+		WHEN 4 THEN '대기'
+		WHEN 5 THEN '징계'
+		WHEN 6 THEN '인턴/수습'
+		WHEN 7 THEN '파견'
+		END AS STATUS_NAME,
+
+		<!-- 직급 한글명 -->
+		CASE e.GRADE_NO
+		WHEN 1 THEN '최고관리자'
+		WHEN 2 THEN '관리자'
+		WHEN 3 THEN '사원'
+		WHEN 4 THEN '계약사원'
+		WHEN 5 THEN '인턴/수습'
+		WHEN 6 THEN '기타'
+		END AS GRADE_NAME
+
+		FROM EMP e
+		LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+		ORDER BY e.EMP_NO
+	</select>
+
+	<!-- ============================ 2) 검색 포함 사원 목록 - EmpSearchVO 사용 ============================ -->
+	<select id="getEmpList"
+		parameterType="com.example.domain.EmpSearchVO" resultMap="empMap">
+		<!-- (기존 코드 유지, 주석만 생략 없이 유지) -->
+		<!-- 이 쿼리는 관리자 검색/필터 전용 -->
+		<!-- 급여관리와 직접 연결되지 않음 -->
+
+		SELECT
+		e.EMP_NO,
+		e.STATUS_NO,
+		e.DEPT_NO,
+		e.GRADE_NO,
+		e.EMP_PASS,
+		e.KAKAO_ID,
+		e.EMP_NAME,
+		e.EMP_PHONE,
+		e.EMP_ADDR,
+		e.EMP_EMAIL,
+		e.EMP_IMAGE,
+		e.EMP_REG_NO,
+		TO_CHAR(e.EMP_REGDATE, 'YYYY-MM-DD') AS EMP_REGDATE,
+		e.SAL_BASE,
+		d.DEPT_NAME,
+
+		CASE e.STATUS_NO
+		WHEN 0 THEN '퇴직'
+		WHEN 1 THEN '재직'
+		WHEN 2 THEN '휴직(자발적)'
+		WHEN 3 THEN '휴직(병가 등 복지)'
+		WHEN 4 THEN '대기'
+		WHEN 5 THEN '징계'
+		WHEN 6 THEN '인턴/수습'
+		WHEN 7 THEN '파견'
+		END AS STATUS_NAME,
+
+		CASE e.GRADE_NO
+		WHEN 1 THEN '최고관리자'
+		WHEN 2 THEN '관리자'
+		WHEN 3 THEN '사원'
+		WHEN 4 THEN '계약사원'
+		WHEN 5 THEN '인턴/수습'
+		WHEN 6 THEN '기타'
+		END AS GRADE_NAME
+
+		FROM EMP e
+		LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+
+		<where>
+			<if test="keyword != null and keyword != ''">
+				AND (
+				e.EMP_NAME LIKE '%' || #{keyword} || '%'
+				OR e.EMP_PHONE LIKE '%' || #{keyword} || '%'
+				OR e.EMP_EMAIL LIKE '%' || #{keyword} || '%'
+				)
+			</if>
+
+			<if test="deptNo != null and deptNo != 0">
+				AND e.DEPT_NO = #{deptNo}
+			</if>
+
+			<if test="statusNo != null and statusNo != -1">
+				AND e.STATUS_NO = #{statusNo}
+			</if>
+
+			<if test="gradeNo != null and gradeNo != -1">
+				AND e.GRADE_NO = #{gradeNo}
+			</if>
+		</where>
+
+		ORDER BY e.EMP_NO
+	</select>
+
+	<!-- ============================ 3) 사번으로 단건 조회 (공용) ============================ -->
+	<select id="getEmp" parameterType="string" resultMap="empMap">
+		SELECT
+		e.EMP_NO,
+		e.STATUS_NO,
+		e.DEPT_NO,
+		e.GRADE_NO,
+		e.EMP_PASS,
+		e.KAKAO_ID,
+		e.EMP_NAME,
+		e.EMP_PHONE,
+		e.EMP_ADDR,
+		e.EMP_EMAIL,
+		e.EMP_IMAGE,
+		e.EMP_REG_NO,
+		TO_CHAR(e.EMP_REGDATE, 'YYYY-MM-DD') AS EMP_REGDATE,
+		e.SAL_BASE,
+		d.DEPT_NAME,
+
+		CASE e.STATUS_NO
+		WHEN 0 THEN '퇴직'
+		WHEN 1 THEN '재직'
+		WHEN 2 THEN '휴직(자발적)'
+		WHEN 3 THEN '휴직(병가 등 복지)'
+		WHEN 4 THEN '대기'
+		WHEN 5 THEN '징계'
+		WHEN 6 THEN '인턴/수습'
+		WHEN 7 THEN '파견'
+		END AS STATUS_NAME,
+
+		CASE e.GRADE_NO
+		WHEN 1 THEN '최고관리자'
+		WHEN 2 THEN '관리자'
+		WHEN 3 THEN '사원'
+		WHEN 4 THEN '계약사원'
+		WHEN 5 THEN '인턴/수습'
+		WHEN 6 THEN '기타'
+		END AS GRADE_NAME
+
+		FROM EMP e
+		LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+		WHERE e.EMP_NO = #{empNo}
+	</select>
+
+	<!-- ============================ 3-1) 사번으로 단건 조회 (인사카드 전용) - getEmp와 동일 
+		로직(호출부 호환 유지용) ============================ -->
+	<select id="selectEmpByEmpNo" parameterType="string"
+		resultMap="empMap">
+		SELECT
+		e.EMP_NO,
+		e.STATUS_NO,
+		e.DEPT_NO,
+		e.GRADE_NO,
+		e.EMP_PASS,
+		e.KAKAO_ID,
+		e.EMP_NAME,
+		e.EMP_PHONE,
+		e.EMP_ADDR,
+		e.EMP_EMAIL,
+		e.EMP_IMAGE,
+		e.EMP_REG_NO,
+		TO_CHAR(e.EMP_REGDATE, 'YYYY-MM-DD') AS EMP_REGDATE,
+		e.SAL_BASE,
+		d.DEPT_NAME,
+		CASE e.STATUS_NO
+		WHEN 0 THEN '퇴직'
+		WHEN 1 THEN '재직'
+		WHEN 2 THEN '휴직(자발적)'
+		WHEN 3 THEN '휴직(병가 등 복지)'
+		WHEN 4 THEN '대기'
+		WHEN 5 THEN '징계'
+		WHEN 6 THEN '인턴/수습'
+		WHEN 7 THEN '파견'
+		END AS STATUS_NAME,
+		CASE e.GRADE_NO
+		WHEN 1 THEN '최고관리자'
+		WHEN 2 THEN '관리자'
+		WHEN 3 THEN '사원'
+		WHEN 4 THEN '계약사원'
+		WHEN 5 THEN '인턴/수습'
+		WHEN 6 THEN '기타'
+		END AS GRADE_NAME
+		FROM EMP e
+		LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+		WHERE e.EMP_NO = #{empNo}
+	</select>
+
+
+	<!-- ============================ 4) 사원 등록 - empNewForm 전용 ============================ -->
+	<insert id="insertEmp" parameterType="com.example.domain.EmpVO">
+		INSERT INTO EMP (
+		EMP_NO,
+		STATUS_NO,
+		DEPT_NO,
+		GRADE_NO,
+		EMP_NAME,
+		EMP_PHONE,
+		EMP_ADDR,
+		EMP_IMAGE,
+		EMP_REG_NO,
+		EMP_REGDATE,
+		SAL_BASE
+		)
+		VALUES (
+		#{empNo},
+		#{statusNo},
+		#{deptNo},
+		#{gradeNo},
+		#{empName},
+		#{empPhone, jdbcType=VARCHAR},
+		#{empAddr, jdbcType=VARCHAR},
+		#{empImage, jdbcType=VARCHAR},
+		#{empRegNo, jdbcType=VARCHAR},
+		SYSDATE,
+		#{salBase, jdbcType=INTEGER}
+		)
+	</insert>
+
+	<!-- ============================ 5) 사원 정보 수정- empCard 수정 모드 ============================ -->
+	<update id="updateEmp" parameterType="com.example.domain.EmpVO">
+		UPDATE EMP
+		SET STATUS_NO =
+		#{statusNo},
+		GRADE_NO = #{gradeNo},
+		EMP_PHONE = #{empPhone},
+		EMP_ADDR = #{empAddr},
+		EMP_EMAIL = #{empEmail},
+		EMP_IMAGE = #{empImage}
+		WHERE EMP_NO = #{empNo}
+	</update>
+
+	<!-- ============================ 6) 사원 삭제 (물리 삭제) ============================ -->
+	<delete id="deleteEmp" parameterType="string">
+		DELETE FROM EMP
+		WHERE EMP_NO
+		= #{empNo}
+	</delete>
+
+	<!-- ============================ 7) 사번 중복 체크 - 퇴직자 포함 전체 기준 ============================ -->
+	<select id="isEmpNoDuplicate" resultType="int">
+		SELECT COUNT(*)
+		FROM EMP
+		WHERE EMP_NO = #{empNo}
+	</select>
+
+	<!-- ============================ 8) 부서장/직책 설정 ============================ -->
+	<update id="setEmpJobTitle" parameterType="map">
+		UPDATE EMP
+
+		SET JOB_TITLE = #{jobTitle},
+		    GRADE_NO = #{targetGradeNo, jdbcType=NUMERIC}
+
+		WHERE EMP_NO = #{empNo}
+	</update>
+	
+	<select id="selectEmpNoListByDept" parameterType="String" resultType="string">
+	    SELECT 
+	        EMP_NO
+	    FROM EMP
+	    WHERE DEPT_NO = #{deptNo}
+	      AND STATUS_NO != 0
+	</select>
+	
+	<select id="selectAllEmpNoList" resultType="string">
+	    SELECT 
+	        EMP_NO
+	    FROM EMP
+	    WHERE STATUS_NO != 0
+	</select>
+
+</mapper>

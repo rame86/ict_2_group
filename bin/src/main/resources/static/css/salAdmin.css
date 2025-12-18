@@ -1,0 +1,277 @@
+/* =========================================================
+   ✅ salAdmin.css (adminList.jsp 전용)
+   - adminList.jsp 최상단을 <div class="sal-admin-page">로 감싼 상태 기준
+   - salDetail 등 다른 화면에는 영향 없음
+   ========================================================= */
+
+/* ===== 폰트/기본 ===== */
+.sal-admin-page,
+.sal-admin-page button,
+.sal-admin-page input,
+.sal-admin-page select,
+.sal-admin-page table,
+.sal-admin-page th,
+.sal-admin-page td {
+  font-family: 'SUIT','Pretendard','Noto Sans KR',-apple-system,
+    BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+
+/* ===== 타이틀(밑줄: 페이지 끝까지) ===== */
+.sal-admin-page .page-title-wrap{
+  width: 100%;
+  border-bottom: 4px double #869ABF;
+  margin-top: 18px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+}
+
+.sal-admin-page .page-title{
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.sal-admin-page .page-mini{
+  font-weight: 700;
+  color: #374151;
+  margin: 0;
+  padding-bottom: 10px;
+}
+
+/* ===== 요약 카드 ===== */
+.sal-admin-page .sal-summary-row{
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 16px;
+  margin: 14px 0 16px;
+}
+
+.sal-admin-page .summary-card{
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 16px 18px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  cursor: pointer;
+}
+
+.sal-admin-page .summary-card:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+  border-color: #D1D5DB;
+}
+
+.sal-admin-page .summary-card.summary-main{
+  border-color: #C7D2FE;
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFF 100%);
+}
+
+.sal-admin-page .summary-label{
+  font-size: 13px;
+  color: #6B7280;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.sal-admin-page .summary-value{
+  font-size: 22px;
+  font-weight: 900;
+  color: #111827;
+  letter-spacing: -0.2px;
+}
+
+.sal-admin-page .summary-sub{
+  margin-top: 6px;
+  font-size: 12px;
+  color: #9CA3AF;
+}
+
+/* ===== 필터 바(월/부서/체크/검색/엑셀/서치) ===== */
+.sal-admin-page .sal-filter-row{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  gap:14px;
+  margin-bottom:12px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:#fff;
+  border:1px solid #E5E7EB;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
+}
+
+.sal-admin-page .sal-filter-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap: wrap;
+}
+
+.sal-admin-page .sal-filter-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-wrap: wrap;
+}
+
+.sal-admin-page .sal-overtime-check{
+  font-size: 13px;
+  color: #374151;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===== 검색 버튼(핑크) ===== */
+.sal-admin-page .btn-search{
+  background-color:#ffbdbd;
+  border:1px solid #ff8080;
+  color:#fff;
+  font-weight:800;
+  border-radius:12px;
+  padding:7px 12px;
+}
+.sal-admin-page .btn-search:hover{
+  background-color:#F8AFAF;
+}
+
+/* ===== 엑셀 버튼(파스텔 초록) ===== */
+.sal-admin-page .btn-excel{
+  background:#80c6ab;
+  border:1px solid #01beb5;
+  color:#fff;
+  font-weight:900;
+  border-radius:12px;
+  padding:7px 12px;
+  transition: transform .12s ease, filter .12s ease;
+}
+.sal-admin-page .btn-excel:hover{
+  background:#009d9d;
+  color:#fff;
+  transform: translateY(-1px);
+}
+.sal-admin-page .btn-excel:active{
+  transform: translateY(0);
+}
+
+/* ===== DataTables 검색창(오른쪽 Search...) ===== */
+.sal-admin-page .sal-filter-right .dataTables_filter{ margin:0; }
+.sal-admin-page .sal-filter-right .dataTables_filter label{ font-size:0; }
+
+.sal-admin-page .sal-filter-right .dataTables_filter input{
+  font-size:13px;
+  height:32px;
+  padding:6px 10px;
+  border-radius:12px;
+  border:1px solid #E5E7EB !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+.sal-admin-page .sal-filter-right .dataTables_filter input:focus{
+  border-color:#C7D2FE !important;
+}
+
+/* ===== 테이블(카드형 컨테이너) ===== */
+.sal-admin-page #salTable{
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.05);
+}
+
+.sal-admin-page #salTable thead th{
+  background: #F8FAFC;
+  color: #374151;
+  font-weight: 900;
+  font-size: 13px;
+  border-bottom: 1px solid #E5E7EB !important;
+  text-align:center;
+  vertical-align:middle;
+}
+
+.sal-admin-page #salTable tbody td{
+  font-size: 13px;
+  color: #111827;
+  border-bottom: 1px solid #F1F5F9;
+  text-align:center;
+  vertical-align:middle;
+}
+
+.sal-admin-page #salTable tbody tr:hover{
+  background:#F8FAFF;
+}
+
+/* 초과근무 강조 */
+.sal-admin-page tr.has-overtime{ background-color:#fff7ed; }
+.sal-admin-page .badge-overtime{
+  display:inline-block;
+  padding:2px 8px;
+  border-radius:999px;
+  background-color:#fee2e2;
+  color:#b91c1c;
+  font-size:11px;
+  margin-left:4px;
+  font-weight: 800;
+}
+
+/* ===== 페이징 중앙 정렬 ===== */
+.sal-admin-page div.dataTables_wrapper div.dataTables_paginate{
+  float: none !important;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.sal-admin-page .dataTables_paginate .paginate_button{
+  border: 1px solid #ccc !important;
+  border-radius: 10px !important;
+  padding: 4px 10px !important;
+  margin: 0 3px !important;
+  background: #fff !important;
+  color: #333 !important;
+}
+
+.sal-admin-page .dataTables_paginate .paginate_button:hover{
+  background: #f0f0f0 !important;
+  border-color: #888 !important;
+}
+
+.sal-admin-page .dataTables_paginate .paginate_button.current{
+  border: 1px solid #C7D2FE !important;
+  background: #EEF2FF !important;
+  color: #333 !important;
+}
+
+/* =====  adminList 전용: footer 겹침 방지용 하단 여백 ===== */
+.sal-admin-page #layoutSidenav_content main .container-fluid{
+  padding-bottom: 260px;
+}
+
+/* ===== 반응형 ===== */
+@media (max-width: 1200px){
+  .sal-admin-page .sal-summary-row{ grid-template-columns: 1fr; }
+  .sal-admin-page .sal-filter-row{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .sal-admin-page .sal-filter-left,
+  .sal-admin-page .sal-filter-right{
+    justify-content: space-between;
+  }
+}
+
+
+.btn-edit{
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:10px;
+  border:1px solid #d0d7ff;
+  background:#f6f8ff;
+  color:#2b4bd6;
+  font-weight:600;
+  margin-left:8px;
+  text-decoration:none;
+}
+.btn-edit:hover{ background:#eef2ff; }

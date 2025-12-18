@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.example.repository.EmpDeptMapper">
+  
+  <select id="getDeptList" resultType="com.example.domain.DeptVO">
+    SELECT
+        DEPT_NO         AS deptNo,
+        MANAGER_EMP_NO  AS managerEmpNo,
+        DEPT_NAME       AS deptName,
+        NVL(PARENT_DEPT_NO, 0) AS myParentDeptNo,
+        DEPT_ADDR       AS deptAddr,
+        DEPT_PHONE      AS deptPhone
+    FROM DEPT
+    ORDER BY TO_NUMBER(DEPT_NO)
+
+</select>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  </mapper>
