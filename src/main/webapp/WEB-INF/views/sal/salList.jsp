@@ -104,7 +104,7 @@ if (request.getAttribute("menu") == null) {
 													${sal.yearMonthLabel}
 												</a>
 
-												<%-- ✅ choose 안에는 HTML 주석 넣으면 오류(이미 겪음) --%>
+												<%-- ✅ choose 안에는 HTML 주석 넣으면 오류 --%>
 												<c:choose>
 													<c:when test="${today lt sal.salDate}">
 														<span class="pay-badge planned">지급예정</span>
