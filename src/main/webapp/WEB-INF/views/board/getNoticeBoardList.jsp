@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>getNoticeBoardList.jsp - 공지 게시판</title>
+<title>공지 게시판</title>
 <style>
 /* -------------------- [모달 스타일 리뉴얼] -------------------- */
 #boardModal .modal-content {
@@ -48,11 +48,32 @@
 .info-item {
 	font-size: 0.9rem;
 	color: #666;
+	display: flex;
+	align-items: center;
 }
 
 .info-item i {
 	margin-right: 5px;
 	color: #adb5bd;
+}
+
+/* [NEW] 작성자/댓글 프로필 이미지 스타일 */
+.writer-profile-img {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin-right: 8px;
+	border: 1px solid #dee2e6;
+}
+
+.comment-profile-img {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin-right: 15px;
+	border: 1px solid #dee2e6;
 }
 
 /* 본문 영역 */
@@ -82,6 +103,7 @@
 	border-radius: 8px;
 	padding: 10px;
 	margin-bottom: 10px;
+	text-align: left;
 }
 </style>
 </head>
@@ -129,7 +151,8 @@
 											<tr>
 												<td>${ vo.noticeNo }</td>
 												<td>
-												    <span class="badge bg-danger me-2">전체</span> <a href="#" class="text-decoration-none text-dark fw-bold" 
+												    <span class="badge bg-danger me-2">전체</span> 
+												    <a href="#" class="text-decoration-none text-dark fw-bold" 
 												       data-bs-toggle="modal" 
 												       data-bs-target="#boardModal" 
 												       data-no="${ vo.noticeNo }" 
@@ -140,7 +163,7 @@
 												       ${ vo.noticeTitle } 
 												    </a>
 												
-												    <%-- [수정] 댓글 갯수 표시: 0보다 클 때만 제목 옆에 [N] 형태로 표시 --%>
+												    <%-- 댓글 갯수 표시 --%>
 												    <c:if test="${vo.replyCnt > 0}">
 												    	<span class="text-danger fw-bold ms-1" style="font-size: 0.9rem;">
 												    		[${vo.replyCnt}]
@@ -192,7 +215,7 @@
 													   ${ vo.noticeTitle } 
 													</a>
 													
-													<%-- [수정] 댓글 갯수 표시: 0보다 클 때만 제목 옆에 [N] 형태로 표시 --%>
+													<%-- 댓글 갯수 표시 --%>
 												    <c:if test="${vo.replyCnt > 0}">
 												    	<span class="text-danger fw-bold ms-1" style="font-size: 0.9rem;">
 												    		[${vo.replyCnt}]
@@ -226,13 +249,18 @@
 										<input type="text" class="form-control" name="noticeWriter" value="${ sessionScope.login.empName }" readonly> 
 										<input type="hidden" name="empNo" value="${ sessionScope.login.empNo }">
 									</div>
+									
+									<%-- 게시 대상 선택: 권한(canWriteGlobal)이 있을 때만 전체 공지 옵션 표시 --%>
 									<div class="mb-3">
 										<label class="form-label fw-bold">게시 대상 선택</label> 
 										<select class="form-select" name="deptNo">
-											<option value="0" class="text-danger fw-bold">📢 전체 공지 (전 직원)</option>
+											<c:if test="${canWriteGlobal}">
+												<option value="0" class="text-danger fw-bold">📢 전체 공지 (전 직원)</option>
+											</c:if>
 											<option value="${sessionScope.login.deptNo}" selected>🏢 부서 공지 (${sessionScope.login.deptName})</option>
 										</select>
 									</div>
+									
 									<div class="mb-3">
 										<label class="form-label fw-bold">제목</label> 
 										<input type="text" class="form-control" name="noticeTitle" required>
@@ -282,7 +310,7 @@
 					</div>
 				</div>
 
-				<%-- 상세보기 모달 (댓글 포함) --%>
+				<%-- 상세보기 모달 (댓글 + 삭제 기능 포함) --%>
 				<div class="modal fade" id="boardModal" tabindex="-1" aria-hidden="true">
 					<div class="modal-dialog modal-lg modal-dialog-scrollable">
 						<div class="modal-content">
@@ -295,7 +323,8 @@
 
 								<div class="view-info-box">
 									<span class="info-item"> 
-										<i class="fas fa-user-circle"></i> <span id="modalWriterText">작성자</span>
+										<img id="modalWriterImg" src="" class="writer-profile-img" alt="작성자">
+										<span id="modalWriterText">작성자</span>
 									</span> 
 									<span class="info-item"> 
 										<i class="far fa-clock"></i> <span id="modalDateText">2024-00-00</span>
@@ -305,13 +334,22 @@
 								<div id="modalContentText" class="view-content-box">내용 로딩중...</div>
 
 								<div class="d-flex justify-content-between align-items-center mt-4">
-									<%-- [수정] 댓글 버튼에 ID(btnToggleComment) 추가 --%>
+									<%-- 댓글 토글 버튼 --%>
 									<button class="btn btn-outline-secondary" type="button" id="btnToggleComment" data-bs-toggle="collapse" data-bs-target="#collapseComments" aria-expanded="false" aria-controls="collapseComments">
 										<i class="far fa-comment-dots me-1"></i> 댓글
 									</button>
 
 									<div>
 										<input type="hidden" id="currentNoticeNo">
+										
+										<%-- 삭제 버튼과 폼 (JS로 제어) --%>
+										<form action="/board/deleteNoticeBoard" method="post" id="deleteForm" style="display:inline;">
+                                            <input type="hidden" name="noticeNo" id="deleteNoticeNo">
+                                            <button type="button" class="btn btn-danger text-white" id="btnDelete" style="display: none;">
+                                                <i class="fas fa-trash-alt me-1"></i> 삭제
+                                            </button>
+                                        </form>
+
 										<button type="button" class="btn btn-warning text-white" id="btnModify" style="display: none;">
 											<i class="fas fa-edit me-1"></i> 수정
 										</button>
@@ -322,7 +360,7 @@
 								<div class="collapse comment-section" id="collapseComments">
 									<div class="d-flex mb-3">
 										<div class="flex-shrink-0 me-2">
-											<i class="fas fa-user-circle fa-2x text-secondary"></i>
+											<img id="myCommentProfileImg" src="${pageContext.request.contextPath}/images/default_profile.png" class="comment-profile-img" alt="나">
 										</div>
 										<div class="flex-grow-1">
 											<input type="text" id="replyInput" class="form-control" placeholder="댓글을 입력하세요...">
@@ -345,25 +383,39 @@
 	</div>
 
 	<script>
-		// 전역 변수: 로그인 사번
+		// 전역 변수
 		var LOGIN_EMP_NO = "${sessionScope.login.empNo}";
+		var DEFAULT_IMG = "${pageContext.request.contextPath}/images/default_profile.png"; 
+		
 		// DataTables 초기화
 		window.addEventListener('DOMContentLoaded', event => {
 			const datatablesGlobal = document.getElementById('datatablesGlobal');
-			if (datatablesGlobal) {
-				new simpleDatatables.DataTable(datatablesGlobal);
-			}
+			if (datatablesGlobal) new simpleDatatables.DataTable(datatablesGlobal);
 			
 			const datatablesDept = document.getElementById('datatablesDept');
-			if (datatablesDept) {
-				new simpleDatatables.DataTable(datatablesDept);
-			}
+			if (datatablesDept) new simpleDatatables.DataTable(datatablesDept);
 		});
-		
+
 		$(document).ready(function() {
 			var $boardModal = $('#boardModal');
 			var $btnModify = $('#btnModify');
+			var $btnDelete = $('#btnDelete'); // 삭제 버튼
 			var $modifyForm = $('#modifyForm');
+
+			// 1. 내 프로필 사진 로드 (댓글 입력창 옆)
+			if(LOGIN_EMP_NO) {
+				$.ajax({
+					url: '${pageContext.request.contextPath}/emp/myInfo', 
+					type: 'GET',
+					success: function(htmlData) {
+						var $temp = $('<div>').html(htmlData);
+						var imgSrc = $temp.find('.emp-photo-placeholder img').attr('src');
+						if(imgSrc) {
+							$('#myCommentProfileImg').attr('src', imgSrc);
+						}
+					}
+				});
+			}
 
 			// [자동 실행 로직] 알림 타고 들어왔을 때
 			var targetNoticeNo = "${targetNoticeNo}"; 
@@ -382,30 +434,44 @@
 					dataType : 'json',
 					success : function(response) {
 						if (response && response.noticeContent) {
-							// 모달 초기화
+							// 모달 텍스트 세팅
 							$boardModal.find('#modalTitleText').text(response.noticeTitle);
 							$boardModal.find('#modalWriterText').text(response.noticeWriter);
 							$boardModal.find('#modalDateText').text(response.noticeDate || '-'); 
 							$boardModal.find('#modalContentText').text(response.noticeContent);
 							
+							// [NEW] 작성자 이미지 세팅
+							var writerImg = response.empImage; 
+							if(writerImg) {
+								$boardModal.find('#modalWriterImg').attr('src', '${pageContext.request.contextPath}/upload/emp/' + writerImg);
+							} else {
+								$boardModal.find('#modalWriterImg').attr('src', DEFAULT_IMG);
+							}
+							
 							// 댓글창 초기화 및 번호 세팅
 							$('#collapseComments').collapse('hide');
-							$('#currentNoticeNo').val(noticeNo); // [중요]
-							$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글'); // 버튼 초기화
+							$('#currentNoticeNo').val(noticeNo);
+							$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글');
 							
-							// 수정 권한 체크
+							// 수정/삭제 권한 체크
 							$btnModify.hide();
+							$btnDelete.hide();
+
 							var loginGrade = "${sessionScope.login.gradeNo}";
 							var loginName = "${sessionScope.login.empName}";
+							
+							// 관리자(등급<=2) 이거나 작성자 본인이면 수정/삭제 가능
 							if (loginGrade <= 2 || loginName == response.noticeWriter) {
 								$btnModify.show();
 								$btnModify.data('title', response.noticeTitle);
 								$btnModify.data('content', response.noticeContent);
 								$btnModify.data('deptno', response.deptNo);
+								
+								$btnDelete.show(); // 삭제 버튼 보이기
 							}
 							
 							new bootstrap.Modal(document.getElementById('boardModal')).show();
-							// [중요] 모달 뜨면서 댓글 로드
+							// 모달 뜨면서 댓글 로드
 							loadReplies(noticeNo); 
 
 						} else {
@@ -428,17 +494,21 @@
 				var writer = button.data('writer'); 
 				var date = button.data('date');
 
-				// UI 세팅
+				// UI 기본 세팅
 				$boardModal.find('#modalTitleText').text(title);
 				$boardModal.find('#modalWriterText').text(writer);
 				$boardModal.find('#modalDateText').text(date);
 				$boardModal.find('#modalContentText').text('내용 로딩중...');
 				
+				// 이미지 초기화
+				$boardModal.find('#modalWriterImg').attr('src', DEFAULT_IMG);
+				
 				$('#collapseComments').collapse('hide');
-				$('#currentNoticeNo').val(noticeNo); // [중요]
-				$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글'); // 버튼 초기화
+				$('#currentNoticeNo').val(noticeNo);
+				$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글');
 
 				$btnModify.hide(); 
+				$btnDelete.hide(); // 초기화
 
 				$.ajax({
 					url : '/board/getContentNoticeBoard',
@@ -448,13 +518,23 @@
 					success : function(response) {
 						if (response && response.noticeContent) {
 							$boardModal.find('#modalContentText').text(response.noticeContent);
-							// 권한 체크: 관리자(등급<=2) 이거나 작성자 본인이면 수정 버튼 노출
+							
+							// [NEW] 작성자 이미지 교체
+							var writerImg = response.empImage; 
+							if(writerImg) {
+								$boardModal.find('#modalWriterImg').attr('src', '${pageContext.request.contextPath}/upload/emp/' + writerImg);
+							}
+							
+							// 권한 체크: 관리자(등급<=2) 이거나 작성자 본인이면 수정/삭제 버튼 노출
 							if ("${sessionScope.login.gradeNo}" <= 2 ||
 								"${sessionScope.login.empName}" == response.noticeWriter) {
+								
 								$btnModify.show();
 								$btnModify.data('title', title);
 								$btnModify.data('content', response.noticeContent);
 								$btnModify.data('deptno', response.deptNo); 
+								
+								$btnDelete.show(); // 삭제 버튼 보이기
 							}
 						}
 					},
@@ -463,13 +543,15 @@
 					}
 				});
 			});
-			// [중요] 모달이 완전히 열렸을 때 댓글 목록 자동 로드
+
+			// 모달이 완전히 열렸을 때 댓글 목록 자동 로드
 			$boardModal.on('shown.bs.modal', function() {
 				var noticeNo = $('#currentNoticeNo').val();
 				if(noticeNo) {
 					loadReplies(noticeNo);
 				}
 			});
+
 			// 수정 버튼 클릭 -> 수정 모달 OPEN
 			$btnModify.on('click', function() {
 				var boardModalEl = document.getElementById('boardModal');
@@ -488,6 +570,15 @@
 
 				new bootstrap.Modal(document.getElementById('modifyModal')).show();
 			});
+			
+			// 삭제 버튼 클릭 이벤트
+            $btnDelete.on('click', function() {
+                if(confirm("정말 이 공지사항을 삭제하시겠습니까?\n포함된 댓글도 모두 삭제됩니다.")) {
+                    var noticeNo = $('#currentNoticeNo').val();
+                    $('#deleteNoticeNo').val(noticeNo);
+                    $('#deleteForm').submit();
+                }
+            });
 		});
 		
 		// -----------------------------------------------------------
@@ -496,15 +587,12 @@
 
 		// 댓글 목록 로드 함수
 	    function loadReplies(no) {
-	        // 공지사항은 noticeNo 파라미터 사용
 	        $.ajax({
 	            url: '/replies/list',
 	            type: 'GET',
 	            data: { noticeNo: no },
 	            dataType: 'json', 
 	            success: function(list) {
-	            	
-	            	// [수정] 댓글 목록을 가져온 후 버튼 텍스트 업데이트 (총 갯수 반영)
 		        	let totalCount = list ? list.length : 0;
 		        	$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글 (' + totalCount + ')');
 		        	
@@ -515,26 +603,42 @@
 	                    list.forEach(reply => {
 	                        let date = new Date(reply.replyCreatedAt);
 	                        let dateStr = date.toISOString().split('T')[0] + " " + date.toTimeString().split(' ')[0].substring(0,5);
-
-	                        // [수정] 이름 + 직급 표시
-			            	// 만약 VO수정이 안되었다면 undefined가 뜰 수 있으므로 방어코드 추가
 			            	let writerName = reply.replyWriterName ? reply.replyWriterName : reply.replyWriterEmpNo;
 			            	let writerJob = reply.replyWriterJob ? reply.replyWriterJob : '';
 			            	let writerDisplay = writerName + (writerJob ? ' (' + writerJob + ')' : '');
 			            	
+			            	// [NEW] 댓글 작성자 이미지
+			            	let replyImgSrc = DEFAULT_IMG;
+                            if(reply.replyWriterImage) {
+                                replyImgSrc = '${pageContext.request.contextPath}/upload/emp/' + reply.replyWriterImage;
+                            }
+			            	
 	                        html += '<div class="comment-card" id="reply-' + reply.replyNo + '">';
-	                        html += '  <div class="d-flex justify-content-between">';
-	                        html += '    <strong class="text-dark">' + writerDisplay + '</strong>';
-	                        html += '    <small class="text-muted">' + dateStr + '</small>';
-	                        html += '  </div>';
-	                        html += '  <p class="mb-0 mt-1 text-secondary small">' + reply.replyContent + '</p>';
+	                        
+	                        // [NEW] 댓글 레이아웃 (flex)
+                            html += '  <div class="d-flex">';
+                            // 1. 프로필 이미지
+                            html += '    <div class="flex-shrink-0">';
+                            html += '      <img src="' + replyImgSrc + '" class="comment-profile-img" alt="프로필">';
+                            html += '    </div>';
+                            
+                            // 2. 내용
+                            html += '    <div class="flex-grow-1">';
+	                        html += '      <div class="d-flex justify-content-between align-items-center">';
+	                        html += '        <strong class="text-dark">' + writerDisplay + '</strong>';
+	                        html += '        <small class="text-muted">' + dateStr + '</small>';
+	                        html += '      </div>';
+	                        html += '      <p class="mb-0 mt-1 text-secondary small">' + reply.replyContent + '</p>';
+	                        
 	                        // 로그인 사번과 일치하면 삭제 버튼 표시
 	                        if (LOGIN_EMP_NO == reply.replyWriterEmpNo) {
-	                            html += '  <div class="mt-2 text-end">';
+	                            html += '  <div class="mt-1 text-end">';
 	                            html += '    <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteReply(' + reply.replyNo + ')">삭제</button>';
 	                            html += '  </div>';
 	                        }
-	                        html += '</div>';
+	                        html += '    </div>'; // end flex-grow-1
+                            html += '  </div>'; // end d-flex
+	                        html += '</div>'; // end comment-card
 	                    });
 	                }
 	                $('.comment-list-container').html(html);

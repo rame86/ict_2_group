@@ -14,4 +14,5 @@ public class FreeBoardVO {
 	private Integer deptNo;
 	private String deptName;
 	private Integer replyCnt;
+	private String empImage;
 }

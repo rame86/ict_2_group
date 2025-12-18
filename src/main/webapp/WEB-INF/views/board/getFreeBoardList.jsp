@@ -5,7 +5,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>getFreeBoardList.jsp - 자유 게시판</title>
+<title>자유 게시판</title>
 <style>
 /* -------------------- [모달 스타일 리뉴얼] -------------------- */
 #boardModal .modal-content {
@@ -48,11 +48,32 @@
 .info-item {
 	font-size: 0.9rem;
 	color: #666;
+	display: flex;
+	align-items: center;
 }
 
 .info-item i {
 	margin-right: 5px;
 	color: #adb5bd;
+}
+
+/* [NEW] 작성자/댓글 프로필 이미지 스타일 */
+.writer-profile-img {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin-right: 8px;
+	border: 1px solid #dee2e6;
+}
+
+.comment-profile-img {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	object-fit: cover;
+	margin-right: 15px;
+	border: 1px solid #dee2e6;
 }
 
 /* 본문 영역 */
@@ -82,6 +103,7 @@
 	border-radius: 8px;
 	padding: 10px;
 	margin-bottom: 10px;
+	text-align: left;
 }
 
 /* 카드 헤더 스타일 */
@@ -147,7 +169,7 @@
 												       ${ vo.boardTitle } 
 												    </a>
 												    
-												    <%-- [수정] 댓글 갯수 표시: 0보다 클 때만 제목 옆에 [N] 형태로 표시 --%>
+												    <%-- 댓글 갯수 표시 --%>
 												    <c:if test="${vo.replyCnt > 0}">
 												    	<span class="text-danger fw-bold ms-1" style="font-size: 0.9rem;">
 												    		[${vo.replyCnt}]
@@ -198,7 +220,7 @@
 													   ${ vo.boardTitle } 
 													</a>
 													
-												    <%-- [수정] 댓글 갯수 표시: 0보다 클 때만 제목 옆에 [N] 형태로 표시 --%>
+												    <%-- 댓글 갯수 표시 --%>
 												    <c:if test="${vo.replyCnt > 0}">
 												    	<span class="text-danger fw-bold ms-1" style="font-size: 0.9rem;">
 												    		[${vo.replyCnt}]
@@ -302,7 +324,8 @@
 
 								<div class="view-info-box">
 									<span class="info-item"> 
-										<i class="fas fa-user-circle"></i> <span id="modalWriterText">작성자</span>
+										<img id="modalWriterImg" src="" class="writer-profile-img" alt="작성자">
+										<span id="modalWriterText">작성자</span>
 									</span> 
 									<span class="info-item"> 
 										<i class="far fa-clock"></i> <span id="modalDateText">2024-00-00</span>
@@ -312,13 +335,22 @@
 								<div id="modalContentText" class="view-content-box">내용 로딩중...</div>
 
 								<div class="d-flex justify-content-between align-items-center mt-4">
-									<%-- [수정] 댓글 버튼에 ID(btnToggleComment) 추가 --%>
+									<%-- 댓글 버튼 --%>
 									<button class="btn btn-outline-secondary" type="button" id="btnToggleComment" data-bs-toggle="collapse" data-bs-target="#collapseComments" aria-expanded="false" aria-controls="collapseComments">
 										<i class="far fa-comment-dots me-1"></i> 댓글
 									</button>
 
 									<div>
 										<input type="hidden" id="currentBoardNo">
+										
+										<%-- 삭제 버튼과 폼 (JS로 제어) --%>
+                                        <form action="/board/deleteFreeBoard" method="post" id="deleteForm" style="display:inline;">
+                                            <input type="hidden" name="boardNo" id="deleteBoardNo">
+                                            <button type="button" class="btn btn-danger text-white" id="btnDelete" style="display: none;">
+                                                <i class="fas fa-trash-alt me-1"></i> 삭제
+                                            </button>
+                                        </form>
+										
 										<button type="button" class="btn btn-warning text-white" id="btnModify" style="display: none;">
 											<i class="fas fa-edit me-1"></i> 수정
 										</button>
@@ -328,6 +360,9 @@
 
 								<div class="collapse comment-section" id="collapseComments">
 									<div class="d-flex mb-3">
+										<div class="flex-shrink-0 me-2">
+											<img id="myCommentProfileImg" src="${pageContext.request.contextPath}/images/default_profile.png" class="comment-profile-img" alt="나">
+										</div>
 										<div class="flex-grow-1">
 											<input type="text" id="replyInput" class="form-control" placeholder="댓글을 입력하세요...">
 										</div>
@@ -349,23 +384,36 @@
 
 	<script>
 		var LOGIN_EMP_NO = "${sessionScope.login.empNo}";
-
+		var DEFAULT_IMG = "${pageContext.request.contextPath}/images/default_profile.png"; 
+		
 		window.addEventListener('DOMContentLoaded', event => {
 			const datatablesGlobal = document.getElementById('datatablesGlobal');
-			if (datatablesGlobal) {
-				new simpleDatatables.DataTable(datatablesGlobal);
-			}
+			if (datatablesGlobal) new simpleDatatables.DataTable(datatablesGlobal);
 			
 			const datatablesDept = document.getElementById('datatablesDept');
-			if (datatablesDept) {
-				new simpleDatatables.DataTable(datatablesDept);
-			}
+			if (datatablesDept) new simpleDatatables.DataTable(datatablesDept);
 		});
 
 		$(document).ready(function() {
 			var $boardModal = $('#boardModal');
 			var $btnModify = $('#btnModify');
+			var $btnDelete = $('#btnDelete'); // 삭제 버튼
 			var $modifyForm = $('#modifyForm');
+
+			// 1. 내 프로필 사진 로드
+			if(LOGIN_EMP_NO) {
+				$.ajax({
+					url: '${pageContext.request.contextPath}/emp/myInfo', 
+					type: 'GET',
+					success: function(htmlData) {
+						var $temp = $('<div>').html(htmlData);
+						var imgSrc = $temp.find('.emp-photo-placeholder img').attr('src');
+						if(imgSrc) {
+							$('#myCommentProfileImg').attr('src', imgSrc);
+						}
+					}
+				});
+			}
 
 			// 상세보기 모달 OPEN (데이터 세팅)
 			$boardModal.on('show.bs.modal', function(event) {
@@ -381,12 +429,16 @@
 				$boardModal.find('#modalDateText').text(date);
 				$boardModal.find('#modalContentText').text('내용 로딩중...');
 				
+				// 이미지 초기화
+				$boardModal.find('#modalWriterImg').attr('src', DEFAULT_IMG);
+				
 				// 댓글창 및 hidden 값 초기화
 				$('#collapseComments').collapse('hide');
-				$('#currentBoardNo').val(boardNo); // [중요] 게시글 번호 세팅
-				$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글'); // 버튼 초기화
+				$('#currentBoardNo').val(boardNo);
+				$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글');
 
 				$btnModify.hide(); 
+				$btnDelete.hide();
 
 				// 2. 게시글 상세 내용 AJAX 조회
 				$.ajax({
@@ -397,12 +449,21 @@
 					success : function(response) {
 						if (response && response.boardContent) {
 							$boardModal.find('#modalContentText').text(response.boardContent);
-							// 작성자 본인 여부 확인 -> 수정버튼 노출
+							
+							// [NEW] 작성자 이미지 교체
+							var writerImg = response.empImage; 
+							if(writerImg) {
+								$boardModal.find('#modalWriterImg').attr('src', '${pageContext.request.contextPath}/upload/emp/' + writerImg);
+							}
+							
+							// 작성자 본인 여부 확인 -> 수정/삭제 버튼 노출
 							if (LOGIN_EMP_NO && LOGIN_EMP_NO == response.empNo) {
 								$btnModify.show();
 								$btnModify.data('title', title);
 								$btnModify.data('content', response.boardContent);
 								$btnModify.data('deptno', response.deptNo);
+								
+								$btnDelete.show(); // 삭제 버튼 보이기
 							}
 						}
 					},
@@ -412,7 +473,7 @@
 				});
 			});
 
-			// [추가된 부분] 모달이 완전히 열린 후 -> 댓글 목록 불러오기
+			// 모달이 완전히 열린 후 -> 댓글 목록 불러오기
 			$boardModal.on('shown.bs.modal', function() {
 				var boardNo = $('#currentBoardNo').val();
 				if(boardNo) {
@@ -436,6 +497,15 @@
 
 				new bootstrap.Modal($('#modifyModal')[0]).show();
 			});
+			
+			// 삭제 버튼 클릭 이벤트
+            $btnDelete.on('click', function() {
+                if(confirm("정말 이 게시글을 삭제하시겠습니까?\n포함된 댓글도 모두 삭제됩니다.")) {
+                    var boardNo = $('#currentBoardNo').val();
+                    $('#deleteBoardNo').val(boardNo);
+                    $('#deleteForm').submit();
+                }
+            });
 		});
 		
 		// -----------------------------------------------------------
@@ -444,15 +514,12 @@
 
 		// 댓글 목록 조회 및 렌더링
 		function loadReplies(boardNo, type) {
-			// type 구분 (자유게시판은 boardNo 사용)
 		    let queryData = { boardNo: boardNo };
 		    $.ajax({
 		        url: '/replies/list',
 		        type: 'GET',
 		        data: queryData,
 		        success: function(list) {
-		        	
-		        	// [수정] 댓글 목록을 가져온 후 버튼 텍스트 업데이트 (총 갯수 반영)
 		        	let totalCount = list ? list.length : 0;
 		        	$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글 (' + totalCount + ')');
 		        	
@@ -461,31 +528,44 @@
 		            	html = '<p class="text-center text-muted my-3">작성된 댓글이 없습니다.</p>';
 		            } else {
 			            list.forEach(reply => {
-			            	// 날짜 포맷
 			            	let date = new Date(reply.replyCreatedAt);
 	                        let dateStr = date.toISOString().split('T')[0] + " " + date.toTimeString().split(' ')[0].substring(0,5);
-
-			            	// [수정] 이름 + 직급 표시 (VO/Mapper 수정 전제)
-			            	// 만약 VO수정이 안되었다면 undefined가 뜰 수 있으므로 방어코드 추가
 			            	let writerName = reply.replyWriterName ? reply.replyWriterName : reply.replyWriterEmpNo;
 			            	let writerJob = reply.replyWriterJob ? reply.replyWriterJob : '';
 			            	let writerDisplay = writerName + (writerJob ? ' (' + writerJob + ')' : '');
 
-			                html += '<div class="comment-card" id="reply-' + reply.replyNo + '">';
-			                html += '  <div class="d-flex justify-content-between">';
-			                html += '    <strong class="text-dark">' + writerDisplay + '</strong>';
-			                html += '    <small class="text-muted">' + dateStr + '</small>';
-			                html += '  </div>';
-			                html += '  <p class="mb-0 mt-1 text-secondary small">' + reply.replyContent + '</p>';
-			                // 로그인 사번 검증: 작성자에게만 수정/삭제 버튼 표시
+			            	// [NEW] 댓글 작성자 이미지
+			            	let replyImgSrc = DEFAULT_IMG;
+                            if(reply.replyWriterImage) {
+                                replyImgSrc = '${pageContext.request.contextPath}/upload/emp/' + reply.replyWriterImage;
+                            }
+			            	
+			            	html += '<div class="comment-card" id="reply-' + reply.replyNo + '">';
+			            	
+			            	// [NEW] 댓글 레이아웃 (flex)
+                            html += '  <div class="d-flex">';
+                            // 1. 프로필 이미지
+                            html += '    <div class="flex-shrink-0">';
+                            html += '      <img src="' + replyImgSrc + '" class="comment-profile-img" alt="프로필">';
+                            html += '    </div>';
+			            	
+                            // 2. 내용
+                            html += '    <div class="flex-grow-1">';
+			                html += '      <div class="d-flex justify-content-between align-items-center">';
+			                html += '        <strong class="text-dark">' + writerDisplay + '</strong>';
+			                html += '        <small class="text-muted">' + dateStr + '</small>';
+			                html += '      </div>';
+			                html += '      <p class="mb-0 mt-1 text-secondary small">' + reply.replyContent + '</p>';
+			                
+			                // 로그인 사번 검증: 작성자에게만 삭제 버튼 표시
 			                if (LOGIN_EMP_NO == reply.replyWriterEmpNo) {
-			                    html += '  <div class="mt-2 text-end">';
-			                    // 수정 기능은 구현 복잡도상 일단 삭제만 활성화하거나 필요시 추가
-			                    // html += '<button class="btn btn-sm btn-link text-warning p-0 me-2" onclick="editReply(' + reply.replyNo + ')">수정</button>';
+			                    html += '  <div class="mt-1 text-end">';
 			                    html += '    <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteReply(' + reply.replyNo + ')">삭제</button>';
 			                    html += '  </div>';
 			                }
-			                html += '</div>';
+			                html += '    </div>'; // end flex-grow-1
+                            html += '  </div>'; // end d-flex
+			                html += '</div>'; // end comment-card
 			            });
 		            }
 		            $('#collapseComments .comment-list-container').html(html);

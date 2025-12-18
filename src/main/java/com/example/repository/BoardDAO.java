@@ -42,4 +42,13 @@ public interface BoardDAO {
 	int updateReply(ReplyVO vo);
 
 	int deleteReply(Long replyNo);
+	
+	// 공지 삭제
+	void deleteNoticeBoard(String noticeNo);
+
+	// 자유게시판 삭제
+	void deleteFreeBoard(String boardNo);
+
+	// 공지권한
+	int checkGlobalWriteAuth(String empNo);
 }

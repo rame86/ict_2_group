@@ -62,24 +62,35 @@ public class BoardServiceImpl implements BoardService {
 		boardDAO.updateFreeBoardCnt(boardNo);
 		return boardDAO.getContentFreeBoard(boardNo);
 	}
-	
+
 	// 댓글 CRUD
-    public int insertReply(ReplyVO vo) {
-        return boardDAO.insertReply(vo);
+	public int insertReply(ReplyVO vo) {
+		return boardDAO.insertReply(vo);
+	}
+
+	public List<ReplyVO> getReplyList(ReplyVO vo) {
+		return boardDAO.getReplyList(vo);
+	}
+
+	public int updateReply(ReplyVO vo) {
+		return boardDAO.updateReply(vo);
+	}
+
+	public int deleteReply(Long replyNo) {
+		return boardDAO.deleteReply(replyNo);
+	}
+
+	public void deleteNoticeBoard(String noticeNo) {
+		boardDAO.deleteNoticeBoard(noticeNo);
+	}
+
+	public void deleteFreeBoard(String boardNo) {
+		boardDAO.deleteFreeBoard(boardNo);
+	}
+
+	// 0보다 크면 true
+	public boolean checkGlobalWriteAuth(String empNo) {
+        return boardDAO.checkGlobalWriteAuth(empNo) > 0;
     }
 
-  
-    public List<ReplyVO> getReplyList(ReplyVO vo) {
-        return boardDAO.getReplyList(vo);
-    }
-
- 
-    public int updateReply(ReplyVO vo) {
-        return boardDAO.updateReply(vo);
-    }
-
-  
-    public int deleteReply(Long replyNo) {
-        return boardDAO.deleteReply(replyNo);
-    }
 }
