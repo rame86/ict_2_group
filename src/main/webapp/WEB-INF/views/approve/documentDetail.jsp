@@ -220,6 +220,10 @@
         box-shadow: 0 4px 6px -1px rgba(78, 115, 223, 0.2);
         transition: 0.2s;
     }
+    .color-red{
+    	background-color: rgb(221,134,156);
+    	border : 1px solid rgb(221,134,156);
+    }
 </style>
 
 <div class="container-fluid px-4">
@@ -348,7 +352,7 @@
                         <c:if test="${sessionScope.login.empNo == vo.step1ManagerNo || sessionScope.login.empNo == vo.step2ManagerNo}">
                             <div class="d-flex gap-2">
                                 <button class="btn btn-submit-custom flex-fill fw-bold py-2" id="approveBtn" type="button">승인</button>
-                                <button class="btn btn-submit-custom flex-fill fw-bold py-2" type="button" data-bs-toggle="modal" data-bs-target="#rejectModal">반려</button>
+                                <button class="btn btn-submit-custom flex-fill fw-bold py-2 color-red" type="button" data-bs-toggle="modal" data-bs-target="#rejectModal">반려</button>
                             </div>
                         </c:if>
                         <a href="/approve/receiveList" class="btn btn-reset-custom w-100 py-2">목록으로 이동</a>
