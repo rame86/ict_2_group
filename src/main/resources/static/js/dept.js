@@ -1,4 +1,4 @@
-/* dept.js - Clean & Verified Version */
+/* dept.js - 전체 완성본 */
 
 // 전역 변수 초기화
 let currentDeptId = null;
@@ -21,12 +21,10 @@ function showDeptModal(deptId, deptName, managerName) {
 
     if (modalDeptName) modalDeptName.textContent = deptName;
 
-    // 헤더 재구성 (관리자일 경우 '부서장 임명' 버튼 노출)
     const header = document.querySelector('#deptInfoModal .modal-header-custom');
     let appointBtnHtml = '';
 
-    // isAdminUser는 JSP 하단 스크립트에서 정의됨
-    if (!currentManagerName && typeof isAdminUser !== 'undefined' && isAdminUser) {
+    if (!currentManagerName && typeof canCreateAuth !== 'undefined' && canCreateAuth) {
         appointBtnHtml = `
             <button class="btn-xs" style="margin-left:auto; margin-right:10px; background:#fff; color:#4e73df; border:none; border-radius:4px; font-weight:bold; cursor:pointer;" 
                     onclick="openAppointModal()">
@@ -69,7 +67,6 @@ function loadEmployeeList(deptId) {
                 return;
             }
 
-            // 부서장 맨 위로, 그 다음 직급순 정렬
             data.sort(function(a, b) {
                 if (a.empName === currentManagerName) return -1;
                 if (b.empName === currentManagerName) return 1;
@@ -85,18 +82,8 @@ function loadEmployeeList(deptId) {
 
                 let btnHtml = '';
 
-                // 관리자 권한 버튼 로직
-                if (typeof isAdminUser !== 'undefined' && isAdminUser) {
-                    if (!isManager) {
-                        // 일반 사원: 이동/제외 버튼
-                        btnHtml = `
-                            <div class="emp-actions">
-                                <button class="btn-xs btn-move" onclick="openMoveModal(event, '${emp.empNo}', '${emp.empName}')">이동</button>
-                                <button class="btn-xs btn-exclude" onclick="submitExcludeEmp(event, '${emp.empNo}', '${emp.empName}')">제외</button>
-                            </div>
-                        `;
-                    } else {
-                        // 부서장: MANAGER 뱃지 + [해임] 버튼
+                if (isManager) {
+                    if (typeof canCreateAuth !== 'undefined' && canCreateAuth) {
                         btnHtml = `
                             <div class="emp-actions" style="display:flex; align-items:center;">
                                 <span style="font-size:11px; color:#fff; background:#4e73df; padding:2px 6px; border-radius:4px; margin-right:5px;">MANAGER</span>
@@ -106,11 +93,17 @@ function loadEmployeeList(deptId) {
                                 </button>
                             </div>
                         `;
+                    } else {
+                        btnHtml = `<span style="font-size:11px; color:#fff; background:#4e73df; padding:2px 6px; border-radius:4px; margin-left:auto;">MANAGER</span>`;
                     }
                 } else {
-                    // 일반 사용자
-                    if (isManager) {
-                        btnHtml = `<span style="font-size:11px; color:#fff; background:#4e73df; padding:2px 6px; border-radius:4px; margin-left:auto;">MANAGER</span>`;
+                    if (typeof canMoveAuth !== 'undefined' && canMoveAuth) {
+                        btnHtml = `
+                            <div class="emp-actions">
+                                <button class="btn-xs btn-move" onclick="openMoveModal(event, '${emp.empNo}', '${emp.empName}')">이동</button>
+                                <button class="btn-xs btn-exclude" onclick="submitExcludeEmp(event, '${emp.empNo}', '${emp.empName}')">제외</button>
+                            </div>
+                        `;
                     }
                 }
 
@@ -139,21 +132,25 @@ function closeModal() {
 }
 
 function goToEmployeeMgmt(empId) {
-    location.href = `${contextPath}/emp/list?autoSelectEmpNo=${empId}`;
+    if (typeof canViewAuth !== 'undefined' && canViewAuth) {
+        location.href = `${contextPath}/emp/list?autoSelectEmpNo=${empId}`;
+    }
 }
 
 function goToEmployeeMgmtByDept() {
-    if (currentDeptName) location.href = `${contextPath}/emp/list?keyword=` + encodeURIComponent(currentDeptName);
-    else location.href = `${contextPath}/emp/list`;
+    if (typeof canViewAuth !== 'undefined' && canViewAuth) {
+        if (currentDeptName) location.href = `${contextPath}/emp/list?keyword=` + encodeURIComponent(currentDeptName);
+        else location.href = `${contextPath}/emp/list`;
+    } else {
+         alert("조회 권한이 없습니다.");
+    }
 }
-
 
 /* =========================================
    2. 부서장 임명 & 해임 (결재 연동)
    ========================================= */
 function openAppointModal() {
-    if (!isAdminUser) { alert("권한이 없습니다."); return; }
-
+    if (!canCreateAuth) { alert("권한이 없습니다."); return; }
     const select = document.getElementById('appointEmpSelect');
     select.innerHTML = '<option value="">사원을 선택하세요</option>';
 
@@ -178,62 +175,31 @@ function closeAppointModal() { $('#deptAppointModal').hide(); }
 function submitAppointManager() {
     const empNo = $('#appointEmpSelect').val();
     const empInfoText = $('#appointEmpSelect option:selected').text();
-
     if (!empNo) { alert("임명할 사원을 선택해주세요."); return; }
-
     closeAppointModal();
-    // type 6: 임명
     openDraftModal(empNo, empInfoText, 6);
 }
 
 function submitDismissManager(e, empNo, empName) {
     e.stopPropagation();
-    if (!isAdminUser) { alert("권한이 없습니다."); return; }
+    if (!canCreateAuth) { alert("권한이 없습니다."); return; }
     if (!confirm(`[${empName}] 님을 부서장에서 해임하시겠습니까?\n결재 기안 창으로 이동합니다.`)) return;
-
-    // type 7: 해임
     openDraftModal(empNo, empName, 7);
 }
 
 function openDraftModal(empNo, empName, type) {
     $('#draftTargetEmpNo').val(empNo);
     $('#draftTargetDeptNo').val(currentDeptId);
-    $('#draftDeptNo').val(currentDeptId);
-
-    // DocType 설정
     let docTypeInput = $('input[name="DocType"]');
-    if (docTypeInput.length > 0) {
-        docTypeInput.val(type);
-    } else {
-        $('#finalApprovalForm').append(`<input type="hidden" name="DocType" value="${type}">`);
-    }
+    if (docTypeInput.length > 0) docTypeInput.val(type);
+    else $('#finalApprovalForm').append(`<input type="hidden" name="DocType" value="${type}">`);
 
     const now = new Date();
     const todayString = now.toISOString().split('T')[0];
     $('#draftDocDate').val(todayString);
 
-    let title = "";
-    let content = "";
-
-    if (type === 6) { // 임명
-        $('#draftMemo').val(currentDeptName);
-        title = `[인사발령] ${currentDeptName} 부서장 임명 건`;
-        content = `1. 귀 부서의 무궁한 발전을 기원합니다.\n`
-            + `2. 아래와 같이 부서장 임명을 명하고자 하오니 재가 바랍니다.\n\n`
-            + `- 부서명 : ${currentDeptName}\n`
-            + `- 대상자 : ${empName}\n`
-            + `- 발령일 : ${todayString}\n\n`
-            + `위와 같이 부서장 임명을 품의합니다.`;
-    } else if (type === 7) { // 해임
-        $('#draftMemo').val(currentDeptName);
-        title = `[인사발령] ${currentDeptName} 부서장 해임 건`;
-        content = `1. 귀 부서의 무궁한 발전을 기원합니다.\n`
-            + `2. 아래와 같이 부서장 해임을 명하고자 하오니 재가 바랍니다.\n\n`
-            + `- 부서명 : ${currentDeptName}\n`
-            + `- 대상자 : ${empName}\n`
-            + `- 해임일 : ${todayString}\n\n`
-            + `위와 같이 부서장 해임을 품의합니다.`;
-    }
+    let title = (type === 6) ? `[인사발령] ${currentDeptName} 부서장 임명 건` : `[인사발령] ${currentDeptName} 부서장 해임 건`;
+    let content = `1. 귀 부서의 무궁한 발전을 기원합니다.\n2. 아래와 같이 부서장 ${type === 6 ? '임명' : '해임'}을 명하고자 하오니 재가 바랍니다.\n\n- 부서명 : ${currentDeptName}\n- 대상자 : ${empName}\n- ${type === 6 ? '발령일' : '해임일'} : ${todayString}\n\n위와 같이 부서장 ${type === 6 ? '임명' : '해임'}을 품의합니다.`;
 
     $('#draftTitle').val(title);
     $('#draftContent').val(content);
@@ -244,30 +210,16 @@ function closeDraftModal() { $('#approvalDraftModal').hide(); }
 
 function submitFinalApproval() {
     if (!confirm("작성된 내용으로 결재를 상신하시겠습니까?")) return;
-
     const formData = $('#finalApprovalForm').serialize();
-
     $.ajax({
         url: contextPath + '/approve/approve-ajax',
         type: 'POST',
         data: formData,
         success: function(res) {
-            if (res === "OK" || res.result === "success") {
-                alert("결재가 성공적으로 상신되었습니다.");
-                closeDraftModal();
-                closeModal();
-                location.reload();
-            } else {
-                alert("상신 처리 완료");
-                closeDraftModal();
-                closeModal();
-                location.reload();
-            }
+            alert("결재가 상신되었습니다.");
+            location.reload();
         },
-        error: function(xhr, status, error) {
-            console.error(error);
-            alert("서버 통신 오류가 발생했습니다.");
-        }
+        error: function() { alert("서버 통신 오류"); }
     });
 }
 
@@ -283,13 +235,8 @@ function closeDeleteModal() { $('#deptDeleteModal').hide(); }
 function openUpdateModal() { $('#deptUpdateModal').show(); }
 function closeUpdateModal() { $('#deptUpdateModal').hide(); }
 
-
 function submitCreateDept() {
     const formData = $('#createDeptForm').serialize();
-    if (!$('input[name="deptNo"]').val() || !$('input[name="deptName"]').val()) {
-        alert("부서 번호와 이름은 필수입니다.");
-        return;
-    }
     $.ajax({
         url: contextPath + '/dept/create',
         type: 'POST',
@@ -297,74 +244,60 @@ function submitCreateDept() {
         success: function(res) {
             if (res === "OK") { alert("부서 생성됨"); location.reload(); }
             else { alert("생성 실패"); }
-        },
-        error: function() { alert("오류 발생"); }
+        }
     });
 }
 
+// [수정] 부서 삭제 시 안전장치 강화
 function submitDeleteDept() {
-    const targetDeptNo = $('#deleteDeptSelect').val();
+    const select = document.getElementById('deleteDeptSelect');
+    const targetDeptNo = select.value;
     if (!targetDeptNo) { alert("부서 선택 필요"); return; }
-    if (!confirm("삭제하시겠습니까?")) return;
+
+    // 1. [핵심] 클라이언트 측 안전장치 체크
+    const selectedOption = select.options[select.selectedIndex];
+    const managerNo = selectedOption.getAttribute('data-manager');
+
+    if (managerNo && managerNo !== '0' && managerNo !== 'null' && managerNo !== '') {
+        alert("해당 부서에 부서장이 임명되어 있습니다.\n부서장을 먼저 해임한 후 삭제해 주세요.");
+        return;
+    }
+
+    if (!confirm("정말 이 부서를 삭제하시겠습니까?\n해당 부서원들은 '무소속' 처리됩니다.")) return;
 
     $.ajax({
         url: contextPath + '/dept/delete',
         type: 'POST',
         data: { deptNo: targetDeptNo },
         success: function(res) {
-            if (res === "OK") { alert("삭제됨"); location.reload(); }
-            else { alert("삭제 실패"); }
+            if (res === "OK") { alert("부서가 삭제되었습니다."); location.reload(); }
+            else if (res === "HAS_MANAGER") { alert("서버 확인 결과: 부서장이 존재하여 삭제할 수 없습니다."); }
+            else if (res === "PROTECTED") { alert("핵심 부서는 삭제할 수 없습니다."); }
+            else { alert("삭제 실패 또는 권한 없음"); }
         },
         error: function() { alert("오류 발생"); }
     });
 }
 
-// [핵심] 수정 폼 채우기 함수 (여기가 문제였음)
 function fillUpdateForm(selectObj) {
     const selectedOption = selectObj.options[selectObj.selectedIndex];
-    
-    // 선택된 값이 없으면 리셋하고 종료
-    if (!selectedOption.value) {
-        $('#updateDeptForm')[0].reset();
-        return;
-    }
-
-    const deptNo = selectedOption.value;
-    const name = selectedOption.getAttribute('data-name');
-    const parent = selectedOption.getAttribute('data-parent');
-    const phone = selectedOption.getAttribute('data-phone');
-    const manager = selectedOption.getAttribute('data-manager');
-
-    // 폼에 값 주입
-    $('#editDeptNo').val(deptNo);
-    $('#editDeptName').val(name);
-    $('#editParentDeptNo').val(parent == '0' ? '' : parent);
-    $('#editDeptPhone').val(phone === 'null' ? '' : phone);
-    $('#editManagerEmpNo').val(manager === '0' || manager === 'null' ? '' : manager);
+    if (!selectedOption.value) { $('#updateDeptForm')[0].reset(); return; }
+    $('#editDeptNo').val(selectedOption.value);
+    $('#editDeptName').val(selectedOption.getAttribute('data-name'));
+    $('#editParentDeptNo').val(selectedOption.getAttribute('data-parent') == '0' ? '' : selectedOption.getAttribute('data-parent'));
+    $('#editDeptPhone').val(selectedOption.getAttribute('data-phone') === 'null' ? '' : selectedOption.getAttribute('data-phone'));
+    $('#editManagerEmpNo').val(selectedOption.getAttribute('data-manager') === '0' || selectedOption.getAttribute('data-manager') === 'null' ? '' : selectedOption.getAttribute('data-manager'));
 }
 
 function submitUpdateDept() {
-    const deptNo = $('#editDeptNo').val();
-    if (!deptNo) {
-        alert("수정할 부서를 선택해주세요.");
-        return;
-    }
     const formData = $('#updateDeptForm').serialize();
-
     $.ajax({
         url: contextPath + '/dept/update',
         type: 'POST',
         data: formData,
         success: function(res) {
-            if (res === "OK") {
-                alert("부서 정보가 수정되었습니다.");
-                location.reload();
-            } else {
-                alert("수정 실패");
-            }
-        },
-        error: function() {
-            alert("서버 오류 발생");
+            if (res === "OK") { alert("정보 수정됨"); location.reload(); }
+            else { alert("수정 실패"); }
         }
     });
 }
@@ -401,13 +334,12 @@ function ajaxChangeDept(empNo, newDeptNo) {
         success: function(res) {
             if (res === "OK") { alert("처리됨"); closeMoveModal(); loadEmployeeList(currentDeptId); }
             else { alert("권한 없음/실패"); }
-        },
-        error: function() { alert("오류"); }
+        }
     });
 }
 
 /* =========================================
-   5. 모달 외부 클릭 닫기
+   5. 모달 외부 클릭 닫기 (스크롤 잠금 해제 포함)
    ========================================= */
 window.onclick = function(event) {
     const modalIds = [
@@ -420,6 +352,8 @@ window.onclick = function(event) {
         const modalEl = document.getElementById(id);
         if (event.target === modalEl) {
             modalEl.style.display = 'none';
+            // [중요] 배경 클릭으로 닫을 때도 반드시 스크롤을 활성화합니다.
+            document.body.style.overflow = 'auto'; 
         }
     });
 }

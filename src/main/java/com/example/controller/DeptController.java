@@ -29,30 +29,42 @@ public class DeptController {
 	public String department(Model m, HttpSession session) {
 		List<DeptVO> deptList = deptService.getOrgChartData();
 		m.addAttribute("deptList", deptList);
-		
-		// 2. 권한 체크 로직 (여기서 확실하게 계산)
+
 		LoginVO login = (LoginVO) session.getAttribute("login");
-		boolean isAdmin = false;
 
-		if (login != null) {		
-			m.addAttribute("myDeptNo", login.getDeptNo()); 
+		// 권한 기본값 false
+		boolean canCreateAuth = false; // 부서생성, 부서장임명 (등급2이상 + 2000/2010부서)
+		boolean canMoveAuth = false; // 부서원 이동 (등급2이상)
+		boolean canViewAuth = false; // 상세정보 확인 (등급3이상)
 
-			// String으로 변환해서 비교
-			String dNo = String.valueOf(login.getDeptNo());
-			String gNo = String.valueOf(login.getGradeNo()).trim();
+		if (login != null) {
+			m.addAttribute("myDeptNo", login.getDeptNo());
 
-			log.info("[DeptController] 접속자 부서: " + dNo + ", 등급: " + gNo);
+			int deptNo = Integer.parseInt(login.getDeptNo());
+			int gradeNo = Integer.parseInt(login.getGradeNo());
 
-			// 인사부(2010) or 운영총괄(2000) AND 관리자급(1 or 2)
-			if ((dNo.equals("2000") || dNo.equals("2010")) && (gNo.equals("1") || gNo.equals("2"))) {
-				isAdmin = true;
+			log.info("[DeptController] 접속자 부서: " + deptNo + ", 등급: " + gradeNo);
+
+			// 1. 부서 생성 및 부서장 임명 권한: 권한등급 2이상 AND (부서 2000 OR 2010)
+			if (gradeNo <= 2 && (deptNo == 2000 || deptNo == 2010)) {
+				canCreateAuth = true;
+			}
+
+			// 2. 부서원 이동 권한: 권한등급 2이상 (부서 무관)
+			if (gradeNo <= 2) {
+				canMoveAuth = true;
+			}
+
+			// 3. 부서원 정보 확인 권한: 권한등급 3이상 (부서 무관)
+			if (gradeNo <= 3) {
+				canViewAuth = true;
 			}
 		}
 
-		log.info("[DeptController] 관리자 권한 여부: " + isAdmin);
-
-		// 3. JSP로 결과 전달
-		m.addAttribute("isAdmin", isAdmin);
+		// JSP로 권한 플래그 전달
+		m.addAttribute("canCreateAuth", canCreateAuth);
+		m.addAttribute("canMoveAuth", canMoveAuth);
+		m.addAttribute("canViewAuth", canViewAuth);
 
 		return "/dept/dept";
 	}
@@ -67,7 +79,20 @@ public class DeptController {
 	// 부서 생성
 	@PostMapping("/dept/create")
 	@ResponseBody
-	public String createDept(DeptVO vo) {
+	public String createDept(DeptVO vo, HttpSession session) {
+		// 서버 측 권한 검증
+		LoginVO login = (LoginVO) session.getAttribute("login");
+		if (login == null)
+			return "FAIL";
+
+		int deptNo = Integer.parseInt(login.getDeptNo());
+		int gradeNo = Integer.parseInt(login.getGradeNo());
+
+		// 권한등급 2이상 + 특정부서(2000, 2010)만 가능
+		if (!(gradeNo <= 2 && (deptNo == 2000 || deptNo == 2010))) {
+			return "NO_AUTH";
+		}
+
 		try {
 			deptService.createDept(vo);
 			return "OK";
@@ -80,13 +105,34 @@ public class DeptController {
 	// 부서 삭제
 	@PostMapping("/dept/delete")
 	@ResponseBody
-	public String deleteDept(@RequestParam("deptNo") int deptNo) {
+	public String deleteDept(@RequestParam("deptNo") int deptNo, HttpSession session) {
+		// 서버 측 권한 검증
+		LoginVO login = (LoginVO) session.getAttribute("login");
+		if (login == null)
+			return "FAIL";
 
-		// 1. 핵심 부서(CEO, 운영총괄, 인사, CTO, CBO) 삭제 방지 로직
-		if (deptNo == 1001 || deptNo == 2000 || deptNo == 2010 || deptNo == 3000 || deptNo == 4000) {
-			return "PROTECTED"; // "보호된 부서"라는 신호를 보냄
+		int userDeptNo = Integer.parseInt(login.getDeptNo());
+		int gradeNo = Integer.parseInt(login.getGradeNo());
+
+		// 권한등급 2이상 + 특정부서(2000, 2010)만 가능
+		if (!(gradeNo <= 2 && (userDeptNo == 2000 || userDeptNo == 2010))) {
+			return "NO_AUTH";
 		}
 
+		// 핵심 부서 보호 로직
+		if (deptNo == 1001 || deptNo == 2000 || deptNo == 2010 || deptNo == 3000 || deptNo == 4000) {
+			return "PROTECTED";
+		}
+		// 전체 부서 목록에서 해당 부서의 매니저가 있는지 확인
+		List<DeptVO> allDepts = deptService.getOrgChartData();
+		for (DeptVO d : allDepts) {
+			if (Integer.parseInt(d.getDeptNo()) == deptNo) {
+				if (d.getManagerEmpNo() != null && !d.getManagerEmpNo().equals("0") && !d.getManagerEmpNo().isEmpty()) {
+					return "HAS_MANAGER"; // 부서장이 있으면 삭제 거부
+				}
+				break;
+			}
+		}
 		try {
 			deptService.removeDept(deptNo);
 			return "OK";
@@ -99,7 +145,20 @@ public class DeptController {
 	// 부서 수정
 	@PostMapping("/dept/update")
 	@ResponseBody
-	public String updateDept(DeptVO vo) {
+	public String updateDept(DeptVO vo, HttpSession session) {
+		// 서버 측 권한 검증
+		LoginVO login = (LoginVO) session.getAttribute("login");
+		if (login == null)
+			return "FAIL";
+
+		int userDeptNo = Integer.parseInt(login.getDeptNo());
+		int gradeNo = Integer.parseInt(login.getGradeNo());
+
+		// 권한등급 2이상 + 특정부서(2000, 2010)만 가능
+		if (!(gradeNo <= 2 && (userDeptNo == 2000 || userDeptNo == 2010))) {
+			return "NO_AUTH";
+		}
+
 		try {
 			deptService.editDept(vo);
 			return "OK";
@@ -116,17 +175,15 @@ public class DeptController {
 			HttpSession session) {
 
 		LoginVO login = (LoginVO) session.getAttribute("login");
+		if (login == null)
+			return "FAIL";
 
-		String dNo = String.valueOf(login.getDeptNo());
-		String gNo = String.valueOf(login.getGradeNo());
-		// 권한 체크 (2000, 2010 부서의 관리자만 가능)
-		boolean isAuth = false;
-		if ((dNo.equals("2000") || dNo.equals("2010")) && (gNo.equals("1") || gNo.equals("2"))) {
-			isAuth = true;
-		}
+		int gradeNo = Integer.parseInt(login.getGradeNo());
 
-		if (!isAuth)
+		// 권한 체크: 권한등급 2이상만 가능 (부서 무관)
+		if (gradeNo > 2) {
 			return "NO_AUTH";
+		}
 
 		try {
 			// newDeptNo가 0이면 '제외', 아니면 '이동'

@@ -22,15 +22,13 @@
 </script>
 
 <style>
-    /* 사이드바 메뉴 사라짐 방지 (Tailwind와 Bootstrap의 collapse 클래스 충돌 해결) */
+    /* 사이드바 메뉴 사라짐 방지 */
     .sb-sidenav .collapse {
         visibility: visible !important;
     }
-    
-    /* 혹시 모를 네비게이션 링크 가시성 확보 */
     .sb-sidenav-menu-nested.nav a {
         visibility: visible !important;
-    }
+	}
 </style>
 
 </head>
@@ -45,28 +43,27 @@
             <main class="px-4 py-6">
                 <div class="container-fluid px-4">
                  
+                 
                     <h2 class="mt-4">조직도</h2>
                     <ol class="breadcrumb mb-4">
                         <li class="breadcrumb-item active">Organization Chart</li>
                     </ol>
 
-                    <c:if test="${isAdmin}">
-        
+					<%-- 관리자 툴바: 부서 생성 권한(canCreateAuth)이 있는 경우에만 표시 --%>
+                    <c:if test="${canCreateAuth}">
                         <div class="admin-toolbar">
                             <button class="btn-toolbar-custom btn-create" onclick="openCreateModal()">
                                 <i class="fas fa-plus"></i> 부서 생성
-                
                             </button>
                             <button class="btn-toolbar-custom btn-update" onclick="openUpdateModal()">
                                 <i class="fas fa-edit"></i> 정보 수정
-                     
                             </button>
                             <button class="btn-toolbar-custom btn-delete" onclick="openDeleteModal()">
                                 <i class="fas fa-trash"></i> 부서 삭제
-                          
                             </button>
                         </div>
                     </c:if>
+
 					<div class="card mb-4">
 						<div class="card-body">
 							
@@ -90,10 +87,11 @@
 							
 							                    <ul>
 							                        <c:forEach var="sub" items="${deptList}">
-							                            <%-- CEO 직속 부서 (운영총괄, 기술총괄 등) --%>
+							                        
+							                            <%-- CEO 직속 부서 --%>
 							                            <c:if test="${sub.parentDeptNo == 1001 && sub.deptNo != 1001}">
 							                                <li>
-							                         	       <div class="org-node head ${myDeptNo == sub.deptNo ? 'my-dept' : ''}"
+							                                	 <div class="org-node head ${myDeptNo == sub.deptNo ? 'my-dept' : ''}"
      																onclick="showDeptModal('${sub.deptNo}', '${sub.deptName}', '${sub.managerName}')">
 							                                        
 							                                        <i class="fas fa-crown crown-icon crown-silver"></i>
@@ -106,7 +104,7 @@
 							                                        <span class="position">${sub.deptName}장</span>
 							                                    </div>
 							
-							                                    <%-- 하위 팀들 (왕관 없음) --%>
+							                                    <%-- 하위 팀들 --%>
 							                                    <ul class="team-grid">
 							                                        <c:forEach var="team" items="${deptList}">
 							                                            <c:if test="${team.parentDeptNo == sub.deptNo}">
@@ -130,7 +128,6 @@
 							    </ul>
 							</div>
 							
-         
                             <div class="mt-5 pt-4 border-top">
 								<h5 class="text-secondary font-weight-bold mb-3">
 									<i class="fas fa-user-clock"></i> 대기 / 무소속
@@ -185,7 +182,8 @@
 			</div>
 
 			<c:choose>
-				<c:when test="${isAdmin}">
+				<%-- 부서원 정보 확인 권한(canViewAuth)이 있을 때만 버튼 활성화 --%>
+				<c:when test="${canViewAuth}">
 					<button class="btn-manage-custom" onclick="goToEmployeeMgmtByDept()">
 						<i class="fas fa-users-cog"></i> 부서원 관리 / 상세 보기
 					</button>
@@ -217,13 +215,11 @@
 					</div>
 					<div class="form-group">
 						<label for="parentDeptNoInput">상위 부서 번호</label> 
-   
                         <input type="number" id="parentDeptNoInput" name="parentDeptNo" placeholder="예: 1001 (CEO직속)">
 					</div>
                     <div class="form-group">
                         <label>부서 연락처</label>
- 
-                        <input type="text" name="deptPhone" placeholder="예: 02-1234-5678">
+                       <input type="text" name="deptPhone" placeholder="예: 02-1234-5678">
                     </div>
 					<div class="form-group">
 						<label for="managerEmpNoInput">부서장 사번</label> 
@@ -238,7 +234,6 @@
 	</div>
 
     <div id="deptUpdateModal" class="modal-custom">
-        
         <div class="modal-content-custom">
             <div class="modal-header-custom" style="background-color: #36b9cc;">
                 <h5>부서 정보 수정</h5>
@@ -246,53 +241,44 @@
             </div>
             <div class="modal-body-custom">
                 <div class="form-group">
-      
                     <label>수정할 부서 선택</label>
                     <select id="updateDeptSelect" onchange="fillUpdateForm(this)">
                         <option value="">선택하세요</option>
                         <c:forEach var="d" items="${deptList}">
-           
                             <option value="${d.deptNo}" 
                                     data-name="${d.deptName}" 
                                     data-parent="${d.parentDeptNo}" 
-       
                                     data-phone="${d.deptPhone}" 
                                     data-manager="${d.managerEmpNo}">
-                                ${d.deptName} (${d.deptNo})
- 
+                                    ${d.deptName} (${d.deptNo})
                             </option>
                         </c:forEach>
                     </select>
                 </div>
-             
+            
                 <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
 
                 <form id="updateDeptForm">
                     <input type="hidden" name="deptNo" id="editDeptNo">
                     
                     <div class="form-group">
-              
                         <label>부서 이름</label>
                         <input type="text" id="editDeptName" name="deptName" required>
                     </div>
                     <div class="form-group">
-                    
                         <label>상위 부서 번호</label>
                         <input type="number" id="editParentDeptNo" name="parentDeptNo">
                     </div>
-                    <div class="form-group">
+                     <div class="form-group">
                         <label>부서 연락처</label>
- 
                         <input type="text" id="editDeptPhone" name="deptPhone">
                     </div>
                     <div class="form-group">
                         <label>부서장 사번</label>
-        
                         <input type="text" id="editManagerEmpNo" name="managerEmpNo">
                     </div>
                     
                     <button type="button" class="btn-manage-custom" style="background-color: #36b9cc;" onclick="submitUpdateDept()">
-                
                         <i class="fas fa-save"></i> 수정 저장
                     </button>
                 </form>
@@ -309,7 +295,6 @@
 			<div class="modal-body-custom">
 				<div class="warning-text">
 					<i class="fas fa-exclamation-triangle"></i> 
-           
 					<span>주의: 삭제 시 해당 부서원들은 모두 '무소속' 처리됩니다. 이 작업은 되돌릴 수 없습니다.</span>
 				</div>
 				<div class="form-group">
@@ -318,7 +303,7 @@
 						<option value="">부서를 선택하세요</option>
 						<c:forEach var="d" items="${deptList}">
 							<c:if test="${d.deptNo != 1001}">
-								<option value="${d.deptNo}">${d.deptName}(${d.deptNo})</option>
+								<option value="${d.deptNo}" data-manager="${d.managerEmpNo}">${d.deptName}(${d.deptNo})</option>
 							</c:if>
 						</c:forEach>
 					</select>
@@ -386,14 +371,12 @@
 			<div class="modal-body-custom">
 				<form id="finalApprovalForm">
 					<input type="hidden" name="empNo" value="${sessionScope.login.empNo}"> 
-                    <input type="hidden" name="deptNo" id="draftDeptNo"> 
-    
+                    <input type="hidden" name="deptNo" id="draftDeptNo" value="${sessionScope.login.deptNo}">
                     <input type="hidden" name="DocType" value="6">
                     <input type="hidden" name="step1ManagerNo" value="${sessionScope.login.managerEmpNo}">
 					<input type="hidden" name="step2ManagerNo" value="${sessionScope.login.parentDeptNo}"> 
                     <input type="hidden" name="targetEmpNo" id="draftTargetEmpNo"> 
                     <input type="hidden" name="targetDeptNo" id="draftTargetDeptNo"> 
-     
                     <input type="hidden" name="memo" id="draftMemo">
                     <input type="hidden" name="docDate" id="draftDocDate">
 
@@ -420,8 +403,12 @@
 
   <script>
         const contextPath = '${pageContext.request.contextPath}';
-        const isAdminUser = ${isAdmin != null ? isAdmin : false};
-        console.log("현재 접속자 관리자 권한 여부:", isAdminUser); 
+        // [수정] 세분화된 권한 변수 설정 (Controller에서 값 전달됨)
+        const canCreateAuth = ${canCreateAuth}; // 부서 생성/수정/삭제, 부서장 임명/해임
+        const canMoveAuth = ${canMoveAuth};     // 부서원 이동/제외
+        const canViewAuth = ${canViewAuth};     // 부서원 상세 보기
+
+        console.log("권한 확인 - 생성:", canCreateAuth, ", 이동:", canMoveAuth, ", 조회:", canViewAuth); 
     </script>
 
     <script src="${pageContext.request.contextPath}/js/dept.js?v=<%=System.currentTimeMillis()%>"></script>
