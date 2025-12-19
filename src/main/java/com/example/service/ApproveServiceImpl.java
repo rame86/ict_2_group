@@ -1,5 +1,6 @@
 package com.example.service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,27 +46,29 @@ public class ApproveServiceImpl implements ApproveService {
         
         // 2. [파일 처리 로직 추가]
         if (upfile != null && !upfile.isEmpty()) {
-            // 저장 경로 설정 (사용자님 요청: upload/approve)
-            // 실제 서버의 절대 경로로 설정하는 것이 좋습니다 (예: C:/upload/approve/)
-            String savePath = "C:/upload/approve/"; 
-            java.io.File folder = new java.io.File(savePath);
+            // 프로젝트 루트 경로를 가져옵니다.
+            String projectPath = System.getProperty("user.dir");
+            // 저장될 상세 경로 (프로젝트 내부 static 폴더 하위)
+            String savePath = projectPath + File.separator + "src" + File.separator + "main" 
+                             + File.separator + "resources" + File.separator + "static" 
+                             + File.separator + "upload" + File.separator + "approve" + File.separator;
             
-            // 폴더가 없으면 생성
+            File folder = new File(savePath);
             if (!folder.exists()) {
                 folder.mkdirs();
             }
 
-            // 원본 파일명 및 저장용 파일명 생성
             String originName = upfile.getOriginalFilename();
             String changeName = System.currentTimeMillis() + "_" + originName;
 
             try {
                 // 파일 실제 저장
-                upfile.transferTo(new java.io.File(savePath + changeName));
+                upfile.transferTo(new File(savePath + changeName));
                 
-                // DocVO에 파일 정보 세팅 (DB 컬럼명에 맞춰 VO에 필드가 있어야 함)
                 dvo.setOriginName(originName);
                 dvo.setChangeName(changeName);
+                
+                log.info("파일 저장 성공: " + savePath + changeName);
                 
             } catch (java.io.IOException e) {
                 log.error("파일 저장 중 오류 발생: {}", e.getMessage());
