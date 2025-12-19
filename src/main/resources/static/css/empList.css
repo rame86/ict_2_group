@@ -37,21 +37,22 @@ html, body {
    - 원래 화면처럼 가운데 정렬 + 적당한 여백 유지
    ========================================= */
 .content-wrapper {
-  padding: 24px 32px;
+  padding: 24px -20px;
   max-width: 1440px;    /* 16:9 발표 환경에서 안정적인 폭 */
-  margin: 0 auto;       /* ✅ 원래(오른쪽) 느낌 유지 핵심 */
+   margin: 0 ;    /* ✅ 원래(오른쪽) 느낌 유지 핵심 */
 }
 
-/* 상단 제목 영역 */
-.page-header {
+/* /* 상단 제목 영역 */
+.page-header
+{
   margin-bottom: 20px;
   padding-bottom: 8px;
   border-bottom: 4px double #869ABF;
-}
+ width: 100%;   
+} */
 
 /* "사원 목록" 타이틀 */
 .page-title {
-  margin-top: 20px;
   font-size: 30px;
   font-weight: 600;
   color: #000;
@@ -544,12 +545,38 @@ table.dataTable thead th.sorting_desc:after {
 }
 
 .grade-guide{
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.6;
   color: #6B7280;
   white-space: normal;   /* 줄바꿈 허용 */
   word-break: keep-all; /* 한글 단어 깨짐 방지 */
 }
 
+/* ✅ 사원목록 페이지: 왼쪽 여백이 창 크기에 따라 늘지 않게 고정 */
+.emp-list-fixed{
+  width: 100%;
+  max-width: none;     /* 혹시 max-width로 가운데 몰아두던 거 해제 */
+  margin: 0;           /* ⭐ margin: 0 auto; 제거 효과 */
+  padding-left: 0px;  /* 왼쪽 시작 간격은 여기서 고정(원하는 값으로) */
+  box-sizing: border-box;
+   margin-left: 0 !important; 
+   margin-right: 0 !important; 
+   padding-top : 20px;
+}
 
+/* page-title-line을 "진짜 밑줄"로 사용 */
+.emp-list-fixed .page-title-line{
+  height: 0;
+  border-bottom: 4px double #869ABF;   /* 기존과 동일한 '두 줄' */
+  width: calc(100vw - 225px - 64px);  /* 225px=사이드바 폭(기본), 64px=좌우 여백 보정 */
+  max-width: none;
+  margin: 8px 0 18px 0;
+ 
+}
 
+/* ✅ (사원목록) 밑줄만 화면 끝까지 길게 */
+.emp-list-fixed .page-header{
+  border-bottom: none;          /* 기존 밑줄 제거(두 줄 중복 방지) */
+  padding-bottom: 0;
+  margin-bottom: 8px;
+}

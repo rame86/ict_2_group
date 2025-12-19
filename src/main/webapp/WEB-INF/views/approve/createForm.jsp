@@ -15,10 +15,7 @@
 <head>
 <meta charset="UTF-8">
 <title>approve - createForm</title>
-<link href="https://cdn.jsdelivr.net/npm/suit-font/dist/suit.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
 <style>
-    body { font-family: 'SUIT', sans-serif; background-color: #f8f9fc; }
     
     .unified-card {
         border-radius: 12px;
@@ -288,6 +285,13 @@
         const hiddenDocType = document.getElementById("documentTypeInput");
         const templates = document.querySelectorAll(".doc-template");
         const cardTitle = document.getElementById("selectedDocTitle");
+        
+        templates.forEach((tpl, index) => {
+            const textarea = tpl.querySelector("textarea");
+            if (index !== 0) { // 첫 번째가 아니면
+                if(textarea) textarea.setAttribute("disabled", "disabled"); // 전송 안 되게 막음
+            }
+        });
 
         buttons.forEach(btn => {
             btn.addEventListener("click", () => {
@@ -302,15 +306,22 @@
                 templates.forEach(tpl => {
                     tpl.classList.add("d-none");
                     const textarea = tpl.querySelector("textarea");
-                    if(textarea) textarea.removeAttribute("required");
+                    if(textarea) {
+                        textarea.removeAttribute("required");
+                        textarea.setAttribute("disabled", "disabled"); // 핵심: 숨겨진 건 전송 제외
+                    }
                 });
                 
                 const selectedTemplate = document.getElementById("template" + docType);
                 if(selectedTemplate) {
                     selectedTemplate.classList.remove("d-none");
                     const selectedTextarea = selectedTemplate.querySelector("textarea");
-                    if(selectedTextarea) selectedTextarea.setAttribute("required", "required");
+                    if(selectedTextarea) {
+                        selectedTextarea.setAttribute("required", "required");
+                        selectedTextarea.removeAttribute("disabled"); // 핵심: 이것만 전송되게 풀기
+                    }
                 }
+                
             });
         });
 
