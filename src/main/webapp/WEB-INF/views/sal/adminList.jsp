@@ -205,7 +205,7 @@
 
 												<!-- 정정(관리자 편집폼) -->
 												<td class="text-center">
-												<a href="${pageContext.request.contextPath}/sal/admin/edit?salNum=${s.salNum}">신청</a>
+												<a href="${pageContext.request.contextPath}/sal/admin/edit?salNum=${s.salNum}">정정</a>
 
 											</tr>
 										</c:forEach>
