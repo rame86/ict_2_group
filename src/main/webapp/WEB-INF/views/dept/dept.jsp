@@ -294,8 +294,8 @@
 			</div>
 			<div class="modal-body-custom">
 				<div class="warning-text">
-					<i class="fas fa-exclamation-triangle"></i> 
-					<span>주의: 삭제 시 해당 부서원들은 모두 '무소속' 처리됩니다. 이 작업은 되돌릴 수 없습니다.</span>
+					
+					<span><i class="fas fa-exclamation-triangle"></i> 주의: 삭제 시 해당 부서원들은 모두 '무소속' 처리됩니다. 이 작업은 되돌릴 수 없습니다.</span>
 				</div>
 				<div class="form-group">
 					<label for="deleteDeptSelect">삭제할 부서 선택</label> 
