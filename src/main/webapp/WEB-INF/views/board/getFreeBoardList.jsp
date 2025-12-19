@@ -8,6 +8,17 @@
 <title>자유 게시판</title>
 <style>
 /* -------------------- [모달 스타일 리뉴얼] -------------------- */
+/* 자유 게시판용 연분홍 클래스 */
+.bg-custom-pink {
+    background-color: #F7CAC9 !important;
+    color: white !important;
+}
+
+/* 공지 게시판용 파란색 클래스 */
+.bg-custom-blue {
+    background-color: #0d6efd !important;
+    color: white !important;
+}
 #boardModal .modal-content {
 	border: none;
 	border-radius: 15px;
@@ -247,7 +258,7 @@
 				<div class="modal fade" id="writeModal" tabindex="-1" aria-hidden="true">
 					<div class="modal-dialog modal-lg">
 						<div class="modal-content">
-							<div class="modal-header bg-pink text-white">
+							<div class="modal-header bg-custom-pink text-white">
 								<h5 class="modal-title">새 글 작성</h5>
 								<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
 							</div>
