@@ -11,13 +11,16 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         String uploadPath = "file:///" + System.getProperty("user.dir")
                 + "/src/main/resources/static/upload/";
+        
+        // approve설정
+        String myExternalPath = "file:///C:/upload/";
 
 		/* 프로젝트 루트 기준 업로드 경로 : 프로젝트 내부(static/upload)로 고정해서 사용
         	▶ 경로 통일
         *   ▶ 팀원 혼란 방지
         *   ▶ 빠른 안정화*/
         registry.addResourceHandler("/upload/**")
-                .addResourceLocations(uploadPath);
+                .addResourceLocations(uploadPath, myExternalPath);
         
 		/*  CSS / JS 정적 리소스 */
 

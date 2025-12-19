@@ -5,13 +5,28 @@
 <link href="https://cdn.jsdelivr.net/npm/suit-font/dist/suit.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
 <style>
-    body { font-family: 'SUIT', sans-serif; }
+    /* 카드 및 헤더 스타일 */
+    .card {
+        border-radius: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.17);
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.08);
+        background-color: #fff;
+    }
     
-    /* 도장 애니메이션 (기존 위치 유지) */
+    .unified-card-header {
+        padding: 1rem 1.5rem;
+        background-color: #92A8D1;
+        border-bottom: 1px solid #f1f4f8;
+        font-weight: 700;
+        color: #FFFFFF;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    /* 도장 애니메이션 */
     .stamp {
         position: absolute;
         right: 40px;
-        top: 40px;
+        top: 65px;
         width: 120px;
         opacity: 0;
         transform: rotate(-20deg) scale(0.3);
@@ -24,16 +39,14 @@
         transform: rotate(-20deg) scale(1);
     }
 
-    /* 패딩 및 간격 최적화 (createForm 기준) */
     .detail-body {
         padding: 2.5rem !important;
-        /* 전체적인 내부 간격을 넓힘 */
     }
 
     .form-group-row {
         display: flex;
         align-items: center;
-        margin-bottom: 1.5rem; /* 요소 간 간격 확대 */
+        margin-bottom: 1.5rem;
         width: 100%;
     }
     .info-item {
@@ -43,24 +56,23 @@
     }
     .label-box {
         width: 110px;
-        /* 라벨 너비 최적화 */
         font-size: 0.9rem;
         font-weight: 700;
         color: #4a5568;
         flex-shrink: 0;
     }
+    
     .input-box { flex: 1; position: relative; }
 
     .input-custom {
         width: 100%;
-        padding: 0.5rem 0.8rem;
+        padding: 0.6rem 1rem;
         font-size: 0.9rem;
         border: 1px solid #d1d9e6;
         border-radius: 8px;
-        background-color: #f8f9fc;
+        background-color: #fff;
+        transition: 0.2s;
         color: #333;
-        border: none;
-        /* 선을 없애 더 깔끔하게 처리 가능 */
     }
     
     .textarea-custom {
@@ -71,56 +83,153 @@
         border-radius: 8px;
         resize: none;
         font-size: 0.95rem;
-        /* createForm 기준 */
         line-height: 1.7;
         background-color: #fff;
         outline: none;
-        /* div로 변경 시 스크롤 처리를 위해 추가 */
-        overflow-y: auto; 
+        overflow-y: auto;
+        white-space: pre-wrap;
     }
 
-    /* 콤팩트한 결재 진행 상황 (가로 배치) */
-    .compact-approval {
+    /* ✅ 수정된 결재 프로세스 라인 (3단계 및 동그란 테두리 적용) */
+    .approval-flow-container {
         display: flex;
-        gap: 20px;
-        padding: 10px 15px;
-        background: #f1f4f8;
-        border-radius: 8px;
-        font-size: 0.85rem;
-        margin-bottom: 1.5rem;
+        align-items: center;
+        width: 100%;
+        padding: 15px 0;
+        border-radius: 12px;
     }
-    .status-badge {
+    .approval-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        min-width: 100px;
+    }
+    .step-title {
+        font-size: 0.8rem;
         font-weight: 700;
-        margin-left: 5px;
+        color: #adb5bd;
     }
-    .text-ok { color: #1cc88a; }
+    .step-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 2px solid #d1d9e6;
+        background-color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: #4a5568;
+        font-size: 0.8rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .status-text {
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+    }
+
+    /* 긴 화살표 구현 (CSS 직접 그림) */
+    .long-arrow {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 10px;
+        position: relative;
+        height: 20px;
+    }
+    .long-arrow::before {
+        content: "";
+        width: 100%;
+        height: 1px;
+        border-top: 1px dashed #cbd5e0;
+    }
+    .long-arrow::after {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-top: 2px solid #cbd5e0;
+        border-right: 2px solid #cbd5e0;
+        transform: rotate(45deg);
+        position: absolute;
+        right: 0;
+        background: transparent;
+    }
+
     .text-wait { color: #858796; }
+    .text-ok { color: #1cc88a; }
     .text-no { color: #e74a3b; }
 
-    /* 파일 미리보기 영역 */
+    /* 파일 미리보기 및 버튼 영역 */
     .preview-card {
         border: 1px solid #d1d9e6;
         border-radius: 8px;
         background-color: #f8f9fc;
         padding: 20px;
-        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
+        min-height: 493px;
     }
     .preview-img {
         max-width: 100%;
-        max-height: 450px;
+        max-height: 200px;
         border-radius: 6px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .action-buttons-wrapper {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #f1f4f8;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .left-section{
+    	padding-right : 2.5rem;
+    }
+    .preivew-box2{
+    	width : 120px;
+    }
+    
+    .btn-reset-custom {
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        color: #4b5563;
+        padding: 0.6rem 2.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
+    
+    .btn-submit-custom {
+        background-color: #4e73df;
+        border: 1px solid #4e73df;
+        color: #fff;
+        padding: 0.6rem 3.5rem;
+        font-size: 0.9rem;
+        font-weight: 700;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(78, 115, 223, 0.2);
+        transition: 0.2s;
     }
 </style>
 
 <div class="container-fluid px-4">
-    <h3 class="mt-4 mb-4">문서 상세 보기</h3>
-
+    <h3 class="mt-4">문서 상세 보기</h3>
+	<br>
     <div class="card position-relative">
+        <div class="unified-card-header">
+            <i class="fas fa-file-alt me-2"></i>결재 문서 상세 정보
+        </div>
+
         <svg id="approveStamp" class="stamp" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <circle cx="50" cy="50" r="45" fill="none" stroke="#e74c3c" stroke-width="5"/>
             <circle cx="50" cy="50" r="38" fill="none" stroke="#e74c3c" stroke-width="2" stroke-dasharray="4 2"/>
@@ -129,13 +238,12 @@
 
         <div class="card-body detail-body">
             <div class="row">
-                <div class="col-xl-8 col-lg-7">
-                    
+                <div class="col-xl-8 col-lg-7 left-section">
                     <div class="form-group-row">
                         <div class="info-item">
                             <div class="label-box">문서 제목</div>
                             <div class="input-box">
-                                <span class="input-custom d-block fw-bold">${vo.docTitle}</span>
+                                <span class="input-custom d-block">${vo.docTitle}</span>
                             </div>
                         </div>
                         <div class="info-item ms-4">
@@ -158,61 +266,65 @@
                             <div class="input-box">
                                 <c:choose>
                                     <c:when test="${not empty vo.originName}">
+                                    <span class="input-custom d-block">
                                         <a href="/approve/download?changeName=${vo.changeName}&originName=${vo.originName}" class="text-primary fw-bold text-decoration-none small">
                                             <i class="fas fa-download me-1"></i>${vo.originName}
                                         </a>
+                                    </span>
                                     </c:when>
                                     <c:otherwise>
-                                        <span class="text-muted small">없음</span>
+                                        <span class="input-custom d-block">없음</span>
                                     </c:otherwise>
                                 </c:choose>
                             </div>
                         </div>
                     </div>
 
-                    <div class="compact-approval">
-                        <span class="fw-bold"><i class="fas fa-tasks me-2"></i>결재 상황:</span>
-                        <span>
-                            1차(${vo.step1ManagerName}) 
-                            <c:choose>
-                                <c:when test="${vo.step1Status == 'A'}"><span class="status-badge text-ok">승인 ✔</span></c:when>
-                                <c:when test="${vo.step1Status == 'R'}"><span class="status-badge text-no">반려 ✘</span></c:when>
-                                <c:otherwise><span class="status-badge text-wait">대기</span></c:otherwise>
-                            </c:choose>
-                        </span>
-                        <span class="text-muted mx-2">|</span>
-                        <span>
-                            2차(${vo.step2ManagerName}) 
-                            <c:choose>
-                                <c:when test="${vo.step2Status == 'A'}"><span class="status-badge text-ok">승인 ✔</span></c:when>
-                                <c:when test="${vo.step2Status == 'R'}"><span class="status-badge text-no">반려 ✘</span></c:when>
-                                <c:otherwise><span class="status-badge text-wait">대기</span></c:otherwise>
-                            </c:choose>
-                        </span>
-                    </div>
+                    <div class="approval-flow-container">
+                        <div class="label-box">결재 현황</div>
+                        
+                        <div class="approval-step">
+                            <span class="step-title">기안</span>
+                            <div class="step-circle">${vo.writerName}</div>
+                            <div class="status-text text-ok"><i class="fas fa-pen-nib"></i> 기안완료</div>
+                        </div>
 
-                    <div class="mt-4">
-                        <div class="label-box mb-2">상세 내용</div>
-                        <%-- 수정됨: textarea를 div로 변경하여 HTML 태그가 렌더링 되도록 함 --%>
-                        <div class="textarea-custom">
-                            ${vo.docContent}
+                        <div class="long-arrow"></div>
+
+                        <div class="approval-step">
+                            <span class="step-title">1차 결재자</span>
+                            <div class="step-circle">${vo.step1ManagerName}</div>
+                            <div class="status-text">
+                                <c:choose>
+                                    <c:when test="${vo.step1Status == 'A'}"><span class="text-ok"><i class="fas fa-check-circle"></i> 승인</span></c:when>
+                                    <c:when test="${vo.step1Status == 'R'}"><span class="text-no"><i class="fas fa-times-circle"></i> 반려</span></c:when>
+                                    <c:otherwise><span class="text-wait"><i class="fas fa-clock"></i> 대기</span></c:otherwise>
+                                </c:choose>
+                            </div>
+                        </div>
+
+                        <div class="long-arrow"></div>
+
+                        <div class="approval-step">
+                            <span class="step-title">2차 결재자</span>
+                            <div class="step-circle">${vo.step2ManagerName}</div>
+                            <div class="status-text">
+                                <c:choose>
+                                    <c:when test="${vo.step2Status == 'A'}"><span class="text-ok"><i class="fas fa-check-circle"></i> 승인</span></c:when>
+                                    <c:when test="${vo.step2Status == 'R'}"><span class="text-no"><i class="fas fa-times-circle"></i> 반려</span></c:when>
+                                    <c:otherwise><span class="text-wait"><i class="fas fa-clock"></i> 대기</span></c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-center gap-3 mt-4 pt-4 border-top">
-                        <c:if test="${sessionScope.login.empNo == vo.step1ManagerNo || sessionScope.login.empNo == vo.step2ManagerNo}">
-                            <form action="approveDocument" method="post" id="approveForm" class="d-flex gap-2">
-                                <input type="hidden" name="docNo" value="${ vo.docNo }">
-                                <button class="btn btn-success px-5 fw-bold" id="approveBtn" type="button" style="border-radius:8px;">승인</button>
-                                <button class="btn btn-danger px-5 fw-bold" type="button" data-bs-toggle="modal" data-bs-target="#rejectModal" style="border-radius:8px;">반려</button>
-                            </form>
-                        </c:if>
-                        <a href="/approve/receiveList" class="btn btn-secondary px-4 fw-bold" style="border-radius:8px;">목록으로</a>
+                    <div class="mt-4">
+                        <div class="textarea-custom">${vo.docContent}</div>
                     </div>
                 </div>
 
                 <div class="col-xl-4 col-lg-5 mt-4 mt-lg-0">
-                    <div class="label-box mb-2"><i class="fas fa-image me-2"></i>파일 미리보기</div>
+                    <div class="label-box mb-2 preivew-box2"><i class="fas fa-image me-2"></i>파일 미리보기</div>
                     <div class="preview-card">
                         <c:choose>
                             <c:when test="${not empty vo.originName}">
@@ -226,33 +338,24 @@
                                 </c:if>
                             </c:when>
                             <c:otherwise>
-                                <i class="fas fa-folder-open fa-4x text-gray-200"></i>
+                                <i class="fas fa-folder-open fa-2x text-gray-200"></i>
                                 <p class="mt-3 text-muted small">첨부파일 없음</p>
                             </c:otherwise>
                         </c:choose>
                     </div>
+
+                    <div class="action-buttons-wrapper">
+                        <c:if test="${sessionScope.login.empNo == vo.step1ManagerNo || sessionScope.login.empNo == vo.step2ManagerNo}">
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-submit-custom flex-fill fw-bold py-2" id="approveBtn" type="button">승인</button>
+                                <button class="btn btn-submit-custom flex-fill fw-bold py-2" type="button" data-bs-toggle="modal" data-bs-target="#rejectModal">반려</button>
+                            </div>
+                        </c:if>
+                        <a href="/approve/receiveList" class="btn btn-reset-custom w-100 py-2">목록으로 이동</a>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<div class="modal fade" id="rejectModal" tabindex="-1">
-    <div class="modal-dialog">
-        <form method="post" action="approveDocument" class="modal-content">
-            <input type="hidden" name="docNo" value="${ vo.docNo }">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">반려 사유 입력</h5>
-                <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <textarea name="rejectReason" class="form-control" rows="5" placeholder="반려 사유를 입력하세요" required></textarea>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">취소</button>
-                <button class="btn btn-danger" id="rejectBtn">반려 확정</button>
-            </div>
-        </form>
     </div>
 </div>
 
