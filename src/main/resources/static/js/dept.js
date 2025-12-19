@@ -21,29 +21,35 @@ function showDeptModal(deptId, deptName, managerName) {
 
     if (modalDeptName) modalDeptName.textContent = deptName;
 
+    // 모달 헤더에 '부서장 임명' 버튼 동적 추가
     const header = document.querySelector('#deptInfoModal .modal-header-custom');
+    
+    // 기존 내용 유지하며 버튼만 주입하기 위해 HTML 다시 구성
+    let closeBtn = `<span id="closeModalBtn" class="close-btn" onclick="closeModal()">&times;</span>`;
     let appointBtnHtml = '';
 
     if (!currentManagerName && typeof canCreateAuth !== 'undefined' && canCreateAuth) {
         appointBtnHtml = `
-            <button class="btn-xs" style="margin-left:auto; margin-right:10px; background:#fff; color:#4e73df; border:none; border-radius:4px; font-weight:bold; cursor:pointer;" 
+            <button class="btn-xs" style="margin-left:auto; margin-right:15px; background:#fff; color:#4e73df; border:1px solid #4e73df; border-radius:4px; font-weight:bold; cursor:pointer; padding: 5px 10px;" 
                     onclick="openAppointModal()">
                 + 부서장 임명
             </button>
         `;
+    } else {
+        appointBtnHtml = `<span style="margin-left:auto;"></span>`; // 공간 차지용
     }
 
     if (header) {
         header.innerHTML = `
-            <h5 style="margin:0;">${deptName}</h5>
+            <h5 style="margin:0; font-weight:bold; color:#4e73df;">${deptName}</h5>
             ${appointBtnHtml}
-            <span id="closeModalBtn" class="close-btn" onclick="closeModal()">&times;</span>
+            ${closeBtn}
         `;
     }
 
     if (modal) {
-        modal.style.display = 'block';
-        document.body.style.overflow = 'hidden';
+        modal.style.display = 'block'; // CSS에서 display:none 상태를 block으로 변경
+        document.body.style.overflow = 'hidden'; // 배경 스크롤 잠금
     }
 
     if (employeeListUl) {
@@ -67,6 +73,7 @@ function loadEmployeeList(deptId) {
                 return;
             }
 
+            // 부서장 > 직급순 정렬
             data.sort(function(a, b) {
                 if (a.empName === currentManagerName) return -1;
                 if (b.empName === currentManagerName) return 1;
@@ -78,16 +85,16 @@ function loadEmployeeList(deptId) {
                 let imgSrc = emp.empImage ? contextPath + '/upload/emp/' + emp.empImage : contextPath + '/images/default_profile.png';
                 let jobTitle = emp.jobTitle ? emp.jobTitle : '사원';
                 let isManager = (emp.empName === currentManagerName);
-                let nameStyle = isManager ? "font-weight:bold; color:#0056b3;" : "";
+                let nameStyle = isManager ? "font-weight:bold; color:#4e73df;" : "";
 
                 let btnHtml = '';
 
                 if (isManager) {
                     if (typeof canCreateAuth !== 'undefined' && canCreateAuth) {
                         btnHtml = `
-                            <div class="emp-actions" style="display:flex; align-items:center;">
+                            <div class="emp-actions" style="margin-left: auto; display:flex; align-items:center;">
                                 <span style="font-size:11px; color:#fff; background:#4e73df; padding:2px 6px; border-radius:4px; margin-right:5px;">MANAGER</span>
-                                <button class="btn-xs" style="background:#e74a3b; color:#fff; border:none; border-radius:4px; padding:2px 6px; cursor:pointer;" 
+                                <button class="btn-xs" style="background:#e74a3b; color:#fff; border:none; border-radius:4px; padding:4px 8px; cursor:pointer;" 
                                         onclick="submitDismissManager(event, '${emp.empNo}', '${emp.empName}')">
                                     해임
                                 </button>
@@ -99,7 +106,7 @@ function loadEmployeeList(deptId) {
                 } else {
                     if (typeof canMoveAuth !== 'undefined' && canMoveAuth) {
                         btnHtml = `
-                            <div class="emp-actions">
+                            <div class="emp-actions" style="margin-left: auto;">
                                 <button class="btn-xs btn-move" onclick="openMoveModal(event, '${emp.empNo}', '${emp.empName}')">이동</button>
                                 <button class="btn-xs btn-exclude" onclick="submitExcludeEmp(event, '${emp.empNo}', '${emp.empName}')">제외</button>
                             </div>
@@ -112,7 +119,7 @@ function loadEmployeeList(deptId) {
                         <img src="${imgSrc}" class="emp-thumb" alt="프로필">
                         <div class="emp-details">
                             <span class="emp-name" style="${nameStyle}">${emp.empName}</span>
-                            <span class="position" style="font-size:12px;">${jobTitle}</span>
+                            <span class="position" style="font-size:12px; color:#888;">${jobTitle}</span>
                         </div>
                         ${btnHtml}
                     </li>
@@ -128,7 +135,7 @@ function loadEmployeeList(deptId) {
 
 function closeModal() {
     if (modal) modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
+    document.body.style.overflow = 'auto'; // 스크롤 잠금 해제
 }
 
 function goToEmployeeMgmt(empId) {
@@ -248,13 +255,11 @@ function submitCreateDept() {
     });
 }
 
-// [수정] 부서 삭제 시 안전장치 강화
 function submitDeleteDept() {
     const select = document.getElementById('deleteDeptSelect');
     const targetDeptNo = select.value;
     if (!targetDeptNo) { alert("부서 선택 필요"); return; }
 
-    // 1. [핵심] 클라이언트 측 안전장치 체크
     const selectedOption = select.options[select.selectedIndex];
     const managerNo = selectedOption.getAttribute('data-manager');
 
@@ -352,8 +357,7 @@ window.onclick = function(event) {
         const modalEl = document.getElementById(id);
         if (event.target === modalEl) {
             modalEl.style.display = 'none';
-            // [중요] 배경 클릭으로 닫을 때도 반드시 스크롤을 활성화합니다.
-            document.body.style.overflow = 'auto'; 
+            document.body.style.overflow = 'auto'; // 배경 클릭시 스크롤 잠금 해제
         }
     });
 }
