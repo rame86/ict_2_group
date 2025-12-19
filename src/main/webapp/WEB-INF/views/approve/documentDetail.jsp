@@ -359,6 +359,24 @@
     </div>
 </div>
 
+	<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="rejectModalLabel">반려 사유 입력</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea name="rejectReason" class="form-control" rows="5" placeholder="반려 사유를 입력하세요" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-danger" id="rejectBtn">반려 확정</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 <script>
 $(document).ready(function(){
     $("#approveBtn").on("click", function(){
