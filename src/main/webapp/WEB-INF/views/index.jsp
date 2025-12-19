@@ -272,7 +272,7 @@
                    
                     <div class="welcome-banner p-4 mt-4 mb-4 d-flex justify-content-between align-items-center shadow-sm">
                         <div>
-                            <h1 class="display-6 fw-bold">Hello, PeopleSync!</h1>
+                            <h1 class="display-7 fw-bold mb-4">Hello, PeopleSync!</h1>
                             <p class="lead mb-0">
                                 안녕하세요, <strong>${sessionScope.login.deptName}</strong>팀 
                                 <strong>${sessionScope.login.empName}</strong>님!
