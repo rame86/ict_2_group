@@ -310,7 +310,7 @@ html, body {
   border: 1px solid #d7e3ff;
   box-shadow: none;
   width: 100%;
-  max-width: 260px;
+  max-width: 300px;
 }
 
 .form-control:focus,
@@ -365,7 +365,7 @@ input:focus::placeholder {
   margin-top: 6px;
   line-height: 1.35;
   color: #6B7280;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .grade-hint > span {

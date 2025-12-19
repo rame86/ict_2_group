@@ -184,6 +184,7 @@ $(document).ready(function () {
 
   <div id="layoutSidenav_content">
     <main>
+    <div class="emp-list-wrap emp-list-fixed">
       <div class="container-fluid px-4">
         <div class="content-wrapper">
 
@@ -192,7 +193,7 @@ $(document).ready(function () {
 
             <!-- 1) 제목 -->
             <div class="page-header">
-              <h1 class="page-title">사원 목록</h1>
+              <h2 class="page-title">사원 목록</h2>
             </div>
 				 <div class="page-title-line"></div>
             <!-- =========================================================
@@ -375,6 +376,7 @@ $(document).ready(function () {
         </div>
         <!-- end content-wrapper -->
       </div>
+ </div>    <!-- end emp-list-wrap emp-list-fixed -->
     </main>
 
     <!-- 푸터 -->
