@@ -122,12 +122,14 @@
 
 					<h1 class="mt-4">공지 게시판</h1>
 
-					<%-- 글쓰기 버튼 --%>
-					<div class="d-flex justify-content-end mb-3">
-						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#writeModal">
-							<i class="fas fa-pen me-1"></i> 새 공지 작성
-						</button>
-					</div>
+					<%-- 글쓰기 버튼: 권한이 있는 사용자(3등급 이내)만 노출 --%>
+					<c:if test="${canWriteNotice}">
+						<div class="d-flex justify-content-end mb-3">
+							<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#writeModal">
+								<i class="fas fa-pen me-1"></i> 새 공지 작성
+							</button>
+						</div>
+					</c:if>
 
 					<%-- 전체 공지사항 카드 --%>
 					<div class="card mb-4">
@@ -250,14 +252,20 @@
 										<input type="hidden" name="empNo" value="${ sessionScope.login.empNo }">
 									</div>
 									
-									<%-- 게시 대상 선택: 권한(canWriteGlobal)이 있을 때만 전체 공지 옵션 표시 --%>
+									<%-- 게시 대상 선택: 1,2등급(canWriteGlobal)일 때만 전체 공지 옵션 표시 --%>
 									<div class="mb-3">
 										<label class="form-label fw-bold">게시 대상 선택</label> 
 										<select class="form-select" name="deptNo">
-											<c:if test="${canWriteGlobal}">
-												<option value="0" class="text-danger fw-bold">📢 전체 공지 (전 직원)</option>
-											</c:if>
-											<option value="${sessionScope.login.deptNo}" selected>🏢 부서 공지 (${sessionScope.login.deptName})</option>
+											<c:choose>
+												<c:when test="${canWriteGlobal}">
+													<option value="0" class="text-danger fw-bold">📢 전체 공지 (전 직원)</option>
+													<option value="${sessionScope.login.deptNo}" selected>🏢 부서 공지 (${sessionScope.login.deptName})</option>
+												</c:when>
+												<c:otherwise>
+													<%-- 3등급은 부서 공지 고정 --%>
+													<option value="${sessionScope.login.deptNo}" selected>🏢 부서 공지 (${sessionScope.login.deptName})</option>
+												</c:otherwise>
+											</c:choose>
 										</select>
 									</div>
 									
@@ -460,8 +468,8 @@
 							var loginGrade = "${sessionScope.login.gradeNo}";
 							var loginName = "${sessionScope.login.empName}";
 							
-							// 관리자(등급<=2) 이거나 작성자 본인이면 수정/삭제 가능
-							if (loginGrade <= 2 || loginName == response.noticeWriter) {
+							// 관리자(등급<=2) 이거나 작성자 본인이면 수정/삭제 가능 -> 로직 단순화: 3등급(관리자) 이하거나 본인이면
+							if (loginGrade <= 3 || loginName == response.noticeWriter) {
 								$btnModify.show();
 								$btnModify.data('title', response.noticeTitle);
 								$btnModify.data('content', response.noticeContent);
@@ -472,8 +480,7 @@
 							
 							new bootstrap.Modal(document.getElementById('boardModal')).show();
 							// 모달 뜨면서 댓글 로드
-							loadReplies(noticeNo); 
-
+							loadReplies(noticeNo);
 						} else {
 							alert("삭제되었거나 존재하지 않는 게시글입니다.");
 						}
@@ -518,15 +525,14 @@
 					success : function(response) {
 						if (response && response.noticeContent) {
 							$boardModal.find('#modalContentText').text(response.noticeContent);
-							
 							// [NEW] 작성자 이미지 교체
 							var writerImg = response.empImage; 
 							if(writerImg) {
 								$boardModal.find('#modalWriterImg').attr('src', '${pageContext.request.contextPath}/upload/emp/' + writerImg);
 							}
 							
-							// 권한 체크: 관리자(등급<=2) 이거나 작성자 본인이면 수정/삭제 버튼 노출
-							if ("${sessionScope.login.gradeNo}" <= 2 ||
+							// 권한 체크: 3등급 이하(관리자급) 이거나 작성자 본인이면 수정/삭제 버튼 노출
+							if ("${sessionScope.login.gradeNo}" <= 3 ||
 								"${sessionScope.login.empName}" == response.noticeWriter) {
 								
 								$btnModify.show();
@@ -570,12 +576,13 @@
 
 				new bootstrap.Modal(document.getElementById('modifyModal')).show();
 			});
-			
+
 			// 삭제 버튼 클릭 이벤트
             $btnDelete.on('click', function() {
                 if(confirm("정말 이 공지사항을 삭제하시겠습니까?\n포함된 댓글도 모두 삭제됩니다.")) {
                     var noticeNo = $('#currentNoticeNo').val();
                     $('#deleteNoticeNo').val(noticeNo);
+                
                     $('#deleteForm').submit();
                 }
             });
@@ -593,12 +600,14 @@
 	            data: { noticeNo: no },
 	            dataType: 'json', 
 	            success: function(list) {
+		      
 		        	let totalCount = list ? list.length : 0;
 		        	$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글 (' + totalCount + ')');
 		        	
 	                let html = '';
 	                if(list.length === 0){
 	                    html = '<p class="text-center text-muted my-3">작성된 댓글이 없습니다.</p>';
+	  
 	                } else {
 	                    list.forEach(reply => {
 	                        let date = new Date(reply.replyCreatedAt);
@@ -609,13 +618,12 @@
 			            	
 			            	// [NEW] 댓글 작성자 이미지
 			            	let replyImgSrc = DEFAULT_IMG;
-                            if(reply.replyWriterImage) {
+			            	if(reply.replyWriterImage) {
                                 replyImgSrc = '${pageContext.request.contextPath}/upload/emp/' + reply.replyWriterImage;
-                            }
+							}
 			            	
 	                        html += '<div class="comment-card" id="reply-' + reply.replyNo + '">';
-	                        
-	                        // [NEW] 댓글 레이아웃 (flex)
+                            // [NEW] 댓글 레이아웃 (flex)
                             html += '  <div class="d-flex">';
                             // 1. 프로필 이미지
                             html += '    <div class="flex-shrink-0">';
@@ -624,28 +632,30 @@
                             
                             // 2. 내용
                             html += '    <div class="flex-grow-1">';
-	                        html += '      <div class="d-flex justify-content-between align-items-center">';
-	                        html += '        <strong class="text-dark">' + writerDisplay + '</strong>';
-	                        html += '        <small class="text-muted">' + dateStr + '</small>';
-	                        html += '      </div>';
+                            html += '      <div class="d-flex justify-content-between align-items-center">';
+                            html += '        <strong class="text-dark">' + writerDisplay + '</strong>';
+                            html += '        <small class="text-muted">' + dateStr + '</small>';
+                            html += '      </div>';
 	                        html += '      <p class="mb-0 mt-1 text-secondary small">' + reply.replyContent + '</p>';
-	                        
 	                        // 로그인 사번과 일치하면 삭제 버튼 표시
 	                        if (LOGIN_EMP_NO == reply.replyWriterEmpNo) {
 	                            html += '  <div class="mt-1 text-end">';
 	                            html += '    <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteReply(' + reply.replyNo + ')">삭제</button>';
 	                            html += '  </div>';
 	                        }
-	                        html += '    </div>'; // end flex-grow-1
-                            html += '  </div>'; // end d-flex
-	                        html += '</div>'; // end comment-card
+	                        html += '    </div>';
+                            // end flex-grow-1
+                            html += '  </div>';
+                            // end d-flex
+	                        html += '</div>';
+	                        // end comment-card
 	                    });
-	                }
+					}
 	                $('.comment-list-container').html(html);
-	            },
+				},
 	            error: function(err){
 	                console.log("댓글 로드 실패", err);
-	            }
+				}
 	        });
 	    }
 
@@ -669,11 +679,13 @@
 	            type: 'POST',
 	            contentType: 'application/json',
 	            data: JSON.stringify(sendData),
+	      
 	            success: function(res) {
 	                if(res === "success") {
 	                    $('#replyInput').val(''); // 입력창 초기화
 	                    loadReplies(noticeNo);    // 목록 갱신
 	                } else {
+	      
 	                    alert("댓글 등록에 실패했습니다.");
 	                }
 	            },
@@ -681,25 +693,27 @@
 	                console.log("에러 발생", err);
 	            }
 	        });
-	    });
+	    
+		});
 
 	    // 댓글 삭제 함수
 	    window.deleteReply = function(replyNo) {
 	        if(!confirm("정말 삭제하시겠습니까?")) return;
-	        $.ajax({
+			$.ajax({
 	            url: '/replies/delete',
 	            type: 'POST',
 	            data: { replyNo: replyNo },
 	            success: function(res) {
 	                if(res === "success") {
 	                    let noticeNo = $('#currentNoticeNo').val();
-	                    loadReplies(noticeNo);
+	  
+	                   loadReplies(noticeNo);
 	                } else {
 	                    alert("삭제 실패");
 	                }
 	            }
 	        });
-	    };
+		};
 	</script>
 </body>
 </html>
