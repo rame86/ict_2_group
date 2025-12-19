@@ -40,7 +40,7 @@
         <jsp:include page="../common/sidebar.jsp" flush="true" />
 
         <div id="layoutSidenav_content">
-            <main class="px-4 py-6">
+            <main class="px-4 py-1">
                 <div class="container-fluid px-4">
                  
                  
