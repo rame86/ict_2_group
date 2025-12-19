@@ -4,13 +4,16 @@
 
 <%
 /* =========================================================
-   ✅ 메뉴 활성화(사이드바 하이라이트용)
-   - 컨트롤러에서 menu를 안 내려줘도 기본값으로 'salemp'
-   ========================================================= */
+✅ 메뉴 활성화(사이드바 하이라이트용)
+- 컨트롤러에서 menu를 안 내려줘도 기본값으로 'salemp'
+========================================================= */
 if (request.getAttribute("menu") == null) {
-	request.setAttribute("menu", "salemp");
+	Object isAdminObj = request.getAttribute("isAdmin");
+	boolean isAdmin = (isAdminObj != null) && Boolean.TRUE.equals(isAdminObj);
+	request.setAttribute("menu", isAdmin ? "saladmin" : "salemp");
 }
 %>
+
 
 <!DOCTYPE html>
 <html>
@@ -153,9 +156,12 @@ if (request.getAttribute("menu") == null) {
 									<h5>지급 / 공제 비율</h5>
 
 									<!-- ✅ 숫자 데이터는 dataset으로 전달(스크립트에서 안전 파싱) -->
-									<canvas id="payDonutChart" data-pay="${sal.payTotal}"
-										data-deduct="${sal.deductTotal}" data-realpay="${sal.realPay}">
-                                </canvas>
+									<canvas id="payDonutChart"
+										data-pay="${empty sal.payTotal ? 0 : sal.payTotal}"
+										data-deduct="${empty sal.deductTotal ? 0 : sal.deductTotal}"
+										data-realpay="${empty sal.realPay ? 0 : sal.realPay}">
+									</canvas>
+
 
 									<div class="chart-legend">
 										<span class="legend pay">● 지급</span> <span
@@ -263,7 +269,7 @@ if (request.getAttribute("menu") == null) {
                          - model.addAttribute("isAdmin", true/false);
                          - model.addAttribute("edits", List<SalEditVO>);
                          ========================================================= -->
-						<c:if test="${isAdmin && not empty edits}">
+						<c:if test="${isAdmin}">
 							<div class="detail-card edit-history">
 								<h5 class="m-title">급여 정정 이력</h5>
 
@@ -286,16 +292,25 @@ if (request.getAttribute("menu") == null) {
 									</thead>
 
 									<tbody>
+
+										<c:if test="${empty edits}">
+											<tr>
+												<td colspan="4"
+													style="text-align: center; color: #6B7280; padding: 12px;">
+													정정 이력이 없습니다.</td>
+											</tr>
+										</c:if>
+
 										<c:forEach var="e" items="${edits}">
 											<tr>
 												<td>${e.editDate}</td>
 												<td><c:choose>
 														<c:when test="${not empty e.editByName}">
-														      ${e.editByName} (${e.editBy})
-														    </c:when>
+											            ${e.editByName} (${e.editBy})
+											          </c:when>
 														<c:otherwise>
-														      ${e.editBy}
-														    </c:otherwise>
+											            ${e.editBy}
+											          </c:otherwise>
 													</c:choose></td>
 												<td class="edit-reason">${e.editReason}</td>
 												<td><fmt:formatNumber value="${e.beforeRealPay}"
@@ -303,7 +318,9 @@ if (request.getAttribute("menu") == null) {
 														value="${e.afterRealPay}" pattern="#,##0" />원</td>
 											</tr>
 										</c:forEach>
+
 									</tbody>
+
 
 								</table>
 							</div>

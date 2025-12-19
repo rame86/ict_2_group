@@ -86,14 +86,22 @@
 		</div>
 
 		<%-- 관리자만 수정/삭제 노출 --%>
-		<c:if test="${canModify}">
+		<c:if test="${canModify or canDelete}">
 			<div class="emp-card-actions">
-				<button type="button" class="emp-btn emp-btn-edit"
-					onclick="enterEmpEditMode()">수정</button>
-				<button type="button" class="emp-btn emp-btn-delete"
-					onclick="deleteEmp('<c:out value="${emp.empNo}"/>')">삭제</button>
+
+				<c:if test="${canModify}">
+					<button type="button" class="emp-btn emp-btn-edit"
+						onclick="enterEmpEditMode()">수정</button>
+				</c:if>
+
+				<c:if test="${canDelete}">
+					<button type="button" class="emp-btn emp-btn-delete"
+						onclick="deleteEmp('<c:out value="${emp.empNo}"/>')">삭제</button>
+				</c:if>
+
 			</div>
 		</c:if>
+
 	</div>
 
 
@@ -161,34 +169,49 @@
 						<tr>
 							<th>재직상태</th>
 							<td><select name="statusNo">
-									<option value="1" ${emp.statusNo == 1 ? 'selected' : ''}>재직</option>
-									<option value="7" ${emp.statusNo == 7 ? 'selected' : ''}>파견</option>
-									<option value="2" ${emp.statusNo == 2 ? 'selected' : ''}>휴직(자발적)</option>
-									<option value="3" ${emp.statusNo == 3 ? 'selected' : ''}>휴직(병가
+									<option value="1"
+										${String.valueOf(emp.statusNo).trim() eq '1' ? 'selected' : ''}>재직</option>
+									<option value="7"
+										${String.valueOf(emp.statusNo).trim() eq '7' ? 'selected' : ''}>파견</option>
+									<option value="2"
+										${String.valueOf(emp.statusNo).trim() eq '2' ? 'selected' : ''}>휴직(자발적)</option>
+									<option value="3"
+										${String.valueOf(emp.statusNo).trim() eq '3' ? 'selected' : ''}>휴직(병가
 										등 복지)</option>
-									<option value="4" ${emp.statusNo == 4 ? 'selected' : ''}>대기</option>
-									<option value="5" ${emp.statusNo == 5 ? 'selected' : ''}>징계</option>
-									<option value="6" ${emp.statusNo == 6 ? 'selected' : ''}>인턴/수습</option>
-									<option value="0" ${emp.statusNo == 0 ? 'selected' : ''}>퇴직</option>
+									<option value="4"
+										${String.valueOf(emp.statusNo).trim() eq '4' ? 'selected' : ''}>대기</option>
+									<option value="5"
+										${String.valueOf(emp.statusNo).trim() eq '5' ? 'selected' : ''}>징계</option>
+									<option value="6"
+										${String.valueOf(emp.statusNo).trim() eq '6' ? 'selected' : ''}>인턴/수습</option>
+									<option value="0"
+										${String.valueOf(emp.statusNo).trim() eq '0' ? 'selected' : ''}>퇴직</option>
+
 							</select></td>
 							<th>직급번호</th>
 							<td><select name="gradeNo">
-									<option value="1" ${emp.gradeNo == 1 ? 'selected' : ''}>1
+									<option value="1"
+										${String.valueOf(emp.gradeNo).trim() eq '1' ? 'selected' : ''}>1
 										- 최고관리자</option>
-									<option value="2" ${emp.gradeNo == 2 ? 'selected' : ''}>2
-										- 관리자</option>
-									<option value="3" ${emp.gradeNo == 3 ? 'selected' : ''}>3
+									<option value="2"
+										${String.valueOf(emp.gradeNo).trim() eq '2' ? 'selected' : ''}>2
+										- 상급관리자</option>
+									<option value="3"
+										${String.valueOf(emp.gradeNo).trim() eq '3' ? 'selected' : ''}>3
+										- 하급관리자</option>
+									<option value="4"
+										${String.valueOf(emp.gradeNo).trim() eq '4' ? 'selected' : ''}>4
 										- 사원</option>
-									<option value="4" ${emp.gradeNo == 4 ? 'selected' : ''}>4
-										- 계약사원</option>
-									<option value="5" ${emp.gradeNo == 5 ? 'selected' : ''}>5
+									<option value="5"
+										${String.valueOf(emp.gradeNo).trim() eq '5' ? 'selected' : ''}>5
 										- 인턴/수습</option>
-									<option value="6" ${emp.gradeNo == 6 ? 'selected' : ''}>6
+									<option value="6"
+										${String.valueOf(emp.gradeNo).trim() eq '6' ? 'selected' : ''}>6
 										- 기타</option>
-							</select> <br /> <span class="grade-guide"> 
-							※ 재직/파견만 1~4등급 선택 가능,<br>
-							인턴/수습은 5등급,<br> 
-							휴직·대기·징계·퇴직 등은 6등급으로 고정됩니다.
+
+
+							</select> <br /> <span class="grade-guide"> ※ 재직/파견만 1~4등급 선택 가능,<br>
+									인턴/수습은 5등급,<br> 휴직·대기·징계·퇴직 등은 6등급으로 고정됩니다.
 							</span></td>
 						</tr>
 

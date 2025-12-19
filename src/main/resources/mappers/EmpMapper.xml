@@ -76,29 +76,32 @@
 		WHEN 3 THEN '휴직(병가 등 복지)'
 		WHEN 4 THEN '대기'
 		WHEN 5 THEN '징계'
-		WHEN 6 THEN '인턴/수습'
+		WHEN 6 THEN
+		'인턴/수습'
 		WHEN 7 THEN '파견'
 		END AS STATUS_NAME,
 
 		<!-- 직급 한글명 -->
-		CASE e.GRADE_NO
-		WHEN 1 THEN '최고관리자'
-		WHEN 2 THEN '관리자'
-		WHEN 3 THEN '사원'
-		WHEN 4 THEN '계약사원'
-		WHEN 5 THEN '인턴/수습'
-		WHEN 6 THEN '기타'
-		END AS GRADE_NAME
+		CASE
+		WHEN e.grade_no = 1 THEN '최고관리자'
+		WHEN e.grade_no = 2 THEN '상급관리자'
+		WHEN e.grade_no = 3 THEN '하급관리자'
+		WHEN e.grade_no = 4 THEN '사원'
+		WHEN
+		e.grade_no = 5 THEN '인턴/수습'
+		ELSE '기타'
+		END AS grade_name
 
 		FROM EMP e
-		LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+		LEFT
+		JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
 		ORDER BY e.EMP_NO
 	</select>
 
 	<!-- ============================ 2) 검색 포함 사원 목록 - EmpSearchVO 사용 ============================ -->
 	<select id="getEmpList"
 		parameterType="com.example.domain.EmpSearchVO" resultMap="empMap">
-		
+
 		SELECT
 		e.EMP_NO,
 		e.STATUS_NO,
@@ -118,7 +121,8 @@
 
 		CASE e.STATUS_NO
 		WHEN 0 THEN '퇴직'
-		WHEN 1 THEN '재직'
+		WHEN 1 THEN
+		'재직'
 		WHEN 2 THEN '휴직(자발적)'
 		WHEN 3 THEN '휴직(병가 등 복지)'
 		WHEN 4 THEN '대기'
@@ -127,24 +131,28 @@
 		WHEN 7 THEN '파견'
 		END AS STATUS_NAME,
 
-		CASE e.GRADE_NO
-		WHEN 1 THEN '최고관리자'
-		WHEN 2 THEN '관리자'
-		WHEN 3 THEN '사원'
-		WHEN 4 THEN '계약사원'
-		WHEN 5 THEN '인턴/수습'
-		WHEN 6 THEN '기타'
-		END AS GRADE_NAME
+		CASE
+		WHEN e.grade_no = 1 THEN '최고관리자'
+		WHEN e.grade_no = 2 THEN '상급관리자'
+		WHEN e.grade_no = 3 THEN '하급관리자'
+		WHEN e.grade_no = 4 THEN '사원'
+		WHEN
+		e.grade_no = 5 THEN '인턴/수습'
+		ELSE '기타'
+		END AS grade_name
 
 		FROM EMP e
-		LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+		LEFT
+		JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
 
 		<where>
 			<if test="keyword != null and keyword != ''">
 				AND (
 				e.EMP_NAME LIKE '%' || #{keyword} || '%'
-				OR e.EMP_PHONE LIKE '%' || #{keyword} || '%'
-				OR e.EMP_EMAIL LIKE '%' || #{keyword} || '%'
+				OR
+				e.EMP_PHONE LIKE '%' || #{keyword} || '%'
+				OR e.EMP_EMAIL LIKE '%' ||
+				#{keyword} || '%'
 				)
 			</if>
 
@@ -185,7 +193,8 @@
 
 		CASE e.STATUS_NO
 		WHEN 0 THEN '퇴직'
-		WHEN 1 THEN '재직'
+		WHEN 1 THEN
+		'재직'
 		WHEN 2 THEN '휴직(자발적)'
 		WHEN 3 THEN '휴직(병가 등 복지)'
 		WHEN 4 THEN '대기'
@@ -194,18 +203,21 @@
 		WHEN 7 THEN '파견'
 		END AS STATUS_NAME,
 
-		CASE e.GRADE_NO
-		WHEN 1 THEN '최고관리자'
-		WHEN 2 THEN '관리자'
-		WHEN 3 THEN '사원'
-		WHEN 4 THEN '계약사원'
-		WHEN 5 THEN '인턴/수습'
-		WHEN 6 THEN '기타'
-		END AS GRADE_NAME
+		CASE
+		WHEN e.grade_no = 1 THEN '최고관리자'
+		WHEN e.grade_no = 2 THEN '상급관리자'
+		WHEN e.grade_no = 3 THEN '하급관리자'
+		WHEN e.grade_no = 4 THEN '사원'
+		WHEN
+		e.grade_no = 5 THEN '인턴/수습'
+		ELSE '기타'
+		END AS grade_name
 
 		FROM EMP e
-		LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
-		WHERE e.EMP_NO = #{empNo}
+		LEFT
+		JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
+		WHERE e.EMP_NO =
+		#{empNo}
 	</select>
 
 	<!-- ============================ 3-1) 사번으로 단건 조회 (인사카드 전용) - getEmp와 동일 
@@ -230,7 +242,8 @@
 		d.DEPT_NAME,
 		CASE e.STATUS_NO
 		WHEN 0 THEN '퇴직'
-		WHEN 1 THEN '재직'
+		WHEN 1 THEN
+		'재직'
 		WHEN 2 THEN '휴직(자발적)'
 		WHEN 3 THEN '휴직(병가 등 복지)'
 		WHEN 4 THEN '대기'
@@ -238,17 +251,18 @@
 		WHEN 6 THEN '인턴/수습'
 		WHEN 7 THEN '파견'
 		END AS STATUS_NAME,
-		CASE e.GRADE_NO
-		WHEN 1 THEN '최고관리자'
-		WHEN 2 THEN '관리자'
-		WHEN 3 THEN '사원'
-		WHEN 4 THEN '계약사원'
-		WHEN 5 THEN '인턴/수습'
-		WHEN 6 THEN '기타'
-		END AS GRADE_NAME
+		CASE
+		WHEN e.grade_no = 1 THEN '최고관리자'
+		WHEN e.grade_no = 2 THEN '상급관리자'
+		WHEN e.grade_no = 3 THEN '하급관리자'
+		WHEN e.grade_no = 4 THEN '사원'
+		WHEN e.grade_no = 5 THEN '인턴/수습'
+		ELSE '기타'
+		END AS grade_name
 		FROM EMP e
 		LEFT JOIN DEPT d ON e.DEPT_NO = d.DEPT_NO
-		WHERE e.EMP_NO = #{empNo}
+		WHERE e.EMP_NO =
+		#{empNo}
 	</select>
 
 
@@ -289,10 +303,12 @@
 		#{statusNo},
 		GRADE_NO = #{gradeNo},
 		EMP_PHONE = #{empPhone},
-		EMP_ADDR = #{empAddr},
+		EMP_ADDR =
+		#{empAddr},
 		EMP_EMAIL = #{empEmail},
 		EMP_IMAGE = #{empImage}
-		WHERE EMP_NO = #{empNo}
+		WHERE EMP_NO
+		= #{empNo}
 	</update>
 
 	<!-- ============================ 6) 사원 삭제 (물리 삭제) ============================ -->
@@ -312,30 +328,34 @@
 	<!-- ============================ 8) 부서장/직책 설정 ============================ -->
 	<update id="setEmpJobTitle" parameterType="map">
 		UPDATE EMP
-		SET JOB_TITLE = #{jobTitle},
-		    GRADE_NO = #{targetGradeNo},
-		    STATUS_NO = 1
+		SET
+		JOB_TITLE = #{jobTitle},
+		GRADE_NO = #{targetGradeNo},
+		STATUS_NO = 1
 		WHERE EMP_NO = #{empNo}
 	</update>
-	
-	<select id="selectEmpNoListByDept" parameterType="String" resultType="string">
-	    SELECT 
-	        EMP_NO
-	    FROM EMP
-	    WHERE DEPT_NO = #{deptNo}
-	      AND STATUS_NO != 0
+
+	<select id="selectEmpNoListByDept" parameterType="String"
+		resultType="string">
+		SELECT
+		EMP_NO
+		FROM EMP
+		WHERE DEPT_NO = #{deptNo}
+		AND STATUS_NO
+		!= 0
 	</select>
-	
+
 	<select id="selectAllEmpNoList" resultType="string">
-	    SELECT 
-	        EMP_NO
-	    FROM EMP
-	    WHERE STATUS_NO != 0
+		SELECT
+		EMP_NO
+		FROM EMP
+		WHERE STATUS_NO != 0
 	</select>
 
 	<update id="updateProfileImage" parameterType="map">
-        UPDATE EMP
-           SET EMP_IMAGE = #{empImage}
-         WHERE EMP_NO    = #{empNo}
-    </update>
+		UPDATE EMP
+		SET
+		EMP_IMAGE = #{empImage}
+		WHERE EMP_NO = #{empNo}
+	</update>
 </mapper>

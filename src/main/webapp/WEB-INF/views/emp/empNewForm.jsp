@@ -168,23 +168,23 @@
 										<!-- 3줄: 권한등급 / 재직상태 -->
 										<div class="form-row">
 											<div class="form-group">
-												<label class="form-label1">권한등급 (1~6)</label> 
-												<select name="gradeNo" class="form-select1">
+												<label class="form-label1">권한등급 (1~6)</label> <select
+													name="gradeNo" class="form-select1">
 													<option value="1">1 - 최고관리자</option>
-													<option value="2">2 - 관리자</option>
-													<option value="3">3 - 사원</option>
-													<option value="4">4 - 계약사원</option>
-													<option value="5">5 - 인턴/수습</option>
+													<option value="2">2 - 상급관리자</option>
+													<option value="3">3 - 하급관리자</option>
+													<option value="4">4 - 사원</option>
+													<option value="5" selected>5 - 인턴/수습</option>
 													<option value="6">6 - 기타</option>
-												</select> <small class="grade-hint"> 
-												<span>※ 재직/파견만 1~4등급 선택 가능, 인턴/수습은 5등급,</span> 
-												<span>휴직·대기·징계·퇴직 등은 6등급으로 고정됩니다.</span>
+												</select> <small class="grade-hint"> <span>※ 재직/파견만
+														1~4등급 선택 가능, 인턴/수습은 5등급,</span> <span>휴직·대기·징계·퇴직 등은 6등급으로
+														고정됩니다.</span>
 												</small>
 											</div>
 
 											<div class="form-group">
-												<label class="form-label2">재직상태</label>
-												<select name="statusNo" class="form-select2">
+												<label class="form-label2">재직상태</label> <select
+													name="statusNo" class="form-select2">
 													<option value="1">재직</option>
 													<option value="7">파견</option>
 													<option value="2">휴직(자발적)</option>
@@ -268,9 +268,9 @@
 				</div>
 				<!-- /.container-fluid -->
 			</main>
-			
+
 			<!-- footer -->
-<jsp:include page="../common/footer.jsp" />
+			<jsp:include page="../common/footer.jsp" />
 		</div>
 		<!-- /#layoutSidenav_content -->
 	</div>
