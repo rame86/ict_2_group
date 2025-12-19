@@ -31,19 +31,26 @@ public class SalController {
 
     /* =========================================================
        ✅ 급여관리 관리자 허용 여부
-       - gradeNo: 1(대표이사), 2(팀장급)
+       - gradeNo: 1~3 (최고/상급/하급관리자)
        - deptNo : 1001(대표이사), 2000(운영총괄), 2020(재무회계)
        ========================================================= */
     private boolean isSalaryAdmin(LoginVO login) {
         if (login == null) return false;
 
-        String gradeNo = (login.getGradeNo() == null) ? "" : login.getGradeNo().trim();
-        String deptNo  = (login.getDeptNo()  == null) ? "" : login.getDeptNo().trim();
+        String gradeNo = safeTrim(login.getGradeNo());
+        String deptNo  = safeTrim(login.getDeptNo());
 
-        boolean gradeOk = "1".equals(gradeNo) || "2".equals(gradeNo);
+        // ✅ 등급: 1~3 허용 (SalAdminController랑 동일 기준)
+        boolean gradeOk = "1".equals(gradeNo) || "2".equals(gradeNo) || "3".equals(gradeNo);
+
+        // ✅ 부서: 급여 접근 부서만 허용
         boolean deptOk  = "1001".equals(deptNo) || "2000".equals(deptNo) || "2020".equals(deptNo);
 
         return gradeOk && deptOk;
+    }
+
+    private String safeTrim(Object v) {
+        return (v == null) ? "" : String.valueOf(v).trim();
     }
 
     /* =========================================================
@@ -130,7 +137,7 @@ public class SalController {
         }
 
         model.addAttribute("sal", sal);
-        model.addAttribute("edits", edits); // JSP는 isAdmin && not empty edits 로 출력
+        model.addAttribute("edits", edits);
         model.addAttribute("emp", emp);
         model.addAttribute("menu", isAdmin ? "saladmin" : "salemp");
 
