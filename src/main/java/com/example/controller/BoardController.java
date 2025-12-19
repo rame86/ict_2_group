@@ -41,7 +41,9 @@ public class BoardController {
 	@Autowired
 	private AlertService alertService;
 
-	// ************* 공지사항 영역 *************
+	// =========================================================
+	// 공지사항 영역
+	// =========================================================
 
 	@GetMapping("/board/getNoticeBoardList")
 	public String getNoticeBoardList(Model m, HttpSession session,
@@ -53,7 +55,12 @@ public class BoardController {
 		LoginVO loginUser = (LoginVO) login;
 		Integer userDeptNo = Integer.parseInt(loginUser.getDeptNo());
 
-		// 1. 공지 목록 가져오기
+		// 권한 등급 확인
+		Integer gradeNo = Integer.parseInt(loginUser.getGradeNo());
+		if (gradeNo == null)
+			gradeNo = 99; // 안전장치
+
+		// 공지 목록 가져오기
 		List<NoticeBoardVO> globalNotices = boardService.getGlobalNoticeList();
 		List<NoticeBoardVO> deptNotices = boardService.getDeptNoticeList(userDeptNo);
 
@@ -65,14 +72,19 @@ public class BoardController {
 
 		m.addAttribute("noticeBoardList", combinedList);
 
-		// 2. 알림 타고 들어온 경우 처리
+		// 2. 알림 타고 들어온 경우 처리함~
 		if (noticeNo != null) {
 			m.addAttribute("targetNoticeNo", noticeNo);
 		}
 
-		// ⭐ [추가] 전체 공지 작성 권한 체크 (상위부서 1001인 부서장만)
-		boolean canWriteGlobal = boardService.checkGlobalWriteAuth(loginUser.getEmpNo());
+		// canWriteGlobal: 등급 1(최고), 2(상급) 만 전체 공지 가능~
+		boolean canWriteGlobal = (gradeNo <= 2);
+
+		// canWriteNotice: 등급 3(관리자)까지 공지 작성 버튼 노출~
+		boolean canWriteNotice = (gradeNo <= 3);
+
 		m.addAttribute("canWriteGlobal", canWriteGlobal);
+		m.addAttribute("canWriteNotice", canWriteNotice);
 
 		return "/board/getNoticeBoardList";
 	}
@@ -80,20 +92,30 @@ public class BoardController {
 	@PostMapping("/board/insertNoticeBoard")
 	public String insertNoticeBoard(NoticeBoardVO vo, HttpSession session) {
 		LoginVO login = (LoginVO) session.getAttribute("login");
-		if (login != null) {
-			vo.setEmpNo(login.getEmpNo());
-			vo.setNoticeWriter(login.getEmpName());
+		if (login == null)
+			return "redirect:/";
+
+		// 한번더 권한확인~
+		Integer gradeNo = Integer.parseInt(login.getGradeNo());
+		
+	
+
+		// 3등급(관리자)보다 낮은 등급은 작성 불가 판정으로 되돌려버리기~
+		if (gradeNo > 3) {
+			return "redirect:/board/getNoticeBoardList";
 		}
+
+		vo.setEmpNo(login.getEmpNo());
+		vo.setNoticeWriter(login.getEmpName());
 
 		// JSP에서 넘어온 deptNo가 없으면(null) 내 부서로 설정
 		if (vo.getDeptNo() == null) {
 			vo.setDeptNo(Integer.parseInt(login.getDeptNo()));
 		}
 
-		// 만약 사용자가 '0'(전체공지)을 보냈는데 권한이 없으면 강제로 본인 부서로 변경
+		// 만약 사용자가 '0'(전체공지)을 보냈는데, 권한(등급 1,2)이 없으면 강제로 본인 부서로 변경
 		if (vo.getDeptNo() == 0) {
-			boolean canWriteGlobal = boardService.checkGlobalWriteAuth(login.getEmpNo());
-			if (!canWriteGlobal) {
+			if (gradeNo > 2) {
 				vo.setDeptNo(Integer.parseInt(login.getDeptNo()));
 			}
 		}
@@ -120,7 +142,9 @@ public class BoardController {
 		return boardService.getContentNoticeBoard(noticeNo);
 	}
 
-	// ************* 자유게시판 영역 *************
+	// =========================================================
+	// 자유게시판 영역
+	// =========================================================
 
 	@GetMapping("/board/getFreeBoardList")
 	public String getFreeBoardList(Model m, HttpSession session) {
@@ -176,7 +200,7 @@ public class BoardController {
 		return boardService.getContentFreeBoard(boardNo);
 	}
 
-	// 알림 전송 로직 (기존 유지)
+	// 알림 전송 로직
 	private void sendNoticeAlert(NoticeBoardVO vo) {
 		List<String> targetEmpList;
 		if (vo.getDeptNo() == 0) {
@@ -199,7 +223,10 @@ public class BoardController {
 		}
 	}
 
-	// ************* 댓글(Reply) AJAX 컨트롤러 영역 (기존 유지) *************
+	// =========================================================
+	// 댓글 영역
+	// =========================================================
+
 	@PostMapping("/replies/insert")
 	@ResponseBody
 	public String insertReply(@RequestBody ReplyVO vo, HttpSession session) {
