@@ -230,12 +230,14 @@ public class ApproveController {
 	@GetMapping("/approve/download")
 	public ResponseEntity<Resource> downloadFile(@RequestParam String changeName, @RequestParam String originName) {
         try {
-            // 파일이 저장된 절대 경로 (ApproveServiceImpl에서 설정한 경로와 일치해야 함)
-            Path filePath = Paths.get("C:/upload/approve/").resolve(changeName);
+            // 프로젝트 루트 경로를 가져와서 내부 upload/approve 폴더와 연결합니다.
+            String projectPath = System.getProperty("user.dir");
+            Path filePath = Paths.get(projectPath, "src", "main", "resources", "static", "upload", "approve").resolve(changeName);
+            
             Resource resource = new UrlResource(filePath.toUri());
 
             if (resource.exists() || resource.isReadable()) {
-                // 한글 파일명 깨짐 방지 처리
+                // 한글 파일명 깨짐 방지
                 String encodedOriginName = URLEncoder.encode(originName, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
                 
                 return ResponseEntity.ok()
