@@ -356,7 +356,7 @@
                                         <div class="tab-pane fade" id="dept-notice">
                                             <div class="d-flex justify-content-between mb-2">
                                                 <span class="small text-muted">우리 부서 중요 공지입니다.</span>
-                                                <a href="/board/getDeptNoticeList" class="small text-decoration-none">더보기 +</a>
+                                                <a href="/board/getNoticeBoardList" class="small text-decoration-none">더보기 +</a>
                                             </div>
                                             <table class="table table-hover table-bordered mb-0 table-sm" style="font-size: 0.95rem;">
                                                 <thead class="table-light"><tr><th style="width: 60%;">제목</th><th style="width: 20%;">작성자</th><th style="width: 20%;">작성일</th></tr></thead>
@@ -390,7 +390,7 @@
                                         <div class="tab-pane fade" id="dept-free">
                                             <div class="d-flex justify-content-between mb-2">
                                                 <span class="small text-muted">자유롭게 소통하는 공간입니다.</span>
-                                                <a href="/board/getDeptFreeList" class="small text-decoration-none">더보기 +</a>
+                                                <a href="/board/getFreeBoardList" class="small text-decoration-none">더보기 +</a>
                                             </div>
                                             <table class="table table-hover table-bordered mb-0 table-sm" style="font-size: 0.95rem;">
                                                 <thead class="table-light"><tr><th style="width: 60%;">제목</th><th style="width: 20%;">작성자</th><th style="width: 20%;">작성일</th></tr></thead>
