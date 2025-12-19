@@ -207,30 +207,38 @@
 										<div class="text-center people-cync-title">PEOPLE CYNC</div>
 									</div>
 									<div class="card-body">
-										<form action="loginCheck" method="post">
-											<div class="form-floating mb-3">
-												<input class="form-control" id="inputEmpno" type="text" placeholder="name@example.com" name="empNo" /> <label for="inputEmpno">사원번호</label>
-											</div>
-											<div class="form-floating mb-3">
-												<input class="form-control" id="inputPassword" type="password" placeholder="Password" name="empPass" /> <label for="inputPassword">비밀번호</label>
-											</div>
-											<div class="form-check mb-3">
-												<input class="form-check-input" id="inputRememberPassword" type="checkbox" value="" /> <label class="form-check-label" for="inputRememberPassword">비밀번호 기억</label>
-											</div>
-
-											<div class="mt-4 mb-3">
-												<input class="btn btn-primary" type="submit" value="로그인">
-											</div>
-
-											<a href="/kakao/login" class="kakao-login-btn"> <i class="fas fa-comment"></i>&nbsp;
-												카카오 로그인
-											</a>
-
-
-											<div class="d-flex align-items-center justify-content-center mt-4 mb-0">
-												<span class="small">비밀번호 분실 시 관리자에게 문의하세요.</span>
-											</div>
-										</form>
+									    <form id="loginForm"> 
+									        <div class="form-floating mb-3">
+									            <input class="form-control" id="inputEmpno" type="text" placeholder="name@example.com" name="empNo" /> 
+									            <label for="inputEmpno">사원번호</label>
+									        </div>
+									        
+									        <div class="form-floating mb-3">
+									            <input class="form-control" id="inputPassword" type="password" placeholder="Password" name="empPass" /> 
+									            <label for="inputPassword">비밀번호</label>
+									            
+									            <div id="loginErrorMsg" class="invalid-feedback text-start mt-1 ms-1" style="display:none;">
+									                <i class="fas fa-exclamation-circle"></i> 비밀번호 또는 사원번호가 일치하지 않습니다.
+									            </div>
+									        </div>
+									        
+									        <div class="form-check mb-3">
+									            <input class="form-check-input" id="inputRememberPassword" type="checkbox" value="" /> 
+									            <label class="form-check-label" for="inputRememberPassword">비밀번호 기억</label>
+									        </div>
+									
+									        <div class="mt-4 mb-3">
+									            <button class="btn btn-primary" type="submit" style="width:100%;">로그인</button>
+									        </div>
+									
+									        <a href="/kakao/login" class="kakao-login-btn"> 
+									            <i class="fas fa-comment"></i>&nbsp; 카카오 로그인
+									        </a>
+									
+									        <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
+									            <span class="small">비밀번호 분실 시 관리자에게 문의하세요.</span>
+									        </div>
+									    </form>
 									</div>
 									<div class="card-footer text-center py-3">
 										<div class="small">
@@ -248,6 +256,54 @@
 			<jsp:include page="../common/footer.jsp" flush="true" />
 		</div>
 	</div>
+	<script>
+	$(document).ready(function() {
+	    $('#loginForm').on('submit', function(e) {
+	        e.preventDefault(); // 1. 폼의 기본 제출(새로고침) 막기
+	
+	        // 2. 입력값 가져오기
+	        let empNo = $('#inputEmpno').val();
+	        let empPass = $('#inputPassword').val();
+	
+	        // 3. AJAX 요청 보내기
+	        $.ajax({
+	            type: 'post',
+	            url: '/member/loginCheckAjax', // 컨트롤러에 새로 만든 주소
+	            data: {
+	                empNo: empNo,
+	                empPass: empPass
+	            },
+	            success: function(result) {
+	                if (result === 'success') {
+	                    // 로그인 성공 -> 메인 페이지로 이동
+	                    window.location.href = '/'; 
+	                } else {
+	                    // 로그인 실패 -> 경고 메시지 표시
+	                    
+	                    // 1) 비밀번호 입력창을 빨간색으로 (Bootstrap 클래스 활용)
+	                    $('#inputPassword').addClass('is-invalid');
+	                    
+	                    // 2) 에러 메시지 div 보이기
+	                    $('#loginErrorMsg').show();
+	                    
+	                    // 3) 비밀번호 입력창 비우고 포커스 주기 (선택사항)
+	                    $('#inputPassword').val('').focus();
+	                }
+	            },
+	            error: function(err) {
+	                alert('시스템 오류가 발생했습니다. 관리자에게 문의하세요.');
+	                console.log(err);
+	            }
+	        });
+	    });
+	
+	    // 사용자가 다시 입력을 시작하면 빨간색 경고 없애기
+	    $('#inputPassword').on('input', function() {
+	        $(this).removeClass('is-invalid');
+	        $('#loginErrorMsg').hide();
+	    });
+	});
+	</script>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 	<script src="js/scripts.js"></script>
 </body>

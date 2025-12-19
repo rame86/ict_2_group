@@ -31,6 +31,21 @@ public class MemberController {
 		log.info("요청받은 step : " + step);
 	}
 
+	@PostMapping("/member/loginCheckAjax")
+    @ResponseBody 
+    public String loginCheckAjax(MemberVO vo, HttpSession session) {
+        log.info("[AJAX 로그인 요청] : " + vo.toString());
+
+        LoginVO check = memberService.loginCheck(vo);
+
+        if (check != null) {
+            session.setAttribute("login", check);
+            return "success"; // 로그인 성공 시 문자열 반환
+        } else {
+            return "fail";    // 로그인 실패 시 문자열 반환
+        }
+    }
+	
 	@GetMapping("/member/empNoCheck")
 	@ResponseBody
 	public String empNoCheck(String empNo, String empName, EmpVO vo, HttpSession session) {
@@ -94,21 +109,16 @@ public class MemberController {
 
 	@Transactional
 	@PostMapping("member/memberSave")
-	public String memberSave(MemberSaveVO vo, HttpSession session) {
+	@ResponseBody
+	public Integer memberSave(MemberSaveVO vo, HttpSession session) {
 		String kakaoId = (String) session.getAttribute("kakaoId");
 		vo.setKakaoId(kakaoId);
 
-		log.info(vo.toString());
+		log.info("[회원가입 요청 데이터]: " + vo.toString());
 
 		Integer result = memberService.memberSave(vo);
 
-		if (result != null) {
-			return "redirect:/";
-
-		} else {
-			log.info("회원가입 실패");
-			return "redirect:/member/register.jsp";
-		}
+		return result;
 	}
 
 }
