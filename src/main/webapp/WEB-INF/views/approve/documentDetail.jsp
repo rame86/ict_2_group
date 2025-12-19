@@ -334,7 +334,7 @@
                             <c:when test="${not empty vo.originName}">
                                 <c:set var="fileExt" value="${fn:toLowerCase(fn:substringAfter(vo.changeName, '.'))}" />
                                 <c:if test="${fileExt == 'jpg' || fileExt == 'jpeg' || fileExt == 'png' || fileExt == 'gif'}">
-                                    <img src="/upload/approve/${vo.changeName}" class="preview-img" alt="미리보기">
+                                    <img src="${pageContext.request.contextPath}/upload/approve/${vo.changeName}" class="preview-img" alt="미리보기">
                                 </c:if>
                                 <c:if test="${!(fileExt == 'jpg' || fileExt == 'jpeg' || fileExt == 'png' || fileExt == 'gif')}">
                                     <i class="fas fa-file-alt fa-4x text-gray-300"></i>
