@@ -40,7 +40,7 @@ public class SalAdminController {
 
     /* =========================================================
        ✅ 급여관리 관리자 접근 권한
-       - gradeNo: 1(대표이사), 2(팀장급)
+       - gradeNo: 1~3 (최고/상급/하급관리자)
        - deptNo : 1001(대표이사), 2000(운영총괄), 2020(재무회계)
        ========================================================= */
     private boolean isSalaryAdmin(HttpSession session) {
@@ -50,7 +50,10 @@ public class SalAdminController {
         String gradeNo = safeTrim(login.getGradeNo());
         String deptNo  = safeTrim(login.getDeptNo());
 
-        boolean gradeOk = "1".equals(gradeNo) || "2".equals(gradeNo);
+        // ✅ 등급: 1~3 허용
+        boolean gradeOk = "1".equals(gradeNo) || "2".equals(gradeNo) || "3".equals(gradeNo);
+
+        // ✅ 부서: 급여 접근 부서만 허용
         boolean deptOk  = "1001".equals(deptNo) || "2000".equals(deptNo) || "2020".equals(deptNo);
 
         return gradeOk && deptOk;
@@ -78,38 +81,29 @@ public class SalAdminController {
         deptNo = safeTrim(deptNo);
         param.put("deptNo", (deptNo.isEmpty() ? null : deptNo));
 
-        // 3) 체크박스류는 그대로 boolean 전달 (Mapper에서 onlyOvertime == true 형태로 사용 가능)
+        // 3) 체크박스류는 그대로 boolean 전달
         param.put("onlyOvertime", onlyOvertime);
         param.put("excludeRetired", excludeRetired);
 
-        // 4) (선택) 삭제예정/퇴사자 제외 옵션
-        //    - 아직 DB/쿼리 조건이 확정 아니면, Controller에 파라미터만 유지해도 OK
-        //    - Mapper에서 실제 조건을 붙일 때만 사용
+        // 4) (선택) 삭제예정 제외 옵션
         param.put("excludeDeletePlanned", excludeDeletePlanned);
 
         // 5) 정렬(sort) 화이트리스트
-        //    - Mapper <choose>에서 sort 값으로 분기하니까,
-        //      Controller가 허용값만 내려주면 안정화가 됨
         sort = safeTrim(sort);
         Set<String> allowedSort = Set.of("empNo", "name", "dept", "date");
-        if (!allowedSort.contains(sort)) {
-            sort = "date";
-        }
+        if (!allowedSort.contains(sort)) sort = "date";
         param.put("sort", sort);
 
-        // 6) 방향(dir) 화이트리스트 (✅ SQL 인젝션 방지 핵심)
-        //    - Mapper에서 ORDER BY ... ${dir} 쓰고 있으면 반드시 여기서 asc/desc만 허용해야 함
+        // 6) 방향(dir) 화이트리스트 (✅ SQL 인젝션 방지)
         dir = safeTrim(dir).toLowerCase();
-        if (!("asc".equals(dir) || "desc".equals(dir))) {
-            dir = "desc";
-        }
+        if (!("asc".equals(dir) || "desc".equals(dir))) dir = "desc";
         param.put("dir", dir);
 
         return param;
     }
 
-    private String safeTrim(String v) {
-        return (v == null) ? "" : v.trim();
+    private String safeTrim(Object v) {
+        return (v == null) ? "" : String.valueOf(v).trim();
     }
 
     /* =========================================================
@@ -169,42 +163,40 @@ public class SalAdminController {
     }
 
     /* =========================================================
-    🔹 관리자용 급여 상세 (/sal/admin/detail)
-    - 기존 상세 JSP 재사용(sal/salDetail)
-    - ✅ 관리자일 때만 정정 이력(SAL_EDIT) 조회해서 내려줌
-    ========================================================= */
- @GetMapping("/detail")
- public String salDetailAdmin(@RequestParam String empNo,
-                              @RequestParam Integer monthAttno,
-                              HttpSession session,
-                              Model model) {
+       🔹 관리자용 급여 상세 (/sal/admin/detail)
+       - 기존 상세 JSP 재사용(sal/salDetail)
+       - ✅ 관리자일 때만 정정 이력(SAL_EDIT) 조회해서 내려줌
+       ========================================================= */
+    @GetMapping("/detail")
+    public String salDetailAdmin(@RequestParam String empNo,
+                                 @RequestParam Integer monthAttno,
+                                 HttpSession session,
+                                 Model model) {
 
-     // ✅ 권한 체크
-     if (!isSalaryAdmin(session)) return "error/NoAuthPage";
+        // ✅ 권한 체크
+        if (!isSalaryAdmin(session)) return "error/NoAuthPage";
 
-     // ✅ 급여/사원 조회
-     SalVO sal = salService.getSalaryDetail(empNo, monthAttno);
-     EmpVO emp = empService.getEmp(empNo);
+        // ✅ 급여/사원 조회
+        SalVO sal = salService.getSalaryDetail(empNo, monthAttno);
+        EmpVO emp = empService.getEmp(empNo);
 
-     // ✅ 관리자 상세에서만 "정정 이력" 조회
-     //    - salDetail.jsp에서 이미 isAdmin && not empty edits 로 제어할 예정
-     List<SalEditVO> edits = java.util.Collections.emptyList();
-     if (sal != null && sal.getSalNum() != null) {
-         edits = salService.getEditsBySalNum(sal.getSalNum());
-     }
+        // ✅ 관리자 상세에서만 "정정 이력" 조회
+        List<SalEditVO> edits = java.util.Collections.emptyList();
+        if (sal != null && sal.getSalNum() != null) {
+            edits = salService.getEditsBySalNum(sal.getSalNum());
+        }
 
-     // ✅ JSP에서 쓰는 이름으로 통일해서 내려주기
-     model.addAttribute("emp", emp);
-     model.addAttribute("sal", sal);
+        // ✅ JSP에서 쓰는 이름으로 통일해서 내려주기
+        model.addAttribute("emp", emp);
+        model.addAttribute("sal", sal);
 
-     model.addAttribute("isAdmin", true); // ✅ 관리자 상세 진입이므로 true
-     model.addAttribute("edits", edits);  // ✅ JSP에서 쓰는 변수명(edits)로 맞춤
+        model.addAttribute("isAdmin", true);
+        model.addAttribute("edits", edits);
 
-     model.addAttribute("menu", "saladmin");
+        model.addAttribute("menu", "saladmin");
 
-     return "sal/salDetail";
- }
-
+        return "sal/salDetail";
+    }
 
     /* =========================================================
        🔹 관리자용 급여 목록 CSV 다운로드 (/sal/admin/export)
@@ -225,7 +217,6 @@ public class SalAdminController {
             return;
         }
 
-        // ✅ export는 정렬 불필요 → sort/dir 기본값만 안전하게 넣기
         Map<String, Object> param = buildAdminSearchParam(
                 month, deptNo, onlyOvertime, excludeRetired, excludeDeletePlanned, "date", "desc"
         );
@@ -302,11 +293,10 @@ public class SalAdminController {
         if (!isSalaryAdmin(session)) return "error/NoAuthPage";
 
         LoginVO login = (LoginVO) session.getAttribute("login");
-        if (login == null) return "error/NoAuthPage"; // ✅ 안정화: 세션 만료 대비
+        if (login == null) return "error/NoAuthPage";
 
         String editorEmpNo = login.getEmpNo();
 
-        // ✅ 수정 이력 + 급여 업데이트(트랜잭션은 Service에서 처리)
         salService.editSalaryWithHistory(
                 salNum, salBase, salBonus, salPlus, overtimePay, insurance, tax, editReason, editorEmpNo
         );
