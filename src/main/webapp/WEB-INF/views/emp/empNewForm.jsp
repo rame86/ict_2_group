@@ -108,8 +108,8 @@
 									<div class="form-top-right">
 
 										<div class="hint-banner">
-											<span class="hint-ico">i</span> <span><b>* 표시</b>는 필수
-												항목입니다.</span>
+											<span class="hint-ico">i</span> 
+											<span><b>* 표시</b>는 필수항목입니다.</span>
 										</div>
 
 										<!-- 1줄: 사번 / 부서번호 / 부서명 (✅ 여기서 3개 한 줄) -->
@@ -133,7 +133,7 @@
 												<div class="error-text" data-for="deptNo"></div>
 											</div>
 
-											<!-- ✅ 부서명(원래 2번째 row에 있던 걸 여기로 이동) -->
+											<!-- ✅ 부서명-->
 											<div class="form-group">
 												<label class="form-label">* 부서명</label> <select
 													id="deptNameSelect" class="form-select" required>
@@ -176,9 +176,9 @@
 													<option value="4">4 - 사원</option>
 													<option value="5" selected>5 - 인턴/수습</option>
 													<option value="6">6 - 기타</option>
-												</select> <small class="grade-hint"> <span>※ 재직/파견만
-														1~4등급 선택 가능, 인턴/수습은 5등급,</span> <span>휴직·대기·징계·퇴직 등은 6등급으로
-														고정됩니다.</span>
+												</select> <small class="grade-hint"> .
+												<span>※ 재직/파견만 1~4등급 선택 가능, 인턴/수습은 5등급,</span> 
+												<span>휴직·대기·징계·퇴직 등은 6등급으로 고정됩니다.</span>
 												</small>
 											</div>
 
@@ -208,8 +208,8 @@
 													<input type="text" id="empPostcode"
 														class="form-control addr-postcode" placeholder="우편번호"
 														readonly>
-													<button type="button" id="btnAddrSearch" class="btn-addr">주소
-														검색</button>
+													<button type="button" id="btnAddrSearch" class="btn-addr">
+													주소검색</button>
 												</div>
 
 												<div class="addr-row" style="margin-top: 8px;">
@@ -487,8 +487,7 @@
 	  clearError("deptNo");
 	  return true;
 	}
-
-
+  
   function validateEmpRegdateField() {
     const val = $("input[name='empRegdate']").val().trim();
     if (!val) { showError("empRegdate", "입사일을 선택하세요."); return false; }
