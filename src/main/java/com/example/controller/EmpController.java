@@ -228,61 +228,71 @@ public class EmpController {
     }
 
     /* =========================================================
-       6. 사원 등록 (인사팀장만)
-       ========================================================= */
-    @PostMapping("/emp/insert")
-    @ResponseBody
-    public String insertEmp(@ModelAttribute EmpVO vo,
-                            @RequestParam(value="empImageFile", required=false) MultipartFile empImageFile,
-                            HttpSession session) {
+    6. 사원 등록 (인사팀장만)
+    ========================================================= */
+ @PostMapping("/emp/insert")
+ @ResponseBody
+ public String insertEmp(@ModelAttribute EmpVO vo,
+                         @RequestParam(value="empImageFile", required=false) MultipartFile empImageFile,
+                         @RequestParam(value="defaultImg", required=false) String defaultImg, // ✅ 파라미터 추가
+                         HttpSession session) {
 
-        LoginVO login = (LoginVO) session.getAttribute("login");
-        if (login == null) return RES_DENY;
+     LoginVO login = (LoginVO) session.getAttribute("login");
+     if (login == null) return RES_DENY;
 
-        if (!"2010".equals(safeStr(login.getDeptNo()))) return RES_DENY;
+     if (!"2010".equals(safeStr(login.getDeptNo()))) return RES_DENY;
 
-        String savedName = null;
+     String savedName = null;
 
-        try {
-            String reg = vo.getEmpRegdate();
-            if (reg != null && !reg.isBlank()) {
-                try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                    sdf.setLenient(false);
-                    Date regDate = sdf.parse(reg);
-                    if (regDate.after(new Date())) return RES_REGDATE_FUTURE;
-                } catch (ParseException e) {
-                    return RES_REGDATE_PARSE_ERROR;
-                }
-            }
+     try {
+         // 1. 입사일 유효성 검사
+         String reg = vo.getEmpRegdate();
+         if (reg != null && !reg.isBlank()) {
+             try {
+                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                 sdf.setLenient(false);
+                 Date regDate = sdf.parse(reg);
+                 if (regDate.after(new Date())) return RES_REGDATE_FUTURE;
+             } catch (ParseException e) {
+                 return RES_REGDATE_PARSE_ERROR;
+             }
+         }
 
-            if (empImageFile != null && !empImageFile.isEmpty()) {
-                String valid = validateImageFile(empImageFile);
-                if (!RES_OK.equals(valid)) return valid;
+         // 2. 프로필 사진 처리 우선순위: 업로드 파일 > 기본 이미지 선택 > 없음
+         if (empImageFile != null && !empImageFile.isEmpty()) {
+             // A. 직접 파일 업로드 한 경우
+             String valid = validateImageFile(empImageFile);
+             if (!RES_OK.equals(valid)) return valid;
 
-                savedName = saveEmpImage(empImageFile);
-                vo.setEmpImage(savedName);
-            }
+             savedName = saveEmpImage(empImageFile);
+             vo.setEmpImage(savedName);
+         } else if (defaultImg != null && !defaultImg.isBlank()) {            
+             vo.setEmpImage(defaultImg);
+         }
+         // C. 아무것도 없으면 DB Default 혹은 null 처리됨 (VO 그대로 진행)
 
-            int cnt = empService.insertEmp(vo);
-            if (cnt <= 0) {
-                deleteEmpImage(savedName);
-                return RES_FAIL;
-            }
+         // 3. DB 저장
+         int cnt = empService.insertEmp(vo);
+         if (cnt <= 0) {
+             // 실패 시 업로드했던 파일이 있다면 삭제
+             deleteEmpImage(savedName);
+             return RES_FAIL;
+         }
 
-            try {
-                monthAttendService.createDefaultForNewEmp(vo.getEmpNo());
-                salService.createBaseSalaryForNewEmp(vo.getEmpNo());
-            } catch (Exception ignore) {}
+         // 4. 후속 처리 (근태/급여 데이터 생성)
+         try {
+             monthAttendService.createDefaultForNewEmp(vo.getEmpNo());
+             salService.createBaseSalaryForNewEmp(vo.getEmpNo());
+         } catch (Exception ignore) {}
 
-            return RES_OK;
+         return RES_OK;
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            deleteEmpImage(savedName);
-            return RES_ERROR;
-        }
-    }
+     } catch (Exception e) {
+         e.printStackTrace();
+         deleteEmpImage(savedName);
+         return RES_ERROR;
+     }
+ }
 
     /* =========================================================
        7. 관리자 여부 체크 (grade 1~3) ✅ 깔끔 버전
