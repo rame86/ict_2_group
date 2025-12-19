@@ -127,7 +127,11 @@
 			<main>
 				<div class="container-fluid px-4">
 
-					<h1 class="mt-4">자유 게시판</h1>
+					<%-- 제목 및 브레드크럼 수정 --%>
+					<h2 class="mt-4">자유 게시판</h2>
+					<ol class="breadcrumb mb-4">
+						<li class="breadcrumb-item active">Free Board</li>
+					</ol>
 
 					<%-- 글쓰기 버튼 --%>
 					<div class="d-flex justify-content-end mb-3">
@@ -328,7 +332,8 @@
 										<span id="modalWriterText">작성자</span>
 									</span> 
 									<span class="info-item"> 
-										<i class="far fa-clock"></i> <span id="modalDateText">2024-00-00</span>
+										<i class="far fa-clock"></i> 
+										<span id="modalDateText">2024-00-00</span>
 									</span>
 								</div>
 
@@ -393,7 +398,6 @@
 			const datatablesDept = document.getElementById('datatablesDept');
 			if (datatablesDept) new simpleDatatables.DataTable(datatablesDept);
 		});
-
 		$(document).ready(function() {
 			var $boardModal = $('#boardModal');
 			var $btnModify = $('#btnModify');
@@ -437,7 +441,7 @@
 				$('#currentBoardNo').val(boardNo);
 				$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글');
 
-				$btnModify.hide(); 
+				$btnModify.hide();
 				$btnDelete.hide();
 
 				// 2. 게시글 상세 내용 AJAX 조회
@@ -480,7 +484,6 @@
 					loadReplies(boardNo, 'free');
 				}
 			});
-
 			// 수정 버튼 클릭 -> 수정 모달 OPEN
 			$btnModify.on('click', function() {
 				bootstrap.Modal.getInstance($boardModal[0]).hide();
@@ -497,12 +500,12 @@
 
 				new bootstrap.Modal($('#modifyModal')[0]).show();
 			});
-			
 			// 삭제 버튼 클릭 이벤트
             $btnDelete.on('click', function() {
                 if(confirm("정말 이 게시글을 삭제하시겠습니까?\n포함된 댓글도 모두 삭제됩니다.")) {
                     var boardNo = $('#currentBoardNo').val();
                     $('#deleteBoardNo').val(boardNo);
+                
                     $('#deleteForm').submit();
                 }
             });
@@ -524,55 +527,58 @@
 		        	$('#btnToggleComment').html('<i class="far fa-comment-dots me-1"></i> 댓글 (' + totalCount + ')');
 		        	
 		            let html = '';
+		        
 		            if(list.length === 0){
 		            	html = '<p class="text-center text-muted my-3">작성된 댓글이 없습니다.</p>';
 		            } else {
 			            list.forEach(reply => {
 			            	let date = new Date(reply.replyCreatedAt);
-	                        let dateStr = date.toISOString().split('T')[0] + " " + date.toTimeString().split(' ')[0].substring(0,5);
+	                        let dateStr = date.toISOString().split('T')[0] + " " 
+							+ date.toTimeString().split(' ')[0].substring(0,5);
 			            	let writerName = reply.replyWriterName ? reply.replyWriterName : reply.replyWriterEmpNo;
 			            	let writerJob = reply.replyWriterJob ? reply.replyWriterJob : '';
 			            	let writerDisplay = writerName + (writerJob ? ' (' + writerJob + ')' : '');
 
 			            	// [NEW] 댓글 작성자 이미지
 			            	let replyImgSrc = DEFAULT_IMG;
-                            if(reply.replyWriterImage) {
+							if(reply.replyWriterImage) {
                                 replyImgSrc = '${pageContext.request.contextPath}/upload/emp/' + reply.replyWriterImage;
-                            }
+							}
 			            	
 			            	html += '<div class="comment-card" id="reply-' + reply.replyNo + '">';
-			            	
-			            	// [NEW] 댓글 레이아웃 (flex)
+							// [NEW] 댓글 레이아웃 (flex)
                             html += '  <div class="d-flex">';
-                            // 1. 프로필 이미지
+							// 1. 프로필 이미지
                             html += '    <div class="flex-shrink-0">';
-                            html += '      <img src="' + replyImgSrc + '" class="comment-profile-img" alt="프로필">';
-                            html += '    </div>';
+							html += '      <img src="' + replyImgSrc + '" class="comment-profile-img" alt="프로필">';
+							html += '    </div>';
 			            	
                             // 2. 내용
                             html += '    <div class="flex-grow-1">';
-			                html += '      <div class="d-flex justify-content-between align-items-center">';
-			                html += '        <strong class="text-dark">' + writerDisplay + '</strong>';
-			                html += '        <small class="text-muted">' + dateStr + '</small>';
-			                html += '      </div>';
+							html += '      <div class="d-flex justify-content-between align-items-center">';
+							html += '        <strong class="text-dark">' + writerDisplay + '</strong>';
+							html += '        <small class="text-muted">' + dateStr + '</small>';
+							html += '      </div>';
 			                html += '      <p class="mb-0 mt-1 text-secondary small">' + reply.replyContent + '</p>';
-			                
-			                // 로그인 사번 검증: 작성자에게만 삭제 버튼 표시
+							// 로그인 사번 검증: 작성자에게만 삭제 버튼 표시
 			                if (LOGIN_EMP_NO == reply.replyWriterEmpNo) {
 			                    html += '  <div class="mt-1 text-end">';
-			                    html += '    <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteReply(' + reply.replyNo + ')">삭제</button>';
-			                    html += '  </div>';
+								html += '    <button class="btn btn-sm btn-link text-danger p-0" onclick="deleteReply(' + reply.replyNo + ')">삭제</button>';
+								html += '  </div>';
 			                }
-			                html += '    </div>'; // end flex-grow-1
-                            html += '  </div>'; // end d-flex
-			                html += '</div>'; // end comment-card
+			                html += '    </div>';
+							// end flex-grow-1
+                            html += '  </div>';
+							// end d-flex
+			                html += '</div>';
+							// end comment-card
 			            });
-		            }
+					}
 		            $('#collapseComments .comment-list-container').html(html);
-		        },
+				},
 		        error: function(err) {
 		        	console.log("댓글 로딩 실패", err);
-		        }
+				}
 		    });
 		}
 
@@ -599,6 +605,7 @@
 		        success: function(res) {
 		            if(res === "success") {
 		                $('#replyInput').val(''); // 입력창 초기화
+		     
 		                loadReplies(boardNo, 'free'); // 목록 갱신
 		            } else {
 		            	alert("댓글 등록 실패");
@@ -609,27 +616,28 @@
 		        }
 		    });
 		});
-
 		// 댓글 삭제 함수 (전역)
 	    window.deleteReply = function(replyNo) {
 	        if(!confirm("정말 삭제하시겠습니까?")) return;
-	        $.ajax({
+			$.ajax({
 	            url: '/replies/delete',
 	            type: 'POST',
 	            data: { replyNo: replyNo },
 	            success: function(res) {
 	                if(res === "success") {
 	                    let boardNo = $('#currentBoardNo').val();
-	                    loadReplies(boardNo, 'free');
+	  
+	                   loadReplies(boardNo, 'free');
 	                } else {
 	                    alert("삭제 실패");
 	                }
 	            },
-	            error: function(err) {
+	            error: function(err) 
+				{
 	            	console.log("삭제 에러", err);
 	            }
 	        });
-	    };
+		};
 	</script>
 </body>
 </html>

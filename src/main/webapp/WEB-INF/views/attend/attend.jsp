@@ -445,7 +445,8 @@
         <jsp:include page="../common/sidebar.jsp" flush="true" />
         
         <div id="layoutSidenav_content">
-            <main class="px-4 py-6">
+            <main class="px-4 py-1">
+              <div class="container-fluid px-4">
                 <h2 class="mt-4">근태 현황</h2>
 					<ol class="breadcrumb mb-4">
 						<li class="breadcrumb-item active">Attendance status</li>
@@ -476,6 +477,7 @@
                             <button id="btnCommuteCorrection" class="custom-btn bg-blue-400 text-white hover:bg-blue-500 shadow-xl"><i class="fas fa-wrench text-gray-200"></i> 출/퇴근 정정</button>
                         </div>
                     </div>
+                </div>
                 </div>
             </main>
             <jsp:include page="../common/footer.jsp" flush="true" />
