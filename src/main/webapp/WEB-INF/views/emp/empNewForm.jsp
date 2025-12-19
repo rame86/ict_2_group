@@ -176,9 +176,9 @@
 													<option value="4">4 - 계약사원</option>
 													<option value="5">5 - 인턴/수습</option>
 													<option value="6">6 - 기타</option>
-												</select> <small class="grade-hint"> <span>※ 재직/파견만
-														1~4등급 선택 가능, 인턴/수습은 5등급,</span> <span>휴직·대기·징계·퇴직 등은 6등급으로
-														고정됩니다.</span>
+												</select> <small class="grade-hint"> 
+												<span>※ 재직/파견만 1~4등급 선택 가능, 인턴/수습은 5등급,</span> 
+												<span>휴직·대기·징계·퇴직 등은 6등급으로 고정됩니다.</span>
 												</small>
 											</div>
 
