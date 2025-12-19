@@ -77,7 +77,8 @@ public class ApproveServiceImpl implements ApproveService {
         int docNo = approveDao.selectDocSeqNextVal();
         
         dvo.setDocNo(docNo);
-        dvo.setDocWriter(String.valueOf(empNo));
+        dvo.setEmpNo(String.valueOf(empNo));
+        dvo.setDocWriter(String.valueOf(empNo));        
         approveDao.insertDoc(dvo);
         
         avo.setDocNo(docNo);

@@ -129,13 +129,16 @@ public class AttendServiceImpl implements AttendService {
 		// 종료일이 없으면 시작일과 동일하게 처리 방지 (null 체크)
 		String endDate = vo.getEndDate() != null ? toDate.getFomatterDate(vo.getEndDate()) : "";
 
-		davo.setEmpNo(vo.getEmpNo());
+		String empNo = vo.getDocWriter();
+		davo.setEmpNo(empNo);
 		davo.setMemo(status + ":" + startDate + "~" + endDate + ", " + vo.getTotalDays());
 		davo.setAttStatus(status);
 		davo.setDateAttend(startDate);
+		
 
 		String currentDateString = davo.getDateAttend();
-
+		log.info(davo.toString());
+		
 		log.info("[AttendService - insertVacation - 루프 시작 (TotalDays: " + totalDays + ")]");
 
 		// 반차(0.5)인 경우 루프를 1번 돌도록 올림 처리하거나 로직 조정 필요. 
@@ -183,9 +186,12 @@ public class AttendServiceImpl implements AttendService {
 		String newModifyTime = toDate.combineDateAndTime(date, time); // yyyy-MM-dd HH:mm:ss
 		String nowTime = toDate.getFomatterHHmmss(newModifyTime); // HH:mm:ss 추출
 
+		// 데이터 주입
+		String empNo = vo.getDocWriter();
 		vo.setStartDate(date);
 		vo.setNewmodifyTime(newModifyTime);
-		
+		vo.setEmpNo(empNo);
+		log.info(vo.toString());
 		// 2. 기존 근태 기록 조회
 		DayAttendVO davo = attendDAO.selectDayAttend(vo);
 		

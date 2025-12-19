@@ -98,10 +98,7 @@
 	<!-- ============================ 2) 검색 포함 사원 목록 - EmpSearchVO 사용 ============================ -->
 	<select id="getEmpList"
 		parameterType="com.example.domain.EmpSearchVO" resultMap="empMap">
-		<!-- (기존 코드 유지, 주석만 생략 없이 유지) -->
-		<!-- 이 쿼리는 관리자 검색/필터 전용 -->
-		<!-- 급여관리와 직접 연결되지 않음 -->
-
+		
 		SELECT
 		e.EMP_NO,
 		e.STATUS_NO,
@@ -316,7 +313,7 @@
 	<update id="setEmpJobTitle" parameterType="map">
 		UPDATE EMP
 		SET JOB_TITLE = #{jobTitle},
-		    GRADE_NO = #{targetGradeNo}
+		    GRADE_NO = #{targetGradeNo},
 		    STATUS_NO = 1
 		WHERE EMP_NO = #{empNo}
 	</update>
