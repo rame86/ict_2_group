@@ -513,7 +513,7 @@
                                 <div class="card-body py-3">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div>
-                                            <h6 class="mb-0 fw-bold">시스템 공지</h6>
+                                            <h6 class="mb-0 fw-bold">추가기능 공사중</h6>
                                             <small class="text-muted">서버 점검 예정 (12/25)</small>
                                         </div>
                                         <i class="fas fa-info-circle text-info fs-4"></i>
