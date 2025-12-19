@@ -15,10 +15,7 @@
 <head>
 <meta charset="UTF-8">
 <title>approve - createForm</title>
-<link href="https://cdn.jsdelivr.net/npm/suit-font/dist/suit.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/all.min.css">
 <style>
-    body { font-family: 'SUIT', sans-serif; background-color: #f8f9fc; }
     
     .unified-card {
         border-radius: 12px;

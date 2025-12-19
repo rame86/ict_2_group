@@ -106,17 +106,15 @@ if (menu == null)
 						id="collapseApproval" aria-labelledby="headingOne"
 						data-bs-parent="#sidenavAccordion">
 						<nav class="sb-sidenav-menu-nested nav">
-							<a class="nav-link  <%=menu.equals("status") ? "active" : ""%>"
-								href="/approve/statusList">결재 현황</a> <a
-								class="nav-link <%=menu.equals("receive") ? "active" : ""%>"
-								href="/approve/receiveList"> 결재 할 문서 <span id="badgeId"
-								class="notification-badge" style="display: none;"></span></a> <a
-								class="nav-link <%=menu.equals("send") ? "active" : ""%>"
-								href="/approve/sendList">결재 받을 문서</a> <a
-								class="nav-link <%=menu.equals("finish") ? "active" : ""%>"
-								href="/approve/finishList">결재 완료 문서</a> <a
-								class="nav-link <%=menu.equals("create") ? "active" : ""%>"
-								href="/approve/createForm">문서 작성 하기</a>
+							<a class="nav-link  <%=menu.equals("status") ? "active" : ""%>" href="/approve/statusList">결재 현황</a>
+							<c:if test="${not empty sessionScope.login and (sessionScope.login.gradeNo eq '1' or sessionScope.login.gradeNo eq '2' or sessionScope.login.gradeNo eq '3')}">
+								<a class="nav-link <%=menu.equals("receive") ? "active" : ""%>" href="/approve/receiveList"> 결재 할 문서 
+									<span id="badgeId" class="notification-badge" style="display: none;"></span>
+								</a>
+							</c:if>
+							<a class="nav-link <%=menu.equals("send") ? "active" : ""%>" href="/approve/sendList">결재 받을 문서</a>
+							<a class="nav-link <%=menu.equals("finish") ? "active" : ""%>" href="/approve/finishList">결재 완료 문서</a>
+							<a class="nav-link <%=menu.equals("create") ? "active" : ""%>" href="/approve/createForm">문서 작성 하기</a>
 						</nav>
 					</div>
 
