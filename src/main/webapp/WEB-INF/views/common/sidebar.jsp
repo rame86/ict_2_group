@@ -28,7 +28,7 @@ if (menu == null)
     .icon-attend { color: #FFD180; }    /* 연주황 (근태 관리) */
     .icon-emp { color: #D1C4E9; }       /* 연보라 (사원 관리) */
     .icon-dept { color: #C8E6C9; }      /* 연초록 (부서 관리) */
-    .icon-approval { color: #FFF59D; }  /* 연노랑 (전자 결재) */
+    .icon-approval { color: #FBC02D; }  /* 연노랑 (전자 결재) */
     .icon-salary { color: #F8BBD0; }    /* 연피치 (급여 관리) */
 </style>
 </head>
