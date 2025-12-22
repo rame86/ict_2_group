@@ -3,52 +3,47 @@
 
 <mapper namespace="com.example.repository.MemberDAO">
 
-	<select id="kakaoLoginInfo" parameterType="String"
-		resultType="loginVO">
+	<select id="kakaoLoginInfo" parameterType="String" resultType="loginVO">
 		SELECT
-		E.*,
-		D.MANAGER_EMP_NO,
-		D.DEPT_NAME,
-		D.PARENT_DEPT_NO,
-		D.DEPT_ADDR,
-		D.DEPT_PHONE
+			E.*,
+			D.MANAGER_EMP_NO,
+			D.DEPT_NAME,
+			D.PARENT_DEPT_NO,
+			D.DEPT_ADDR,
+			D.DEPT_PHONE
 		FROM
-		EMP E
+			EMP E
 		JOIN
-		DEPT D ON E.DEPT_NO = D.DEPT_NO
+			DEPT D ON E.DEPT_NO = D.DEPT_NO
 		WHERE
-		E.kakao_id =
-		#{kakaoId}
+			E.kakao_id = #{kakaoId}
 	</select>
 
-	<select id="loginCheck" parameterType="MemberVO"
-		resultType="loginVO">
+	<select id="loginCheck" parameterType="MemberVO" resultType="loginVO">
 		SELECT
-		E.*,
-		D.MANAGER_EMP_NO,
-		D.DEPT_NAME,
-		D.PARENT_DEPT_NO,
-		D.DEPT_ADDR,
-		D.DEPT_PHONE
+			E.*,
+			D.MANAGER_EMP_NO,
+			D.DEPT_NAME,
+			D.PARENT_DEPT_NO,
+			D.DEPT_ADDR,
+			D.DEPT_PHONE
 		FROM
-		EMP E
+			EMP E
 		JOIN
-		DEPT D ON E.DEPT_NO = D.DEPT_NO
+			DEPT D ON E.DEPT_NO = D.DEPT_NO
 		WHERE
-		E.EMP_NO = #{empNo}
-		AND E.EMP_PASS
-		= #{empPass}
+			E.EMP_NO = #{empNo}
+		AND 
+			E.EMP_PASS = #{empPass}
 	</select>
 
-	<select id="empNoCheck" parameterType="EmpVO"
-		resultType="EmpVO">
+	<select id="empNoCheck" parameterType="EmpVO" resultType="EmpVO">
 		SELECT *
 		FROM EMP
-		WHERE EMP_NO = #{empNo} AND EMP_NAME =	#{empName}
+		WHERE EMP_NO = #{empNo} AND EMP_NAME = #{empName}
 	</select>
 
-	<select id="KakaoMemberCheck" parameterType="String"
-		resultType="String">
+	<select id="KakaoMemberCheck" parameterType="String" resultType="String">
 		SELECT KAKAO_ID
 		FROM EMP
 		WHERE KAKAO_ID = #{kakaoId}
@@ -63,12 +58,21 @@
 	<insert id="insertMember" parameterType="MemberSaveVO">
 		UPDATE EMP
 		SET
-		KAKAO_ID = #{kakaoId, jdbcType=VARCHAR},
-		EMP_PASS = #{empPass},
-		EMP_EMAIL = #{empEmail}
-		WHERE EMP_NO =
-		#{empNo}
+			KAKAO_ID = #{kakaoId, jdbcType=VARCHAR},
+			EMP_PASS = #{empPass},
+			EMP_EMAIL = #{empEmail}
+		WHERE 
+			EMP_NO = #{empNo}
 	</insert>
+	
+	<update id="updateKakaoId" parameterType="MemberSaveVO">
+		UPDATE EMP
+		SET
+			KAKAO_ID = #{kakaoId}
+		WHERE 
+			EMP_NO = #{empNo}
+	</update>
+
 
 
 </mapper>

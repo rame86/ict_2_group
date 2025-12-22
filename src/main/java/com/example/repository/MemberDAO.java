@@ -15,4 +15,6 @@ public interface MemberDAO {
 	public Integer memberSave(MemberSaveVO vo);
 	
 	public LoginVO kakaoLoginInfo(String kakaId);
+	
+	public Integer updateKakaoId(MemberSaveVO vo);
 }
